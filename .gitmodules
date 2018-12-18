@@ -1,3 +1,6 @@
 [submodule "external/nanogui"]
 	path = external/nanogui
 	url = https://github.com/wjakob/nanogui.git
+[submodule "external/pugixml"]
+	path = external/pugixml
+	url = https://github.com/zeux/pugixml.git
