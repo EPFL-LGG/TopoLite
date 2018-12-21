@@ -51,7 +51,6 @@ using std::min;
 using std::max;
 using namespace nanogui;
 
-#include "../Common/PolyMesh/PolyMesh.h"
 class Viewer : public nanogui::Screen {
 
     public:
