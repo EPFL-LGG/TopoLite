@@ -1,0 +1,16 @@
+/usr/local/Cellar/cmake/3.12.3/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /Users/ziqwang/Documents/GitHub/TopoLockCreator2
+CMake Deprecation Warning at external/nanogui/ext/glfw/CMakeLists.txt:10 (cmake_policy):
+  The OLD behavior for policy CMP0042 will be removed from a future version
+  of CMake.
+
+  The cmake-policies(7) manual explains that the OLD behaviors of all
+  policies are deprecated and that a policy should be set to OLD only under
+  specific short-term circumstances.  Projects should be ported to the NEW
+  behavior and not rely on setting a policy to OLD.
+
+
+-- Using Cocoa for window creation
+-- NanoGUI: using libc++ and libc++abi.
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/ziqwang/Documents/GitHub/TopoLockCreator2/cmake-build-debug
