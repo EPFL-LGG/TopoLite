@@ -4,3 +4,6 @@
 [submodule "external/pugixml"]
 	path = external/pugixml
 	url = https://github.com/zeux/pugixml.git
+[submodule "external/OpenMesh"]
+	path = external/OpenMesh
+	url = https://github.com/KIKI007/OpenMesh.git
