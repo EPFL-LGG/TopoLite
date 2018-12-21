@@ -2,27 +2,80 @@
 // Created by ziqwang on 18.12.18.
 //
 
-#include "viewer.h"
-int main(int /* argc */, char ** /* argv */) {
-    try {
-        nanogui::init();
+#include <iostream>
+// -------------------- OpenMesh
+#include <OpenMesh/Core/IO/MeshIO.hh>
+#include <OpenMesh/Core/Mesh/PolyMesh_ArrayKernelT.hh>
+// ----------------------------------------------------------------------------
+typedef OpenMesh::PolyMesh_ArrayKernelT<>  MyMesh;
+// ----------------------------------------------------------------------------
+// Build a simple cube and write it to std::cout
+
+int main()
+{
+    MyMesh mesh;
+    // generate vertices
+    MyMesh::VertexHandle vhandle[8];
+    vhandle[0] = mesh.add_vertex(MyMesh::Point(-1, -1,  1));
+    vhandle[1] = mesh.add_vertex(MyMesh::Point( 1, -1,  1));
+    vhandle[2] = mesh.add_vertex(MyMesh::Point( 1,  1,  1));
+    vhandle[3] = mesh.add_vertex(MyMesh::Point(-1,  1,  1));
+    vhandle[4] = mesh.add_vertex(MyMesh::Point(-1, -1, -1));
+    vhandle[5] = mesh.add_vertex(MyMesh::Point( 1, -1, -1));
+    vhandle[6] = mesh.add_vertex(MyMesh::Point( 1,  1, -1));
+    vhandle[7] = mesh.add_vertex(MyMesh::Point(-1,  1, -1));
+    // generate (quadrilateral) faces
+    std::vector<MyMesh::VertexHandle>  face_vhandles;
+    face_vhandles.clear();
+    face_vhandles.push_back(vhandle[0]);
+    face_vhandles.push_back(vhandle[1]);
+    face_vhandles.push_back(vhandle[2]);
+    face_vhandles.push_back(vhandle[3]);
+    mesh.add_face(face_vhandles);
+
+    face_vhandles.clear();
+    face_vhandles.push_back(vhandle[7]);
+    face_vhandles.push_back(vhandle[6]);
+    face_vhandles.push_back(vhandle[5]);
+    face_vhandles.push_back(vhandle[4]);
+    mesh.add_face(face_vhandles);
+    face_vhandles.clear();
+    face_vhandles.push_back(vhandle[1]);
+    face_vhandles.push_back(vhandle[0]);
+    face_vhandles.push_back(vhandle[4]);
+    face_vhandles.push_back(vhandle[5]);
+    mesh.add_face(face_vhandles);
+    face_vhandles.clear();
+    face_vhandles.push_back(vhandle[2]);
+    face_vhandles.push_back(vhandle[1]);
+    face_vhandles.push_back(vhandle[5]);
+    face_vhandles.push_back(vhandle[6]);
+    mesh.add_face(face_vhandles);
+    face_vhandles.clear();
+    face_vhandles.push_back(vhandle[3]);
+    face_vhandles.push_back(vhandle[2]);
+    face_vhandles.push_back(vhandle[6]);
+    face_vhandles.push_back(vhandle[7]);
+    mesh.add_face(face_vhandles);
+    face_vhandles.clear();
+    face_vhandles.push_back(vhandle[0]);
+    face_vhandles.push_back(vhandle[3]);
+    face_vhandles.push_back(vhandle[7]);
+    face_vhandles.push_back(vhandle[4]);
+    mesh.add_face(face_vhandles);
+    // write mesh to output.obj
+    try
+    {
+        if ( !OpenMesh::IO::write_mesh(mesh, "output.off") )
         {
-            nanogui::ref<Viewer> app = new Viewer();
-            app->drawAll();
-            app->setVisible(true);
-            nanogui::mainloop();
+            std::cerr << "Cannot write mesh to file 'output.off'" << std::endl;
+            return 1;
         }
-
-        nanogui::shutdown();
-    } catch (const std::runtime_error &e) {
-        std::string error_msg = std::string("Caught a fatal error: ") + std::string(e.what());
-#if defined(_WIN32)
-        MessageBoxA(nullptr, error_msg.c_str(), NULL, MB_ICONERROR | MB_OK);
-#else
-        std::cerr << error_msg << std::endl;
-#endif
-        return -1;
     }
-
+    catch( std::exception& x )
+    {
+        std::cerr << x.what() << std::endl;
+        return 1;
+    }
     return 0;
 }

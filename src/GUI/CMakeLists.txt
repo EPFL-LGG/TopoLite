@@ -7,3 +7,4 @@ add_executable(gui viewer.cpp main.cpp ${COMMON_SRC})
 
 #Add NanoGui
 target_link_libraries(gui nanogui ${NANOGUI_EXTRA_LIBS})
+target_link_libraries(gui ${OPENMESH_LIBRARIES})
