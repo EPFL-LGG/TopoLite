@@ -7,6 +7,6 @@ var searchData=
   ['point_5fplane_5funkwonn',['POINT_PLANE_UNKWONN',['../_help_struct_8h.html#aa65477513740cb00e4d6ef16e6fc7ba3',1,'HelpStruct.h']]],
   ['pointplanedistance',['PointPlaneDistance',['../struct_plane.html#a94995b9d7b4df1e951c3567b1d4fed6d',1,'Plane']]],
   ['pointplaneintersect',['PointPlaneIntersect',['../struct_plane.html#a368979d66fdd42af5ca2ee3a90bb4145',1,'Plane']]],
-  ['polymesh',['PolyMesh',['../class_poly_mesh.html',1,'']]],
+  ['polymesh',['Mesh',['../class_poly_mesh.html',1,'']]],
   ['pos',['pos',['../struct_point.html#a9857e8ee98ec1b0a320d9d2bcaab6bd4',1,'Point']]]
 ];

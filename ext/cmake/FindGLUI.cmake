@@ -1,0 +1,6 @@
+# Find the GLUI library
+set(GLUI_LIBRARY ${CMAKE_CURRENT_SOURCE_DIR}/GLU/libglui.a)
+set(GLUI_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/GLU)
+# Assembly the REQUIRED and QUIET arguments, and set GLUI_FOUND if found.
+include (FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS (GLUI DEFAULT_MSG GLUI_LIBRARY)
