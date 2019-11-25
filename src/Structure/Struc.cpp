@@ -485,7 +485,7 @@ void Struc::ComputePartFaceContactsBruteForce()
                     vector<Vector3f> neiborFace2D = neiborFace->ProjectPolygonTo2D(projMat);
 
                     vector<Vector3f> overlapPolyPts;
-                    ConvexPolygonIntersec(currFace2D, neiborFace2D, overlapPolyPts);
+                    ComputePolygonsIntersection(currFace2D, neiborFace2D, overlapPolyPts);
                     if( overlapPolyPts.size() == 0 ) continue;
 
                     vector<Vector3f> contactPoly;
@@ -559,7 +559,7 @@ void Struc::ComputePartFaceContacts()
 			vector<Vector3f> neiborFace2D = neiborFace->ProjectPolygonTo2D(projMat);
 
 			vector<Vector3f> overlapPolyPts;
-			ConvexPolygonIntersec(currFace2D, neiborFace2D, overlapPolyPts);
+            ComputePolygonsIntersection(currFace2D, neiborFace2D, overlapPolyPts);
 			if( overlapPolyPts.size() == 0 ) continue;
 
 			vector<Vector3f> contactPoly;
@@ -776,13 +776,13 @@ void Struc::WritePartGraph(char *folderPath)
 
 //
 
-void Struc::ConvexPolygonIntersec(
+void Struc::ComputePolygonsIntersection(
         const vector<Vector3f> &polyA,
         const vector<Vector3f> &polyB,
-        vector<Vector3f> &polyInt)
+        vector<Vector3f> &polyIntsec)
 {
 
-    polyInt.clear();
+    polyIntsec.clear();
 
     _Polygon PA; PA.SetVertices(polyA);
     _Polygon PB; PB.SetVertices(polyB);
@@ -819,7 +819,7 @@ void Struc::ConvexPolygonIntersec(
         float x = pt.X / Scale;
         float y = pt.Y / Scale;
         Vector3f pos = x_axis * x + y_axis * y + origin;
-        polyInt.push_back(pos);
+        polyIntsec.push_back(pos);
     }
 
     vector<Vector3f> polySimplest;
@@ -829,12 +829,12 @@ void Struc::ConvexPolygonIntersec(
     {
         doAgain = false;
         polySimplest.clear();
-        int N = polyInt.size();
-        for(int id = 0; id < polyInt.size(); id++)
+        int N = polyIntsec.size();
+        for(int id = 0; id < polyIntsec.size(); id++)
         {
-            Vector3f ppt = polyInt[(id - 1 + N) % N];
-            Vector3f pt =  polyInt[id];
-            Vector3f npt = polyInt[(id + 1) % N];
+            Vector3f ppt = polyIntsec[(id - 1 + N) % N];
+            Vector3f pt =  polyIntsec[id];
+            Vector3f npt = polyIntsec[(id + 1) % N];
             Vector3f tA = ppt - pt;
             Vector3f tB = npt - pt;
             if(len(tA) < big_zero_eps || len(tB) < big_zero_eps) {
@@ -846,7 +846,7 @@ void Struc::ConvexPolygonIntersec(
             }
             polySimplest.push_back(pt);
         }
-        polyInt = polySimplest;
+        polyIntsec = polySimplest;
     }
     return;
 }

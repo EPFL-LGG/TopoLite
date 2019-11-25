@@ -148,16 +148,13 @@ public:
 
 private:
 
-    void ConvexPolygonIntersec( const vector<Vector3f> &polyA,
-                                const vector<Vector3f> &polyB,
-                                vector<Vector3f> &polyIntsec);
+    void ComputePolygonsIntersection(   const vector<Vector3f> &polyA,
+                                        const vector<Vector3f> &polyB,
+                                        vector<Vector3f> &polyInt);
 
-    void ProjectPolygonTo3D(    const vector<Vector3f> &poly,
-                                double projMat[],
-                                vector<Vector3f> &poly3D);
-
-
-
+    void ProjectPolygonTo3D(            const vector<Vector3f> &poly,
+                                        double projMat[],
+                                        vector<Vector3f> &poly3D);
 };
 
 #endif
