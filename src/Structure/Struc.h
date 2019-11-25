@@ -23,12 +23,6 @@
 
 using namespace std;
 
-
-class _Polygon;
-class Part;
-class BodyMobili;
-class PartGroup;
-
 struct PartMove 
 {
 	int partID;

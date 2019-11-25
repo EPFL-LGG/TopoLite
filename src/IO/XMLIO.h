@@ -52,17 +52,18 @@ public:
     XMLIO(shared_ptr<gluiVarList> var): TopoObject(var){}
 
 public:
+
+    bool XMLWriter(string xmlFileName);
     void XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path);
     void XMLWriter_GUISettings(pugi::xml_node &xml_root);
     void XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &xmlFileName_path);
     void XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path);
     void XMLWriter_Animation(string data_folder);
-    bool SaveXMLFile(string xmlFileName);
 
+    bool XMLReader(string xmlFileName);
     void XMLReader_GUISettings(pugi::xml_node &xml_root);
     void XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_path);
-    bool readXMLFile(string xmlFileName);
-    void updateBoundaryPart(pugi::xml_node &xml_root);
+    void XMLReader_Boundary(pugi::xml_node &xml_root);
 };
 
 class MitsubaWriter : public TopoObject

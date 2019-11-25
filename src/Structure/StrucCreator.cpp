@@ -36,7 +36,7 @@ extern vector<int> pickPartIDs;
 //                                   Initialization
 //**************************************************************************************//
 
-StrucCreator::StrucCreator()
+StrucCreator::StrucCreator(shared_ptr<gluiVarList> var): TopoObject(var)
 {
 	refModel = nullptr;
 
@@ -54,7 +54,7 @@ void StrucCreator::ClearStruc()
 	refModel.reset();
 }
 
-StrucCreator::StrucCreator(const StrucCreator &_myStruc)
+StrucCreator::StrucCreator(const StrucCreator &_myStruc) : TopoObject(_myStruc)
 {
     ClearStruc();
 
@@ -70,7 +70,7 @@ StrucCreator::StrucCreator(const StrucCreator &_myStruc)
             if(_myStruc.myStruc->partList[id]->cross.lock())
             {
                 part->cross = refModel->crossMesh->crossList[_myStruc.myStruc->partList[id]->cross.lock()->crossID];
-                part->partGeom->UpdateCross(part->cross.lock());
+                part->partGeom->ParseCrossData(part->cross.lock());
             }
         }
         UpdateStructureGeometry(false);
@@ -98,12 +98,12 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 								  bool previewMode)
 {
 
-	float tiltAngle = varList.get<float>("tiltAngle");
-	float patternID = varList.get<int>("patternID");
-	float patternRadius = varList.get<int>("patternRadius");
-	float cutUpper = varList.get<float>("cutUpper");
-	float cutLower = varList.get<float>("cutLower");
-    bool lockAngle = varList.get<bool>("lockTiltAngle");
+	float tiltAngle = getVarList()->get<float>("tiltAngle");
+	float patternID = getVarList()->get<int>("patternID");
+	float patternRadius = getVarList()->get<int>("patternRadius");
+	float cutUpper = getVarList()->get<float>("cutUpper");
+	float cutLower = getVarList()->get<float>("cutLower");
+    bool lockAngle = getVarList()->get<bool>("lockTiltAngle");
 
 	tbb::tick_count sta = tbb::tick_count::now();
 	if (refModel == nullptr) return 0;
@@ -128,7 +128,7 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 	for (int i = 0; i < crossMesh->crossList.size(); i++)
 	{
 		pCross cross = crossMesh->crossList[i];
-		pPart part = make_shared<Part>(cross);
+		pPart part = make_shared<Part>(cross, getVarList());
 		part->partID = myStruc->partList.size();
 		if (part->CheckLegalGeometry())
 		{
@@ -172,7 +172,7 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 //			}
 //		}
 
-    if(!previewMode && varList.get<bool>("penetration_check")){
+    if(!previewMode && getVarList()->get<bool>("penetration_check")){
         if(ComputePartPenetration()){
             myStruc.reset();
             return 0;
@@ -195,8 +195,8 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 
 int StrucCreator::UpdateStructureGeometry(bool previewMode)
 {
-	float cutUpper = varList.get<float>("cutUpper");
-	float cutLower = varList.get<float>("cutLower");
+	float cutUpper = getVarList()->get<float>("cutUpper");
+	float cutLower = getVarList()->get<float>("cutLower");
 
 	////////////////////////////////////////////////////////////////
 	// 2. Construct a part (i.e., convex polyhedron) from each 3D polygon
@@ -209,7 +209,7 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 	for (int i = 0; i < crossMesh->crossList.size(); i++)
 	{
 		pCross cross = crossMesh->crossList[i];
-		pPart part = make_shared<Part>(cross);
+		pPart part = make_shared<Part>(cross, getVarList());
 		part->partID = myStruc->partList.size();
 
 		if (part->CheckLegalGeometry(true))
@@ -293,7 +293,6 @@ void StrucCreator::BuildPartsGraph()
 	{
 		pPart part = myStruc->partList[i];
         if(part == nullptr) continue;
-		part->currNeighbors = part->initNeighbors;
 	}
 }
 
@@ -310,8 +309,8 @@ void StrucCreator::ComputePartContacts()
     myStruc->contactList.clear();
     myStruc->innerContactList.clear();
 
-    if(varList.get<bool>("faceface_contact")) ComputePartFaceContacts();
-    if(varList.get<bool>("edgeedge_contact")) ComputePartEdgeContacts();
+    if(getVarList()->get<bool>("faceface_contact")) ComputePartFaceContacts();
+    if(getVarList()->get<bool>("edgeedge_contact")) ComputePartEdgeContacts();
 }
 
 

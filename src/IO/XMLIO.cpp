@@ -7,6 +7,63 @@
 #include <boost/algorithm/string.hpp>
 
 
+//**************************************************************************************//
+//                                  XML Writer
+//**************************************************************************************//
+
+bool XMLIO::XMLWriter(string xmlFileName)
+{
+    if(xmlFileName == "") return false;
+    boost::filesystem::path xmlFileName_path(xmlFileName);
+    if(xmlFileName_path.filename() == "") xmlFileName_path.append("/untitle.xml");
+    if(xmlFileName_path.extension() == "") xmlFileName_path.append(".xml");
+
+    std::cout << xmlFileName_path.string() << std::endl;
+    bool is_success = boost::filesystem::exists(xmlFileName_path.parent_path());
+
+    if(is_success)
+    {
+        string file_name = xmlFileName_path.filename().stem().string();
+        string data_path = xmlFileName_path.parent_path().string();
+        data_path += "/" + file_name + "_data";
+        std::cout << data_path << std::endl;
+
+        if(!boost::filesystem::exists(data_path))
+        {
+            boost::filesystem::create_directories(data_path);
+        }
+        else {
+            if(boost::filesystem::exists(data_path + "/mitsuba.xml"))
+            {
+                string mistuba_file = data_path + "/mitsuba.xml";
+                xml_mitsuba_old.load_file(mistuba_file.c_str());
+                mitsuba_sensor =  xml_mitsuba_old.child("scene").child("sensor");
+            }
+            boost::filesystem::remove_all(data_path);
+            boost::filesystem::create_directory(data_path);
+        }
+
+        pugi::xml_node documents_node = xmldoc.child("Documents");
+        if(!documents_node) documents_node = xmldoc.append_child("Documents");
+        xml_general = documents_node;
+
+        XMLWriter_GUISettings(documents_node);
+        XMLWriter_PartGeoData(documents_node, xmlFileName_path);
+        if(getVarList()->get<bool>("output_mitsuba"))
+            XMLWriter_Mitsuba(documents_node, xmlFileName_path);
+        XMLWriter_Output(documents_node, xmlFileName_path);
+        XMLWriter_Animation(data_path);
+        string xml_file_path = xmlFileName_path.string();
+        xmldoc.save_file(xml_file_path.c_str());
+    }
+    else
+    {
+        std::cout << "Output Failed" << std::endl;
+        return false;
+    }
+    return true;
+}
+
 void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
 {
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
@@ -186,10 +243,11 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
             myStrucCreator->refModel->referenceSurface->WriteOBJModel(surface_path.c_str());
 
             shared_ptr<CrossMesh> crossMesh = myStrucCreator->refModel->crossMesh;
-            if(crossMesh && getVarList()->get<bool>("output_mitsuba")){
+            if(crossMesh && getVarList()->get<bool>("output_mitsuba"))
+            {
                 string surface_wire_path = data_path + "/" + file_name + "_CrossMeshWire.obj";
                 shared_ptr<Cross> cross;
-                shared_ptr<Part> part = make_shared<Part>(cross);
+                shared_ptr<Part> part = make_shared<Part>(cross, getVarList());
                 shared_ptr<PolyMesh> polyMesh = make_shared<PolyMesh>();
                 for(int id = 0; id < crossMesh->crossList.size(); id++){
                     shared_ptr<_Polygon> poly = make_shared<_Polygon>(*((_Polygon *)crossMesh->crossList[id].get()));
@@ -376,60 +434,66 @@ void XMLIO::XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::p
     }
 }
 
-bool XMLIO::SaveXMLFile(string xmlFileName)
+
+//**************************************************************************************//
+//                                  XML Reader
+//**************************************************************************************//
+
+bool XMLIO::XMLReader(string xmlFileName)
 {
-    if(xmlFileName == "") return false;
-    boost::filesystem::path xmlFileName_path(xmlFileName);
-    if(xmlFileName_path.filename() == "") xmlFileName_path.append("/untitle.xml");
-    if(xmlFileName_path.extension() == "") xmlFileName_path.append(".xml");
 
-    std::cout << xmlFileName_path.string() << std::endl;
-    bool is_success = boost::filesystem::exists(xmlFileName_path.parent_path());
+    //load xmlfile
+    xmldoc.load_file(xmlFileName.c_str());
+    pugi::xml_node xml_root = xmldoc.child("Documents");
 
-    if(is_success)
+    if (xml_root)
     {
-        string file_name = xmlFileName_path.filename().stem().string();
-        string data_path = xmlFileName_path.parent_path().string();
-        data_path += "/" + file_name + "_data";
-        std::cout << data_path << std::endl;
+        //1) read all gui settings
+        XMLReader_GUISettings(xml_root);
 
-        if(!boost::filesystem::exists(data_path))
+
+        //2) construct the cross mesh
+        boost::filesystem::path xmlPathBoost(xmlFileName);
+        getVarList()->filename = xmlPathBoost.stem().string();
+        string geomDataFolder = boost::filesystem::path(xmlFileName).parent_path().string();
+
+        if (getVarList()->get<bool>("texturedModel") == false)
         {
-            boost::filesystem::create_directories(data_path);
-        }
-        else {
-            if(boost::filesystem::exists(data_path + "/mitsuba.xml"))
+            //2.1) if the model does not have texture
+            pugi::xml_node crossMeshNode = xml_root.child("Output").child("CrossMesh");
+            if (crossMeshNode)
             {
-                string mistuba_file = data_path + "/mitsuba.xml";
-                xml_mitsuba_old.load_file(mistuba_file.c_str());
-                mitsuba_sensor =  xml_mitsuba_old.child("scene").child("sensor");
+                string path = geomDataFolder + "/" + crossMeshNode.attribute("path").as_string();
+                std::cout << "Read File...\t:" << path << std::endl;
+                if (!myStrucCreator->LoadSurface(path.c_str())) return false;
+                myStrucCreator->CreateStructure(true, false, interactMatrix, true);
             }
-            boost::filesystem::remove_all(data_path);
-            boost::filesystem::create_directory(data_path);
+        }
+        else
+        {
+
+            //2.2) if the model has texture
+            pugi::xml_node surfaceMesh = xml_root.child("Output").child("Structure");
+            if (surfaceMesh)
+            {
+                string path = geomDataFolder + "/" + surfaceMesh.attribute("path").as_string();
+                std::cout << "Read File...\t:" << path << std::endl;
+                if (!myStrucCreator->LoadSurface(path.c_str())) return false;
+                myStrucCreator->CreateStructure(true, true, interactMatrix, true);
+            }
         }
 
-        pugi::xml_node documents_node = xmldoc.child("Documents");
-        if(!documents_node) documents_node = xmldoc.append_child("Documents");
-        xml_general = documents_node;
+        //3) update each cross
+        if (myStrucCreator->myStruc != nullptr) {
+            if (xml_root) {
+                XMLReader_PartGeoData(xml_root, geomDataFolder);
+                XMLReader_Boundary(xml_root);
+            }
+        }
+    }
 
-        XMLWriter_GUISettings(documents_node);
-        XMLWriter_PartGeoData(documents_node, xmlFileName_path);
-        if(getVarList()->get<bool>("output_mitsuba"))
-            XMLWriter_Mitsuba(documents_node, xmlFileName_path);
-        XMLWriter_Output(documents_node, xmlFileName_path);
-        XMLWriter_Animation(data_path);
-        string xml_file_path = xmlFileName_path.string();
-        xmldoc.save_file(xml_file_path.c_str());
-    }
-    else
-    {
-        std::cout << "Output Failed" << std::endl;
-        return false;
-    }
     return true;
 }
-
-
 
 void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
 {
@@ -636,13 +700,6 @@ void XMLIO::XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_
 
                             if(angle_node) cross->oriPoints[oriPtID]->rotation_angle = angle_node.attribute("Radian").as_double();
                             oript->normal = cross->RotateNormal(oript->rotation_base, oript->rotation_axis, oript->rotation_angle);
-//                            std::cout << oript->normal << std::endl;
-//                            pugi::xml_node normal_node = ori_node.child("Normal");
-//                            string normal_str = normal_node.attribute("XYZ").as_string();
-//                            sscanf(normal_str.c_str(), "(%f, %f, %f)", &cross->oriPoints[oriPtID]->normal[0],
-//                                    &cross->oriPoints[oriPtID]->normal[1],
-//                                    &cross->oriPoints[oriPtID]->normal[2]);
-//                            std::cout << cross->oriPoints[oriPtID]->normal << std::endl;
                         }
                     }
 
@@ -650,144 +707,55 @@ void XMLIO::XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_
                 }
             }
         }
-
-//        //MergePartGroup
-//        if(myStrucCreator->myStruc)
-//        {
-//            myStrucCreator->myStruc->mergePartGroups.clear();
-//            pugi::xml_node MPGdata_node = partGeo_node.child("MergePartGroup");
-//            if(MPGdata_node)
-//            {
-//                string MPGData_path = MPGdata_node.attribute("path").as_string();
-//                MPGData_path = xmlFileName_path + "/" + MPGData_path;
-//                pugi::xml_document MPGDoc;
-//                MPGDoc.load_file(MPGData_path.c_str());
-//                MPGdata_node = MPGDoc.child("Documents").child("MergePartGroup");
-//
-//                vector<vector<int>> GroupPartIDs;
-//                for(pugi::xml_node group_node : MPGdata_node.children())
-//                {
-//                    //read GroupID
-//                    int groupID = group_node.attribute("id").as_int();
-//
-//                    //read GroupParts
-//                    string str_partIDs = group_node.text().as_string();
-//                    vector<string> split_strs;
-//                    vector<int>partIDs;
-//                    split(split_strs, str_partIDs, boost::is_any_of(","));
-//                    for(string split_str : split_strs)
-//                    {
-//                        int PartID = std::stoi(split_str, nullptr, 10);
-//                        partIDs.push_back(PartID);
-//                    }
-//                    GroupPartIDs.push_back(partIDs);
-//
-//                    //read type, only add type = "Multiple" into struc
-//                    pugi::xml_attribute type_attrib = group_node.attribute("type");
-//                    if(type_attrib != NULL)
-//                    {
-//                        string str_type = type_attrib.as_string();
-//                        if(str_type[0] == 'M') myStrucCreator->myStruc->mergePartGroups.push_back(partIDs);
-//                    }
-//                }
-//
-//                /*
-//                 * 2. Add all key part into struc
-//                 */
-//                pugi::xml_node node_Disassembly = MPGDoc.child("Documents").child("Disassembly");
-//                if(node_Disassembly)
-//                {
-//                    for(pugi::xml_node group_node : node_Disassembly.children())
-//                    {
-//                        string type_str = group_node.attribute("type").as_string();
-//                        if(type_str[0] == 'k')
-//                        {
-//                            int groupID = group_node.attribute("id").as_int();
-//                            for(int partID : GroupPartIDs[groupID])
-//                            {
-//                                myStrucCreator->myStruc->keyPartsID.push_back(partID);
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                std::cout << "keyPartsID:\t [";
-//                for(int partID : myStrucCreator->myStruc->keyPartsID)
-//                    std::cout << partID << " ";
-//                std::cout << "]" << std::endl;
-//            }
-//        }
     }
 }
 
-bool XMLIO::readXMLFile(string xmlFileName) {
-    xmldoc.load_file(xmlFileName.c_str());
-    pugi::xml_node xml_root = xmldoc.child("Documents");
-    if (xml_root) {
-        XMLReader_GUISettings(xml_root);
-        boost::filesystem::path boostpath(xmlFileName);
-        getVarList()->filename = boostpath.stem().string();
-        string xmlfile_path = boost::filesystem::path(xmlFileName).parent_path().string();
-
-        if (getVarList()->get<bool>("texturedModel") == false) {
-            pugi::xml_node crossMesh = xml_root.child("Output").child("CrossMesh");
-            if (crossMesh) {
-                string path = xmlfile_path + "/" + crossMesh.attribute("path").as_string();
-                std::cout << "Read File...\t:" << path << std::endl;
-                if (!myStrucCreator->LoadSurface(path.c_str()))
-                    return false;
-                myStrucCreator->CreateStructure(true, false, interactMatrix, true);
-            }
-        } else {
-            pugi::xml_node surfaceMesh = xml_root.child("Output").child("Structure");
-            if (surfaceMesh) {
-                string path = xmlfile_path + "/" + surfaceMesh.attribute("path").as_string();
-                std::cout << "Read File...\t:" << path << std::endl;
-                if (!myStrucCreator->LoadSurface(path.c_str()))
-                    return false;
-                myStrucCreator->CreateStructure(true, true, interactMatrix, true);
-            }
-        }
-
-        if (myStrucCreator->myStruc != nullptr) {
-            if (xml_root) {
-                XMLReader_PartGeoData(xml_root, xmlfile_path);
-                updateBoundaryPart(xml_root);
-            }
-        }
-    }
-
-    return true;
-}
-
-void XMLIO::updateBoundaryPart(pugi::xml_node &xml_root)
+void XMLIO::XMLReader_Boundary(pugi::xml_node &xml_root)
 {
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
-    //guisettings
+
     {
         pugi::xml_node node_boundary = node_guisettings.child("Boundary_PartIDs");
         if(node_boundary && myStrucCreator && myStrucCreator->myStruc)
         {
-            for(pPart part : myStrucCreator->myStruc->partList){
+
+            //1) clear all boundary maker
+            for(pPart part : myStrucCreator->myStruc->partList)
+            {
                 if(part) part->atBoundary = false;
             }
+
+            //2) read the boundary part
             pugi::xml_text text_boundary = node_boundary.text();
             vector<string> str_partIDs;
             string text_str = text_boundary.get();
             boost::split(str_partIDs, text_str, boost::is_any_of(","));
-            for(int id = 0; id < str_partIDs.size(); id++){
+
+            //3) assign boundary marker
+            for(int id = 0; id < str_partIDs.size(); id++)
+            {
                 if(str_partIDs[id] == "") continue;
                 int partID = std::atoi(str_partIDs[id].c_str());
                 if(partID < 0 || partID >= myStrucCreator->myStruc->partList.size())
+                {
                     continue;
-                else{
+                }
+                else
+                {
                     pPart part = myStrucCreator->myStruc->partList[partID];
                     if(part) part->atBoundary = true;
                 }
             }
+
         }
     }
 }
+
+
+
+//**************************************************************************************//
+//                                  Mitsuba Writer
+//**************************************************************************************//
 
 
 void MitsubaWriter::scene_settings(pugi::xml_node &xml_root) {

@@ -21,7 +21,7 @@
 #include "Utility/vec.h"
 #include "Utility/Controls.h"
 #include "Utility/HelpStruct.h"
-
+#include "Utility/TopoObject.h"
 using namespace std;
 
 class CrossMeshCreator;
@@ -29,7 +29,7 @@ class Struc;
 typedef shared_ptr<CrossMeshCreator> pModel;
 typedef shared_ptr<Struc> pStruc;
 
-class StrucCreator
+class StrucCreator : public TopoObject
 {
 
 public:
@@ -44,7 +44,7 @@ public:
 
 public:
 
-    StrucCreator();
+    StrucCreator(shared_ptr<gluiVarList> var);
     ~StrucCreator();
 	StrucCreator(const StrucCreator &_myStruc);
 	void ClearStruc();

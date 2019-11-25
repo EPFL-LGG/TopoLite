@@ -644,8 +644,8 @@ void Struc::ComputePartContactArea()
         {
             int ID_A = curr_contact->partIDA;
             int ID_B = curr_contact->partIDB;
-            partList[ID_A] -> contactIDs.push_back(i);
-            partList[ID_B] -> contactIDs.push_back(i);
+//            partList[ID_A] -> contactIDs.push_back(i);
+//            partList[ID_B] -> contactIDs.push_back(i);
             _Polygon poly; poly.SetVertices(curr_contact->contactPoly);
             double area = poly.ComputeArea();
             curr_contact->area = area;
@@ -800,50 +800,6 @@ void Struc::ComputePartCutHeight(vector<Vector2f> &heights)
 	}
 	return;
 }
-
-//**************************************************************************************//
-//                                    Part Graph
-//**************************************************************************************//
-
-void Struc::ResetPartsGraph()
-{
-	for (int i = 0; i < partList.size(); i++)
-	{
-		pPart part = partList[i];
-		part->currNeighbors = part->initNeighbors;
-	}
-}
-
-void Struc::UpdatePartsGraph()
-{
-	ResetPartsGraph();
-	for (int i = 0; i < partList.size(); i++)
-	{
-		pPart part = partList[i];
-		// Remove edge between the part and its neighbors
-		if (part->isRemove == true)
-		{
-			vector<wpPart> currNeighbors = part->currNeighbors;
-			for (int j = 0; j < currNeighbors.size(); j++)
-			{
-				pPart neibor = currNeighbors[j].lock();
-				if (neibor == NULL)
-					continue;
-				int index = neibor->GetNeighborIndex(part);
-				if (index != NONE_PART)
-				{
-					neibor->currNeighbors[index] = pPart();
-				}
-			}
-		}
-	}
-}
-
-//**************************************************************************************//
-//                                Disassemble Structure
-//**************************************************************************************//
-
-
 
 //**************************************************************************************//
 //                                   Save OBJ Models

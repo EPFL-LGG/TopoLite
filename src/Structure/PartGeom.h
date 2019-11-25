@@ -18,19 +18,21 @@
 #include <Eigen/Dense>
 
 #include "Mesh/Cross.h"
+#include "Mesh/Polygon.h"
+#include "Mesh/PolyMesh.h"
+
 #include "Utility/vec.h"
 #include "Utility/HelpStruct.h"
 #include "Utility/ConvexHull2D.h"
-#include "Mesh/Polygon.h"
+#include "Utility/TopoObject.h"
 
 using namespace std;
-struct OrientPoint;
-class PolyMesh;
 using pHypPlane = shared_ptr<HypPlane>;
-typedef shared_ptr<HypEdge> pHypEdge;
-typedef shared_ptr<HypVertex> pHypVertex;
-typedef shared_ptr<PolyMesh> pPolyMesh;
-class PartGeom 
+using pHypEdge =  shared_ptr<HypEdge> ;
+using pHypVertex =  shared_ptr<HypVertex> ;
+using pPolyMesh =  shared_ptr<PolyMesh> ;
+
+class PartGeom : public TopoObject
 {
 public:
 	//in
@@ -45,55 +47,26 @@ public:
 	vector<shared_ptr<_Polygon>> faceList;        // Constructed face
 public:
 
-	PartGeom(shared_ptr<Cross> _cross);
+	PartGeom(shared_ptr<Cross> _cross, shared_ptr<gluiVarList> var);
 	PartGeom(const PartGeom &_geom);
 	~PartGeom();
 
 	void Clear();
-	void UpdateCross(shared_ptr<Cross> _cross);
+	void ParseCrossData(shared_ptr<Cross> _cross);
 
-	// Compute Part Geometry
-	void ComputePartGeometry(Vector2f cutPlaneHeight, pPolyMesh &polyMesh);
-	bool ValidateTiltNormal();
-	bool IsFiniteIntersection();
-	Vector3f GetPseudoOrigin();
-	void ComputePartGeometry_Matrix();
-	bool IsLegalGeometry();
-
-	// Compute Faces and Edges
-	void ComputeFaces(Vector2f cutPlaneHeight);
-	void ComputeEdges(vector<pHypPlane> &_planeList);
-	void PlanePlaneIntersect(pHypPlane faceA, pHypPlane faceB, pHypEdge &out);
-	bool EdgeHitFace(Vector3f edgePt, Vector3f edgeDir, pHypPlane plane, Vector3f &hitPt);
-	void Triangles2PolyMesh(vector<Vector3f> &ver, vector<Vector3i> &tri, pPolyMesh &polyMesh);
-
-	// Compute Vertices
-	void ComputeVertices(vector<pHypPlane> &_faceList, vector<pHypEdge> &_edgeList);
-	bool IsPointInList(Vector3f tagtPoint, vector<pHypVertex> &_verList);
-
-	// Validate Vertices
-	void ValidateVertices(vector<Vector3f> &pointList);
-	bool IsValidVertex(Vector3f point);
-
-    vector<Vector3f> verDiffs;
-
-#if USE_OPENGL_DRAW
 public:
 
-	// Draw Base Polygon
-	void DrawInnerPolygon();
-	void DrawOriPoints();
-	void DrawVerDiffs();
+	// Validate Part Geometry
+	bool ValidateTiltNormal();
+	bool IsLegalGeometry();
 
-
-	// Draw Part Construction
-	void DrawFaces();
-	void DrawFace(pHypPlane plane);
-	void DrawEdges();
-	void DrawEdge(pHypEdge edge, float length);
-	void DrawVertices();
-	void DrawVertex(pHypVertex vertex);
-#endif
+	// Compute Part Geometry
+    void ComputePartGeometry(Vector2f cutPlaneHeight, pPolyMesh &polyMesh);
+    void ComputeValidVertices(vector<Vector3f> &pointList);
+    void ComputeVertices();
+    void ComputeFaces(Vector2f cutPlaneHeight);
+	void Convert2PolyMesh(vector<Vector3f> &ver, vector<Vector3i> &tri, pPolyMesh &polyMesh);
+	bool IsValidVertex(Vector3f point);
 };
 
 #endif
