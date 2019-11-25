@@ -17,7 +17,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         gluiVarOrganizer varOrganizer;
         //para basic
         {
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Basic");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Basic");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node_guisettings);
         }
 
@@ -25,7 +25,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node_shapeop = node_guisettings.child("ShapeOp_Settings");
             if(!node_shapeop) node_shapeop = node_guisettings.append_child("ShapeOp_Settings");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_ShapeOp");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_ShapeOp");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node_shapeop);
         }
 
@@ -33,7 +33,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node_mitsuba = node_guisettings.child("Para_Mitsuba");
             if(!node_mitsuba) node_mitsuba = node_guisettings.append_child("Para_Mitsuba");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Mitsuba");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Mitsuba");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node_mitsuba);
         }
 
@@ -42,7 +42,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node_contactgraph = node_guisettings.child("Para_ContactGraph");
             if(!node_contactgraph ) node_contactgraph  = node_guisettings.append_child("Para_ContactGraph");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_ContactGraph");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_ContactGraph");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node_contactgraph);
         }
 
@@ -50,7 +50,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_CrossMesh");
             if(!node ) node  = node_guisettings.append_child("Para_CrossMesh");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_CrossMesh");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_CrossMesh");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node);
         }
 
@@ -58,7 +58,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(!node ) node  = node_guisettings.append_child("Para_Opt");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Opt");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Opt");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node);
         }
 
@@ -66,7 +66,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Assembly");
             if(!node ) node  = node_guisettings.append_child("Para_Assembly");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Assembly");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Assembly");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node);
         }
 
@@ -74,7 +74,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Support");
             if(!node ) node  = node_guisettings.append_child("Para_Support");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Support");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Support");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node);
         }
 
@@ -82,7 +82,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(!node ) node  = node_guisettings.append_child("Para_Opt");
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Opt");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Opt");
             for(shared_ptr<gluiVar> var: series) varOrganizer.write(var.get(), node);
         }
 
@@ -180,13 +180,13 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
         string data_path = xmlFileName_path.parent_path().string();
         data_path += "/" + file_name + "_data";
         //Surface
-        if(myStrucCreator->refModel && myStrucCreator->refModel->polyMesh)
+        if(myStrucCreator->refModel && myStrucCreator->refModel->referenceSurface)
         {
             string surface_path = data_path + "/" + file_name + "_Surface.obj";
-            myStrucCreator->refModel->polyMesh->WriteOBJModel(surface_path.c_str());
+            myStrucCreator->refModel->referenceSurface->WriteOBJModel(surface_path.c_str());
 
             shared_ptr<CrossMesh> crossMesh = myStrucCreator->refModel->crossMesh;
-            if(crossMesh && varList.get<bool>("output_mitsuba")){
+            if(crossMesh && getVarList()->get<bool>("output_mitsuba")){
                 string surface_wire_path = data_path + "/" + file_name + "_CrossMeshWire.obj";
                 shared_ptr<Cross> cross;
                 shared_ptr<Part> part = make_shared<Part>(cross);
@@ -197,7 +197,7 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
                 }
                 polyMesh->UpdateVertices();
                 part->polyMesh = polyMesh;
-                polyMesh->TranslateMesh(Vector3f(0, -varList.get<float>("ground_height"), 0));
+                polyMesh->TranslateMesh(Vector3f(0, -getVarList()->get<float>("ground_height"), 0));
                 part->WriteOBJWireFrameModel(surface_wire_path.c_str());
             }
 
@@ -214,7 +214,7 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
         {
             string crossMesh_path = data_path + "/" + file_name + "_CrossMesh.obj";
             shared_ptr<CrossMesh> crossMesh = make_shared<CrossMesh>(*myStrucCreator->refModel->crossMesh);
-            crossMesh ->TranslateMesh(Vector3f(0, -varList.get<float>("ground_height"), 0));
+            crossMesh ->TranslateMesh(Vector3f(0, -getVarList()->get<float>("ground_height"), 0));
             crossMesh->WriteOBJModel(crossMesh_path.c_str());
 
             pugi::xml_node crossMesh_node = xml_output.child("CrossMesh");
@@ -235,7 +235,7 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
             }
 
             myStrucCreator->myStruc->WriteStructure(part_path.c_str());
-            if(varList.get<bool>("output_mitsuba")) {
+            if(getVarList()->get<bool>("output_mitsuba")) {
                 myStrucCreator->myStruc->WriteStructureWireFrame(part_path.c_str());
             }
 
@@ -252,7 +252,7 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
         }
 
         //Simulation
-        if(myStrucCreator->myStruc && !varList.get<bool>("output_mitsuba"))
+        if(myStrucCreator->myStruc && !getVarList()->get<bool>("output_mitsuba"))
         {
             string part_path = data_path + "/" + "Simulation";
             if(!boost::filesystem::exists(part_path))
@@ -273,7 +273,7 @@ void XMLIO::XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::path 
     string mitsuba_path = data_path + "/mitsuba.xml";
     pugi::xml_document mitsuba_doc;
 
-    gluiMitsuba mitsuba_writter;
+    MitsubaWriter mitsuba_writter(getVarList());
 
     mitsuba_writter.mitsuba_sensor = mitsuba_sensor;
 
@@ -365,54 +365,6 @@ void XMLIO::XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::p
                 }
             }
 
-            //TiltNormal
-            {
-                vector<Vector3f> lines;
-                pugi::xml_node node_tiltNormal = cross_root.append_child("TiltNormal");
-                myStrucCreator->refModel->crossMesh->getCrossMesh_TiltNormal(lines);
-                pugi::xml_text text_tiltNormal = node_tiltNormal.text();
-                string strTiltNormalList;
-
-                strTiltNormalList = "[";
-                for(int id = 0; id < lines.size()/2; id ++)
-                {
-                    char strTiltNormal[1000];
-                    Vector3f staPt = lines[2 * id];
-                    Vector3f endPt = lines[2 * id + 1];
-                    sprintf(strTiltNormal, "[[%lf, %lf, %lf], [%lf, %lf, %lf]]", staPt[0], staPt[1], staPt[2], endPt[0], endPt[1], endPt[2]);
-                    strTiltNormalList += strTiltNormal;
-                    if(id != lines.size()/2 - 1)
-                        strTiltNormalList += ", ";
-                }
-                strTiltNormalList += "]";
-                text_tiltNormal.set(strTiltNormalList.c_str());
-            }
-
-            //MultMovement
-            if(varList.get<bool>("mult_move"))
-            {
-                vector<Vector3f> lines;
-                pugi::xml_node node_multMove = cross_root.append_child("MultMove");
-                myStrucCreator->myStruc->saveMultMovement(lines);
-                pugi::xml_text text_multMove = node_multMove.text();
-                string strmultMove;
-
-                strmultMove = "[";
-                for(int id = 0; id < lines.size()/2; id ++)
-                {
-                    char strMove[1000];
-                    Vector3f staPt = lines[2 * id] + Vector3f(0, -varList.get<float>("ground_height"), 0);
-                    Vector3f endPt = lines[2 * id + 1] + Vector3f(0, -varList.get<float>("ground_height"), 0);
-                    sprintf(strMove, "[[%lf, %lf, %lf], [%lf, %lf, %lf]]", staPt[0], staPt[1], staPt[2], endPt[0], endPt[1], endPt[2]);
-                    strmultMove += strMove;
-                    if(id != lines.size()/2 - 1)
-                        strmultMove += ", ";
-                }
-                strmultMove += "]";
-                text_multMove.set(strmultMove.c_str());
-            }
-
-
             crossDoc.save_file(CrossData_path.c_str());
             crossDoc.remove_child("Documents");
         }
@@ -421,138 +373,6 @@ void XMLIO::XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::p
         pugi::xml_attribute crossdata_attr = crossdata_node.append_attribute("path");
         string relative_CrossData_path = file_name + "_data" + "/CrossMesh.xml";
         crossdata_attr.set_value(relative_CrossData_path.c_str());
-    }
-
-    //MergedPartGroup
-    if(myStrucCreator->myStruc && myStrucCreator->myAssembly)
-    {
-        string MPG_path = data_path + "/MergePartGroup.xml";
-        {
-            pugi::xml_document MPG_Doc;
-            pugi::xml_node MPG_root = MPG_Doc.append_child("Documents");
-            xml_groupdata = MPG_root;
-            pugi::xml_node MPGdata_node = MPG_root.append_child("MergePartGroup");
-            int GroupID = 0;
-
-            vector<shared_ptr<AssemblyNode>> &assembly = myStrucCreator->myAssembly->assembly_sequences;
-            for(size_t id = 0; id < assembly.size(); id++)
-            {
-                shared_ptr<AssemblyNode> assembly_node = assembly[id];
-                switch(assembly_node->type)
-                {
-                    case AssemblyNode::NodeKey:case AssemblyNode::NodePart: {
-                        int partID = assembly_node->part.lock()->partID;
-                        pugi::xml_node group_node = MPGdata_node.append_child("Group");
-
-                        //groupID
-                        group_node.append_attribute("id").set_value(GroupID++);
-
-                        //groupType
-                        group_node.append_attribute("type").set_value("Single");
-
-                        //groupXYZ
-                        char XYZ[1024];
-                        sprintf(XYZ, "(%f, %f, %f)", assembly_node->dis_drt[0], assembly_node->dis_drt[1], assembly_node->dis_drt[2]);
-                        group_node.append_attribute("XYZ").set_value(XYZ);
-
-                        string groupMember = to_string(partID);
-                        group_node.text().set(groupMember.c_str());
-                    }
-                        break;
-                    case AssemblyNode::NodeBoundary:
-                    {
-                        pugi::xml_node group_node = MPGdata_node.append_child("Group");
-                        group_node.append_attribute("id").set_value(GroupID++);
-                        string groupMember = "";
-                        int NBoundary = assembly_node->partGroup->groupParts.size();
-                        for(size_t jd = 0; jd < NBoundary; jd++)
-                        {
-                            int partID = assembly_node->partGroup->groupParts[jd].lock()->partID;
-                            groupMember +=  to_string(partID);
-                            if(jd != NBoundary - 1) groupMember += ",";
-                        }
-                        group_node.text().set(groupMember.c_str());
-                        group_node.append_attribute("type").set_value("Boundary");
-
-                        //groupXYZ
-                        char XYZ[1024];
-                        sprintf(XYZ, "(%f, %f, %f)", assembly_node->dis_drt[0], assembly_node->dis_drt[1], assembly_node->dis_drt[2]);
-                        group_node.append_attribute("XYZ").set_value(XYZ);
-                    }
-                    default:
-                        break;
-                }
-
-            }
-            MPG_Doc.save_file(MPG_path.c_str());
-        }
-
-        string relative_MPG_path = file_name + "_data" + "/MergePartGroup.xml";
-        pugi::xml_node MPG_node = partGeo_node.append_child("MergePartGroup");
-        MPG_node.append_attribute("path").set_value(relative_MPG_path.c_str());
-    }
-
-
-    //Support
-    //MergedPartGroup
-    double Scale = varList.get<float>("clipper_scale");
-    if(myStrucCreator->myStruc && myStrucCreator->myAssembly)
-    {
-        string Support_path = data_path + "/Support.xml";
-        {
-            pugi::xml_document Support_Doc;
-            pugi::xml_node Support_root = Support_Doc.append_child("Documents");
-            xml_groupdata = Support_root;
-            pugi::xml_node Supportdata_node = Support_root.append_child("Curves");
-            int GroupID = 0;
-
-            vector<shared_ptr<SupportSlice>> &slices = myStrucCreator->myAssembly->support_slices;
-            for(size_t id = 0; id < slices.size(); id++)
-            {
-                shared_ptr<SupportSlice> slice = slices[id];
-                if(slice == nullptr) continue;
-                pugi::xml_node slice_node = Supportdata_node.append_child("Slice");
-                slice_node.append_attribute("id").set_value(id);
-                slice_node.append_attribute("layer_height").set_value(slice->height);
-                for(int jd = 0; jd < slice->countour.size(); jd++)
-                {
-                    pugi::xml_node curve_node = slice_node.append_child("Curve");
-                    curve_node.append_attribute("id").set_value(jd);
-                    string pts_str;
-                    for(int kd = 0; kd < slice->countour[jd].size(); kd++)
-                    {
-                        char PtXYZ[256];
-                        ClipperLib::IntPoint intpt = slice->countour[jd][kd];
-                        sprintf(PtXYZ, "%.4f, %.4f", (double)intpt.X/Scale, (double)intpt.Y/Scale);
-                        pts_str = pts_str + PtXYZ + (kd == slice->countour[jd].size() - 1 ? "" : ",");
-                    }
-                    curve_node.text().set(pts_str.c_str());
-                }
-            }
-
-            Support_Doc.save_file(Support_path.c_str());
-        }
-
-        string relative_Support_path = file_name + "_data" + "/Support.xml";
-        pugi::xml_node Support_node = partGeo_node.append_child("Support");
-        Support_node.append_attribute("path").set_value(Support_path.c_str());
-    }
-}
-
-void XMLIO::XMLWriter_Animation(string data_folder)
-{
-    if(myStrucCreator && myStrucCreator->myStruc && myStrucCreator->myAssembly)
-    {
-        string animation_folder = data_folder + "/Animation";
-        boost::filesystem::create_directories(animation_folder);
-        for(int id = 0; id < myStrucCreator->myAssembly->assembly_sequences.size(); id++){
-            shared_ptr<AssemblyNode> node = myStrucCreator->myAssembly->assembly_sequences[id];
-            node->filename = "part_" + std::to_string(id) + ".obj";
-            string outputFile = animation_folder + "/" + node->filename;
-            myStrucCreator->myAssembly->writeAssemblyNode(node, outputFile.c_str());
-        }
-        string animationFile = animation_folder + "/animation.motion.txt";
-        myStrucCreator->myAssembly->writeAnimationMotion(animationFile.c_str());
     }
 }
 
@@ -594,7 +414,7 @@ bool XMLIO::SaveXMLFile(string xmlFileName)
 
         XMLWriter_GUISettings(documents_node);
         XMLWriter_PartGeoData(documents_node, xmlFileName_path);
-        if(varList.get<bool>("output_mitsuba"))
+        if(getVarList()->get<bool>("output_mitsuba"))
             XMLWriter_Mitsuba(documents_node, xmlFileName_path);
         XMLWriter_Output(documents_node, xmlFileName_path);
         XMLWriter_Animation(data_path);
@@ -621,7 +441,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
         //para basic
         gluiVarOrganizer varOrganizer;
         {
-            vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Basic");
+            vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Basic");
             for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node_guisettings);
         }
 
@@ -631,7 +451,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
             pugi::xml_node node_shapeop = node_guisettings.child("ShapeOp_Settings");
             if(node_shapeop){
                 //Para_ShapeOp
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_ShapeOp");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_ShapeOp");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node_shapeop);
             }
         }
@@ -642,7 +462,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
             pugi::xml_node node_mitsuba = node_guisettings.child("Para_Mitsuba");
             if(node_mitsuba){
                 //Para_Mitsuba
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Mitsuba");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Mitsuba");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node_mitsuba);
             }
         }
@@ -652,7 +472,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
             pugi::xml_node node_contactgraph = node_guisettings.child("Para_ContactGraph");
             if(node_contactgraph){
                 //Para_ContactGraph
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_ContactGraph");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_ContactGraph");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node_contactgraph);
             }
         }
@@ -662,7 +482,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
             pugi::xml_node node_crossmesh = node_guisettings.child("Para_CrossMesh");
             if(node_crossmesh){
                 //Para_CrossMesh
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_CrossMesh");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_CrossMesh");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node_crossmesh);
             }
         }
@@ -671,7 +491,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(node){
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Opt");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Opt");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node);
             }
         }
@@ -680,7 +500,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Assembly");
             if(node){
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Assembly");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Assembly");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node);
             }
         }
@@ -689,7 +509,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Support");
             if(node){
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Support");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Support");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node);
             }
         }
@@ -698,7 +518,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(node){
-                vector<shared_ptr<gluiVar>> series = varList.findSeries("Para_Opt");
+                vector<shared_ptr<gluiVar>> series = getVarList()->findSeries("Para_Opt");
                 for(shared_ptr<gluiVar> var: series) varOrganizer.read(var.get(), node);
             }
         };
@@ -904,13 +724,12 @@ bool XMLIO::readXMLFile(string xmlFileName) {
     xmldoc.load_file(xmlFileName.c_str());
     pugi::xml_node xml_root = xmldoc.child("Documents");
     if (xml_root) {
-        XMLIO xml;
-        xml.XMLReader_GUISettings(xml_root);
+        XMLReader_GUISettings(xml_root);
         boost::filesystem::path boostpath(xmlFileName);
-        varList.filename = boostpath.stem().string();
+        getVarList()->filename = boostpath.stem().string();
         string xmlfile_path = boost::filesystem::path(xmlFileName).parent_path().string();
 
-        if (varList.get<bool>("texturedModel") == false) {
+        if (getVarList()->get<bool>("texturedModel") == false) {
             pugi::xml_node crossMesh = xml_root.child("Output").child("CrossMesh");
             if (crossMesh) {
                 string path = xmlfile_path + "/" + crossMesh.attribute("path").as_string();
@@ -932,8 +751,7 @@ bool XMLIO::readXMLFile(string xmlFileName) {
 
         if (myStrucCreator->myStruc != nullptr) {
             if (xml_root) {
-                XMLIO xml;
-                xml.XMLReader_PartGeoData(xml_root, xmlfile_path);
+                XMLReader_PartGeoData(xml_root, xmlfile_path);
                 updateBoundaryPart(xml_root);
             }
         }
@@ -972,19 +790,19 @@ void XMLIO::updateBoundaryPart(pugi::xml_node &xml_root)
 }
 
 
-void gluiMitsuba::scene_settings(pugi::xml_node &xml_root) {
+void MitsubaWriter::scene_settings(pugi::xml_node &xml_root) {
     //scene
     pugi::xml_node scene_node;
     change_attribute(xml_root, scene_node, "scene", "version", "0.5.0");
-    float mitsubaPartYRotation = varList.get<float>("mitsuba_PartYRotation");
-    float mitsubaCameraRotation = varList.get<float>("mitsuba_CameraRotation") / 180 * M_PI;
-    float mitsubaCameraDistance = varList.get<float>("mitsuba_CameraDistance");
-    float mitsubaSunTime = varList.get<float>("mitsuba_SunTime");
-    float mitsubaSunStrength = varList.get<float>("mitsuba_SunStrength");
+    float mitsubaPartYRotation = getVarList()->get<float>("mitsuba_PartYRotation");
+    float mitsubaCameraRotation = getVarList()->get<float>("mitsuba_CameraRotation") / 180 * M_PI;
+    float mitsubaCameraDistance = getVarList()->get<float>("mitsuba_CameraDistance");
+    float mitsubaSunTime = getVarList()->get<float>("mitsuba_SunTime");
+    float mitsubaSunStrength = getVarList()->get<float>("mitsuba_SunStrength");
 
-    int   mitsuba_width =   varList.get<int>("mitsuba_width");
-    int   mitsuba_height =   varList.get<int>("mitsuba_height");
-    int   mitsuba_sample =   varList.get<int>("mitsuba_sample");
+    int   mitsuba_width =   getVarList()->get<int>("mitsuba_width");
+    int   mitsuba_height =   getVarList()->get<int>("mitsuba_height");
+    int   mitsuba_sample =   getVarList()->get<int>("mitsuba_sample");
 
     //integrator
     {
@@ -1292,7 +1110,7 @@ void gluiMitsuba::scene_settings(pugi::xml_node &xml_root) {
 
 }
 
-void gluiMitsuba::change_attribute(pugi::xml_node &root, pugi::xml_node &node, string str_name, string str_attr, string str_value)
+void MitsubaWriter::change_attribute(pugi::xml_node &root, pugi::xml_node &node, string str_name, string str_attr, string str_value)
 {
     node = root.append_child(str_name.c_str());
     pugi::xml_attribute attr = node.attribute(str_attr.c_str());
@@ -1301,7 +1119,7 @@ void gluiMitsuba::change_attribute(pugi::xml_node &root, pugi::xml_node &node, s
     return;
 }
 
-void gluiMitsuba::change_attribute(pugi::xml_node &node, string str_attr, string str_value)
+void MitsubaWriter::change_attribute(pugi::xml_node &node, string str_attr, string str_value)
 {
     pugi::xml_attribute attr = node.attribute(str_attr.c_str());
     if(!attr) attr = node.append_attribute(str_attr.c_str());
