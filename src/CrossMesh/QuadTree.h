@@ -8,11 +8,9 @@
 #include "Mesh/PolyMesh.h"
 #include "Mesh/Polygon.h"
 
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
-#include "Utility/PolyPolyTest.h"
 #include "Utility/TopoObject.h"
 
 using pPolyMesh =  shared_ptr<PolyMesh>;
@@ -94,7 +92,7 @@ public:
 
 public:
 
-    QuadTree(pPolyMesh _baseMesh, shared_ptr<gluiVarList> var);
+    QuadTree(pPolyMesh _baseMesh, shared_ptr<InputVarList> var);
 
 public:
 
@@ -103,6 +101,8 @@ public:
     void dfs_buildQuadTree(pQuadTreeNode node);
 
     void search_point(Vector2f pos, vector<pPolygon> &polyList);
+
+    bool IsConvexPolygonIntersec(vector<Vector2f> &polyA, vector<Vector2f> &polyB, double &area);
 };
 
 

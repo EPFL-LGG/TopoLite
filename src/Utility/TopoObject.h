@@ -5,7 +5,7 @@
 #ifndef TOPOLITE_TOPOOBJECT_H
 #define TOPOLITE_TOPOOBJECT_H
 
-#include <IO/gluiVar.h>
+#include <IO/InputVar.h>
 #include "TopoAssert.h"
 
 class TopoObject {
@@ -15,7 +15,7 @@ public:
         varList = nullptr;
     }
 
-    TopoObject(shared_ptr<gluiVarList> _var){
+    TopoObject(shared_ptr<InputVarList> _var){
         varList = _var;
     }
 
@@ -25,12 +25,12 @@ public:
 
 public:
 
-    shared_ptr<gluiVarList> getVarList(){
+    shared_ptr<InputVarList> getVarList(){
         TopoASSERT(varList != nullptr);
         return varList;
     }
 
-    void setVarList(shared_ptr<gluiVarList> var){
+    void setVarList(shared_ptr<InputVarList> var){
         TopoASSERT(var != nullptr);
         varList = var;
     }
@@ -41,7 +41,7 @@ public:
     }
 
 private:
-    shared_ptr<gluiVarList> varList;
+    shared_ptr<InputVarList> varList;
 };
 
 

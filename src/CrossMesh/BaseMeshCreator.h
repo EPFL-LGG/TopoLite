@@ -60,7 +60,7 @@ public:
     BaseMeshCreator(    shared_ptr<QuadTree> _quadTree,
                         shared_ptr<PolyMesh> _polyMesh,
                         shared_ptr<CrossMesh> _pattern2D,
-                        shared_ptr<gluiVarList> var);
+                        shared_ptr<InputVarList> var);
 
     ~BaseMeshCreator();
 

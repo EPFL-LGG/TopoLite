@@ -16,14 +16,12 @@
 
 #include <vector>
 
-#include "Utility/Controls.h"
 #include "Utility/vec.h"
 #include "Utility/TopoObject.h"
 
 #include "Mesh/HEdgeMesh.h"
 #include "Mesh/Cross.h"
 #include "PartGeom.h"
-#include "BodyMobili.h"
 
 
 using namespace std;
@@ -37,7 +35,6 @@ using pPolyMesh =  shared_ptr<PolyMesh> ;
 using pCross =  shared_ptr<Cross>;
 using pPolygon = shared_ptr<_Polygon> ;
 using pPartGeom = shared_ptr<PartGeom>;
-using pBodyMobili =  shared_ptr<BodyMobili>;
 
 class Part : public TopoObject
 {
@@ -58,7 +55,6 @@ public:
     bool isRemove;                          // If part is removed from the structure (i.e., disassembly)
     bool touchGround;                       // If part touches the ground
 
-	pBodyMobili partMobili;                 // Generate part mobility space (for debug)
 	vector<wpPart>  initNeighbors;           // Neighboring parts (saved in the same order as oriPoints)
 
 public:
@@ -73,7 +69,7 @@ public:
 
 public:
 
-	Part(pCross cross, shared_ptr<gluiVarList> var);
+	Part(pCross cross, shared_ptr<InputVarList> var);
 	Part(const Part &part);
 	~Part();
 	void Clear();

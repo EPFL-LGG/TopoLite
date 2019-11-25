@@ -37,7 +37,7 @@ class AugmentedVectorCreator : public TopoObject
 {
 public:
 
-    AugmentedVectorCreator(shared_ptr<gluiVarList> var):TopoObject(var){}
+    AugmentedVectorCreator(shared_ptr<InputVarList> var):TopoObject(var){}
 
 	~AugmentedVectorCreator();
 

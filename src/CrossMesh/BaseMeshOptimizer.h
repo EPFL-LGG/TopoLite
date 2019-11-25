@@ -26,7 +26,7 @@ public:
     BaseMeshOptimizer( shared_ptr<igl::AABB<Eigen::MatrixXd,3>> _aabbTree,
                             std::shared_ptr<Eigen::MatrixXd> V,
                             std::shared_ptr<Eigen::MatrixXi> F,
-                            shared_ptr<gluiVarList> var) : TopoObject(var){
+                            shared_ptr<InputVarList> var) : TopoObject(var){
         aabbV = V;
         aabbF = F;
         aabbTree = _aabbTree;

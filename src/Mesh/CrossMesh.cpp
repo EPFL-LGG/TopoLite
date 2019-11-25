@@ -12,13 +12,12 @@
 ///////////////////////////////////////////////////////////////
 
 
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Cross.h"
 #include "CrossMesh.h"
 #include "Mesh/PolyMesh.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 
 #include <igl/remove_duplicate_vertices.h>
 //**************************************************************************************//

@@ -14,7 +14,6 @@
 #ifndef _CROSS_H
 #define _CROSS_H
 
-#include "Utility/Controls.h"
 #include "Utility/vec.h"
 #include "Utility/HelpStruct.h"
 #include "Mesh/Polygon.h"
@@ -53,7 +52,7 @@ public:
 public:
 
     Cross(const Cross &Cross);
-    Cross(std::shared_ptr<gluiVarList> var) : TopoObject(var){}
+    Cross(std::shared_ptr<InputVarList> var) : TopoObject(var){}
     Cross();
 	~Cross();
 	void Print();
@@ -89,7 +88,6 @@ public:
 	 * \return vector after rotation
 	 */
     Vector3f RotateNormal(Vector3f normal, Vector3f rotAxis, float rotAngle);
-
 
 public:
     //neighbor

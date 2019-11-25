@@ -1,9 +1,9 @@
 //
 // Created by ziqwang on 10.03.19.
 //
-#include "gluiVar.h"
+#include "InputVar.h"
 
-void InitVar(gluiVarList &varList)
+void InitVar(InputVarList &varList)
 {
     varList.clear();
 
@@ -163,7 +163,7 @@ void InitVar(gluiVarList &varList)
     varList.add(0.01f, Vector2f(0, 1), "support_smallest_area", "Smallest Area") = "Para_Support";
 }
 
-void InitDemoVar(gluiVarList &varList){
+void InitVarLite(InputVarList &varList){
     InitVar(varList);
     varList.add(true, "showDemo", "") = "";
 

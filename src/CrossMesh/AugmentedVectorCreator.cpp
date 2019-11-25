@@ -21,7 +21,7 @@
 #include "Mesh/CrossMesh.h"
 #include "AugmentedVectorCreator.h"
 #include "CrossConstraint.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 
 //**************************************************************************************//
 //                                   Initialization

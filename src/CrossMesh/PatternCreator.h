@@ -28,7 +28,7 @@ class PatternCreator : public TopoObject
 {
 public:
 	PatternCreator();
-	PatternCreator(shared_ptr<gluiVarList> var):TopoObject(var){}
+	PatternCreator(shared_ptr<InputVarList> var):TopoObject(var){}
 	~PatternCreator();
 
 public:

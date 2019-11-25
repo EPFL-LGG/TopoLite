@@ -17,7 +17,7 @@
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
 #include "Utility/ConvexHull2D.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 #include "Mesh/Polygon.h"
 #include "Mesh/PolyMesh.h"
 #include "Mesh/MeshConverter.h"

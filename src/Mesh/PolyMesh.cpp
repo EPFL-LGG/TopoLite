@@ -13,7 +13,6 @@
 
 #ifndef CATCH2_UNITTEST
 
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
@@ -579,7 +578,7 @@ TEST_CASE("Class Mesh")
     REQUIRE(poly.ReadOBJModel("../data/igloo.obj", textureModel, false) == true);
 
     //CASE 2: Copy and Construct
-    shared_ptr<gluiVarList> varList = make_shared<gluiVarList>();
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     poly.setVarList(varList);
     PolyMesh polyB(poly);
     REQUIRE(poly.vertexList.size() == polyB.vertexList.size());

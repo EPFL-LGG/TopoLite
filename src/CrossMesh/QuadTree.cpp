@@ -5,16 +5,17 @@
 #include "Mesh/PolyMesh.h"
 #include "Mesh/Polygon.h"
 
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
-#include "Utility/PolyPolyTest.h"
 #include "QuadTree.h"
 #include "tbb/tbb.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 
-QuadTree::QuadTree(pPolyMesh _baseMesh, shared_ptr<gluiVarList> var)
+#include "clipper.hpp"
+#include "Utility/ConvexHull2D.h"
+
+QuadTree::QuadTree(pPolyMesh _baseMesh, shared_ptr<InputVarList> var)
 : TopoObject(var)
 {
     baseMesh = _baseMesh;
@@ -130,6 +131,53 @@ void QuadTree::search_point(Vector2f pos, vector<pPolygon> &polyList)
             polyList.push_back(baseMesh.lock()->polyList[faceID]);
         }
     }
+}
+
+bool QuadTree::IsConvexPolygonIntersec(vector<Vector2f> &polyA, vector<Vector2f> &polyB, double &area){
+
+    double Scale = getVarList()->get<float>("clipper_scale");
+
+    ClipperLib::Path pathA, pathB;
+    for(int id = 0; id < polyA.size(); id++){
+        int x = polyA[id].x * Scale;
+        int y = polyA[id].y * Scale;
+        pathA.push_back(ClipperLib::IntPoint(x, y));
+    }
+
+    for(int id = 0; id < polyB.size(); id++){
+        int x = polyB[id].x * Scale;
+        int y = polyB[id].y * Scale;
+        pathB.push_back(ClipperLib::IntPoint(x, y));
+    }
+
+    if(!ClipperLib::Orientation(pathA)) {
+        ClipperLib::ReversePath(pathA);
+        //std::cout << "PathA is Wrong" << std::endl;
+    }
+    if(!ClipperLib::Orientation(pathB))
+    {
+        ClipperLib::ReversePath(pathB);
+        //std::cout << "pathB is Wrong" << std::endl;
+    }
+
+    ClipperLib::Clipper solver;
+    solver.AddPath(pathA, ClipperLib::ptSubject, true);
+    solver.AddPath(pathB, ClipperLib::ptClip, true);
+    ClipperLib::Paths path_int;
+    solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftPositive, ClipperLib::pftPositive);
+
+    if(path_int.empty() || path_int.front().empty()) {
+        area = 0;
+        return false;
+    }
+    else{
+        area = 0;
+        for(ClipperLib::Path path : path_int){
+            area += ClipperLib::Area(path);
+        }
+        return true;
+    }
+
 }
 
 

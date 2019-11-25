@@ -19,8 +19,6 @@
 #include <GLUT/glut.h>
 #endif
 
-
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpStruct.h"
 #include "Utility/HelpFunc.h"
@@ -32,15 +30,14 @@
 #include "Mesh/PolyMesh.h"
 
 #include "PartGeom.h"
-#include "BodyMobili.h"
 #include "Part.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 
 //**************************************************************************************//
 //                                   Basic Operations
 //**************************************************************************************//
 
-Part::Part(pCross _cross, shared_ptr<gluiVarList> var):TopoObject(var)
+Part::Part(pCross _cross, shared_ptr<InputVarList> var):TopoObject(var)
 {
 	cross = _cross;
 
@@ -51,7 +48,6 @@ Part::Part(pCross _cross, shared_ptr<gluiVarList> var):TopoObject(var)
 
 	polyMesh = NULL;
 
-	partMobili = NULL;
 
 	groupID = NONE_GROUP;
 
@@ -87,7 +83,6 @@ void Part::Clear()
 {
 	polyMesh.reset();
 	partGeom.reset();
-	partMobili.reset();
 	initNeighbors.clear();
 }
 

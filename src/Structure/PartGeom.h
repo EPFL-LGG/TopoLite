@@ -47,7 +47,7 @@ public:
 	vector<shared_ptr<_Polygon>> faceList;        // Constructed face
 public:
 
-	PartGeom(shared_ptr<Cross> _cross, shared_ptr<gluiVarList> var);
+	PartGeom(shared_ptr<Cross> _cross, shared_ptr<InputVarList> var);
 	PartGeom(const PartGeom &_geom);
 	~PartGeom();
 

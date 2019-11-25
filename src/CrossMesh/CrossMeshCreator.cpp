@@ -13,7 +13,6 @@
 
 
 #include "time.h"
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/vec.h"
@@ -28,7 +27,7 @@
 #include "BaseMeshCreator.h"
 #include "CrossMeshCreator.h"
 #include "BaseMeshOptimizer.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 #include "Mesh/MeshConverter.h"
 #include <Eigen/Dense>
 

@@ -19,57 +19,55 @@
 #include <vector>
 #include "Structure/Part.h"
 #include "Utility/vec.h"
-#include "Utility/Controls.h"
 #include "Utility/HelpStruct.h"
 #include "Utility/TopoObject.h"
+#include "Structure/Struc.h"
+#include "CrossMesh/CrossMeshCreator.h"
+
 using namespace std;
 
-class CrossMeshCreator;
-class Struc;
-typedef shared_ptr<CrossMeshCreator> pModel;
-typedef shared_ptr<Struc> pStruc;
+using pCrossMeshCreator = shared_ptr<CrossMeshCreator> ;
+using pStruc = shared_ptr<Struc> ;
 
 class StrucCreator : public TopoObject
 {
 
 public:
 
-	pModel refModel;                   // Reference surface model
-
-	pStruc myStruc;                    // Designed interlocking structure
-
-	double worldAxesMat[16];
-
-	double worldMatrix[16];
+    pCrossMeshCreator   crossMeshCreator;             // Reference surface model
+	pStruc              struc;                        // Designed interlocking structure
+	double              worldAxesMat[16];
+	double              worldMatrix[16];
 
 public:
 
-    StrucCreator(shared_ptr<gluiVarList> var);
+    StrucCreator(shared_ptr<InputVarList> var);
     ~StrucCreator();
 	StrucCreator(const StrucCreator &_myStruc);
 	void ClearStruc();
 
-public: // Create Structure
-	bool LoadSurface(const char* objFileName);
+public:
+    // Create Structure
 
+	bool LoadSurface(const char* objFileName);
     int CreateStructure(bool createCrossMesh,
-                        bool texturedModel,
+                        bool textureMode,
                         double interactMatrix[],
                         bool previewMode);
-
     int UpdateStructureGeometry(bool previewMode);
 
-public: // Compute Part Contacts
+public:
+    // Compute Part Contacts
+
     void BuildPartsGraph();
-	void IdentifyBoundaryParts_Disk();
+	void ComputeBoundaryParts();
 	void ComputePartContacts();
 	void ComputePartFaceContacts();
     void ComputePartFaceContactsBruteForce();
 	void ComputePartEdgeContacts();
-	bool ComputePartPenetration();
 
-
-public: // Save Output Models
+public:
+    // Save Output Models
 
 	void WriteStructure(const char *folderPath);
     void WriteCrossMesh(char *meshFileName);

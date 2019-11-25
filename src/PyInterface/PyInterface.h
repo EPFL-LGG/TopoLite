@@ -6,7 +6,7 @@
 #define TOPOLOCKCREATOR_PYINTERFACE_H
 
 #include "IO/XMLIO.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 
 #include <iostream>
 #include <boost/filesystem.hpp>

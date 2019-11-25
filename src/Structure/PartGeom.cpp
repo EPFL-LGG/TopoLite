@@ -14,7 +14,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
@@ -25,14 +24,14 @@
 #include "Mesh/Cross.h"
 #include "PartGeom.h"
 #include <list>
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 
 
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
-PartGeom::PartGeom(shared_ptr<Cross> _cross, shared_ptr<gluiVarList> var) :TopoObject(var)
+PartGeom::PartGeom(shared_ptr<Cross> _cross, shared_ptr<InputVarList> var) :TopoObject(var)
 {
     ParseCrossData(_cross);
 }

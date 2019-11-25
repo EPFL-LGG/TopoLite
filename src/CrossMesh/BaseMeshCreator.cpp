@@ -11,7 +11,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Mesh/Polygon.h"
@@ -22,7 +21,7 @@
 #include "BaseMeshCreator.h"
 #include "tbb/tbb.h"
 #include <unordered_map>
-#include <IO/gluiVar.h>
+#include <IO/InputVar.h>
 
 //**************************************************************************************//
 //                                   Initialization
@@ -31,7 +30,7 @@
 BaseMeshCreator::BaseMeshCreator(   shared_ptr<QuadTree> _quadTree,
                                     shared_ptr<PolyMesh> _polyMesh,
                                     shared_ptr<CrossMesh> _pattern2D,
-                                    shared_ptr<gluiVarList> var)
+                                    shared_ptr<InputVarList> var)
 : TopoObject(var)
 {
 	quadTree = _quadTree;

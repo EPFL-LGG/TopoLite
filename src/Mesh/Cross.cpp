@@ -10,7 +10,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#include "Utility/Controls.h"
 #include "Utility/math3D.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
@@ -313,9 +312,8 @@ TEST_CASE("Class CrossMesh"){
     Cross cross;
     //CASE 1: Init Cross
 
-
     //CASE 2: Copy and Construct
-    shared_ptr<gluiVarList> varList = make_shared<gluiVarList>();
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     cross.setVarList(varList);
     Cross crossB(cross);
     REQUIRE(cross.getVarList() == crossB.getVarList());

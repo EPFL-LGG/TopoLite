@@ -6,11 +6,10 @@
 #define TOPOLOCKCREATOR_GLUIXML_H
 
 #include "Mesh/PolyMesh.h"
-#include "Utility/Controls.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Structure/StrucCreator.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 #include "CrossMesh/CrossMeshCreator.h"
 #include "Mesh/CrossMesh.h"
 #include "Mesh/Cross.h"
@@ -36,20 +35,21 @@ public:
     shared_ptr<StrucCreator> myStrucCreator;
     vector<int> pickPartIDs;
     double interactMatrix[16];
-    pugi::xml_document xmldoc;
     int mainWinW, mainWinH;
 
+    pugi::xml_document xmldoc;
     pugi::xml_node xml_groupdata;
     pugi::xml_node xml_mitsuba;
     pugi::xml_node xml_crossdata;
     pugi::xml_node xml_general;
 
     pugi::xml_document xml_mitsuba_old;
+
     pugi::xml_node mitsuba_sensor;
 
 public:
 
-    XMLIO(shared_ptr<gluiVarList> var): TopoObject(var){}
+    XMLIO(shared_ptr<InputVarList> var): TopoObject(var){}
 
 public:
 
@@ -75,7 +75,7 @@ public:
 
 public:
 
-    MitsubaWriter(shared_ptr<gluiVarList> var): TopoObject(var){}
+    MitsubaWriter(shared_ptr<InputVarList> var): TopoObject(var){}
 public:
 
     void change_attribute(pugi::xml_node &root, pugi::xml_node &node, string str_name, string str_attr, string str_value);

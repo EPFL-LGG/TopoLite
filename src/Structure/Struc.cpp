@@ -13,38 +13,31 @@
 
 
 #include "Mesh/Cross.h"
-#include "Utility/Controls.h"
 #include "Utility/math3D.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpStruct.h"
 #include "Utility/HelpFunc.h"
-#include "Utility/PolyPolyTest.h"
 #include "Mesh/Polygon.h"
 #include "Mesh/PolyMesh.h"
 #include "Structure/Part.h"
 #include "Structure/PartGroup.h"
-#include "Structure/BodyMobili.h"
 #include "Structure/Struc.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 
 #include <unordered_map>
 #include <queue>
+#include <clipper.hpp>
 
 using std::unordered_map;
 using std::queue;
-
-extern gluiVarList varList;
-extern Vector3f colorTable[18];
-extern vector<int> pickPartIDs;
 
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
-Struc::Struc()
+Struc::Struc(shared_ptr<InputVarList> var) : TopoObject(var)
 {
-	partGroup = NULL;
-    num_edge_edge = num_face_face = 0;
+    numEdgeEdgeContacts = numFaceFaceContacts = 0;
 }
 
 Struc::~Struc()
@@ -56,14 +49,12 @@ void Struc::ClearStruc()
 {
 	partList.clear();
 
-	partGroup.reset();
-
 	contactList.clear();
 
-    num_edge_edge = num_face_face = 0;
+    numEdgeEdgeContacts = numFaceFaceContacts = 0;
 }
 
-Struc::Struc(const Struc& _struc)
+Struc::Struc(const Struc& _struc) : TopoObject(_struc)
 {
     ClearStruc();
 
@@ -77,26 +68,21 @@ Struc::Struc(const Struc& _struc)
     contactList = _struc.contactList;
     parts = _struc.parts;
     innerContactList = _struc.innerContactList;
-    minimum_contact_surface = _struc.minimum_contact_surface;
-    average_face_area = _struc.average_face_area;
+    minContactArea = _struc.minContactArea;
+    avgContactArea = _struc.avgContactArea;
     avgPartSize = _struc.avgPartSize;
-    groundY = _struc.groundY;
-    num_face_face = _struc.num_face_face;
-    num_edge_edge = _struc.num_edge_edge;
+    groundPlaneY = _struc.groundPlaneY;
+    numFaceFaceContacts = _struc.numFaceFaceContacts;
+    numEdgeEdgeContacts = _struc.numEdgeEdgeContacts;
 
     return;
-}
-
-void Struc::ClearPartGroup()
-{
-	partGroup.reset();
 }
 
 //**************************************************************************************//
 //                              Identify Parts (Disk Model)
 //**************************************************************************************//
 
-void Struc::IdentifyBoundaryParts_Disk()
+void Struc::ComputeBoundaryParts()
 {
 
 	vector<int> BoundPartIDs;
@@ -114,12 +100,6 @@ void Struc::IdentifyBoundaryParts_Disk()
                 BoundPartIDs.push_back(part->partID);
 			}
 		}
-//		cout << "Init Boundary: \t\t[";
-//		for(int partID : BoundPartIDs)
-//		{
-//			cout << partID << " ";
-//		}
-//		cout << "]" << endl;
 	}
 
 
@@ -193,12 +173,7 @@ void Struc::IdentifyBoundaryParts_Disk()
 
 		for(int partID : BoundPartIDs) partList[partID]->atBoundary = true;
 
-//		cout << "Connect Boundary: \t[";
-//		for(int partID : BoundPartIDs)
-//		{
-//			cout << partID << " ";
-//		}
-//		cout << "]" << endl;
+
 	}
 
 	/*
@@ -228,7 +203,7 @@ void Struc::IdentifyBoundaryParts_Disk()
 		{
 			pPart pU = checkList.front(); checkList.pop();
 			if(pU->atBoundary || pU->partID >= partList.size()) continue;
-			if(IsLockedByBoundary(pU->partID))
+			if(CheckPartsDeadLock(pU->partID))
 			{
 				pU->atBoundary = true;
 				BoundPartIDs.push_back(pU->partID);
@@ -240,13 +215,6 @@ void Struc::IdentifyBoundaryParts_Disk()
 				}
 			}
 		}
-
-//		cout << "Locked Boundary: \t[";
-//		for(int partID : BoundPartIDs)
-//		{
-//			cout << partID << " ";
-//		}
-//		cout << "]" << endl;
 	}
 
 	int boundaryPartNum = BoundPartIDs.size();
@@ -261,14 +229,11 @@ void Struc::IdentifyBoundaryParts_Disk()
 		else{
 			partList[id]->assemblyID = assembly ++ ;
 			parts.push_back(partList[id]);
-			//std::cout << id << ", " << partList[id]->assemblyID << std::endl;
 		}
 	}
-
-	//printf("\nTotal part: %d   boundary part: %d \n", (int)partList.size(), (int)boundaryPartNum);
 }
 
-bool Struc::IsLockedByBoundary(int partID) {
+bool Struc::CheckPartsDeadLock(int partID) {
 
 	/*
 	 * 1. To check whether part would be locked by the boundary
@@ -339,7 +304,7 @@ bool Struc::IsLockedByBoundary(int partID) {
     return false;
 }
 
-double Struc::ComputeGroundHeight()
+double Struc::ComputeLowestY()
 {
     // Compute structure's lowest point
     float strucMinY = MAX_FLOAT;
@@ -362,16 +327,16 @@ double Struc::ComputeGroundHeight()
 void Struc::ComputeGroundY(bool showGround)
 {
 	// Compute average part size
-	AveragePartSize();
+    ComputeAveragePartSize();
 
 	// Get ground y-coordinate
-	groundY = ComputeGroundHeight() + 0.1f * avgPartSize;
-	varList.set("ground_height", groundY);
+	groundPlaneY = ComputeLowestY() + 0.1f * avgPartSize;
+	getVarList()->set("ground_height", groundPlaneY);
 
 	// Identify parts that touch the ground
 	if (showGround)
 	{
-		IdentifyTouchGroundParts_Disk();
+        ComputeTouchGroundParts();
 	}
 	else
 	{
@@ -379,7 +344,7 @@ void Struc::ComputeGroundY(bool showGround)
 	}
 }
 
-void Struc::IdentifyTouchGroundParts_Disk()
+void Struc::ComputeTouchGroundParts()
 {
 	const float ydistThres = 0.08 * avgPartSize;
 
@@ -390,8 +355,8 @@ void Struc::IdentifyTouchGroundParts_Disk()
 		float partMinY = part->polyMesh->bbox.minPt.y;
 		float partMaxY = part->polyMesh->bbox.maxPt.y;
 
-		if ((groundY - partMinY) > ydistThres &&
-			(partMaxY - groundY) > ydistThres)
+		if ((groundPlaneY - partMinY) > ydistThres &&
+			(partMaxY - groundPlaneY) > ydistThres)
 		{
 			part->touchGround = true;
 		}
@@ -407,7 +372,6 @@ void Struc::ResetTouchGround()
 	for (int i = 0; i < partList.size(); i++)
 	{
 		pPart part = partList[i];
-
 		part->touchGround = false;
 	}
 }
@@ -456,7 +420,7 @@ void Struc::RemoveParts(vector<int> partIDs)
     }
 }
 
-void Struc::AveragePartSize()
+double Struc::ComputeAveragePartSize()
 {
 	avgPartSize = 0;
 
@@ -466,18 +430,12 @@ void Struc::AveragePartSize()
 
 		float partSize = len(part->polyMesh->bbox.maxPt - part->polyMesh->bbox.minPt);
 
-		//printf("i=%d  partSize: %.3f \n", i, partSize);
-
 		avgPartSize += partSize;
 	}
 
 	avgPartSize /= (float)partList.size();
 
-	//printf("AveragePartSize: %3f \n", avgPartSize);
-}
-
-
-
+	return avgPartSize;}
 
 //**************************************************************************************//
 //                              Compute Part Contacts
@@ -485,7 +443,7 @@ void Struc::AveragePartSize()
 
 void Struc::ComputePartFaceContactsBruteForce()
 {
-    num_face_face = 0;
+    numFaceFaceContacts = 0;
     std::vector<double> face_area_list;
     for (int i = 0; i < partList.size(); i++)
     {
@@ -525,10 +483,14 @@ void Struc::ComputePartFaceContactsBruteForce()
                     currFace->ComputeProjectMatrixTo2D(projMat, invsProjMat);
                     vector<Vector3f> currFace2D = currFace->ProjectPolygonTo2D(projMat);
                     vector<Vector3f> neiborFace2D = neiborFace->ProjectPolygonTo2D(projMat);
-                    vector<Vector3f> overlapPolyPts = ConvexPolygonIntersec(currFace2D, neiborFace2D);
 
+                    vector<Vector3f> overlapPolyPts;
+                    ConvexPolygonIntersec(currFace2D, neiborFace2D, overlapPolyPts);
                     if( overlapPolyPts.size() == 0 ) continue;
-                    vector<Vector3f> contactPoly = ProjectPolygonTo3D(overlapPolyPts, invsProjMat);
+
+                    vector<Vector3f> contactPoly;
+                    ProjectPolygonTo3D(overlapPolyPts, invsProjMat, contactPoly);
+
                     Vector3f contactNormal = currFace->normal;
 
                     bool boundaryContact;
@@ -546,27 +508,26 @@ void Struc::ComputePartFaceContactsBruteForce()
                     contactList.push_back(contact);
                     if(!part->atBoundary || !neibor->atBoundary) innerContactList.push_back(contact);
 
-                    num_face_face++;
+                    numFaceFaceContacts++;
                 }
             }
         }
     }
 
     //average face size
-    average_face_area = 0;
+    avgContactArea = 0;
     for(double face_area: face_area_list)
     {
-        average_face_area += face_area;
+        avgContactArea += face_area;
     }
-    average_face_area /= face_area_list.size();
+    avgContactArea /= face_area_list.size();
     ComputePartContactArea();
 }
-
 
 void Struc::ComputePartFaceContacts()
 {
 	std::vector<double> face_area_list;
-    num_face_face = 0;
+    numFaceFaceContacts = 0;
 	for (int i = 0; i < partList.size(); i++)
 	{
 		shared_ptr<Part> part = partList[i];
@@ -596,16 +557,14 @@ void Struc::ComputePartFaceContacts()
 			currFace->ComputeProjectMatrixTo2D(projMat, invsProjMat);
 			vector<Vector3f> currFace2D = currFace->ProjectPolygonTo2D(projMat);
 			vector<Vector3f> neiborFace2D = neiborFace->ProjectPolygonTo2D(projMat);
-			vector<Vector3f> overlapPolyPts = ConvexPolygonIntersec(currFace2D, neiborFace2D);
 
-//			//if(overlapPolyPts.size() != 6){
-//				std::cout << part->partID << "\t" << neibor->partID << "\t" << overlapPolyPts.size() << std::endl;
-//			//}
-
+			vector<Vector3f> overlapPolyPts;
+			ConvexPolygonIntersec(currFace2D, neiborFace2D, overlapPolyPts);
 			if( overlapPolyPts.size() == 0 ) continue;
-			vector<Vector3f> contactPoly = ProjectPolygonTo3D(overlapPolyPts, invsProjMat);
-			Vector3f contactNormal = currFace->normal;
 
+			vector<Vector3f> contactPoly;
+			ProjectPolygonTo3D(overlapPolyPts, invsProjMat, contactPoly);
+			Vector3f contactNormal = currFace->normal;
 
 			bool boundaryContact;
 			if( part->atBoundary && neibor->atBoundary)
@@ -618,25 +577,25 @@ void Struc::ComputePartFaceContacts()
 				contact = make_shared<Contact>(part->partID, neibor->partID, contactNormal, shared_ptr<OrientPoint>(), contactPoly, boundaryContact);
 			else
 				contact = make_shared<Contact>(part->partID, neibor->partID, contactNormal, cross->oriPoints[j], contactPoly, boundaryContact);
-            num_face_face++;
+            numFaceFaceContacts++;
 			contactList.push_back(contact);
 			if(!part->atBoundary || !neibor->atBoundary) innerContactList.push_back(contact);
 		}
 	}
 
     //average face size
-    average_face_area = 0;
+    avgContactArea = 0;
     for(double face_area: face_area_list)
     {
-        average_face_area += face_area;
+        avgContactArea += face_area;
     }
-    average_face_area /= face_area_list.size();
+    avgContactArea /= face_area_list.size();
     ComputePartContactArea();
 }
 
 void Struc::ComputePartContactArea()
 {
-    minimum_contact_surface = 1 << 30;
+    minContactArea = 1 << 30;
     for (int i = 0; i < innerContactList.size(); ++i)
     {
         shared_ptr<Contact> curr_contact = innerContactList[i].lock();
@@ -648,10 +607,10 @@ void Struc::ComputePartContactArea()
 //            partList[ID_B] -> contactIDs.push_back(i);
             _Polygon poly; poly.SetVertices(curr_contact->contactPoly);
             double area = poly.ComputeArea();
-            curr_contact->area = area;
-            if(minimum_contact_surface > area)
+            curr_contact->contactArea = area;
+            if(minContactArea > area)
             {
-                minimum_contact_surface = area;
+                minContactArea = area;
             }
         }
     }
@@ -659,7 +618,7 @@ void Struc::ComputePartContactArea()
 
 void Struc::ComputePartEdgeContact(vector<vector<weak_ptr<Cross>>> &vertexCrossList)
 {
-    num_edge_edge = 0;
+    numEdgeEdgeContacts = 0;
 	for(int id = 0; id < vertexCrossList.size(); id++)
 	{
 	    for(int jd = 0; jd < vertexCrossList[id].size(); jd++)
@@ -708,7 +667,7 @@ void Struc::ComputePartEdgeContact(vector<vector<weak_ptr<Cross>>> &vertexCrossL
                     bool atBoundary = partI->atBoundary && partJ->atBoundary;
                     shared_ptr<Contact> contact = make_shared<Contact>(partI->partID, partJ->partID, n, pt, atBoundary);
                     contactList.push_back(contact);
-                    num_edge_edge++;
+                    numEdgeEdgeContacts++;
                     if(!atBoundary) {
                         innerContactList.push_back(contact);
                     }
@@ -718,88 +677,6 @@ void Struc::ComputePartEdgeContact(vector<vector<weak_ptr<Cross>>> &vertexCrossL
 	}
 }
 
-bool Struc::ComputePartPenetration(vector<vector<weak_ptr<Cross>>> &vertexCrossList) {
-    for (int id = 0; id < vertexCrossList.size(); id++) {
-        for (int jd = 0; jd < vertexCrossList[id].size(); jd++) {
-            for (int kd = 0; kd < vertexCrossList[id].size(); kd++) {
-                shared_ptr<Cross> crossI = vertexCrossList[id][jd].lock();
-                shared_ptr<Cross> crossJ = vertexCrossList[id][kd].lock();
-                if (crossI && crossJ && crossI->crossID < crossJ->crossID) {
-                    //part
-                    if (crossI->crossID < 0 || crossI->crossID >= partList.size())
-                        continue;
-                    if (crossJ->crossID < 0 || crossJ->crossID >= partList.size())
-                        continue;
-
-                    shared_ptr<Part> partI = partList[crossI->crossID];
-                    shared_ptr<Part> partJ = partList[crossJ->crossID];
-
-                    if (partI == nullptr || partJ == nullptr)
-                        continue;
-
-                    if (ComputePartCSG(partI->partID, partJ->partID)) {
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
-}
-
-bool Struc::check_same_poly(vector<Vector3f> poly_A, vector<Vector3f> poly_B) {
-	for (int ind_a = 0; ind_a < poly_A.size(); ++ind_a) {
-		for (int ind_b = 0; ind_b < poly_B.size(); ++ind_b) {
-			if (len(poly_A[ind_a] - poly_B[ind_b]) < FLOAT_ERROR_LARGE)
-				return true;
-		}
-	}
-	return false;
-}
-
-vector<Vector3f> Struc::MergePoly(vector<Vector3f> poly_A, vector<Vector3f> poly_B)
-{
-	vector<Vector3f> merged_poly;
-	for (int ind_a = 0; ind_a < poly_A.size(); ++ind_a) {
-		bool new_vx = true;
-		for (int ind_b = 0; ind_b < poly_B.size(); ++ind_b) {
-			if (len(poly_A[ind_a] - poly_B[ind_b]) < FLOAT_ERROR_LARGE)
-				new_vx = false;
-		}
-		if (new_vx)	merged_poly.push_back(poly_A[ind_a]);
-	}
-	for (int ind_b = 0; ind_b < poly_B.size(); ++ind_b)
-		merged_poly.push_back(poly_B[ind_b]);
-	RearrangePoints(merged_poly);
-	return merged_poly;
-}
-
-void Struc::ComputePartCutHeight(vector<Vector2f> &heights)
-{
-	heights.resize(partList.size(), Vector2f(0, 0));
-	for(int id = 0; id < contactList.size(); id++){
-		shared_ptr<Contact> contact = contactList[id];
-		int partIDs[2] = {contact->partIDA, contact->partIDB};
-		//partIDA
-		for(int partID : partIDs)
-		{
-			shared_ptr<Part> part = partList[partID];
-			Vector3f center = part->cross.lock()->center;
-			Vector3f normal = part->cross.lock()->normal;
-			normal /= len(normal);
-
-			for(int kd = 0; kd < 2; kd++){
-				if(kd == 1) normal = normal * (-1.0f);
-				for(Vector3f cpt: contact->contactPoly)
-				{
-					double dist = (cpt - center) DOT normal;
-					if(dist > heights[partID][kd]) heights[partID][kd] = dist;
-				}
-			}
-		}
-	}
-	return;
-}
 
 //**************************************************************************************//
 //                                   Save OBJ Models
@@ -840,7 +717,7 @@ void Struc::WriteStructureWireFrame(const char *folderPath)
     {
         partIDs.push_back(partList[i]->partID);
         shared_ptr<Part> part = make_shared<Part>(*partList[i]);
-        part->polyMesh->TranslateMesh(Vector3f(0, -varList.get<float>("ground_height"), 0));
+        part->polyMesh->TranslateMesh(Vector3f(0, -getVarList()->get<float>("ground_height"), 0));
         int assemblyID = part->assemblyID;
         _partList.push_back(part);
     }
@@ -851,17 +728,6 @@ void Struc::WriteStructureWireFrame(const char *folderPath)
         PartGroup parts = PartGroup(_partList, partIDs);
         parts.WriteGroupOBJWireModel(objFileName);
     }
-}
-
-
-void Struc::WriteStructureForSimulation(const char *folderPath){
-	for (int i = 0; i < partList.size(); i++)
-	{
-		pPart part = partList[i];
-		char objFileName[FILE_NAME_LENGTH];
-		sprintf(objFileName, "%s/Part_%d.obj", folderPath, i);
-		part->WriteOBJModel(objFileName);
-	}
 }
 
 void Struc::WritePartGraph(char *folderPath)
@@ -908,998 +774,94 @@ void Struc::WritePartGraph(char *folderPath)
 	}
 }
 
-
-void Struc::WriteDisassemFiles(char *folderPath, vector<int> doorPartIDs)
-{
-	/////////////////////////////////////////////////////////////////
-	// 1. Assembly parts as a single piece
-
-	vector<int> suppPartIDs;
-	for (int i = 0; i < partList.size(); i++)
-	{
-		pPart part = partList[i];
-
-		if (part->atBoundary == true)
-		{
-			if (GetElementIndexInList(part->partID, doorPartIDs) == ELEMENT_OUT_LIST)
-			{
-				suppPartIDs.push_back(part->partID);
-			}
-		}
-	}
-
-
-	char suppObjFileName[FILE_NAME_LENGTH];
-	sprintf(suppObjFileName, "%s\\Supp_Fix.obj", folderPath);
-
-	PartGroup suppGroup = PartGroup(partList, suppPartIDs);
-	suppGroup.WriteGroupOBJModel(suppObjFileName);
-
-
-	/////////////////////////////////////////////////////////////////
-	// 2. Door parts as a single piece
-
-	char doorObjFileName[FILE_NAME_LENGTH];
-	sprintf(doorObjFileName, "%s\\Supp_Door.obj", folderPath);
-
-	PartGroup doorGroup = PartGroup(partList, doorPartIDs);
-	doorGroup.WriteGroupOBJModel(doorObjFileName);
-
-
-	/////////////////////////////////////////////////////////////////
-	// 3. Other parts as individual pieces
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		char objFileName[FILE_NAME_LENGTH];
-		sprintf(objFileName, "%s\\Part_%02d.obj", folderPath, i);
-
-		if (partList[i]->atBoundary == false)
-		{
-			partList[i]->WriteOBJModel(objFileName);
-		}
-	}
-
-
-	/////////////////////////////////////////////////////////////////
-	// 4. Save parts motion file
-
-	WriteMotionFile(folderPath);
-}
-
-
-void Struc::WriteMotionFile(char *folderPath)
-{
-	char motionFileName[512];
-	sprintf(motionFileName, "%s\\animation.motion.txt", folderPath);
-
-	FILE *fp;
-	if ((fp = fopen(motionFileName, "w+")) == NULL)
-	{
-		printf("Error: file not exists! \n");
-		return;
-	}
-	else
-	{
-		////////////////////////////////////////////////////////
-		// Write piece OBJ model name and number
-
-		fprintf(fp, "\n# List of object files with id starts from 1\n");
-		fprintf(fp, "Objects %d\n", (int)partMoveList.size() + 2);
-
-		fprintf(fp, "Supp_Door.obj ");
-
-		for (int i = 0; i < partMoveList.size(); i++)
-		{
-			int partID = partMoveList[i].partID;
-			char partFileName[FILE_NAME_LENGTH];
-			sprintf(partFileName, "Part_%02d.obj ", partID);
-
-			fprintf(fp, "%s", partFileName);
-		}
-
-		fprintf(fp, "Supp_Fix.obj ");
-
-		fprintf(fp, "\n");
-
-
-		////////////////////////////////////////////////////////
-		// Write piece disassembly actions
-
-		const int frameNum = 100;
-		const float dist = 3.0f;
-
-		fprintf(fp, "\n# List of actions during the animation\n");
-
-		Vector3f doorMoveVec = dist * Vector3f(0, 0, 1);
-
-		fprintf(fp, "Begin Action %d\n", frameNum);
-		fprintf(fp, "Move id %d [%.2f, %.2f, %.2f]\n", 1, doorMoveVec.x, doorMoveVec.y, doorMoveVec.z);
-		fprintf(fp, "End\n");
-
-		for (int i = partMoveList.size() - 1; i >= 0; i--)
-			//for (int i = 0; i <partMoveList.size(); i++)
-		{
-
-			Vector3f moveVector = dist * partMoveList[i].transVec;
-
-			// TODO: may need to make this more flexible
-			fprintf(fp, "Begin Action %d\n", frameNum);
-			fprintf(fp, "Move id %d [%.2f, %.2f, %.2f]\n", i + 2, moveVector.x, moveVector.y, moveVector.z);
-			//fprintf(fp, "Move id %d [%.2f, %.2f, %.2f]\n", i + 1, moveVector.x, moveVector.y, moveVector.z);
-			fprintf(fp, "End\n");
-		}
-
-		fclose(fp);
-	}
-}
-
-//**************************************************************************************//
-//                                   Test Functions
-//**************************************************************************************//
-
-void Struc::Function_PartGroup(vector<int> &pickPartIDs)
-{
-	if (partList.size() == 0)
-		return;
-
-	partGroup.reset();
-
-	/*vector<int> groupPartIDs;
-	for (int i = 0; i <partList.size(); i++)
-	{
-		Part *part = partList[i];
-
-		if( part->atBoundary == false)
-		{
-			groupPartIDs.push_back(part->partID);
-		}
-	}*/
-
-	//pickPartIDs = groupPartIDs;
-
-	//partGroup = new PartGroup(partList, groupPartIDs);
-	partGroup = make_shared<PartGroup>(partList, pickPartIDs);
-
-	//partGroup->IdentifyGroupBoundary();
-
-	bool isMobile = partGroup->EvaluateGroupMobility();
-}
-
-void Struc::Function_Mobility(vector<int> groupPartIDs)
-{
-	partGroup.reset();
-	partGroup = make_shared<PartGroup>(partList, groupPartIDs);
-
-	bool isMobile = partGroup->EvaluateGroupMobility();
-}
-
-void Struc::Function_Test()
-{
-	vector<int> groupPartIDs;
-
-	for(int i=0; i<partList.size(); i++)
-	{
-		groupPartIDs.push_back( partList[i]->partID );
-	}
-
-	partGroup.reset();
-	partGroup = make_shared<PartGroup>(partList, groupPartIDs);
-
-	bool isMobile = partGroup->EvaluateGroupMobility();
-
-	/*vector<Vector3f> points;
-	points.push_back(Vector3f(-1.0, 0.0, 0));
-	points.push_back(Vector3f(0.0, 1.0, 0));
-	points.push_back(Vector3f(1.0, 0.0, 0));
-	points.push_back(Vector3f(0.0, -1.0, 0));
-	points.push_back(Vector3f(-0.1, -0.1, 0));
-
-	vector<Vector3f> normals;
-	normals.push_back(Vector3f(-1.0, 0.0, -0.5));
-	normals.push_back(Vector3f(0.0, 1.0, 0.5));
-	normals.push_back(Vector3f(1.0, 0.0, -0.5));
-	normals.push_back(Vector3f(0.0, -1.0, 0.5));
-	normals.push_back(Vector3f(-0.5, -1.0, 0.0));
-
-	vector<OrientPoint*> oriPts;
-	for (int i = 0; i < points.size(); i++)
-	{
-		OrientPoint *oriPt = new OrientPoint();
-		oriPt->point = points[i];
-		oriPt->normal = normals[i];
-
-		oriPts.push_back(oriPt);
-	}
-
-	Part *part = new Part(oriPts);
-	part->ComputePartGeometry();
-	partList.push_back(part);*/
-}
-
-
-#if USE_OPENGL_DRAW
-
-//**************************************************************************************//
-//                                 Draw TI Construction
-//**************************************************************************************//
-
-void Struc::DrawOriPoints(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		partList[i]->DrawOriPoints();
-	}
-
-	glPopMatrix();
-}
-
-void Struc::DrawInnerPolygons(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		partList[i]->DrawInnerPolygon();
-	}
-
-	glPopMatrix();
-}
-
-void Struc::DrawGeomFaces(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	//int i = 0;
-	for (int i = 0; i < partList.size(); i++)
-	{
-		partList[i]->DrawGeomFaces();
-	}
-
-	glPopMatrix();
-}
-
-void Struc::DrawGeomEdges(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		partList[i]->DrawGeomEdges();
-	}
-
-	glPopMatrix();
-}
-
-void Struc::DrawGeomVertices(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		partList[i]->DrawGeomVertices();
-	}
-
-//	for(int partID: pickPartIDs){
-//		partList[partID]->DrawGeomVertices();
-//	}
-
-	glPopMatrix();
-}
-
-
-
-
-//**************************************************************************************//
-//                                 Draw Part Group Mobility
-//**************************************************************************************//
-
-void Struc::DrawGroupMobiliFaces(double worldMatrix[])
-{
-	if (partGroup == NULL)
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	partGroup->DrawMobiliFaces();
-
-	glPopMatrix();
-}
-
-void Struc::DrawGroupMobiliEdges(double worldMatrix[])
-{
-	if (partGroup == NULL)
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	partGroup->DrawMobiliEdges();
-
-	glPopMatrix();
-}
-
-void Struc::DrawGroupMobiliVertices(double worldMatrix[])
-{
-	if (partGroup == NULL)
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	partGroup->DrawMobiliVertices();
-
-	glPopMatrix();
-}
-
-void Struc::DrawGroupMobiliRays(double worldMatrix[])
-{
-	if (partGroup == NULL)
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	partGroup->DrawMobiliRays();
-
-	glPopMatrix();
-}
-
-void Struc::DrawGroupMobiliVectors(double worldMatrix[])
-{
-	if (partGroup == NULL)
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	partGroup->DrawMobiliVector();
-
-	glPopMatrix();
-}
-
-void Struc::DrawGroupMobiliMeshes(double worldMatrix[])
-{
-	if (partGroup == NULL)
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	partGroup->DrawMobiliMesh();
-
-	glPopMatrix();
-}
-
-
-
-
-//**************************************************************************************//
-//                                   Draw TI Structure
-//**************************************************************************************//
-
-void Struc::DrawStructure(int mode, double worldMatrix[])
-{
-	if (partList.size() == 0)
-		return;
-
-	//int i = 12;
-
-	if(varList.get<bool>("showPickParts"))
-	{
-		vector<weak_ptr<Part>> partial_parts;
-		for (int i = 0; i < pickPartIDs.size(); i++)
-		{
-		    if(pickPartIDs[i] >= partList.size() || pickPartIDs[i] < 0)
-                continue;
-			pPart part = partList[pickPartIDs[i]];
-			partial_parts.push_back(part);
-		}
-		DrawParts(mode, worldMatrix, partial_parts);
-	}
-	else if(varList.get<bool>("showAssembly"))
-	{
-//		int startID = varList.get<int>("assembling_Kth_part") + 1;
-//		vector<weak_ptr<Part>> partial_parts;
-//		vector<weak_ptr<Part>> extra_boundaries;
-//		for(int i = startID; i < assemblingSequence->orderParts.size(); i++){
-//			int partID = assemblingSequence->orderParts[i].lock()->staticID;
-//			shared_ptr<Part> part = partList[partID];
-//			partial_parts.push_back(part);
-//		}
 //
-//		for(int i = 0; i < assemblingSequence->boundaryParts.size(); i++){
-//			int partID = assemblingSequence->boundaryParts[i].lock()->staticID;
-//			shared_ptr<Part> part = partList[partID];
-//			extra_boundaries.push_back(part);
-//		}
-//
-//		DrawParts(mode, worldMatrix, partial_parts);
-//		DrawParts(mode, worldMatrix, boundarys);
-//		DrawParts(mode, worldMatrix, extra_boundaries);
-//		if(startID >= 0 && startID < assemblingSequence->orderParts.size())
-//		{
-//			int partID = assemblingSequence->orderParts[startID].lock()->staticID;
-//			DrawPartAssemblyCone(worldMatrix, partList[partID], assemblingSequence->orderCones[startID]);
-//		}
 
-	}
-	else {
-		if(!parts.empty()){
-			DrawParts(mode, worldMatrix, parts);
-			DrawParts(mode, worldMatrix, boundarys);
-		}
-		else{
-			vector<weak_ptr<Part>> partial_parts;
-			for(int i = 0; i < partList.size(); i++){
-				partial_parts.push_back(partList[i]);
-			}
-			DrawParts(mode, worldMatrix, partial_parts);
-		}
-
-	}
-}
-
-void Struc::DrawParts(int mode, double *worldMatrix, const vector<weak_ptr<Part>> &_parts)
+void Struc::ConvexPolygonIntersec(
+        const vector<Vector3f> &polyA,
+        const vector<Vector3f> &polyB,
+        vector<Vector3f> &polyInt)
 {
-	for (int i = 0; i < _parts.size(); i++)
+
+    polyInt.clear();
+
+    _Polygon PA; PA.SetVertices(polyA);
+    _Polygon PB; PB.SetVertices(polyB);
+
+    Vector3f x_axis, y_axis, origin;
+    PA.ComputeFrame(x_axis, y_axis, origin);
+
+    float Scale = getVarList()->get<float>("clipper_scale");
+    vector<Vector3i> intPA = PA.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
+    vector<Vector3i> intPB = PB.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
+
+    ClipperLib::Path pathA, pathB;
+    for(int id = 0; id < intPA.size(); id++){
+        int x = intPA[id].x;
+        int y = intPA[id].y;
+        pathA.push_back(ClipperLib::IntPoint(x, y));
+    }
+
+    for(int id = 0; id < intPB.size(); id++){
+        int x = intPB[id].x;
+        int y = intPB[id].y;
+        pathB.push_back(ClipperLib::IntPoint(x, y));
+    }
+
+    ClipperLib::Clipper solver;
+    solver.AddPath(pathA, ClipperLib::ptSubject, true);
+    solver.AddPath(pathB, ClipperLib::ptClip, true);
+    ClipperLib::Paths path_int;
+    solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+
+    if(path_int.empty()) return;
+
+    for(ClipperLib::IntPoint pt : path_int[0]){
+        float x = pt.X / Scale;
+        float y = pt.Y / Scale;
+        Vector3f pos = x_axis * x + y_axis * y + origin;
+        polyInt.push_back(pos);
+    }
+
+    vector<Vector3f> polySimplest;
+    bool doAgain = true;
+    float big_zero_eps = getVarList()->get<float>("big_zero_eps");
+    while(doAgain)
     {
-		pPart part =  _parts[i].lock();
-		if(varList.get<bool>("mult_move") && part->atBoundary == false)
+        doAgain = false;
+        polySimplest.clear();
+        int N = polyInt.size();
+        for(int id = 0; id < polyInt.size(); id++)
         {
-		    if(contactGraph && !contactGraph->translation.isZero())
-		    {
-		        Eigen::VectorXd &translation = contactGraph->translation;
-		        int assemblyID = part->assemblyID;
-                if(assemblyID != -1) {
-                    Vector3f move(translation[3 * assemblyID], translation[3 * assemblyID + 1], translation[3 * assemblyID + 2]);
-                    move *= varList.get<float>("mult_move_scale");
-                    part = make_shared<Part>(*_parts[i].lock());
-                    part->polyMesh->TranslateMesh(move);
-                }
+            Vector3f ppt = polyInt[(id - 1 + N) % N];
+            Vector3f pt =  polyInt[id];
+            Vector3f npt = polyInt[(id + 1) % N];
+            Vector3f tA = ppt - pt;
+            Vector3f tB = npt - pt;
+            if(len(tA) < big_zero_eps || len(tB) < big_zero_eps) {
+                doAgain = true; continue;
             }
-        }
-
-		if(part == nullptr)
-            continue;
-		if (part->isRemove) continue;
-
-		if (mode == GL_SELECT)
-		{
-			glLoadName(part->partID);
-			glPushName(part->partID);
-		}
-
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadMatrixd(worldMatrix);
-
-		part->DrawPart();
-
-		glPopMatrix();
-
-		if (mode == GL_SELECT)
-		{
-			glPopName();
-		}
-	}
-}
-
-void Struc::DrawStructureWire(double worldMatrix[])
-{
-	if (partList.size() == 0)
-		return;
-
-	if(varList.get<bool>("showPickParts"))
-	{
-        vector<weak_ptr<Part>> partial_parts;
-        for (int i = 0; i < pickPartIDs.size(); i++)
-        {
-            if(pickPartIDs[i] >= partList.size() || pickPartIDs[i] < 0)
-                continue;
-            pPart part = partList[pickPartIDs[i]];
-            partial_parts.push_back(part);
-        }
-        DrawPartsWire(worldMatrix, partial_parts);
-	}
-	else if(varList.get<bool>("showAssembly"))
-	{
-//		int startID = varList.get<int>("assembling_Kth_part") + 1;
-//		vector<weak_ptr<Part>> partial_parts;
-//		vector<weak_ptr<Part>> extra_boundaries;
-//		for(int i = startID; i < assemblingSequence->orderParts.size(); i++){
-//			int partID = assemblingSequence->orderParts[i].lock()->staticID;
-//			shared_ptr<Part> part = partList[partID];
-//			partial_parts.push_back(part);
-//		}
-//
-//		for(int i = 0; i < assemblingSequence->boundaryParts.size(); i++){
-//			int partID = assemblingSequence->boundaryParts[i].lock()->staticID;
-//			shared_ptr<Part> part = partList[partID];
-//			extra_boundaries.push_back(part);
-//		}
-//
-//		DrawPartsWire(worldMatrix, partial_parts);
-//		DrawPartsWire(worldMatrix, boundarys);
-//		DrawPartsWire(worldMatrix, extra_boundaries);
-
-	}
-	else {
-		if(!parts.empty())
-		{
-			DrawPartsWire(worldMatrix, parts);
-			DrawPartsWire(worldMatrix, boundarys);
-		}
-		else{
-			vector<weak_ptr<Part>> partial_parts;
-			for(int i = 0; i < partList.size(); i++){
-				partial_parts.push_back(partList[i]);
-			}
-			DrawPartsWire(worldMatrix, partial_parts);
-		}
-	}
-}
-
-void Struc::DrawPartsWire(double *worldMatrix, const vector<weak_ptr<Part>> &_parts){
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-	for (int i = 0; i < _parts.size(); i++)
-	{
-		pPart part = _parts[i].lock();
-        if(varList.get<bool>("mult_move") && part->atBoundary == false)
-        {
-            if(contactGraph && !contactGraph->translation.isZero())
-            {
-                Eigen::VectorXd &translation = contactGraph->translation;
-                int assemblyID = part->assemblyID;
-                if(assemblyID != -1){
-                    Vector3f move(translation[3 * assemblyID], translation[3 * assemblyID + 1], translation[3 * assemblyID + 2]);
-                    move *= varList.get<float>("mult_move_scale");
-                    part = make_shared<Part>(*_parts[i].lock());
-                    part->polyMesh->TranslateMesh(move);
-                }
+            double cross_product = len(tA CROSS tB)/len(tA)/len(tB);
+            if(cross_product < big_zero_eps) {
+                doAgain = true; continue;
             }
+            polySimplest.push_back(pt);
         }
-		if (part == nullptr || part->isRemove)
-			continue;
-
-//		if(!pickPartIDs.empty() && pickPartIDs[0] != i)
-//			continue;
-
-		part->DrawPartWire(2.0, part->wire_color);
-	}
-	glPopMatrix();
+        polyInt = polySimplest;
+    }
+    return;
 }
 
-void Struc::DrawStructure3DText(double worldMatrix[])
+void ProjectPolygonTo3D(const vector<Vector3f> &poly, double projMat[], vector<Vector3f> &poly3D)
 {
-	if (partList.size() == 0)
-		return;
+    poly3D.clear();
 
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	float scale = 0.04f * avgPartSize;
-	for (int i = 0; i < partList.size(); i++)
-	{
-		pPart part = partList[i];
-
-		if(part->isRemove) continue;
-
-		part->DrawPart3DText(scale, 2.0, Vector3f(0.2, 0.2, 0.2));
-	}
-
-	glPopMatrix();
-}
-
-void Struc::DrawStructureNormals(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-        if(partList[i]->isRemove) continue;
-		partList[i]->DrawPartNormals();
-	}
-//    for (int i = 0; i < pickPartIDs.size(); i++)
-//    {
-//        partList[pickPartIDs[i]]->DrawPartNormals();
-//    }
-
-	glPopMatrix();
-}
-
-void Struc::DrawStructureBBox(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-        if(partList[i]->isRemove) continue;
-		partList[i]->DrawPartBBox(2.5, Vector3f(0.3, 0.6, 0.3));
-	}
-
-	glPopMatrix();
-}
-
-void Struc::DrawStructureCentroid(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-        if(partList[i]->isRemove) continue;
-		partList[i]->DrawPartCentroid(0.02, Vector3f(0.6, 0.9, 0.9));
-	}
-
-	glPopMatrix();
-}
-
-void Struc::DrawStructureGraph(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	glDisable(GL_LIGHTING);
-	glLineWidth(3.0);
-	glColor3f(0.9, 0.2, 0.9);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		pPart part = partList[i];
-
-		if (part->isRemove) continue;
-
-		Vector3f partCen = part->polyMesh->centroid;
-
-		for (int j = 0; j < part->currNeighbors.size(); j++)
-		{
-			pPart neibor = part->currNeighbors[j].lock();
-
-			if (neibor == NULL)
-				continue;
-
-			Vector3f neiborCen = neibor->polyMesh->centroid;
-
-			glBegin(GL_LINES);
-			glVertex3f(partCen.x, partCen.y, partCen.z);
-			glVertex3f(neiborCen.x, neiborCen.y, neiborCen.z);
-			glEnd();
-		}
-	}
-
-	glEnable(GL_LIGHTING);
-	glLineWidth(1.0);
-
-	glPopMatrix();
-}
-
-
-
-
-//**************************************************************************************//
-//                                Draw Picked Part(s)
-//**************************************************************************************//
-
-void Struc::DrawPickPart(int pickPartID, double worldMatrix[])
-{
-	if (pickPartID < 0 || pickPartID >= partList.size())
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	pPart pickPart = partList[pickPartID];
-	pickPart->DrawPartWire(5.0, Vector3f(0.2, 0.9, 0.2));
-
-	glPopMatrix();
-}
-
-void Struc::DrawPickPartGroup(vector<int> pickPartIDs, double worldMatrix[])
-{
-    Vector3f cyan = Vector3f(0.612,  0.784,  0.953);
-    //Vector3f yellow = Vector3f(0.953,  0.886,  0.667);
-    //Vector3f green = Vector3f(0.906,  0.973,  0.780);
-
-	for (int i = 0; i < pickPartIDs.size(); i++)
-	{
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadMatrixd(worldMatrix);
-
-		int partID = pickPartIDs[i];
-		if(partID < 0 || partID >= partList.size())
-            continue;
-		pPart pickPart = partList[partID];
-		pickPart->DrawPartWire(5.0, cyan);
-
-		glPopMatrix();
-	}
-}
-
-void Struc::DrawDebug_PartGroup(double worldMatrix[])
-{
-	if( partGroup == NULL )
-		return;
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	partGroup->DrawOriPoints();
-
-	glPopMatrix();
-}
-
-
-
-
-//**************************************************************************************//
-//                                   Draw Equilibrium
-//**************************************************************************************//
-
-
-void Struc::DrawStructureContacts(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	Vector3f red    = Vector3f(230, 184, 185) / 255.0f;
-    Vector3f yellow = Vector3f(243, 226, 170) / 255.0f;
-    Vector3f purple = Vector3f(192, 140, 233) / 255.0f;
-
-    if(varList.get<bool>("showPickParts"))
+    for (int i = 0; i < poly.size(); i++)
     {
-        map<int, bool> visited;
-        for(int partID: pickPartIDs){
-            visited[partID] = true;
-        }
+        Vector3f ver3D;
+        MultiplyPoint( poly[i], projMat, ver3D);
 
-        for (int i = 0; i < contactList.size(); i++)
-        {
-            if(visited[contactList[i]->partIDA] == false) continue;
-            if(visited[contactList[i]->partIDB] == false) continue;
-            vector<Vector3f> contact_poly = contactList[i]->contactPoly;
-            if(contact_poly.size() > 1)
-            {
-                DrawPolygon(contact_poly, 6.0, red);
-
-                for(int j=0; j<contact_poly.size(); j++ )
-                {
-                    Vector3f startPt = contact_poly[j];
-                    Vector3f endPt = startPt + 0.12f * contactList[i]->normal;
-
-                    DrawLine(startPt, endPt, 6.0f, purple);
-                }
-            }
-
-
-            if(varList.get<bool>("showOptGraident") && contactList[i]->versDiff.size() == contact_poly.size())
-            {
-                glColor3f(0.4f, 0.4f, 0.9f);
-                glLineWidth(5);
-                glDisable(GL_LIGHTING);
-                for(int j = 0; j < contact_poly.size(); j++){
-                    glBegin(GL_LINES);
-                    Vector3f pt = contact_poly[j];
-                    Vector3f pt_gradient = pt + contactList[i]->versDiff[j];
-                    glVertex3d(pt.x, pt.y, pt.z);
-                    glVertex3d(pt_gradient.x, pt_gradient.y, pt_gradient.z);
-                    glEnd();
-                }
-                glEnable(GL_LIGHTING);
-                glLineWidth(1);
-            }
-
-        }
-    }
-    else{
-        for (int i = 0; i < contactList.size(); i++)
-        {
-            vector<Vector3f> contact_poly = contactList[i]->contactPoly;
-            if(contact_poly.size() > 1)
-            {
-                DrawPolygon(contact_poly, 6.0, Vector3f(0.9, 0.3, 0.3));
-            }
-        }
+        poly3D.push_back( ver3D );
     }
 
-	glPopMatrix();
+    return;
 }
-
-void Struc::DrawStructureForces(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		if(pickPartIDs.empty() || pickPartIDs[0] == i)
-		{
-			shared_ptr<Part> part = partList[i];
-			part->DrawContactForces();
-		}
-	}
-	glPopMatrix();
-}
-
-void Struc::DrawStructureSupport(double worldMatrix[])
-{
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	for (int i = 0; i < partList.size(); i++)
-	{
-		pPart part = partList[i];
-		part->DrawSupport();
-	}
-	glPopMatrix();
-}
-
-void Struc::DrawStructureGravityCone(double *worldMatrix)
-{
-	if(!contactGraph)
-		return;
-
-	vector<ContactGraph::SlopeSearchRegion> &gravity_cone = contactGraph->gravity_cone;
-	if(gravity_cone.empty())
-		return;
-
-	shared_ptr<PolyMesh> slopeMesh;
-	slopeMesh = std::make_shared<PolyMesh>();
-
-	 EigenPoint gravity(0, -1, 0), vec;
-    // EigenPoint gravity(0, -0.5, 0), vec;
-
-	for(int id = 0; id < gravity_cone.size(); id++){
-
-		pPolygon poly = make_shared<_Polygon>();
-		poly->vers.push_back(Vector3f(0, varList.get<float>("ground_height"), 0));
-
-		vec = gravity + gravity_cone[id].va * tan(gravity_cone[id].ta / 180 * M_PI);
-		poly->vers.push_back(Vector3f(vec[0], vec[1] + varList.get<float>("ground_height"), vec[2]));
-
-		vec = gravity + gravity_cone[id].vb * tan(gravity_cone[id].tb / 180 * M_PI);
-		poly->vers.push_back(Vector3f(vec[0], vec[1] + varList.get<float>("ground_height"), vec[2]));
-
-		slopeMesh->polyList.push_back(poly);
-	}
-
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadMatrixd(worldMatrix);
-
-	//Vector3f color = ColorMapping(0, M_PI/2, contactGraph->minimum_slope / 180 * M_PI);
-
-    Vector3f color = Vector3f(0.612,  0.784,  0.953);
-
-	float mtlAmbient[4] = { color.x, color.y, color.z, 0.4 };
-	float mtlDiffuse[4] = { color.x, color.y, color.z, 0.4 };
-	float mtlSpecular[4] = { color.x, color.y, color.z, 0.4 };
-	float mtlEmission[4] = { color.x, color.y, color.z, 0.4 };
-
-	glPushAttrib(GL_LIGHTING_BIT);
-	    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mtlAmbient);
-	    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mtlDiffuse);
-	    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mtlSpecular);
-	    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, mtlEmission);
-	slopeMesh->DrawMesh();
-	slopeMesh->DrawMesh_Wire(2.0, Vector3f(0.3, 0.3, 0.3));
-	glPopAttrib();
-
-	glPopMatrix();
-}
-
-void Struc::DrawContactEdgeNormal(double *worldMatrix)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadMatrixd(worldMatrix);
-
-    AveragePartSize();
-
-    Vector3f red    = Vector3f(230, 184, 185) / 255.0f;
-    Vector3f yellow = Vector3f(243, 226, 170) / 255.0f;
-    Vector3f purple = Vector3f(192, 140, 233) / 255.0f;
-
-    if(varList.get<bool>("showPickParts"))
-    {
-        map<int, bool> visited;
-        for(int partID: pickPartIDs){
-            visited[partID] = true;
-        }
-
-        for (int i = 0; i < contactList.size(); i++)
-        {
-            if(visited[contactList[i]->partIDA] == false) continue;
-            if(visited[contactList[i]->partIDB] == false) continue;
-            vector<Vector3f> contact_poly = contactList[i]->contactPoly;
-            if(contact_poly.size() == 1)
-            {
-                Vector3f startPt = contact_poly[0];
-                //Vector3f endPt = startPt + 0.2f * avgPartSize * contactList[i]->normal;
-                Vector3f endPt = startPt + 0.13f * contactList[i]->normal;
-                DrawLine(startPt, endPt, 8.0f, purple);
-            }
-        }
-    }
-    else{
-        for (int i = 0; i < contactList.size(); i++)
-        {
-            vector<Vector3f> contact_poly = contactList[i]->contactPoly;
-            if(contact_poly.size() == 1)
-            {
-                Vector3f startPt = contact_poly[0];
-                Vector3f endPt = startPt + 0.2f * avgPartSize * contactList[i]->normal;
-                DrawLine(startPt, endPt, 2.0f, purple);
-            }
-        }
-    }
-
-}
-
-void Struc::DrawMultMovement(double *worldMatrix)
-{
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadMatrixd(worldMatrix);
-
-
-    Vector3f red    = Vector3f(230, 184, 185) / 255.0f;
-    Vector3f yellow = Vector3f(243, 226, 170) / 255.0f;
-    Vector3f purple = Vector3f(192, 140, 233) / 255.0f;
-
-    for (int i = 0; i < parts.size(); i++) {
-        pPart part = parts[i].lock();
-        if (varList.get<bool>("mult_move") && part->atBoundary == false) {
-            if (contactGraph && !contactGraph->translation.isZero()) {
-                Eigen::VectorXd &translation = contactGraph->translation;
-                int assemblyID = part->assemblyID;
-                if (assemblyID != -1) {
-                    Vector3f textLinkPt = part->polyMesh->ComputeExtremeVertex(part->cross.lock()->normal);
-                    Vector3f move = Vector3f(translation[3 * assemblyID], translation[3 * assemblyID + 1],
-                                  translation[3 * assemblyID + 2]) * 1.5f;
-                    DrawLine(textLinkPt, textLinkPt + move, 5.0f, purple);
-                }
-            }
-        }
-    }
-}
-
-
-
-
-#endif

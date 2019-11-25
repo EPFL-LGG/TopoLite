@@ -20,7 +20,7 @@
 #include "Utility/vec.h"
 #include "Polygon.h"
 #include "Utility/TopoObject.h"
-#include "IO/gluiVar.h"
+#include "IO/InputVar.h"
 #include "Mesh/PolyMesh.h"
 
 #include <vector>
@@ -38,7 +38,7 @@ class MeshConverter: public TopoObject
 
 public:
     MeshConverter(){}
-    MeshConverter(std::shared_ptr<gluiVarList> var) : TopoObject(var){}
+    MeshConverter(std::shared_ptr<InputVarList> var) : TopoObject(var){}
 	~MeshConverter(){}
 
 public:

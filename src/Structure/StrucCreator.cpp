@@ -11,36 +11,35 @@
 //
 ///////////////////////////////////////////////////////////////
 #include <cmath>
-#include "Utility/Controls.h"
-#include "../Utility/HelpDefine.h"
-#include "../Utility/HelpStruct.h"
-#include "../Utility/HelpFunc.h"
-#include "../Utility/math3D.h"
+#include <tbb/tbb.h>
+
+#include "Utility/HelpDefine.h"
+#include "Utility/HelpStruct.h"
+#include "Utility/HelpFunc.h"
+#include "Utility/math3D.h"
+
 #include "Mesh/Cross.h"
 #include "Mesh/CrossMesh.h"
-#include "CrossMesh/CrossMeshCreator.h"
 #include "Mesh/PolyMesh.h"
+
+#include "CrossMesh/CrossMeshCreator.h"
+#include "CrossMesh/AugmentedVectorCreator.h"
+
 #include "Part.h"
 #include "PartGroup.h"
-#include "BodyMobili.h"
 #include "Struc.h"
 #include "StrucCreator.h"
-#include "IO/gluiVar.h"
-#include "tbb/tbb.h"
-#include "CrossMesh/AugmentedVectorCreator.h"
-extern Vector3f colorTable[18];
-extern gluiVarList varList;
-extern vector<int> pickPartIDs;
+#include "IO/InputVar.h"
 
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
-StrucCreator::StrucCreator(shared_ptr<gluiVarList> var): TopoObject(var)
+StrucCreator::StrucCreator(shared_ptr<InputVarList> var): TopoObject(var)
 {
-	refModel = nullptr;
+    crossMeshCreator = nullptr;
 
-	myStruc = nullptr;
+	struc = nullptr;
 }
 
 StrucCreator::~StrucCreator()
@@ -50,26 +49,27 @@ StrucCreator::~StrucCreator()
 
 void StrucCreator::ClearStruc()
 {
-	myStruc.reset();
-	refModel.reset();
+	struc.reset();
+
+    crossMeshCreator.reset();
 }
 
 StrucCreator::StrucCreator(const StrucCreator &_myStruc) : TopoObject(_myStruc)
 {
     ClearStruc();
 
-    if(_myStruc.refModel)
-        refModel = make_shared<CrossMeshCreator>(*_myStruc.refModel);
+    if(_myStruc.crossMeshCreator)
+        crossMeshCreator = make_shared<CrossMeshCreator>(*_myStruc.crossMeshCreator);
 
-    if(_myStruc.myStruc)
+    if(_myStruc.struc)
     {
-        myStruc = make_shared<Struc>(*_myStruc.myStruc);
-        for(int id = 0; id < myStruc->partList.size(); id++)
+        struc = make_shared<Struc>(*_myStruc.struc);
+        for(int id = 0; id < struc->partList.size(); id++)
         {
-            shared_ptr<Part> part = myStruc->partList[id];
-            if(_myStruc.myStruc->partList[id]->cross.lock())
+            shared_ptr<Part> part = struc->partList[id];
+            if(_myStruc.struc->partList[id]->cross.lock())
             {
-                part->cross = refModel->crossMesh->crossList[_myStruc.myStruc->partList[id]->cross.lock()->crossID];
+                part->cross = crossMeshCreator->crossMesh->crossList[_myStruc.struc->partList[id]->cross.lock()->crossID];
                 part->partGeom->ParseCrossData(part->cross.lock());
             }
         }
@@ -84,8 +84,8 @@ StrucCreator::StrucCreator(const StrucCreator &_myStruc) : TopoObject(_myStruc)
 bool StrucCreator::LoadSurface(const char * objFileName)
 {
 	ClearStruc();
-	refModel = make_shared<CrossMeshCreator>();
-	if(!refModel->LoadReferenceSurface(objFileName))
+	crossMeshCreator = make_shared<CrossMeshCreator>();
+	if(!crossMeshCreator->LoadReferenceSurface(objFileName))
 	{
 		return false;
 	}
@@ -93,46 +93,46 @@ bool StrucCreator::LoadSurface(const char * objFileName)
 }
 
 int StrucCreator::CreateStructure(bool createCrossMesh,
-								  bool texturedModel,
+								  bool textureMode,
 								  double interactMatrix[],
 								  bool previewMode)
 {
 
-	float tiltAngle = getVarList()->get<float>("tiltAngle");
-	float patternID = getVarList()->get<int>("patternID");
-	float patternRadius = getVarList()->get<int>("patternRadius");
-	float cutUpper = getVarList()->get<float>("cutUpper");
-	float cutLower = getVarList()->get<float>("cutLower");
-    bool lockAngle = getVarList()->get<bool>("lockTiltAngle");
+	float   tiltAngle       = getVarList()->get<float>("tiltAngle");
+	float   patternID       = getVarList()->get<int>("patternID");
+	float   patternRadius   = getVarList()->get<int>("patternRadius");
+	float   cutUpper        = getVarList()->get<float>("cutUpper");
+	float   cutLower        = getVarList()->get<float>("cutLower");
+    bool    lockAngle       = getVarList()->get<bool>("lockTiltAngle");
 
 	tbb::tick_count sta = tbb::tick_count::now();
-	if (refModel == nullptr) return 0;
+	if (crossMeshCreator == nullptr) return 0;
 
-	myStruc.reset();
+	struc.reset();
 
 	////////////////////////////////////////////////////////////////
 	// 1. Create a cross mesh from a polygonal mesh
 	if ( createCrossMesh && !lockAngle)
 	{
-		refModel->CreateCrossMesh(texturedModel, tiltAngle, patternID, patternRadius, previewMode, interactMatrix);
+		crossMeshCreator->CreateCrossMesh(textureMode, tiltAngle, patternID, patternRadius, previewMode, interactMatrix);
 	}
-	pCrossMesh crossMesh = refModel->crossMesh;
+	pCrossMesh crossMesh = crossMeshCreator->crossMesh;
 	std::cout << "Compute Cross Mesh:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 
 	////////////////////////////////////////////////////////////////
 	// 2. Construct a part (i.e., convex polyhedron) from each 3D polygon
 
 	sta = tbb::tick_count::now();
-	myStruc = make_shared<Struc>();
+	struc = make_shared<Struc>(getVarList());
 
 	for (int i = 0; i < crossMesh->crossList.size(); i++)
 	{
 		pCross cross = crossMesh->crossList[i];
 		pPart part = make_shared<Part>(cross, getVarList());
-		part->partID = myStruc->partList.size();
+		part->partID = struc->partList.size();
 		if (part->CheckLegalGeometry())
 		{
-			myStruc->partList.push_back(part);
+			struc->partList.push_back(part);
 		}
 		else
 		{
@@ -144,11 +144,11 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 	std::cout << "Check Legal Geometry:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 
 	sta = tbb::tick_count::now();
-	tbb::parallel_for(tbb::blocked_range<size_t>(0, myStruc->partList.size()), [&](const tbb::blocked_range<size_t>& r)
+	tbb::parallel_for(tbb::blocked_range<size_t>(0, struc->partList.size()), [&](const tbb::blocked_range<size_t>& r)
 	{
 		for (size_t id = r.begin(); id != r.end(); ++id)
 		{
-			shared_ptr<Part> part = myStruc->partList[id];
+			shared_ptr<Part> part = struc->partList[id];
 			part->atBoundary = part->cross.lock()->atBoundary;
 			part->ComputePartGeometry( true, Vector2f(cutUpper, cutLower), previewMode);
 			if( !previewMode )
@@ -159,36 +159,16 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 		}
 	});
 
-
-//	for (size_t id = 0; id < myStruc->partList.size(); ++id)
-//		{
-//			shared_ptr<Part> part = myStruc->partList[id];
-//			part->atBoundary = part->cross.lock()->atBoundary;
-//			part->ComputePartGeometry( true, Vector2f(cutUpper, cutLower), previewMode);
-//			if( !previewMode )
-//			{
-//				part->polyMesh->UpdateVertices();
-//				part->Compute3DTextPosition();
-//			}
-//		}
-
-    if(!previewMode && getVarList()->get<bool>("penetration_check")){
-        if(ComputePartPenetration()){
-            myStruc.reset();
-            return 0;
-        }
-    }
-
-
 	std::cout << "Compute Part Geometry:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
-    std::cout << "Number of Parts:\t" << myStruc->partList.size() << std::endl << std::endl;
-	//3. Compute the auxiliary data
+    std::cout << "Number of Parts:\t" << struc->partList.size() << std::endl << std::endl;
+
+    //3. Compute the auxiliary data
 	if( !previewMode )
 	{
-		myStruc->AveragePartSize();
+        struc->ComputeAveragePartSize();
         BuildPartsGraph();
-		IdentifyBoundaryParts_Disk();
-		myStruc->ComputeGroundY(true);
+        ComputeBoundaryParts();
+		struc->ComputeGroundY(true);
 	}
 	return 1;
 }
@@ -201,20 +181,20 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 	////////////////////////////////////////////////////////////////
 	// 2. Construct a part (i.e., convex polyhedron) from each 3D polygon
 
-	pCrossMesh crossMesh = refModel->crossMesh;
+	pCrossMesh crossMesh = crossMeshCreator->crossMesh;
 
-	myStruc = make_shared<Struc>();
+	struc = make_shared<Struc>(getVarList());
 
 	// TODO: double check these codes
 	for (int i = 0; i < crossMesh->crossList.size(); i++)
 	{
 		pCross cross = crossMesh->crossList[i];
 		pPart part = make_shared<Part>(cross, getVarList());
-		part->partID = myStruc->partList.size();
+		part->partID = struc->partList.size();
 
 		if (part->CheckLegalGeometry(true))
 		{
-			myStruc->partList.push_back(part);
+			struc->partList.push_back(part);
 		}
 		else
 		{
@@ -225,9 +205,9 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 
 	vector<float> timer;
 	timer.resize(6, 0);
-	for (int i = 0; i < myStruc->partList.size(); i++)
+	for (int i = 0; i < struc->partList.size(); i++)
 	{
-		shared_ptr<Part> part = myStruc->partList[i];
+		shared_ptr<Part> part = struc->partList[i];
 
 		part->ComputePartGeometry( true, Vector2f(cutUpper, cutLower), previewMode);
 
@@ -240,9 +220,9 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 
 	if( !previewMode )
 	{
-		myStruc->AveragePartSize();
+        struc->ComputeAveragePartSize();
 		BuildPartsGraph();
-		IdentifyBoundaryParts_Disk();
+        ComputeBoundaryParts();
         ComputePartContacts();
 	}
 
@@ -256,14 +236,13 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 
 void StrucCreator::BuildPartsGraph()
 {
-	if (myStruc == NULL)
+	if (struc == NULL)
 		return;
 
-	CrossMesh *crossMesh = refModel->crossMesh.get();
-
-	for (int i = 0; i < myStruc->partList.size(); i++)
+	CrossMesh *crossMesh = crossMeshCreator->crossMesh.get();
+	for (int i = 0; i < struc->partList.size(); i++)
 	{
-		pPart part = myStruc->partList[i];
+		pPart part = struc->partList[i];
 		if(part == nullptr) continue;
         part->initNeighbors.clear();
 
@@ -282,66 +261,57 @@ void StrucCreator::BuildPartsGraph()
 			else
 			{
 				int neiborCrossID = neiborCross->crossID;
-				if(neiborCrossID >= myStruc->partList.size())
+				if(neiborCrossID >= struc->partList.size())
                     continue;
-				part->initNeighbors.push_back(myStruc->partList[neiborCrossID]);
+				part->initNeighbors.push_back(struc->partList[neiborCrossID]);
 			}
 		}
 	}
 
-	for (int i = 0; i < myStruc->partList.size(); i++)
+	for (int i = 0; i < struc->partList.size(); i++)
 	{
-		pPart part = myStruc->partList[i];
+		pPart part = struc->partList[i];
         if(part == nullptr) continue;
 	}
 }
 
-void StrucCreator::IdentifyBoundaryParts_Disk()
+void StrucCreator::ComputeBoundaryParts()
 {
-	if (myStruc == NULL)
+	if (struc == NULL)
 		return;
 
-	myStruc->IdentifyBoundaryParts_Disk();
+    struc->ComputeBoundaryParts();
 }
 
 void StrucCreator::ComputePartContacts()
 {
-    myStruc->contactList.clear();
-    myStruc->innerContactList.clear();
+    struc->contactList.clear();
+    struc->innerContactList.clear();
 
     if(getVarList()->get<bool>("faceface_contact")) ComputePartFaceContacts();
     if(getVarList()->get<bool>("edgeedge_contact")) ComputePartEdgeContacts();
 }
 
-
 void StrucCreator::ComputePartFaceContactsBruteForce()
 {
-    if (myStruc == nullptr) return;
-    myStruc->ComputePartFaceContactsBruteForce();
+    if (struc == nullptr) return;
+    struc->ComputePartFaceContactsBruteForce();
 }
-
 
 void StrucCreator::ComputePartFaceContacts()
 {
-	if (myStruc == nullptr) return;
-    myStruc->ComputePartFaceContacts();
+	if (struc == nullptr) return;
+    struc->ComputePartFaceContacts();
 }
 
 void StrucCreator::ComputePartEdgeContacts()
 {
-	if (refModel == nullptr || myStruc == nullptr || refModel->crossMesh == nullptr) return;
+	if (crossMeshCreator == nullptr || struc == nullptr || crossMeshCreator->crossMesh == nullptr) return;
 
-	refModel->crossMesh->UpdateCrossVertexIndex();
-	myStruc->ComputePartEdgeContact(refModel->crossMesh->vertexCrossList);
+	crossMeshCreator->crossMesh->UpdateCrossVertexIndex();
+	struc->ComputePartEdgeContact(crossMeshCreator->crossMesh->vertexCrossList);
 }
 
-bool StrucCreator::ComputePartPenetration() {
-    if (refModel == nullptr || myStruc == nullptr || refModel->crossMesh == nullptr)
-        return false;
-
-    refModel->crossMesh->UpdateCrossVertexIndex();
-    return myStruc->ComputePartPenetration(refModel->crossMesh->vertexCrossList);
-}
 
 //**************************************************************************************//
 //                                   Save OBJ Models
@@ -349,16 +319,16 @@ bool StrucCreator::ComputePartPenetration() {
 
 void StrucCreator::WriteStructure(const char *folderPath)
 {
-	if (myStruc == NULL)
+	if (struc == NULL)
 		return;
 
-	myStruc->WriteStructure(folderPath);
+	struc->WriteStructure(folderPath);
 }
 
 void StrucCreator::WriteCrossMesh(char *meshFileName)
 {
-	if( refModel == NULL || refModel->crossMesh == NULL )
+	if( crossMeshCreator == NULL || crossMeshCreator->crossMesh == NULL )
 		return;
 
-	refModel->crossMesh->WriteOBJModel( meshFileName );
+	crossMeshCreator->crossMesh->WriteOBJModel( meshFileName );
 }
