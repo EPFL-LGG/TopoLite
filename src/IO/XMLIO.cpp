@@ -5,7 +5,7 @@
 #include "XMLIO.h"
 #include <sstream>
 #include <boost/algorithm/string.hpp>
-extern int mainWinW, mainWinH;
+
 
 void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
 {

@@ -37,6 +37,7 @@ public:
     vector<int> pickPartIDs;
     double interactMatrix[16];
     pugi::xml_document xmldoc;
+    int mainWinW, mainWinH;
 
     pugi::xml_node xml_groupdata;
     pugi::xml_node xml_mitsuba;
