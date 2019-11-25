@@ -40,14 +40,16 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Release)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Release)
 
-file(GLOB TpCoreFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.cpp
-                      ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh/*.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh/*.h
-                      ${CMAKE_CURRENT_SOURCE_DIR}/src/CrossMesh/*.cpp
-                      ${CMAKE_CURRENT_SOURCE_DIR}/src/CrossMesh/*.h
-                      ${CMAKE_CURRENT_SOURCE_DIR}/src/Structure/*.cpp
-                      ${CMAKE_CURRENT_SOURCE_DIR}/src/Structure/*.h)
+file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/IO/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/IO/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/CrossMesh/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/CrossMesh/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Structure/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Structure/*.h)
 
 add_library(TpCorelib STATIC ${TpCoreFiles})
 

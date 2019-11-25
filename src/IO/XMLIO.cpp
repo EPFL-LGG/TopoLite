@@ -2,12 +2,12 @@
 // Created by ziqwang on 22.02.19.
 //
 
-#include "gluiXML.h"
+#include "XMLIO.h"
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 extern int mainWinW, mainWinH;
 
-void gluiXML::XMLWriter_GUISettings(pugi::xml_node &xml_root)
+void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root)
 {
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
     //guisettings
@@ -169,7 +169,7 @@ void gluiXML::XMLWriter_GUISettings(pugi::xml_node &xml_root)
     }
 }
 
-void gluiXML::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &xmlFileName_path)
+void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &xmlFileName_path)
 {
     pugi::xml_node xml_output = xmlroot.child("Output");
     if(!xml_output) xml_output = xmlroot.append_child("Output");
@@ -264,7 +264,7 @@ void gluiXML::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path 
     }
 }
 
-void gluiXML::XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path)
+void XMLIO::XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path)
 {
     string file_name = xmlFileName_path.filename().stem().string();
     string data_path = xmlFileName_path.parent_path().string();
@@ -288,7 +288,7 @@ void gluiXML::XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::pat
     mitsubadata_attr.set_value(relative_Mitsuba_path.c_str());
 }
 
-void gluiXML::XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path)
+void XMLIO::XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path)
 {
     string file_name = xmlFileName_path.filename().stem().string();
     string data_path = xmlFileName_path.parent_path().string();
@@ -539,7 +539,7 @@ void gluiXML::XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem:
     }
 }
 
-void gluiXML::XMLWriter_Animation(string data_folder)
+void XMLIO::XMLWriter_Animation(string data_folder)
 {
     if(myStrucCreator && myStrucCreator->myStruc && myStrucCreator->myAssembly)
     {
@@ -556,7 +556,7 @@ void gluiXML::XMLWriter_Animation(string data_folder)
     }
 }
 
-bool gluiXML::SaveXMLFile(string xmlFileName)
+bool XMLIO::SaveXMLFile(string xmlFileName)
 {
     if(xmlFileName == "") return false;
     boost::filesystem::path xmlFileName_path(xmlFileName);
@@ -611,7 +611,7 @@ bool gluiXML::SaveXMLFile(string xmlFileName)
 
 
 
-void gluiXML::XMLReader_GUISettings(pugi::xml_node &xml_root)
+void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root)
 {
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
     //guisettings
@@ -779,7 +779,7 @@ void gluiXML::XMLReader_GUISettings(pugi::xml_node &xml_root)
     }
 }
 
-void gluiXML::XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_path)
+void XMLIO::XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_path)
 {
     pugi::xml_node partGeo_node = xml_root.child("PartGeoData");
     if(partGeo_node)
@@ -900,11 +900,11 @@ void gluiXML::XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileNam
     }
 }
 
-bool gluiXML::readXMLFile(string xmlFileName) {
+bool XMLIO::readXMLFile(string xmlFileName) {
     xmldoc.load_file(xmlFileName.c_str());
     pugi::xml_node xml_root = xmldoc.child("Documents");
     if (xml_root) {
-        gluiXML xml;
+        XMLIO xml;
         xml.XMLReader_GUISettings(xml_root);
         boost::filesystem::path boostpath(xmlFileName);
         varList.filename = boostpath.stem().string();
@@ -932,7 +932,7 @@ bool gluiXML::readXMLFile(string xmlFileName) {
 
         if (myStrucCreator->myStruc != nullptr) {
             if (xml_root) {
-                gluiXML xml;
+                XMLIO xml;
                 xml.XMLReader_PartGeoData(xml_root, xmlfile_path);
                 updateBoundaryPart(xml_root);
             }
@@ -942,7 +942,7 @@ bool gluiXML::readXMLFile(string xmlFileName) {
     return true;
 }
 
-void gluiXML::updateBoundaryPart(pugi::xml_node &xml_root)
+void XMLIO::updateBoundaryPart(pugi::xml_node &xml_root)
 {
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
     //guisettings

@@ -5,7 +5,7 @@ int ReadFile(string filename)
     boost::filesystem::path filepath(filename);
     if (boost::filesystem::extension(filepath) == ".xml")
     {
-        gluiXML xml;
+        XMLIO xml;
         xml.readXMLFile(filename);
     }
     else if (boost::filesystem::extension(filepath) == ".obj")
@@ -24,7 +24,7 @@ int ReadFile(string filename)
 
 int SaveFile(string filename) {
     if (myStrucCreator && myStrucCreator->myStruc) {
-        gluiXML xml;
+        XMLIO xml;
         return xml.SaveXMLFile(filename);
     }
     return 0;

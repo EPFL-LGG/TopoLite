@@ -148,13 +148,13 @@ void PatternCreator::CreateMesh_2DPattern( int patternID,
         polyMesh->UpdateVertices();
         polyMesh->NormalizeMesh();
 
-        AugmentedVectorCreator remesh_own;
+        AugmentedVectorCreator vectorCreator(getVarList());
         crossMesh = make_shared<CrossMesh>();
-        remesh_own.InitCrossMesh(polyMesh, crossMesh);
+        vectorCreator.InitCrossMesh(polyMesh, crossMesh);
         pHEdgeMesh hedgeMesh = make_shared<HEdgeMesh>();
         hedgeMesh->InitHEdgeMesh(polyMesh);
         hedgeMesh->BuildHalfEdgeMesh();
-        remesh_own.ComputeCrossNeighbors(hedgeMesh, crossMesh);
+        vectorCreator.ComputeCrossNeighbors(hedgeMesh, crossMesh);
         crossMesh->baseMesh2D = polyMesh;
     }
 
@@ -369,13 +369,13 @@ void PatternCreator::CreateMesh_2DPattern(vector<_Polygon> &root_polys, Vector3f
     polyMesh->UpdateVertices();
     polyMesh->NormalizeMesh();
 
-    AugmentedVectorCreator remesh_own;
+    AugmentedVectorCreator vectorCreator(getVarList());
     crossMesh = make_shared<CrossMesh>();
-    remesh_own.InitCrossMesh(polyMesh, crossMesh);
+    vectorCreator.InitCrossMesh(polyMesh, crossMesh);
     pHEdgeMesh hedgeMesh = make_shared<HEdgeMesh>();
     hedgeMesh->InitHEdgeMesh(polyMesh);
     hedgeMesh->BuildHalfEdgeMesh();
-    remesh_own.ComputeCrossNeighbors(hedgeMesh, crossMesh);
+    vectorCreator.ComputeCrossNeighbors(hedgeMesh, crossMesh);
     crossMesh->baseMesh2D = polyMesh;
     return;
 }

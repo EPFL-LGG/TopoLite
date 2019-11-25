@@ -5,7 +5,7 @@
 #ifndef TOPOLOCKCREATOR_PYINTERFACE_H
 #define TOPOLOCKCREATOR_PYINTERFACE_H
 
-#include "IO/gluiXML.h"
+#include "IO/XMLIO.h"
 #include "IO/gluiVar.h"
 
 #include <iostream>

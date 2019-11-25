@@ -38,8 +38,11 @@ public:
 
 	pStruc myStruc;                    // Designed interlocking structure
 
-public:
+	double worldAxesMat[16];
 
+	double worldMatrix[16];
+
+public:
 
     StrucCreator();
     ~StrucCreator();

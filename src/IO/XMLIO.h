@@ -25,18 +25,23 @@
 #include "pugixml.hpp"
 
 // TI Assembly creator
-extern shared_ptr<StrucCreator> myStrucCreator;
-extern vector<int> pickPartIDs;
-extern double interactMatrix[];
-extern pugi::xml_document xmldoc;
 
-typedef std::unordered_map<int, bool> IgnoreList;
 
-// Input parameters
-extern gluiVarList varList;
+using IgnoreList = std::unordered_map<int, bool> ;
 
-class gluiXML
+class XMLIO
 {
+public:
+
+    gluiVarList varList;
+    shared_ptr<StrucCreator> myStrucCreator;
+    vector<int> pickPartIDs;
+    double interactMatrix[16];
+    pugi::xml_document xmldoc;
+
+public:
+
+
 public:
     void XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path);
     void XMLWriter_GUISettings(pugi::xml_node &xml_root);

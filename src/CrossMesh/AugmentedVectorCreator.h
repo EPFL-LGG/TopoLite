@@ -21,9 +21,6 @@
 #include "Mesh/CrossMesh.h"
 #include "Utility/TopoObject.h"
 
-#include <libShapeOp/src/Solver.h>
-#include <libShapeOp/src/Constraint.h>
-#include <libShapeOp/src/Common.h>
 #include <igl/AABB.h>
 #include <vector>
 
@@ -39,17 +36,8 @@ using pPolyMesh = shared_ptr<PolyMesh>;
 class AugmentedVectorCreator : public TopoObject
 {
 public:
-	weak_ptr<igl::AABB<Eigen::MatrixXd,3>> aabbTree;
 
-	std::shared_ptr<Eigen::MatrixXd> aabbV;
-
-	std::shared_ptr<Eigen::MatrixXi> aabbF;
-
-public:
-
-	AugmentedVectorCreator();
-
-    AugmentedVectorCreator(shared_ptr<gluiVarList> var):TopoObject(var){AugmentedVectorCreator();}
+    AugmentedVectorCreator(shared_ptr<gluiVarList> var):TopoObject(var){}
 
 	~AugmentedVectorCreator();
 
@@ -59,9 +47,9 @@ public:
 	 * \brief Create crossMesh by setting alterative tiltAngle in polyMesh
 	 * \note This is the main function
 	 */
-	void CreateCrossMesh_Own  (pPolyMesh polyMesh, float tiltAngle, pCrossMesh &crossMesh);
+	void CreateAugmentedVector(pPolyMesh referenceMesh, float tiltAngle, pCrossMesh &crossMesh);
 
-	void CreateCrossMesh_Own  (float tiltAngle, pCrossMesh &crossMesh);
+	void CreateAugmentedVector(float tiltAngle, pCrossMesh &crossMesh);
 
 public:
 
@@ -90,12 +78,6 @@ public:
 	void UpdateMeshTiltNormals(pCrossMesh crossMesh, float tiltAngle);
 
 	bool UpdateMeshTiltRange(pCrossMesh crossMesh);
-
-	void setAABBTree(shared_ptr<igl::AABB<Eigen::MatrixXd,3>> _aabbTree,
-	std::shared_ptr<Eigen::MatrixXd> V,
-			std::shared_ptr<Eigen::MatrixXi> F);
-
-	void OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh);
 
 	void ComputePracticalBoundary(shared_ptr<CrossMesh> &crossMesh);
 };

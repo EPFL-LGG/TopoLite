@@ -20,7 +20,7 @@
 #include "igl/AABB.h"
 #include "Eigen/Dense"
 #include "Utility/TopoObject.h"
-
+#include "Mesh/CrossMesh.h"
 #include <vector>
 
 using pCrossMesh = shared_ptr<CrossMesh>;
@@ -47,9 +47,9 @@ public:
 
 	shared_ptr<igl::AABB<Eigen::MatrixXd,3>> aabbTree;
 
-	shared_ptr<Eigen::MatrixXd> polyMeshV;
+	shared_ptr<Eigen::MatrixXd> aabbV;
 
-	shared_ptr<Eigen::MatrixXi> polyMeshF;
+	shared_ptr<Eigen::MatrixXi> aabbF;
 
 	int default_patternRadius;
 
@@ -78,10 +78,11 @@ public:
 	 * \param patternRadius: how many polygons the pattern has (the size the of the pattern)
 	 * \param interactMatrix: User interaction of the pattern (scale, rotate, translate)
 	 */
-	void CreateCrossMesh(   bool texturedModel,
+    bool CreateCrossMesh(   bool texturedModel,
 	                        float tiltAngle,
 	                        int patternID,
 	                        int patternRadius,
+	                        bool previewMode,
 	                        double interactMatrix[]);
 
 public:

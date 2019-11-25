@@ -114,22 +114,9 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 	// 1. Create a cross mesh from a polygonal mesh
 	if ( createCrossMesh && !lockAngle)
 	{
-		refModel->CreateCrossMesh(texturedModel, tiltAngle, patternID, patternRadius, interactMatrix);
-#if USE_OPENGL_DRAW
-		if(!previewMode && texturedModel) refModel->BindTexture();
-#endif
+		refModel->CreateCrossMesh(texturedModel, tiltAngle, patternID, patternRadius, previewMode, interactMatrix);
 	}
 	pCrossMesh crossMesh = refModel->crossMesh;
-	if(!previewMode)
-	{
-        AugmentedVectorCreator remesh_own;
-        if(!remesh_own.UpdateMeshTiltRange(crossMesh))
-        {
-            cout<<"Warning: the tilt normals will not compose legal geometry. Please adjust them"<<endl;
-            return 0;
-        }
-	}
-
 	std::cout << "Compute Cross Mesh:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 
 	////////////////////////////////////////////////////////////////

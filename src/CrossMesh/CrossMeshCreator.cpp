@@ -27,6 +27,7 @@
 #include "AugmentedVectorCreator.h"
 #include "BaseMeshCreator.h"
 #include "CrossMeshCreator.h"
+#include "BaseMeshOptimizer.h"
 #include "IO/gluiVar.h"
 #include "Mesh/MeshConverter.h"
 #include <Eigen/Dense>
@@ -63,8 +64,8 @@ void CrossMeshCreator::ClearModel()
     pattern2D.reset();
     crossMesh.reset();
 
-    polyMeshV.reset();
-    polyMeshF.reset();
+    aabbV.reset();
+    aabbF.reset();
 
     default_patternRadius = -1;
     default_patternID = -1;
@@ -128,10 +129,11 @@ bool CrossMeshCreator::LoadReferenceSurface(const char *objFileName)
 	}
 }
 
-void CrossMeshCreator::CreateCrossMesh( bool texturedModel,
+bool CrossMeshCreator::CreateCrossMesh( bool texturedModel,
                                         float tiltAngle,
                                         int patternID,
                                         int patternRadius,
+                                        bool previewMode,
                                         double interactMatrix[])
 {
     //clear CrossMesh
@@ -167,9 +169,12 @@ void CrossMeshCreator::CreateCrossMesh( bool texturedModel,
         std::cout << "--Remesh Para:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
         sta = clock();
+        BaseMeshOptimizer meshOptimizer(aabbTree, aabbV, aabbF, getVarList());
+        meshOptimizer.OptimizeBaseMesh(crossMesh);
+
+        sta = clock();
         AugmentedVectorCreator vectorCreator(getVarList());
-        vectorCreator.setAABBTree(aabbTree, polyMeshV, polyMeshF);
-        vectorCreator.CreateCrossMesh_Own(tiltAngle, crossMesh);
+        vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
         std::cout << "--Remesh Own:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
         crossMesh->SetBaseMesh2D(baseMesh2D);
@@ -177,8 +182,19 @@ void CrossMeshCreator::CreateCrossMesh( bool texturedModel,
     else
     {
         AugmentedVectorCreator vectorCreator(getVarList());
-        vectorCreator.CreateCrossMesh_Own(referenceSurface, tiltAngle, crossMesh);
+        vectorCreator.CreateAugmentedVector(referenceSurface, tiltAngle, crossMesh);
     }
+
+    if(!previewMode && crossMesh)
+    {
+        AugmentedVectorCreator vectorCreator(getVarList());
+        if(!vectorCreator.UpdateMeshTiltRange(crossMesh))
+        {
+            crossMesh.reset();
+        }
+    }
+
+    return crossMesh != nullptr;
 }
 
 //**************************************************************************************//
@@ -283,25 +299,27 @@ void CrossMeshCreator::CreateAABBTree()
 
     int n = referenceSurface->vertexList.size();
     int m = referenceSurface->polyList.size();
-    polyMeshV = make_shared<Eigen::MatrixXd>(n, 3);
-    polyMeshF = make_shared<Eigen::MatrixXi>(m, 3);
+    aabbV = make_shared<Eigen::MatrixXd>(n, 3);
+    aabbF = make_shared<Eigen::MatrixXi>(m, 3);
     for(int id = 0; id < n; id++)
     {
         Vector3f ver = referenceSurface->vertexList[id];
-        polyMeshV->row(id) = Eigen::RowVector3d(ver.x, ver.y, ver.z);
+        aabbV->row(id) = Eigen::RowVector3d(ver.x, ver.y, ver.z);
     }
     for(int id = 0; id < m; id++){
         shared_ptr<_Polygon> poly = referenceSurface->polyList[id];
-        polyMeshF->row(id) = Eigen::RowVector3i(poly->verIDs[0], poly->verIDs[1], poly->verIDs[2]);
+        aabbF->row(id) = Eigen::RowVector3i(poly->verIDs[0], poly->verIDs[1], poly->verIDs[2]);
     }
 
     aabbTree.reset();
     aabbTree = make_shared<igl::AABB<Eigen::MatrixXd,3>>();
-    aabbTree->init(*polyMeshV, *polyMeshF);
+    aabbTree->init(*aabbV, *aabbF);
 
     return;
 }
 
 #else
+
+
 
 #endif

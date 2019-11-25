@@ -6,7 +6,6 @@ find_package (Eigen3 3.3 REQUIRED NO_MODULE)
 
 #Boost
 find_package(Boost COMPONENTS system filesystem thread REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
 
 #Cpp Subprocess
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
@@ -53,7 +52,7 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${LIBIGL_INCLUDE_DIR}
                 ${SHAPEOP_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
-                # ${FASTWIND_INCLUDE_DIR}
+                ${Boost_INCLUDE_DIRS}
                 PARENT_SCOPE)
 set(ext_lib pugixml
             QuickHull
