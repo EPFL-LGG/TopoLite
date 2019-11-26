@@ -6,6 +6,8 @@
 #define C_SHARP_EXTERN_INCLUDE
 
 #include "CSharpCommon.h"
+#include "Structure/StrucCreator.h"
+#include "IO/XMLIO.h"
 
 typedef struct CPoint{
     float x, y, z;
@@ -26,33 +28,33 @@ typedef struct CMesh
 
 // CSharp_LIBRARY C Exports
 CSharp_LIBRARY_C_FUNCTION
-int readXML(const char *xmlstr);
+XMLData* readXML(const char *xmlstr);
 
 CSharp_LIBRARY_C_FUNCTION
-int deleteStructure();
+int deleteStructure(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-void refresh();
+void refresh(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-void preview();
+void preview(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-int partNumber();
+int partNumber(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-bool initMesh(int partID, CMesh *mesh);
+bool initMesh(int partID, CMesh *mesh, XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-bool assignMesh(int partID, CMesh *mesh);
+bool assignMesh(int partID, CMesh *mesh, XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-bool isBoundary(int partID);
+bool isBoundary(int partID, XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-float ComputeGroundHeight();
+float ComputeGroundHeight(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-void setParaDouble(const char *name, double value);
+void setParaDouble(const char *name, double value, XMLData* data);
 
 #endif

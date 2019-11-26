@@ -80,7 +80,7 @@ public:
 
     void EigenMesh2ClipperPath(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, ClipperLib::Paths &contour);
 
-    void ClipperPathExtrusion(ClipperLib::Paths &contour, double height, shared_ptr<PolyMesh> &out);
+//    void ClipperPathExtrusion(ClipperLib::Paths &contour, double height, shared_ptr<PolyMesh> &out);
 
 
 private:

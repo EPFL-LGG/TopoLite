@@ -25,7 +25,6 @@
 #include <Eigen/Dense>
 #include <igl/boundary_loop.h>
 #include <igl/lscm.h>
-#include <igl/triangle/triangulate.h>
 #include <igl/remove_duplicate_vertices.h>
 
 
@@ -317,101 +316,101 @@ void MeshConverter::EigenMesh2ClipperPath(const Eigen::MatrixXd &V, const Eigen:
     return;
 }
 
-void MeshConverter::ClipperPathExtrusion(ClipperLib::Paths &contour, double height, shared_ptr<PolyMesh> &out)
-{
-    double Scale = CLIPPER_INTERGER_SCALE;
-	int numV = 0, numE = 0, numH = 0;
-
-	for(int id = 0; id < contour.size(); id++)
-	{
-        ClipperLib::Path path = contour[id];
-        numV += path.size();
-        numE += path.size();
-        if(ClipperLib::Orientation(path) == false)
-        {
-            numH++;
-        }
-	}
-
-    Eigen::MatrixXd V;
-    Eigen::MatrixXi E;
-    Eigen::MatrixXd H;
-	V = Eigen::MatrixXd(numV, 2); numV = 0;
-	E = Eigen::MatrixXi(numE, 2); numE = 0;
-	H = Eigen::MatrixXd(numH, 2); numH = 0;
-	for(int id = 0; id < contour.size(); id++)
-	{
-	    ClipperLib::Path path = contour[id];
-	    for(int jd = 0; jd < path.size();jd++){
-	        E(numE, 0) = numV + jd;
-	        E(numE, 1) = numV + (jd + 1) % path.size();
-            numE++;
-	    }
-
-        for(int jd = 0; jd < path.size(); jd++)
-        {
-            V(numV, 0) = path[jd].X / Scale;
-            V(numV, 1) = path[jd].Y / Scale;
-            numV++;
-        }
-
-        if(ClipperLib::Orientation(path) == false)
-        {
-            ClipperLib::ClipperOffset co;
-            ClipperLib::Paths solution;
-            co.AddPath(path, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
-            co.Execute(solution, -100);
-            ClipperLib::IntPoint pt = solution.front().front();
-            H.row(numH) << pt.X /Scale, pt.Y/Scale;
-            numH++;
-        }
-	}
-	Eigen::MatrixXd VA;
-	Eigen::MatrixXi FA;
-
-	out.reset();
-
-	if(V.rows() >= 3)
-	{
-		igl::triangle::triangulate(V,E,H,"a0.01qQ",VA,FA);
-
-		double thickness = getVarList()->get<float>("support_thickness");
-		Eigen::MatrixXd VB = Eigen::MatrixXd(VA.rows() * 2 + V.rows() * 2, 3);
-		Eigen::MatrixXi FB = Eigen::MatrixXi(FA.rows() * 2 + E.rows() * 2, 3);
-
-		//bottom-up
-		for(int id = 0; id < VA.rows(); id++)
-		{
-			VB.row(id) << VA(id, 0), height, VA(id, 1);
-			VB.row(id + VA.rows()) << VA(id, 0), height + thickness, VA(id, 1);
-		}
-		//side
-		for(int id = 0; id < V.rows(); id++){
-			VB.row(id +            2 * VA.rows()) << V(id, 0), height,             V(id, 1);
-			VB.row(id + V.rows() + 2 * VA.rows()) << V(id, 0), height + thickness, V(id, 1);
-		}
-
-		//bottom-up
-		for(int id = 0; id < FA.rows(); id++)
-		{
-			FB.row(id) << FA(id, 0), FA(id, 1), FA(id, 2);
-			FB.row(id + FA.rows()) << FA(id, 2) + VA.rows(), FA(id, 1) + VA.rows(), FA(id, 0) + VA.rows();
-		}
-
-		//side
-		for(int id = 0; id < E.rows(); id++)
-		{
-			FB.row(2 * id     + 2 * FA.rows()) << E(id, 1) + 2 * VA.rows(), E(id, 0) + 2 * VA.rows(), E(id, 1) + 2 * VA.rows() + V.rows();
-			FB.row(2 * id + 1 + 2 * FA.rows()) << E(id, 0) + 2 * VA.rows() + V.rows(), E(id, 1) + 2 * VA.rows() + V.rows(), E(id, 0) + 2 * VA.rows();
-		}
-
-		Eigen::MatrixXd VC;
-		Eigen::MatrixXi FC, SVI, SVJ;
-		igl::remove_duplicate_vertices(VB, FB, FLOAT_ERROR_LARGE, VC, SVI, SVJ, FC);
-
-		Convert2PolyMesh(VC, FC, out);
-	}
-}
+//void MeshConverter::ClipperPathExtrusion(ClipperLib::Paths &contour, double height, shared_ptr<PolyMesh> &out)
+//{
+//    double Scale = CLIPPER_INTERGER_SCALE;
+//	int numV = 0, numE = 0, numH = 0;
+//
+//	for(int id = 0; id < contour.size(); id++)
+//	{
+//        ClipperLib::Path path = contour[id];
+//        numV += path.size();
+//        numE += path.size();
+//        if(ClipperLib::Orientation(path) == false)
+//        {
+//            numH++;
+//        }
+//	}
+//
+//    Eigen::MatrixXd V;
+//    Eigen::MatrixXi E;
+//    Eigen::MatrixXd H;
+//	V = Eigen::MatrixXd(numV, 2); numV = 0;
+//	E = Eigen::MatrixXi(numE, 2); numE = 0;
+//	H = Eigen::MatrixXd(numH, 2); numH = 0;
+//	for(int id = 0; id < contour.size(); id++)
+//	{
+//	    ClipperLib::Path path = contour[id];
+//	    for(int jd = 0; jd < path.size();jd++){
+//	        E(numE, 0) = numV + jd;
+//	        E(numE, 1) = numV + (jd + 1) % path.size();
+//            numE++;
+//	    }
+//
+//        for(int jd = 0; jd < path.size(); jd++)
+//        {
+//            V(numV, 0) = path[jd].X / Scale;
+//            V(numV, 1) = path[jd].Y / Scale;
+//            numV++;
+//        }
+//
+//        if(ClipperLib::Orientation(path) == false)
+//        {
+//            ClipperLib::ClipperOffset co;
+//            ClipperLib::Paths solution;
+//            co.AddPath(path, ClipperLib::jtRound, ClipperLib::etClosedPolygon);
+//            co.Execute(solution, -100);
+//            ClipperLib::IntPoint pt = solution.front().front();
+//            H.row(numH) << pt.X /Scale, pt.Y/Scale;
+//            numH++;
+//        }
+//	}
+//	Eigen::MatrixXd VA;
+//	Eigen::MatrixXi FA;
+//
+//	out.reset();
+//
+//	if(V.rows() >= 3)
+//	{
+//		igl::triangle::triangulate(V,E,H,"a0.01qQ",VA,FA);
+//
+//		double thickness = getVarList()->get<float>("support_thickness");
+//		Eigen::MatrixXd VB = Eigen::MatrixXd(VA.rows() * 2 + V.rows() * 2, 3);
+//		Eigen::MatrixXi FB = Eigen::MatrixXi(FA.rows() * 2 + E.rows() * 2, 3);
+//
+//		//bottom-up
+//		for(int id = 0; id < VA.rows(); id++)
+//		{
+//			VB.row(id) << VA(id, 0), height, VA(id, 1);
+//			VB.row(id + VA.rows()) << VA(id, 0), height + thickness, VA(id, 1);
+//		}
+//		//side
+//		for(int id = 0; id < V.rows(); id++){
+//			VB.row(id +            2 * VA.rows()) << V(id, 0), height,             V(id, 1);
+//			VB.row(id + V.rows() + 2 * VA.rows()) << V(id, 0), height + thickness, V(id, 1);
+//		}
+//
+//		//bottom-up
+//		for(int id = 0; id < FA.rows(); id++)
+//		{
+//			FB.row(id) << FA(id, 0), FA(id, 1), FA(id, 2);
+//			FB.row(id + FA.rows()) << FA(id, 2) + VA.rows(), FA(id, 1) + VA.rows(), FA(id, 0) + VA.rows();
+//		}
+//
+//		//side
+//		for(int id = 0; id < E.rows(); id++)
+//		{
+//			FB.row(2 * id     + 2 * FA.rows()) << E(id, 1) + 2 * VA.rows(), E(id, 0) + 2 * VA.rows(), E(id, 1) + 2 * VA.rows() + V.rows();
+//			FB.row(2 * id + 1 + 2 * FA.rows()) << E(id, 0) + 2 * VA.rows() + V.rows(), E(id, 1) + 2 * VA.rows() + V.rows(), E(id, 0) + 2 * VA.rows();
+//		}
+//
+//		Eigen::MatrixXd VC;
+//		Eigen::MatrixXi FC, SVI, SVJ;
+//		igl::remove_duplicate_vertices(VB, FB, FLOAT_ERROR_LARGE, VC, SVI, SVJ, FC);
+//
+//		Convert2PolyMesh(VC, FC, out);
+//	}
+//}
 
 //**************************************************************************************//
 //                      Private Functions
