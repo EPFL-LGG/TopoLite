@@ -1,43 +1,36 @@
 //
 // Created by ziqwang on 2019-10-28.
 //
-
-#include "PyInterface/PyInterface.h"
 #include "CSharpExtern.h"
 #include <string>
-#include "Structure/StrucCreator.h"
-#include "Optimization/SlopeOpt.h"
-#include "Optimization/PolygonCoverOpt.h"
+
 #include "CrossMesh/PatternCreator.h"
-#include "PolyMesh/MeshConverter.h"
+#include "Mesh/MeshConverter.h"
 #include "Structure/Part.h"
+#include "IO/XMLIO.h"
+#include "Structure/StrucCreator.h"
+
 /*
  * GLOBAL VARIABLES
  */
 
-gluiVarList varList; //gluiVar
-double interactMatrix[16] = {5,0,0,0, 0,5,0,0, 0,0,1,0, 0,0,0,1}; // pattern settings
-shared_ptr<StrucCreator> myStrucCreator; // TI Assembly Creator
-pugi::xml_document xmldoc;
-vector<int> pickPartIDs;
 
 Eigen::MatrixXd V;
 Eigen::MatrixXi F;
 
 CSharp_LIBRARY_C_FUNCTION
-int readXML(const char *xmlstr)
+XMLData* readXML(const char *xmlstr)
 {
-    myStrucCreator.reset();
-    myStrucCreator = make_shared<StrucCreator>();
-    InitVar(varList);
-    std::string filename = xmlstr;
-    return ReadFile(filename);
+    XMLData *data = new XMLData();
+    XMLIO reader;
+    reader.XMLReader(xmlstr, *data);
+    return data;
 }
-
+//
 CSharp_LIBRARY_C_FUNCTION
-int deleteStructure(){
-    if(myStrucCreator){
-        myStrucCreator.reset();
+int deleteStructure(XMLData* data){
+    if(data){
+        delete data;
         return 1;
     }
     else{
@@ -46,50 +39,50 @@ int deleteStructure(){
 }
 
 CSharp_LIBRARY_C_FUNCTION
-void refresh() {
-    if (myStrucCreator->refModel) {
-        if (myStrucCreator->refModel->aabbTree && myStrucCreator->refModel->quadTree) {
-            myStrucCreator->CreateStructure(true, true, interactMatrix, false);
+void refresh(XMLData* data)
+{
+    if (data->strucCreator->crossMeshCreator) {
+        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
+            data->strucCreator->CreateStructure(true, true, data->interactMatrix, false);
         } else {
-            myStrucCreator->CreateStructure(true, false, interactMatrix, false);
+            data->strucCreator->CreateStructure(true, false, data->interactMatrix, false);
+        }
+    }
+    return;
+}
+//
+CSharp_LIBRARY_C_FUNCTION
+void preview(XMLData* data)
+{
+    if (data->strucCreator->crossMeshCreator) {
+        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
+            data->strucCreator->CreateStructure(true, true, data->interactMatrix, true);
+        } else {
+            data->strucCreator->CreateStructure(true, false, data->interactMatrix, true);
         }
     }
     return;
 }
 
 CSharp_LIBRARY_C_FUNCTION
-void preview(){
-    if (myStrucCreator->refModel) {
-        if (myStrucCreator->refModel->aabbTree && myStrucCreator->refModel->quadTree) {
-            myStrucCreator->CreateStructure(true, true, interactMatrix, true);
-        } else {
-            myStrucCreator->CreateStructure(true, false, interactMatrix, true);
-        }
-    }
-    return;
-}
-
-CSharp_LIBRARY_C_FUNCTION
-int partNumber(){
-    if(myStrucCreator && myStrucCreator->myStruc)
-        return myStrucCreator->myStruc->partList.size();
+int partNumber(XMLData* data){
+    if(data->strucCreator && data->strucCreator->struc)
+        return data->strucCreator->struc->partList.size();
     else
         return 0;
 }
 
 CSharp_LIBRARY_C_FUNCTION
-bool initMesh(int partID, CMesh *mesh){
-    if(myStrucCreator && myStrucCreator->myStruc){
-        if(0 <= partID && partID < myStrucCreator->myStruc->partList.size())
+bool initMesh(int partID, CMesh *mesh, XMLData* data){
+    if(data->strucCreator && data->strucCreator->struc){
+        if(0 <= partID && partID < data->strucCreator->struc->partList.size())
         {
-            shared_ptr<Part> part = myStrucCreator->myStruc->partList[partID];
+            shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
             if(part){
-                MeshConverter converter;
-                converter.convert2EigenMesh(part->polyMesh.get(), V , F);
+                MeshConverter converter(data->varList);
+                converter.Convert2EigenMesh(part->polyMesh.get(), V , F);
                 mesh->n_vertices = V.rows();
                 mesh->n_faces = F.rows();
-                std::cout << mesh->n_vertices << std::endl;
-                std::cout << mesh->n_faces << std::endl;
                 return true;
             }
         }
@@ -97,13 +90,12 @@ bool initMesh(int partID, CMesh *mesh){
     return false;
 }
 
-
 CSharp_LIBRARY_C_FUNCTION
-bool assignMesh(int partID, CMesh *mesh){
-    if(myStrucCreator && myStrucCreator->myStruc){
-        if(0 <= partID && partID < myStrucCreator->myStruc->partList.size())
+bool assignMesh(int partID, CMesh *mesh, XMLData* data){
+    if(data->strucCreator && data->strucCreator->struc){
+        if(0 <= partID && partID < data->strucCreator->struc->partList.size())
         {
-            shared_ptr<Part> part = myStrucCreator->myStruc->partList[partID];
+            shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
             if(part){
                 if(V.rows() != mesh->n_vertices) return false;
                 if(F.rows() != mesh->n_faces) return false;
@@ -125,30 +117,31 @@ bool assignMesh(int partID, CMesh *mesh){
 }
 
 CSharp_LIBRARY_C_FUNCTION
-bool isBoundary(int partID)
+bool isBoundary(int partID, XMLData* data)
 {
-    if(myStrucCreator && myStrucCreator->myStruc)
+    if(data->strucCreator && data->strucCreator->struc)
     {
-        if(0 <= partID && partID < myStrucCreator->myStruc->partList.size()) {
-            return myStrucCreator->myStruc->partList[partID]->atBoundary;
+        if(0 <= partID && partID < data->strucCreator->struc->partList.size()) {
+            return data->strucCreator->struc->partList[partID]->atBoundary;
         }
     }
     return false;
 }
 
 CSharp_LIBRARY_C_FUNCTION
-float ComputeGroundHeight(){
+float ComputeGroundHeight(XMLData* data){
 
-    if(myStrucCreator && myStrucCreator->myStruc)
+    if(data->strucCreator && data->strucCreator->struc)
     {
-        return myStrucCreator->myStruc->ComputeGroundHeight();
+        return data->strucCreator->struc->ComputeLowestY();
     }
 
     return 0;
 }
 
 CSharp_LIBRARY_C_FUNCTION
-void setParaDouble(const char *name, double value){
-    varList.set(name,  (float)value);
+void setParaDouble(const char *name, double value, XMLData* data){
+    data->varList->set(name,  (float)value);
     return;
 }
+

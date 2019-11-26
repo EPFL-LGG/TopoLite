@@ -11,10 +11,10 @@ set(CMAKE_CXX_STANDARD 17)
 #####                               #####
 #########################################
 
-option(USE_GUI "USE_GUI" ON)
+option(USE_GUI "USE_GUI" OFF)
 option(USE_PYTHON_PLUGIN "USE PYBIND11 PLUGIN" OFF)
 option(USE_UNIT_TEST "USE CATCH2 TEST" OFF)
-option(USE_C_EXTENSION "USE_C_EXTENSION" OFF)
+option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
 #########################################
 #####                               #####
@@ -119,8 +119,6 @@ endif()
 ##########################################
 if(USE_C_EXTENSION)
     add_library(dllTopo SHARED
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/PyInterface/PyInterface.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/PyInterface/PyInterface.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternC/CSharpExtern.h
             ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternC/CSharpExtern.cpp)
     target_link_libraries(dllTopo PUBLIC TpCorelib)
