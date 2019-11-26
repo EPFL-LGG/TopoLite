@@ -1,7 +1,0 @@
-# Hashes of file build rules.
-ae9dd069f093444a2b0c86ba179f256b ext/nanogui/nanogui_resources.cpp
-4c3df2f58d56235ebbde4d87321db849 ext/nanogui/resources/imageview_fragment.metallib
-7f44d790bfa1da14e719f47e55fadc75 ext/nanogui/resources/imageview_vertex.metallib
-c8592361a96786f44f7359d7b3b8855f ext/tbb/CMakeFiles/tbb_def_files
-aff1dfe6a156e66c9291a2f9781f863c ext/tbb/tbb.def
-30db673289ae4589e7d370e1f42c2694 ext/tbb/tbbmalloc.def

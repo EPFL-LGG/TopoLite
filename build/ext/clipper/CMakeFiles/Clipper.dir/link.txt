@@ -1,1 +1,0 @@
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -O3 -DNDEBUG -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -dynamiclib -Wl,-headerpad_max_install_names  -o libClipper.dylib -install_name @rpath/libClipper.dylib CMakeFiles/Clipper.dir/clipper.cpp.o 

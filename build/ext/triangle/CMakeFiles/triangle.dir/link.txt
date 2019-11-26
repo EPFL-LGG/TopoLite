@@ -1,1 +1,0 @@
-/usr/bin/libtool -c -static -o libtriangle.a  CMakeFiles/triangle.dir/triangle.c.o 
