@@ -41,6 +41,11 @@ BaseMeshCreator::BaseMeshCreator(   shared_ptr<QuadTree> _quadTree,
 
 }
 
+BaseMeshCreator::BaseMeshCreator(shared_ptr<InputVarList> var)
+: TopoObject(var){
+
+}
+
 BaseMeshCreator::~BaseMeshCreator()
 {
 
@@ -57,8 +62,8 @@ void BaseMeshCreator::ComputeBaseMesh(double inverTextureMat[16],
 	tbb::tick_count sta = tbb::tick_count::now();
 	crossMesh.reset();
 	baseMesh2D.reset();
-	crossMesh = make_shared<CrossMesh>();
-	baseMesh2D = make_shared<PolyMesh>();
+	crossMesh = make_shared<CrossMesh>(getVarList());
+	baseMesh2D = make_shared<PolyMesh>(getVarList());
 	map_cross2D_3D.clear();
 	map_cross3D_2D.clear();
 
@@ -76,9 +81,56 @@ void BaseMeshCreator::ComputeBaseMesh(double inverTextureMat[16],
 
 	if(crossMesh){
         crossMesh->setVarList(getVarList());
-	}
+        ComputePracticalBoundary(crossMesh);
+    }
 
 	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
+}
+
+void BaseMeshCreator::ComputeBaseMesh( pPolyMesh referenceMesh,
+                        pCrossMesh &crossMesh){
+
+    // 1) Initial the cross mesh
+    crossMesh.reset();
+    crossMesh = make_shared<CrossMesh>(getVarList());
+    InitCrossMesh(referenceMesh, crossMesh);
+
+    // 2. Build half-edge mesh of the polygonal mesh
+    pHEdgeMesh hedgeMesh = make_shared<HEdgeMesh>();
+    hedgeMesh->InitHEdgeMesh(referenceMesh);
+    hedgeMesh->BuildHalfEdgeMesh();
+
+    // 3. Compute neighbors for the cross mesh
+    ComputeCrossNeighbors(hedgeMesh, crossMesh);
+    hedgeMesh.reset();
+
+    // 4. Compute the practical Boundary
+    ComputePracticalBoundary(crossMesh);
+
+}
+
+void BaseMeshCreator::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)
+{
+    for (int i = 0; i < polyMesh->polyList.size(); i++)
+    {
+        pPolygon poly = polyMesh->polyList[i];
+
+        shared_ptr<Cross> cross = make_shared<Cross>(getVarList());
+        cross->atBoundary = false;
+        cross->crossID = i;
+
+        for (int j = 0; j < poly->vers.size(); j++)
+        {
+            cross->vers.push_back(poly->vers[j]);
+            cross->verIDs.push_back(poly->verIDs[j]);
+        }
+
+        cross->ComputeNormal();
+        crossMesh->crossList.push_back(cross);
+    }
+
+    crossMesh->vertexList = polyMesh->vertexList;
+    return;
 }
 
 
@@ -134,7 +186,7 @@ void BaseMeshCreator::ComputeInsideCross(   double *inverTextureMat,
 	for(size_t i = 0; i <  pattern2D.lock()->crossList.size(); i++)
 	{
 		pPolygon poly2D = pattern2D.lock()->crossList[i];
-		shared_ptr<Cross> cross = make_shared<Cross>();
+		shared_ptr<Cross> cross = make_shared<Cross>(getVarList());
 		cross->atBoundary = false;
 		cross->crossID = crossMesh->crossList.size();
 		bool is_all_vertices_in_texture = true;
@@ -318,7 +370,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			shared_ptr<_Polygon> polygon = make_shared<_Polygon>();
 
 			//insert into Crossmesh
-			shared_ptr<Cross> cross = make_shared<Cross>();
+			shared_ptr<Cross> cross = make_shared<Cross>(getVarList());
 			cross->atBoundary = false;
 			cross->crossID = crossMesh->crossList.size();
 
@@ -578,5 +630,85 @@ void BaseMeshCreator::ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh cro
             shared_ptr<Cross> neiborCross = crossMesh->crossList[neiborFaceID];
             cross->neighbors.push_back(neiborCross);
         }
+    }
+}
+
+void BaseMeshCreator::ComputePracticalBoundary(shared_ptr<CrossMesh> &crossMesh)
+{
+    vector<weak_ptr<Cross>> boundaryCross;
+    crossMesh->UpdateCrossVertexIndex();
+    vector<vector<weak_ptr<Cross>>> &vertexCrossList = crossMesh->vertexCrossList;
+
+    for(int id = 0; id < crossMesh->crossList.size(); id++)
+    {
+        shared_ptr<Cross> cross = crossMesh->crossList[id];
+        cross->atBoundary = false;
+    }
+
+    auto setVertexRingBoundary = [&](int verID){
+        if(verID >= 0 && verID < vertexCrossList.size())
+        {
+            for(weak_ptr<Cross> cross: vertexCrossList[verID]){
+                if(!cross.lock()->atBoundary){
+                    boundaryCross.push_back(cross);
+                    cross.lock()->atBoundary = true;
+                }
+            }
+        }
+        return;
+    };
+
+    for(int id = 0; id < crossMesh->crossList.size(); id++)
+    {
+        shared_ptr<Cross> cross = crossMesh->crossList[id];
+        for(int jd = 0; jd < cross->neighbors.size(); jd ++)
+        {
+            if(cross->neighbors[jd].lock() == nullptr)
+            {
+                int verID = cross->verIDs[jd];
+                setVertexRingBoundary(verID);
+                verID = cross->verIDs[(jd + 1) % cross->verIDs.size()];
+                setVertexRingBoundary(verID);
+            }
+        }
+    }
+
+    float minBoundaryEdge = getVarList()->get<float>("minBoundaryEdge");
+    for(int id = 0; id < boundaryCross.size(); id++)
+    {
+        shared_ptr<Cross> cross = boundaryCross[id].lock();
+        size_t size = cross->vers.size();
+        for(int jd = 0; jd < size; jd++)
+        {
+            //the neighbor must exists
+            if(!cross->neighbors[jd].lock()) continue;
+
+            float edgeLen = len(cross->vers[(jd + 1) % size].pos - cross->vers[jd].pos);
+            //if the length of the edge is too small, then include one more part
+            if(minBoundaryEdge > edgeLen)
+            {
+                weak_ptr<Cross> ncross = cross->neighbors[jd];
+                int shared_id = cross->GetSharedCross(ncross);
+
+                if(shared_id >= 0 && shared_id < crossMesh->crossList.size()){
+                    shared_ptr<Cross> shared_cross = crossMesh->crossList[shared_id];
+                    shared_cross->atBoundary = true;
+                }
+            }
+        }
+    }
+
+    for(int id = 0; id < crossMesh->crossList.size(); id++) {
+        shared_ptr<Cross> cross = crossMesh->crossList[id];
+        if (cross == nullptr || cross->atBoundary) continue;
+        bool allBoundary = true;
+        for (int jd = 0; jd < cross->neighbors.size(); jd++) {
+            weak_ptr<Cross> ncross = cross->neighbors[jd];
+            if (ncross.lock() != nullptr && ncross.lock()->atBoundary == false) {
+                allBoundary = false;
+                break;
+            }
+        }
+        cross->atBoundary = allBoundary;
     }
 }

@@ -572,14 +572,14 @@ void PolyMesh::UpdateVertices()
 TEST_CASE("Class Mesh")
 {
 
+
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     //CASE 1: Read Mesh
-    PolyMesh poly;
+    PolyMesh poly(varList);
     bool textureModel;
     REQUIRE(poly.ReadOBJModel("../data/igloo.obj", textureModel, false) == true);
 
     //CASE 2: Copy and Construct
-    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    poly.setVarList(varList);
     PolyMesh polyB(poly);
     REQUIRE(poly.vertexList.size() == polyB.vertexList.size());
     REQUIRE(poly.getVarList() == polyB.getVarList());

@@ -97,7 +97,8 @@ if(USE_UNIT_TEST)
     add_executable(testTopoLockCreator
             src/Mesh/Polygon.cpp
             src/Mesh/PolyMesh.cpp
-            src/Mesh/Cross.cpp)
+            src/Mesh/Cross.cpp
+            src/IO/XMLIO.cpp)
     target_link_libraries(testTopoLockCreator PUBLIC Catch2::Catch2)
     target_link_libraries(testTopoLockCreator PUBLIC TpCorelib)
     target_compile_definitions(testTopoLockCreator PUBLIC -DCATCH2_UNITTEST)

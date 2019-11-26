@@ -28,14 +28,16 @@
 
 using IgnoreList = std::unordered_map<int, bool> ;
 
-class XMLIO : public TopoObject
-{
-public:
-
-    shared_ptr<StrucCreator> myStrucCreator;
+struct XMLData{
+    shared_ptr<InputVarList> varList;
+    shared_ptr<StrucCreator> strucCreator;
     vector<int> pickPartIDs;
     double interactMatrix[16];
-    int mainWinW, mainWinH;
+};
+
+class XMLIO
+{
+public:
 
     pugi::xml_document xmldoc;
     pugi::xml_node xml_groupdata;
@@ -44,26 +46,20 @@ public:
     pugi::xml_node xml_general;
 
     pugi::xml_document xml_mitsuba_old;
-
     pugi::xml_node mitsuba_sensor;
 
 public:
 
-    XMLIO(shared_ptr<InputVarList> var): TopoObject(var){}
+    bool XMLWriter(string xmlFileName, XMLData &data);
+    void XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path, XMLData &data);
+    void XMLWriter_GUISettings(pugi::xml_node &xml_root, XMLData &data);
+    void XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &xmlFileName_path, XMLData &data);
+    void XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path, XMLData &data);
 
-public:
-
-    bool XMLWriter(string xmlFileName);
-    void XMLWriter_Mitsuba(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path);
-    void XMLWriter_GUISettings(pugi::xml_node &xml_root);
-    void XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &xmlFileName_path);
-    void XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path);
-    void XMLWriter_Animation(string data_folder);
-
-    bool XMLReader(string xmlFileName);
-    void XMLReader_GUISettings(pugi::xml_node &xml_root);
-    void XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_path);
-    void XMLReader_Boundary(pugi::xml_node &xml_root);
+    bool XMLReader(string xmlFileName, XMLData &data);
+    void XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data);
+    void XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_path, XMLData &data);
+    void XMLReader_Boundary(pugi::xml_node &xml_root, XMLData &data);
 };
 
 class MitsubaWriter : public TopoObject
@@ -80,7 +76,7 @@ public:
 
     void change_attribute(pugi::xml_node &root, pugi::xml_node &node, string str_name, string str_attr, string str_value);
     void change_attribute(pugi::xml_node &node, string str_attr, string str_value);
-    void scene_settings(pugi::xml_node &xml_root);
+    void scene_settings(pugi::xml_node &xml_root, XMLData &data);
 };
 
 #endif //TOPOLOCKCREATOR_GLUIXML_H

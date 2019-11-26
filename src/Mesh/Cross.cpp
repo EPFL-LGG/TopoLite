@@ -22,7 +22,7 @@
 //                                   Initialization
 //**************************************************************************************//
 
-Cross::Cross()
+Cross::Cross(std::shared_ptr<InputVarList> var) : TopoObject(var)
 {
 	isVisited = false;
 }
@@ -309,12 +309,11 @@ int Cross::GetShareEdge(weak_ptr<Cross> ncross) {
 
 TEST_CASE("Class CrossMesh"){
 
-    Cross cross;
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+    Cross cross(varList);
     //CASE 1: Init Cross
 
     //CASE 2: Copy and Construct
-    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    cross.setVarList(varList);
     Cross crossB(cross);
     REQUIRE(cross.getVarList() == crossB.getVarList());
 

@@ -84,7 +84,7 @@ StrucCreator::StrucCreator(const StrucCreator &_myStruc) : TopoObject(_myStruc)
 bool StrucCreator::LoadSurface(const char * objFileName)
 {
 	ClearStruc();
-	crossMeshCreator = make_shared<CrossMeshCreator>();
+	crossMeshCreator = make_shared<CrossMeshCreator>(getVarList());
 	if(!crossMeshCreator->LoadReferenceSurface(objFileName))
 	{
 		return false;

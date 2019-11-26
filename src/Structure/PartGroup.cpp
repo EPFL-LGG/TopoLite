@@ -25,13 +25,12 @@
 #include "IO/InputVar.h"
 
 #include "igl/writeOBJ.h"
-extern InputVarList varList;
 
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
-PartGroup::PartGroup(const vector<wpPart>& _groupParts)
+PartGroup::PartGroup(const vector<wpPart>& _groupParts, shared_ptr<InputVarList> var) :TopoObject(var)
 {
 	for (int i = 0; i < _groupParts.size(); i++)
 	{
@@ -42,7 +41,7 @@ PartGroup::PartGroup(const vector<wpPart>& _groupParts)
 }
 
 
-PartGroup::PartGroup(vector<pPart> partList, vector<int> groupPartIDs)
+PartGroup::PartGroup(vector<pPart> partList, vector<int> groupPartIDs, shared_ptr<InputVarList> var):TopoObject(var)
 {
 	for (int i = 0; i < groupPartIDs.size(); i++)
 	{
@@ -60,7 +59,7 @@ PartGroup::PartGroup(vector<pPart> partList, vector<int> groupPartIDs)
 	}
 }
 
-PartGroup::PartGroup(vector<wpPart> partList, vector<int> groupPartIDs)
+PartGroup::PartGroup(vector<wpPart> partList, vector<int> groupPartIDs, shared_ptr<InputVarList> var):TopoObject(var)
 {
 	for (int i = 0; i < groupPartIDs.size(); i++)
 	{
@@ -91,7 +90,7 @@ vector<Vector3f> PartGroup::GetAllVertices()
 	for (int i = 0; i < groupParts.size(); i++)
 	{
 		pPolyMesh polyMesh = make_shared<PolyMesh>(*groupParts[i].lock()->polyMesh);
-        polyMesh->TranslateMesh(Vector3f(0, -varList.get<float>("ground_height"), 0));
+        polyMesh->TranslateMesh(Vector3f(0, -getVarList()->get<float>("ground_height"), 0));
 
 		//allVertices.insert(allVertices.end(), polyMesh->verList.begin(), polyMesh->verList.end());
 
@@ -111,7 +110,7 @@ vector<vector<int>> PartGroup::GetAllPolygons(const vector<Vector3f> &allVertice
 	for (int i = 0; i < groupParts.size(); i++)
 	{
 		pPolyMesh polyMesh = make_shared<PolyMesh>(*groupParts[i].lock()->polyMesh);
-        polyMesh->TranslateMesh(Vector3f(0, -varList.get<float>("ground_height"), 0));
+        polyMesh->TranslateMesh(Vector3f(0, -getVarList()->get<float>("ground_height"), 0));
 		
 		for (int j = 0; j < polyMesh->polyList.size(); j++)
 		{
@@ -219,8 +218,8 @@ void PartGroup::WriteGroupOBJWireModel(char *objFileName)
     vector<Vector3i> tri;
     shared_ptr<PolyMesh> wireframe;
 
-    float thickness = varList.get<float>("wireframe_thickness");
-    int circle_vertex_num = varList.get<int>("wireframe_circle_vertex_num");
+    float thickness = getVarList()->get<float>("wireframe_thickness");
+    int circle_vertex_num = getVarList()->get<int>("wireframe_circle_vertex_num");
 
     for(wpPart part : groupParts)
     {

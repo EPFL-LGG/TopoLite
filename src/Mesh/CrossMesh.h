@@ -45,7 +45,7 @@ public:
 
 public:
 
-    CrossMesh();
+    CrossMesh(std::shared_ptr<InputVarList> var);
     CrossMesh(const CrossMesh &_cross);
     ~CrossMesh();
 

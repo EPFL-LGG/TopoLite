@@ -61,4 +61,5 @@ set(ext_lib pugixml
             igl::triangle
             ShapeOp
             tbb_static
+            ${Boost_LIBRARIES}
             PARENT_SCOPE)

@@ -14,7 +14,7 @@
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 
-#include "CrossMesh/AugmentedVectorCreator.h"
+#include "CrossMesh/BaseMeshCreator.h"
 #include "CrossMesh/PatternCreator.h"
 
 #include "Mesh/Polygon.h"
@@ -44,7 +44,7 @@ PatternCreator::~PatternCreator()
 void PatternCreator::CreateMesh_Merge(vector<pPolyMesh> polyMeshes, pPolyMesh &polyMesh)
 {
 	polyMesh.reset();
-	polyMesh = make_shared<PolyMesh>();
+	polyMesh = make_shared<PolyMesh>(getVarList());
 
 //	for (int i = 0; i < polyMeshes.size(); i++)
 //	{
@@ -96,7 +96,7 @@ void PatternCreator::CreateMesh_2DPattern( int patternID,
     }
     else{
 
-        shared_ptr<PolyMesh> polyMesh= make_shared<PolyMesh>();
+        shared_ptr<PolyMesh> polyMesh= make_shared<PolyMesh>(getVarList());
 
         pPolygon poly;
         CreatePolygon_Root(patternID, CROSS_L, poly);
@@ -147,13 +147,13 @@ void PatternCreator::CreateMesh_2DPattern( int patternID,
         polyMesh->UpdateVertices();
         polyMesh->NormalizeMesh();
 
-        AugmentedVectorCreator vectorCreator(getVarList());
-        crossMesh = make_shared<CrossMesh>();
-        vectorCreator.InitCrossMesh(polyMesh, crossMesh);
+        BaseMeshCreator meshCreator(getVarList());
+        crossMesh = make_shared<CrossMesh>(getVarList());
+        meshCreator.InitCrossMesh(polyMesh, crossMesh);
         pHEdgeMesh hedgeMesh = make_shared<HEdgeMesh>();
         hedgeMesh->InitHEdgeMesh(polyMesh);
         hedgeMesh->BuildHalfEdgeMesh();
-        vectorCreator.ComputeCrossNeighbors(hedgeMesh, crossMesh);
+        meshCreator.ComputeCrossNeighbors(hedgeMesh, crossMesh);
         crossMesh->baseMesh2D = polyMesh;
     }
 
@@ -348,7 +348,7 @@ void PatternCreator::CreateMesh_2DPattern_PentagonPattern3(int patternRadius, sh
 
 void PatternCreator::CreateMesh_2DPattern(vector<_Polygon> &root_polys, Vector3f DX, Vector3f DY, int Nx, int Ny,
                                        shared_ptr<CrossMesh> &crossMesh) {
-    shared_ptr<PolyMesh> polyMesh= make_shared<PolyMesh>();
+    shared_ptr<PolyMesh> polyMesh= make_shared<PolyMesh>(getVarList());
     for(int id = 0; id < Ny; id++)
     {
         //row
@@ -368,13 +368,13 @@ void PatternCreator::CreateMesh_2DPattern(vector<_Polygon> &root_polys, Vector3f
     polyMesh->UpdateVertices();
     polyMesh->NormalizeMesh();
 
-    AugmentedVectorCreator vectorCreator(getVarList());
-    crossMesh = make_shared<CrossMesh>();
-    vectorCreator.InitCrossMesh(polyMesh, crossMesh);
+    BaseMeshCreator meshCreator(getVarList());
+    crossMesh = make_shared<CrossMesh>(getVarList());
+    meshCreator.InitCrossMesh(polyMesh, crossMesh);
     pHEdgeMesh hedgeMesh = make_shared<HEdgeMesh>();
     hedgeMesh->InitHEdgeMesh(polyMesh);
     hedgeMesh->BuildHalfEdgeMesh();
-    vectorCreator.ComputeCrossNeighbors(hedgeMesh, crossMesh);
+    meshCreator.ComputeCrossNeighbors(hedgeMesh, crossMesh);
     crossMesh->baseMesh2D = polyMesh;
     return;
 }
@@ -1108,7 +1108,7 @@ void PatternCreator::CreateMesh_Fan(Vector3f verA, Vector3f verB, Vector3f verM,
 
 	// Construct the mesh
 	polyMesh.reset();
-	polyMesh = make_shared<PolyMesh>();
+	polyMesh = make_shared<PolyMesh>(getVarList());
 
 	for (int i = 0; i < poly->vers.size(); i++)
 	{

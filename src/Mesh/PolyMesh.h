@@ -42,8 +42,7 @@ public:
 
 
 public:
-
-    PolyMesh(){}
+    
     PolyMesh(std::shared_ptr<InputVarList> var) : TopoObject(var){}
     PolyMesh(const PolyMesh &_mesh);
 

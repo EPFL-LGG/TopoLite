@@ -24,7 +24,7 @@
 //                                   Initialization
 //**************************************************************************************//
 
-CrossMesh::CrossMesh()
+CrossMesh::CrossMesh(std::shared_ptr<InputVarList> var) : TopoObject(var)
 {
 	baseMesh2D = NULL;
 }

@@ -37,7 +37,7 @@
 //                                   Initialization
 //**************************************************************************************//
 
-CrossMeshCreator::CrossMeshCreator()
+CrossMeshCreator::CrossMeshCreator(shared_ptr<InputVarList> var) :TopoObject(var)
 {
     aabbTree = nullptr;
 
@@ -180,8 +180,11 @@ bool CrossMeshCreator::CreateCrossMesh( bool texturedModel,
     }
     else
     {
+        BaseMeshCreator baseMeshCreator(getVarList());
+        baseMeshCreator.ComputeBaseMesh(referenceSurface, crossMesh);
+
         AugmentedVectorCreator vectorCreator(getVarList());
-        vectorCreator.CreateAugmentedVector(referenceSurface, tiltAngle, crossMesh);
+        vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
     }
 
     if(!previewMode && crossMesh)
@@ -318,7 +321,5 @@ void CrossMeshCreator::CreateAABBTree()
 }
 
 #else
-
-
 
 #endif

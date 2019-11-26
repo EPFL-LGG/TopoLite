@@ -62,6 +62,8 @@ public:
                         shared_ptr<CrossMesh> _pattern2D,
                         shared_ptr<InputVarList> var);
 
+    BaseMeshCreator(shared_ptr<InputVarList> var);
+
     ~BaseMeshCreator();
 
 	// Compute Lifted 3D Mesh 
@@ -80,6 +82,13 @@ public:
 						 shared_ptr<PolyMesh>& baseMesh2D,
 						 shared_ptr<CrossMesh>& crossMesh);
 
+
+    void ComputeBaseMesh(   pPolyMesh polyMesh,
+                            pCrossMesh &crossMesh);
+
+    void InitCrossMesh(     pPolyMesh polyMesh,
+                            pCrossMesh &crossMesh);
+
 	void ComputeInsideCross(double *inverTextureMat,
 							shared_ptr<PolyMesh> &baseMesh2D,
 							shared_ptr<CrossMesh> &crossMesh);
@@ -87,6 +96,8 @@ public:
 	void ComputeBoundaryCross(double *inverTextureMat,
 							  shared_ptr<PolyMesh> &baseMesh2D,
 							  shared_ptr<CrossMesh> &crossMesh);
+
+    void ComputePracticalBoundary(shared_ptr<CrossMesh> &crossMesh);
 
 	void ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh crossMesh);
 

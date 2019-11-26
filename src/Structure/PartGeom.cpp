@@ -301,7 +301,7 @@ void PartGeom::Convert2PolyMesh(vector<Vector3f> &ver, vector<Vector3i> &tri, pP
 	}
 
 	//3) do convex hull to reconstruct the face
-	polyMesh = make_shared<PolyMesh>();
+	polyMesh = make_shared<PolyMesh>(getVarList());
 	polyMesh->vertexList = ver;
 	faceList.resize(hypList.size());
 	for(int id = 0; id < facePolygons.size(); id++)

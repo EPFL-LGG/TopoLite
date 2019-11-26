@@ -57,8 +57,7 @@ public:
 
 public:
 	CrossMeshCreator(const CrossMeshCreator &_model);
-    CrossMeshCreator();
-    CrossMeshCreator(shared_ptr<InputVarList> var) :TopoObject(var){CrossMeshCreator();};
+    CrossMeshCreator(shared_ptr<InputVarList> var);
 	~CrossMeshCreator();
 
 	void ClearModel();

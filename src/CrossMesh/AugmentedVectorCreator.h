@@ -47,23 +47,9 @@ public:
 	 * \brief Create crossMesh by setting alterative tiltAngle in polyMesh
 	 * \note This is the main function
 	 */
-	void CreateAugmentedVector(pPolyMesh referenceMesh, float tiltAngle, pCrossMesh &crossMesh);
-
 	void CreateAugmentedVector(float tiltAngle, pCrossMesh &crossMesh);
 
 public:
-
-	/*!
-	 * \brief Initialize crossMesh's Geomtery.
-	 * \note The edges' tile angles are not setted.
-	 */
-	void InitCrossMesh        (pPolyMesh polyMesh, pCrossMesh &crossMesh);
-
-	/*!
-	 * \brief: Initialize crossMesh's Connectivity.\n
-	 * Give each cross its neighboring information.
-	 */
-	void ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh crossMesh);
 
 	/*!
 	 * \brief Set initial tilt angle for each cross.
@@ -79,7 +65,6 @@ public:
 
 	bool UpdateMeshTiltRange(pCrossMesh crossMesh);
 
-	void ComputePracticalBoundary(shared_ptr<CrossMesh> &crossMesh);
 };
 
 #endif

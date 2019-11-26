@@ -144,7 +144,7 @@ void MeshConverter::InitPolyMesh(   const vector<Vector3f> &inVerList,
                                     pPolyMesh &polyMesh)
 {
     polyMesh.reset();
-    polyMesh = make_shared<PolyMesh>();
+    polyMesh = make_shared<PolyMesh>(getVarList());
 
     // Initialize vertices
     polyMesh->vertexList = inVerList;

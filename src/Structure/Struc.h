@@ -153,7 +153,7 @@ private:
                                         vector<Vector3f> &polyInt);
 
     void ProjectPolygonTo3D(            const vector<Vector3f> &poly,
-                                        double projMat[],
+                                        double *projMat,
                                         vector<Vector3f> &poly3D);
 };
 

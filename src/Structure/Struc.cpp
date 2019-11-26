@@ -703,7 +703,7 @@ void Struc::WriteStructure(const char *folderPath)
     if( boundary_part.size() > 0 ) {
         char boundaryObjFileName[FILE_NAME_LENGTH];
         sprintf(boundaryObjFileName, "%s/Boundary.obj", folderPath);
-        PartGroup boundary_group = PartGroup(partList, boundary_part);
+        PartGroup boundary_group = PartGroup(partList, boundary_part, getVarList());
         boundary_group.WriteGroupOBJModel(boundaryObjFileName, true);
     }
 
@@ -725,7 +725,7 @@ void Struc::WriteStructureWireFrame(const char *folderPath)
     if(partList.size() > 0 ){
         char objFileName[FILE_NAME_LENGTH];
         sprintf(objFileName, "%s/PartsWire.obj", folderPath);
-        PartGroup parts = PartGroup(_partList, partIDs);
+        PartGroup parts = PartGroup(_partList, partIDs, getVarList());
         parts.WriteGroupOBJWireModel(objFileName);
     }
 }
@@ -851,7 +851,7 @@ void Struc::ComputePolygonsIntersection(
     return;
 }
 
-void ProjectPolygonTo3D(const vector<Vector3f> &poly, double projMat[], vector<Vector3f> &poly3D)
+void Struc::ProjectPolygonTo3D(const vector<Vector3f> &poly, double *projMat, vector<Vector3f> &poly3D)
 {
     poly3D.clear();
 

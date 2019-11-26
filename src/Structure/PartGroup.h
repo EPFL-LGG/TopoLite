@@ -17,11 +17,11 @@
 
 #include <vector>
 #include "Utility/vec.h"
-
+#include "Utility/TopoObject.h"
 
 using namespace std;
 
-class PartGroup 
+class PartGroup :public TopoObject
 {
 public:
 	vector<wpPart> groupParts;           // A group of parts
@@ -30,9 +30,9 @@ public:
 
 public:
 
-	PartGroup(vector<pPart> partList, vector<int> groupPartIDs);
-	PartGroup(vector<wpPart> partList, vector<int> groupPartIDs);
-    PartGroup(const vector<wpPart>& _groupParts);
+	PartGroup(vector<pPart> partList, vector<int> groupPartIDs, shared_ptr<InputVarList> var);
+	PartGroup(vector<wpPart> partList, vector<int> groupPartIDs, shared_ptr<InputVarList> var);
+    PartGroup(const vector<wpPart>& _groupParts, shared_ptr<InputVarList> var);
 	~PartGroup();
 
 	vector<Vector3f> GetAllVertices();

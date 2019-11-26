@@ -52,8 +52,7 @@ public:
 public:
 
     Cross(const Cross &Cross);
-    Cross(std::shared_ptr<InputVarList> var) : TopoObject(var){}
-    Cross();
+    Cross(std::shared_ptr<InputVarList> var);
 	~Cross();
 	void Print();
 
