@@ -251,7 +251,8 @@ void RenderPass::resize(const Vector2i &size) {
     m_viewport_size = size;
 }
 
-void RenderPass::set_clear_color(size_t index, const Color &color) {
+void RenderPass::set_clear_color(size_t index, const Color &color)
+{
     m_clear_color.at(index) = color;
 
     MTLRenderPassDescriptor *pass_descriptor =

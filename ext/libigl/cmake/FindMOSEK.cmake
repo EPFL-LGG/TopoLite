@@ -37,5 +37,5 @@ find_package_handle_standard_args(
 )
 set(MOSEK_INCLUDE_DIRS ${MOSEK_INCLUDE_DIR})
 
-# Hide variables from CMake-Gui options
+# Hide variables from CMake-GUI options
 mark_as_advanced(MOSEK_LIBRARIES MOSEK_INCLUDE_DIRS MOSEK_INCLUDE_DIR)

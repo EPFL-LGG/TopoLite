@@ -41,6 +41,16 @@ set(TBB_BUILD_TESTS           OFF  CACHE BOOL " " FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tbb)
 set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 
+#Nanogui
+set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
+set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
+set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
+set(NANOGUI_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/nanogui/include")
+add_subdirectory(nanogui)
+message(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/nanogui/resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+
 #fast-winding-number-soups
 #add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fast-winding-number-soups)
 
@@ -53,6 +63,8 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${SHAPEOP_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
+                ${NANOGUI_INCLUDE_DIRS}
+                ${NANOGUI_EXTRA_INCS}
                 PARENT_SCOPE)
 set(ext_lib pugixml
             QuickHull
@@ -62,4 +74,8 @@ set(ext_lib pugixml
             ShapeOp
             tbb_static
             ${Boost_LIBRARIES}
+            nanogui
+            ${NANOGUI_EXTRA_LIBS}
             PARENT_SCOPE)
+set(ext_defs ${NANOGUI_EXTRA_DEFS}
+             PARENT_SCOPE)
