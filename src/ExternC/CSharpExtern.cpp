@@ -78,7 +78,7 @@ bool initMesh(int partID, CMesh *mesh, XMLData* data){
         if(0 <= partID && partID < data->strucCreator->struc->partList.size())
         {
             shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
-            if(part){
+            if(part && part->polyMesh){
                 MeshConverter converter(data->varList);
                 converter.Convert2EigenMesh(part->polyMesh.get(), V , F);
                 mesh->n_vertices = V.rows();

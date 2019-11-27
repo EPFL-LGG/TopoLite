@@ -100,6 +100,7 @@ void MeshConverter::generateTexture(const PolyMesh *polyMesh, shared_ptr<PolyMes
 
 void MeshConverter::Convert2TriMesh(const PolyMesh* polyMesh, vector<pTriangle> &triList)
 {
+    if(polyMesh == nullptr) return;
 	for (int i = 0; i < polyMesh->polyList.size(); i++)
 	{
 		pPolygon poly = polyMesh->polyList[i];
@@ -257,11 +258,11 @@ void MeshConverter::Convert2EigenMesh(const PolyMesh *polyMesh, Eigen::MatrixXd 
         }
     }
 
-    Eigen::MatrixXd SV;
-    Eigen::MatrixXi SVI, SVJ, SF;
-    igl::remove_duplicate_vertices(V, F, 2e-5, SV, SVI, SVJ, SF);
-    V = SV;
-    F = SF;
+//    Eigen::MatrixXd SV;
+//    Eigen::MatrixXi SVI, SVJ, SF;
+//    igl::remove_duplicate_vertices(V, F, 1e-5, SV, SVI, SVJ, SF);
+//    V = SV;
+//    F = SF;
     return;
 }
 

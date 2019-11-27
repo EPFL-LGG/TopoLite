@@ -313,8 +313,10 @@ double Struc::ComputeLowestY()
     {
         pPart part = partList[i];
 
+        if(part == nullptr || part->polyMesh == nullptr)
+            continue;
+        
         float partMinY = part->polyMesh->bbox.minPt.y;
-
 
         if (partMinY < strucMinY)
         {
