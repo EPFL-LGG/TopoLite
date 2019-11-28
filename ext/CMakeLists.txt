@@ -56,9 +56,6 @@ if(USE_GUI)
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/nanogui/resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
-#fast-winding-number-soups
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/fast-winding-number-soups)
-
 
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}
