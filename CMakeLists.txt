@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.9)
 project(TopoLite)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 
 #########################################
@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 option(USE_GUI "USE_GUI" OFF)
 option(USE_PYTHON_PLUGIN "USE PYBIND11 PLUGIN" OFF)
-option(USE_UNIT_TEST "USE CATCH2 TEST" OFF)
+option(USE_UNIT_TEST "USE CATCH2 TEST" ON)
 option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
 #########################################
@@ -68,6 +68,7 @@ IF(USE_GUI)
             src/GUI/NanoViewer.cpp
             src/GUI/NanoViewer.h)
     target_link_libraries(TopoGUI PUBLIC TpCorelib)
+	set_target_properties(TopoGUI PROPERTIES CXX_STANDARD 17)
 endif()
 
 

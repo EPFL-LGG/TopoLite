@@ -11,16 +11,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-
-#ifdef WIN32
-#include <GL/glut.h>
-#endif
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#endif
-
-
 #include "../Utility/HelpFunc.h"
 #include "Polygon.h"
 #include "PolyMesh.h"
@@ -121,18 +111,11 @@ void HEdgeMesh::InitHEdgeMesh(pPolyMesh polyMesh)
 
 void HEdgeMesh::BuildHalfEdgeMesh()
 {
-	clock_t sta = clock();
 	GenerateHalfEdges();
 
-	//std::cout << "----GenerateHalfEdges:\t" << (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-
-	sta = clock();
 	UpdateVertices();
-	//std::cout << "----UpdateVertices:\t" << (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
-	sta = clock();
 	ComputeTwinHEdges();
-	//std::cout << "----ComputeTwinHEdges:\t" << (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 }
 
 

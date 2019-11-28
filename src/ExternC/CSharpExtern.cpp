@@ -18,7 +18,6 @@
 Eigen::MatrixXd V;
 Eigen::MatrixXi F;
 
-CSharp_LIBRARY_C_FUNCTION
 XMLData* readXML(const char *xmlstr)
 {
     XMLData *data = new XMLData();
@@ -27,7 +26,7 @@ XMLData* readXML(const char *xmlstr)
     return data;
 }
 //
-CSharp_LIBRARY_C_FUNCTION
+
 int deleteStructure(XMLData* data){
     if(data){
         delete data;
@@ -38,7 +37,6 @@ int deleteStructure(XMLData* data){
     }
 }
 
-CSharp_LIBRARY_C_FUNCTION
 void refresh(XMLData* data)
 {
     if (data->strucCreator->crossMeshCreator) {
@@ -51,7 +49,7 @@ void refresh(XMLData* data)
     return;
 }
 //
-CSharp_LIBRARY_C_FUNCTION
+
 void preview(XMLData* data)
 {
     if (data->strucCreator->crossMeshCreator) {
@@ -64,7 +62,7 @@ void preview(XMLData* data)
     return;
 }
 
-CSharp_LIBRARY_C_FUNCTION
+
 int partNumber(XMLData* data){
     if(data->strucCreator && data->strucCreator->struc)
         return data->strucCreator->struc->partList.size();
@@ -72,7 +70,6 @@ int partNumber(XMLData* data){
         return 0;
 }
 
-CSharp_LIBRARY_C_FUNCTION
 bool initMesh(int partID, CMesh *mesh, XMLData* data){
     if(data->strucCreator && data->strucCreator->struc){
         if(0 <= partID && partID < data->strucCreator->struc->partList.size())
@@ -90,7 +87,7 @@ bool initMesh(int partID, CMesh *mesh, XMLData* data){
     return false;
 }
 
-CSharp_LIBRARY_C_FUNCTION
+
 bool assignMesh(int partID, CMesh *mesh, XMLData* data){
     if(data->strucCreator && data->strucCreator->struc){
         if(0 <= partID && partID < data->strucCreator->struc->partList.size())
@@ -116,7 +113,7 @@ bool assignMesh(int partID, CMesh *mesh, XMLData* data){
     return false;
 }
 
-CSharp_LIBRARY_C_FUNCTION
+
 bool isBoundary(int partID, XMLData* data)
 {
     if(data->strucCreator && data->strucCreator->struc)
@@ -128,7 +125,7 @@ bool isBoundary(int partID, XMLData* data)
     return false;
 }
 
-CSharp_LIBRARY_C_FUNCTION
+
 float ComputeGroundHeight(XMLData* data){
 
     if(data->strucCreator && data->strucCreator->struc)
@@ -139,7 +136,7 @@ float ComputeGroundHeight(XMLData* data){
     return 0;
 }
 
-CSharp_LIBRARY_C_FUNCTION
+
 void setParaDouble(const char *name, double value, XMLData* data){
     data->varList->set(name,  (float)value);
     return;

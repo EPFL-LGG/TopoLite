@@ -1099,9 +1099,8 @@ TEST_CASE("Class XMLIO")
     {
         XMLIO Reader;
         XMLData data;
-        Reader.XMLReader("/Users/ziqwang/Documents/GitHub/TopoLockProject/Result/Paper_Render/fig_intro_sphere/SphereA80_Hex_T0.0.xml", data);
-        Reader.XMLWriter("/Users/ziqwang/Documents/GitHub/TopoLockProject/Result/Paper_Render/fig_intro_sphere/test.xml", data);
-
+        Reader.XMLReader("../data/origin.xml", data);
+        Reader.XMLWriter("../data/test.xml", data);
     }
 }
 

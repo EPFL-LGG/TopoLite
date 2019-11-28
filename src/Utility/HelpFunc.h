@@ -14,16 +14,6 @@
 #ifndef _HELP_FUNC_H
 #define _HELP_FUNC_H
 
-
-#ifdef WIN32
-#include <GL/glut.h>
-#endif
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#endif
-
-
 #include "vec.h"
 #include <vector>
 #include "HelpStruct.h"

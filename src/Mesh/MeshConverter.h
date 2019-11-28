@@ -24,6 +24,7 @@
 #include "Mesh/PolyMesh.h"
 
 #include <vector>
+#include <functional>
 #include <Eigen/Dense>
 #include <igl/remove_duplicate_vertices.h>
 #include <clipper.hpp>

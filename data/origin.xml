@@ -1,0 +1,221 @@
+<?xml version="1.0"?>
+<Documents>
+	<GUISettings>
+		<patternID value="4" />
+		<patternRadius value="15" />
+		<tiltAngle value="20" />
+		<cutUpper value="0.0299999993" />
+		<cutLower value="0.0299999993" />
+		<minCrossArea value="0.00100000005" />
+		<minBoundaryEdge value="0.00100000005" />
+		<textureScaleFactor value="1" />
+		<smooth_bdry value="1" />
+		<ground_touch_bdry value="1" />
+		<faceface_contact value="1" />
+		<edgeedge_contact value="1" />
+		<only_cut_bdry value="0" />
+		<texturedModel value="1" />
+		<small_zero_eps value="1.00000001e-07" />
+		<big_zero_eps value="9.99999975e-06" />
+		<clipper_scale value="100000000" />
+		<ShapeOp_Settings>
+			<shapeop_meshFit value="1" />
+			<shapeop_regularity value="1" />
+			<shapeop_planarity value="1" />
+			<shapeop_bending value="0" />
+			<shapeop_boundary value="0" />
+			<shapeop_iterator value="0" />
+		</ShapeOp_Settings>
+		<Para_Mitsuba>
+			<wireframe_thickness value="0.00100000005" />
+			<wireframe_circle_vertex_num value="16" />
+			<mitsuba_PartYRotation value="50" />
+			<mitsuba_CameraRotation value="30" />
+			<mitsuba_CameraDistance value="4" />
+			<mitsuba_width value="768" />
+			<mitsuba_height value="576" />
+			<mitsuba_sample value="128" />
+			<mitsuba_SunTime value="12" />
+			<mitsuba_SunStrength value="1.5" />
+			<output_mitsuba value="0" />
+		</Para_Mitsuba>
+		<Para_ContactGraph>
+			<mosek_intpntCoTolRelGap value="9.99999996e-13" />
+			<mosek_intpntCoTolInfeas value="9.99999996e-13" />
+			<mosek_interlocking_eps value="1.00000001e-07" />
+			<mosek_rbe_eps value="1.00000001e-07" />
+			<mosek_rbeForce_upperBound value="10000000" />
+			<slope_binarySearch_eps value="0.100000001" />
+			<slope_bound_eps value="0.100000001" />
+			<slope_num_init_sample value="4" />
+			<kmeans_iteration value="100" />
+		</Para_ContactGraph>
+		<Para_CrossMesh>
+			<crossmesh_quadTree_leafNodeSize value="0.00999999978" />
+		</Para_CrossMesh>
+		<Para_Opt>
+			<opt_compression_weight value="0.00999999978" />
+			<opt_tension_weight value="10000" />
+			<opt_activeset_eps value="9.99999975e-05" />
+			<opt_gravity_scale_factor value="100" />
+			<opt_knitro_opttol value="1.00000001e-10" />
+			<opt_iterations_times value="100" />
+			<opt_tiltAngle_width value="20" />
+		</Para_Opt>
+		<pickPartIDs></pickPartIDs>
+		<Interact_Matrix>2.344562,-0.209693,0.000000,0.000000,0.209693,2.344562,0.000000,0.000000,0.000000,0.000000,0.470784,0.000000,0.000000,0.000000,0.000000,1.000000</Interact_Matrix>
+		<Camera>
+			<worldAxesMat>-0.411911,-0.389383,0.823854,0.000000,0.295346,0.798261,0.524959,0.000000,-0.862058,0.459556,-0.213802,0.000000,0.000000,0.000000,-4.000000,1.000000</worldAxesMat>
+			<worldMatrix>-0.438862,-0.414856,0.877758,0.000000,0.066234,0.948232,0.481290,0.000000,-0.968607,0.252816,-0.364790,0.000000,0.000000,0.000000,-3.800000,1.000000</worldMatrix>
+		</Camera>
+		<Para_Assembly>
+			<showAssembly value="0" />
+			<assembling_layer value="1" />
+			<assembling_Kth_part value="29" />
+			<assembling_vec_length value="0.200000003" />
+		</Para_Assembly>
+		<Para_Support>
+			<showSupport value="0" />
+			<ground_height value="-0.350661218" />
+			<support_thickness value="0.0299999993" />
+			<support_layer value="0" />
+			<support_smallest_area value="0.00999999978" />
+		</Para_Support>
+		<Unit value="150" />
+	</GUISettings>
+	<Output>
+		<Structure path="origin_data/origin_Surface.obj" />
+		<CrossMesh path="origin_data/origin_CrossMesh.obj" />
+		<PartGeometry>origin_data/PartGeometry/PartWire_60.obj
+origin_data/PartGeometry/PartWire_48.obj
+origin_data/PartGeometry/Part_13.obj
+origin_data/PartGeometry/Part_07.obj
+origin_data/PartGeometry/Part_06.obj
+origin_data/PartGeometry/Part_12.obj
+origin_data/PartGeometry/PartWire_49.obj
+origin_data/PartGeometry/Part_04.obj
+origin_data/PartGeometry/Part_10.obj
+origin_data/PartGeometry/Part_38.obj
+origin_data/PartGeometry/Part_39.obj
+origin_data/PartGeometry/Part_11.obj
+origin_data/PartGeometry/Part_05.obj
+origin_data/PartGeometry/Boundary.obj
+origin_data/PartGeometry/Part_29.obj
+origin_data/PartGeometry/Part_01.obj
+origin_data/PartGeometry/Part_15.obj
+origin_data/PartGeometry/Part_14.obj
+origin_data/PartGeometry/Part_00.obj
+origin_data/PartGeometry/Part_28.obj
+origin_data/PartGeometry/PartWire_59.obj
+origin_data/PartGeometry/Part_16.obj
+origin_data/PartGeometry/Part_02.obj
+origin_data/PartGeometry/Part_03.obj
+origin_data/PartGeometry/Part_17.obj
+origin_data/PartGeometry/PartWire_58.obj
+origin_data/PartGeometry/PartWire_03.obj
+origin_data/PartGeometry/PartWire_17.obj
+origin_data/PartGeometry/Part_58.obj
+origin_data/PartGeometry/Part_59.obj
+origin_data/PartGeometry/PartWire_16.obj
+origin_data/PartGeometry/PartWire_02.obj
+origin_data/PartGeometry/PartWire_14.obj
+origin_data/PartGeometry/PartWire_00.obj
+origin_data/PartGeometry/PartWire_28.obj
+origin_data/PartGeometry/PartWire_29.obj
+origin_data/PartGeometry/PartWire_01.obj
+origin_data/PartGeometry/PartWire_15.obj
+origin_data/PartGeometry/PartWire_39.obj
+origin_data/PartGeometry/PartWire_11.obj
+origin_data/PartGeometry/PartWire_05.obj
+origin_data/PartGeometry/PartWire_04.obj
+origin_data/PartGeometry/PartWire_10.obj
+origin_data/PartGeometry/PartWire_38.obj
+origin_data/PartGeometry/BoundaryWire.obj
+origin_data/PartGeometry/PartWire_06.obj
+origin_data/PartGeometry/PartWire_12.obj
+origin_data/PartGeometry/Part_49.obj
+origin_data/PartGeometry/Part_60.obj
+origin_data/PartGeometry/Part_48.obj
+origin_data/PartGeometry/PartWire_13.obj
+origin_data/PartGeometry/PartWire_07.obj
+origin_data/PartGeometry/PartWire_22.obj
+origin_data/PartGeometry/PartWire_36.obj
+origin_data/PartGeometry/Part_51.obj
+origin_data/PartGeometry/Part_45.obj
+origin_data/PartGeometry/Part_44.obj
+origin_data/PartGeometry/Part_50.obj
+origin_data/PartGeometry/PartWire_37.obj
+origin_data/PartGeometry/PartWire_23.obj
+origin_data/PartGeometry/PartWire_35.obj
+origin_data/PartGeometry/PartWire_21.obj
+origin_data/PartGeometry/PartWire_09.obj
+origin_data/PartGeometry/Part_46.obj
+origin_data/PartGeometry/Part_52.obj
+origin_data/PartGeometry/Part_53.obj
+origin_data/PartGeometry/Part_47.obj
+origin_data/PartGeometry/PartWire_08.obj
+origin_data/PartGeometry/PartWire_20.obj
+origin_data/PartGeometry/PartWire_34.obj
+origin_data/PartGeometry/PartWire_18.obj
+origin_data/PartGeometry/PartWire_30.obj
+origin_data/PartGeometry/PartWire_24.obj
+origin_data/PartGeometry/Part_43.obj
+origin_data/PartGeometry/Part_57.obj
+origin_data/PartGeometry/Part_56.obj
+origin_data/PartGeometry/Part_42.obj
+origin_data/PartGeometry/PartWire_25.obj
+origin_data/PartGeometry/PartWire_31.obj
+origin_data/PartGeometry/PartWire_19.obj
+origin_data/PartGeometry/PartWire_27.obj
+origin_data/PartGeometry/PartWire_33.obj
+origin_data/PartGeometry/Part_54.obj
+origin_data/PartGeometry/Part_40.obj
+origin_data/PartGeometry/Part_41.obj
+origin_data/PartGeometry/Part_55.obj
+origin_data/PartGeometry/PartWire_32.obj
+origin_data/PartGeometry/PartWire_26.obj
+origin_data/PartGeometry/PartWire_41.obj
+origin_data/PartGeometry/PartWire_55.obj
+origin_data/PartGeometry/Part_32.obj
+origin_data/PartGeometry/Part_26.obj
+origin_data/PartGeometry/Part_27.obj
+origin_data/PartGeometry/Part_33.obj
+origin_data/PartGeometry/PartWire_54.obj
+origin_data/PartGeometry/PartWire_40.obj
+origin_data/PartGeometry/PartWire_56.obj
+origin_data/PartGeometry/PartWire_42.obj
+origin_data/PartGeometry/Part_25.obj
+origin_data/PartGeometry/Part_31.obj
+origin_data/PartGeometry/Part_19.obj
+origin_data/PartGeometry/Part_18.obj
+origin_data/PartGeometry/Part_30.obj
+origin_data/PartGeometry/Part_24.obj
+origin_data/PartGeometry/PartWire_43.obj
+origin_data/PartGeometry/PartWire_57.obj
+origin_data/PartGeometry/PartWire_53.obj
+origin_data/PartGeometry/PartWire_47.obj
+origin_data/PartGeometry/Part_08.obj
+origin_data/PartGeometry/Part_20.obj
+origin_data/PartGeometry/Part_34.obj
+origin_data/PartGeometry/Part_35.obj
+origin_data/PartGeometry/Part_21.obj
+origin_data/PartGeometry/Part_09.obj
+origin_data/PartGeometry/PartWire_46.obj
+origin_data/PartGeometry/PartWire_52.obj
+origin_data/PartGeometry/PartWire_44.obj
+origin_data/PartGeometry/PartWire_50.obj
+origin_data/PartGeometry/Part_37.obj
+origin_data/PartGeometry/Part_23.obj
+origin_data/PartGeometry/Part_22.obj
+origin_data/PartGeometry/Part_36.obj
+origin_data/PartGeometry/PartWire_51.obj
+origin_data/PartGeometry/PartWire_45.obj
+</PartGeometry>
+	</Output>
+	<Mitsuba>
+		<MitsubaData path="minimal2_data/mitsuba.xml" />
+	</Mitsuba>
+	<PartGeoData>
+		<CrossData path="origin_data/CrossMesh.xml" />
+	</PartGeoData>
+</Documents>

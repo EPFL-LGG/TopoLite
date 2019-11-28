@@ -9,6 +9,7 @@
 #include <libShapeOp/src/Types.h>
 #include "CrossConstraint.h"
 #include <igl/point_mesh_squared_distance.h>
+
 ShapeOp::MeshClosenessConstraint::MeshClosenessConstraint(const std::vector<int> &idI,
                                                           Scalar weight,
                                                           const Matrix3X &positions) : Constraint(idI, weight)
