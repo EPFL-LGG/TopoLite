@@ -10,15 +10,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-
-#ifdef WIN32
-#include <GL/glut.h>
-#endif
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#endif
-
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpStruct.h"
 #include "Utility/HelpFunc.h"

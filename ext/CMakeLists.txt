@@ -2,10 +2,14 @@ cmake_minimum_required(VERSION 3.1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 #EIGEN
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 
 #Boost
-find_package(Boost COMPONENTS system filesystem thread REQUIRED)
+set(Boost_ADDITIONAL_VERSIONS 1.66.0) 
+set(BOOST_ROOT  "C:\\local\\boost_1_66_0")
+set(Boost_USE_STATIC_LIBS ON)
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost COMPONENTS system filesystem REQUIRED)
 
 #Cpp Subprocess
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)

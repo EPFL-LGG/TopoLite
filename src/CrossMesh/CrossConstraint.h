@@ -10,18 +10,18 @@
 #include <libShapeOp/src/Common.h>
 #include <igl/AABB.h>
 #include <memory>
+
 namespace ShapeOp
 {
-class SHAPEOP_API MeshClosenessConstraint : public Constraint
+class MeshClosenessConstraint : public Constraint
 {
 public:
-
     MeshClosenessConstraint(const std::vector<int> &idI, Scalar weight, const Matrix3X &positions);
-    virtual ~MeshClosenessConstraint() {}
+	~MeshClosenessConstraint() {}
     /** \brief Find the closest configuration from the input positions that satisfy the constraint.*/
-    virtual void project(const Matrix3X & /*positions*/, Matrix3X &projections) const override final;
+    void project(const Matrix3X & /*positions*/, Matrix3X &projections) const override final;
     /** \brief Add the constraint to the linear system.*/
-    virtual void addConstraint(std::vector<Triplet> &triplets, int &idO) const override final;
+    void addConstraint(std::vector<Triplet> &triplets, int &idO) const override final;
 
 public:
 

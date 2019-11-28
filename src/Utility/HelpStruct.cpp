@@ -11,14 +11,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#ifdef WIN32
-#include <GL/glut.h>
-#endif
-
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#endif // __APPLE__
-
 #include "HelpStruct.h"
 #include "HelpDefine.h"
 
