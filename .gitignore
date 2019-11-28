@@ -8,6 +8,7 @@ cmake-build-debug/
 \cmake-build-debug
 \.vs
 Release\*.*
+Release
 
 data\origin_data\PartGeometry\*.*
 data\origin_data\Simulation\*.*
