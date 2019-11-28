@@ -1096,12 +1096,14 @@ TEST_CASE("Class XMLIO")
 {
 
     SECTION("Read XML")
-    {
-        XMLIO Reader;
-        XMLData data;
-        Reader.XMLReader("../data/origin.xml", data);
-        Reader.XMLWriter("../data/test.xml", data);
-    }
+{
+XMLIO Reader;
+XMLData data;
+//        Reader.XMLReader("../data/origin.xml", data);
+//        Reader.XMLWriter("../data/test.xml", data);
+Reader.XMLReader("/Users/ziqwang/Documents/GitHub/TopoLockProject/Result/Paper_Render/fig_result_surfaces/Vase_Quad3.xml", data);
+Reader.XMLWriter("test.xml", data);
+}
 }
 
 #endif
