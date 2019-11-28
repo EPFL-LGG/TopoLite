@@ -35,7 +35,6 @@ struct get_boxes_helper {
   {
     outBoxes.insert(outBoxes.end(), boxBegin, boxEnd);
     eigen_assert(outBoxes.size() == objects.size());
-    EIGEN_ONLY_USED_FOR_DEBUG(objects);
   }
 };
 

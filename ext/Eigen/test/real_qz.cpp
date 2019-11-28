@@ -18,6 +18,7 @@ template<typename MatrixType> void real_qz(const MatrixType& m)
      RealQZ.h
   */
   using std::abs;
+  typedef typename MatrixType::Index Index;
   typedef typename MatrixType::Scalar Scalar;
   
   Index dim = m.cols();

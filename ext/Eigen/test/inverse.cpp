@@ -14,6 +14,7 @@
 template<typename MatrixType> void inverse(const MatrixType& m)
 {
   using std::abs;
+  typedef typename MatrixType::Index Index;
   /* this test covers the following files:
      Inverse.h
   */
@@ -46,7 +47,7 @@ template<typename MatrixType> void inverse(const MatrixType& m)
   //computeInverseAndDetWithCheck tests
   //First: an invertible matrix
   bool invertible;
-  Scalar det;
+  RealScalar det;
 
   m2.setZero();
   m1.computeInverseAndDetWithCheck(m2, det, invertible);
@@ -112,7 +113,5 @@ void test_inverse()
     
     CALL_SUBTEST_7( inverse(Matrix4d()) );
     CALL_SUBTEST_7( inverse(Matrix<double,4,4,DontAlign>()) );
-
-    CALL_SUBTEST_8( inverse(Matrix4cd()) );
   }
 }

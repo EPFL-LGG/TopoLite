@@ -39,8 +39,6 @@
   * \code
   * #include <Eigen/CXX11/Tensor>
   * \endcode
-  *
-  * Much of the documentation can be found \ref eigen_tensors "here".
   */
 
 #include <cmath>

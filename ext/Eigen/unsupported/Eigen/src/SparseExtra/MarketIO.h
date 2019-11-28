@@ -17,8 +17,8 @@ namespace Eigen {
 
 namespace internal 
 {
-  template <typename Scalar,typename IndexType>
-  inline bool GetMarketLine (std::stringstream& line, IndexType& M, IndexType& N, IndexType& i, IndexType& j, Scalar& value)
+  template <typename Scalar>
+  inline bool GetMarketLine (std::stringstream& line, Index& M, Index& N, Index& i, Index& j, Scalar& value)
   {
     line >> i >> j >> value;
     i--;
@@ -30,8 +30,8 @@ namespace internal
     else
       return false;
   }
-  template <typename Scalar,typename IndexType>
-  inline bool GetMarketLine (std::stringstream& line, IndexType& M, IndexType& N, IndexType& i, IndexType& j, std::complex<Scalar>& value)
+  template <typename Scalar>
+  inline bool GetMarketLine (std::stringstream& line, Index& M, Index& N, Index& i, Index& j, std::complex<Scalar>& value)
   {
     Scalar valR, valI;
     line >> i >> j >> valR >> valI;
@@ -109,7 +109,6 @@ namespace internal
 inline bool getMarketHeader(const std::string& filename, int& sym, bool& iscomplex, bool& isvector)
 {
   sym = 0; 
-  iscomplex = false;
   isvector = false;
   std::ifstream in(filename.c_str(),std::ios::in);
   if(!in)
@@ -134,7 +133,7 @@ template<typename SparseMatrixType>
 bool loadMarket(SparseMatrixType& mat, const std::string& filename)
 {
   typedef typename SparseMatrixType::Scalar Scalar;
-  typedef typename SparseMatrixType::StorageIndex StorageIndex;
+  typedef typename SparseMatrixType::Index Index;
   std::ifstream input(filename.c_str(),std::ios::in);
   if(!input)
     return false;
@@ -144,11 +143,11 @@ bool loadMarket(SparseMatrixType& mat, const std::string& filename)
   
   bool readsizes = false;
 
-  typedef Triplet<Scalar,StorageIndex> T;
+  typedef Triplet<Scalar,Index> T;
   std::vector<T> elements;
   
-  StorageIndex M(-1), N(-1), NNZ(-1);
-  StorageIndex count = 0;
+  Index M(-1), N(-1), NNZ(-1);
+  Index count = 0;
   while(input.getline(buffer, maxBuffersize))
   {
     // skip comments   
@@ -171,7 +170,7 @@ bool loadMarket(SparseMatrixType& mat, const std::string& filename)
     }
     else
     { 
-      StorageIndex i(-1), j(-1);
+      Index i(-1), j(-1);
       Scalar value; 
       if( internal::GetMarketLine(line, M, N, i, j, value) ) 
       {

@@ -11,6 +11,7 @@
 
 template<typename ArrayType> void array(const ArrayType& m)
 {
+  typedef typename ArrayType::Index Index;
   typedef typename ArrayType::Scalar Scalar;
   typedef typename ArrayType::RealScalar RealScalar;
   typedef Array<Scalar, ArrayType::RowsAtCompileTime, 1> ColVectorType;
@@ -129,6 +130,7 @@ template<typename ArrayType> void array(const ArrayType& m)
 template<typename ArrayType> void comparisons(const ArrayType& m)
 {
   using std::abs;
+  typedef typename ArrayType::Index Index;
   typedef typename ArrayType::Scalar Scalar;
   typedef typename NumTraits<Scalar>::Real RealScalar;
 
@@ -206,6 +208,7 @@ template<typename ArrayType> void array_real(const ArrayType& m)
 {
   using std::abs;
   using std::sqrt;
+  typedef typename ArrayType::Index Index;
   typedef typename ArrayType::Scalar Scalar;
   typedef typename NumTraits<Scalar>::Real RealScalar;
 
@@ -316,6 +319,7 @@ template<typename ArrayType> void array_real(const ArrayType& m)
 
 template<typename ArrayType> void array_complex(const ArrayType& m)
 {
+  typedef typename ArrayType::Index Index;
   typedef typename ArrayType::Scalar Scalar;
   typedef typename NumTraits<Scalar>::Real RealScalar;
 
@@ -420,6 +424,7 @@ template<typename ArrayType> void array_complex(const ArrayType& m)
 
 template<typename ArrayType> void min_max(const ArrayType& m)
 {
+  typedef typename ArrayType::Index Index;
   typedef typename ArrayType::Scalar Scalar;
 
   Index rows = m.rows();

@@ -14,6 +14,7 @@
 
 template<typename MatrixType> void eigensolver(const MatrixType& m)
 {
+  typedef typename MatrixType::Index Index;
   /* this test covers the following files:
      EigenSolver.h
   */

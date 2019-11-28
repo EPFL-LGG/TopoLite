@@ -207,12 +207,6 @@ struct vectorization_logic
     VERIFY(test_redux(Vector1(),
       LinearVectorizedTraversal,CompleteUnrolling));
 
-    VERIFY(test_redux(Vector1().array()*Vector1().array(),
-      LinearVectorizedTraversal,CompleteUnrolling));
-
-    VERIFY(test_redux((Vector1().array()*Vector1().array()).col(0),
-      LinearVectorizedTraversal,CompleteUnrolling));
-
     VERIFY(test_redux(Matrix<Scalar,PacketSize,3>(),
       LinearVectorizedTraversal,CompleteUnrolling));
 

@@ -13,6 +13,8 @@
 
 template<typename MatrixType> void verifyIsQuasiTriangular(const MatrixType& T)
 {
+  typedef typename MatrixType::Index Index;
+
   const Index size = T.cols();
   typedef typename MatrixType::Scalar Scalar;
 

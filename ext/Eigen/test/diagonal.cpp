@@ -11,6 +11,7 @@
 
 template<typename MatrixType> void diagonal(const MatrixType& m)
 {
+  typedef typename MatrixType::Index Index;
   typedef typename MatrixType::Scalar Scalar;
 
   Index rows = m.rows();
@@ -65,9 +66,6 @@ template<typename MatrixType> void diagonal(const MatrixType& m)
     m2.diagonal(N2).coeffRef(0) = Scalar(2)*s1;
     VERIFY_IS_APPROX(m2.diagonal(N2).coeff(0), Scalar(2)*s1);
   }
-
-  VERIFY( m1.diagonal( cols).size()==0 );
-  VERIFY( m1.diagonal(-rows).size()==0 );
 }
 
 template<typename MatrixType> void diagonal_assert(const MatrixType& m) {
@@ -83,9 +81,6 @@ template<typename MatrixType> void diagonal_assert(const MatrixType& m) {
     VERIFY_RAISES_ASSERT( m1.array() *= m1.diagonal().array() );
     VERIFY_RAISES_ASSERT( m1.array() /= m1.diagonal().array() );
   }
-
-  VERIFY_RAISES_ASSERT( m1.diagonal(cols+1) );
-  VERIFY_RAISES_ASSERT( m1.diagonal(-(rows+1)) );
 }
 
 void test_diagonal()
@@ -100,6 +95,7 @@ void test_diagonal()
     CALL_SUBTEST_2( diagonal(MatrixXcd(internal::random<int>(1,EIGEN_TEST_MAX_SIZE), internal::random<int>(1,EIGEN_TEST_MAX_SIZE))) );
     CALL_SUBTEST_1( diagonal(MatrixXf(internal::random<int>(1,EIGEN_TEST_MAX_SIZE), internal::random<int>(1,EIGEN_TEST_MAX_SIZE))) );
     CALL_SUBTEST_1( diagonal(Matrix<float,Dynamic,4>(3, 4)) );
-    CALL_SUBTEST_1( diagonal_assert(MatrixXf(internal::random<int>(1,EIGEN_TEST_MAX_SIZE), internal::random<int>(1,EIGEN_TEST_MAX_SIZE))) );
   }
+
+  CALL_SUBTEST_1( diagonal_assert(MatrixXf(internal::random<int>(1,EIGEN_TEST_MAX_SIZE), internal::random<int>(1,EIGEN_TEST_MAX_SIZE))) );
 }

@@ -31,12 +31,12 @@ namespace Eigen {
   *
   * \sa Tensor
   */
-template<typename T, typename Dimensions, int Options> class TensorStorage;
+template<typename T, typename Dimensions, int Options_> class TensorStorage;
 
 
 // Pure fixed-size storage
-template<typename T, typename FixedDimensions, int Options_>
-class TensorStorage
+template<typename T, int Options_, typename FixedDimensions>
+class TensorStorage<T, FixedDimensions, Options_>
 {
  private:
   static const std::size_t Size = FixedDimensions::total_size;
@@ -66,7 +66,7 @@ class TensorStorage
 
 
 // pure dynamic
-template<typename T, typename IndexType, int NumIndices_, int Options_>
+template<typename T, int Options_, typename IndexType, int NumIndices_>
 class TensorStorage<T, DSizes<IndexType, NumIndices_>, Options_>
 {
   public:

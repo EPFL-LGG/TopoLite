@@ -15,6 +15,7 @@
 
 template<typename MatrixType> void corners(const MatrixType& m)
 {
+  typedef typename MatrixType::Index Index;
   Index rows = m.rows();
   Index cols = m.cols();
 

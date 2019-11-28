@@ -188,7 +188,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE t array_prod(const array<t, n>& a) {
 }
 template<typename t>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE t array_prod(const array<t, 0>& /*a*/) {
-  return 1;
+  return 0;
 }
 
 template<typename t>

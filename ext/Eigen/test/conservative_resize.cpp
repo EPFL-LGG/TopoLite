@@ -17,6 +17,7 @@ template <typename Scalar, int Storage>
 void run_matrix_tests()
 {
   typedef Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic, Storage> MatrixType;
+  typedef typename MatrixType::Index Index;
 
   MatrixType m, n;
 

@@ -14,6 +14,8 @@
 
 template <typename MatrixType>
 void cod() {
+  typedef typename MatrixType::Index Index;
+
   Index rows = internal::random<Index>(2, EIGEN_TEST_MAX_SIZE);
   Index cols = internal::random<Index>(2, EIGEN_TEST_MAX_SIZE);
   Index cols2 = internal::random<Index>(2, EIGEN_TEST_MAX_SIZE);
@@ -92,6 +94,7 @@ void cod_fixedsize() {
 template<typename MatrixType> void qr()
 {
   using std::sqrt;
+  typedef typename MatrixType::Index Index;
 
   Index rows = internal::random<Index>(2,EIGEN_TEST_MAX_SIZE), cols = internal::random<Index>(2,EIGEN_TEST_MAX_SIZE), cols2 = internal::random<Index>(2,EIGEN_TEST_MAX_SIZE);
   Index rank = internal::random<Index>(1, (std::min)(rows, cols)-1);
@@ -208,6 +211,7 @@ template<typename MatrixType> void qr_kahan_matrix()
 {
   using std::sqrt;
   using std::abs;
+  typedef typename MatrixType::Index Index;
   typedef typename MatrixType::Scalar Scalar;
   typedef typename MatrixType::RealScalar RealScalar;
 

@@ -15,6 +15,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
 #PUGIXML
+set(BUILD_SHARED_LIBS 0)
 find_package(PUGIXML REQUIRED)
 
 #QuickHull

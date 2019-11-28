@@ -12,6 +12,7 @@
 template<typename MatrixType> void matrixVisitor(const MatrixType& p)
 {
   typedef typename MatrixType::Scalar Scalar;
+  typedef typename MatrixType::Index Index;
 
   Index rows = p.rows();
   Index cols = p.cols();
@@ -64,6 +65,7 @@ template<typename MatrixType> void matrixVisitor(const MatrixType& p)
 template<typename VectorType> void vectorVisitor(const VectorType& w)
 {
   typedef typename VectorType::Scalar Scalar;
+  typedef typename VectorType::Index Index;
 
   Index size = w.size();
 

@@ -24,6 +24,7 @@ template<typename MatrixType> void nomalloc(const MatrixType& m)
 {
   /* this test check no dynamic memory allocation are issued with fixed-size matrices
   */
+  typedef typename MatrixType::Index Index;
   typedef typename MatrixType::Scalar Scalar;
 
   Index rows = m.rows();

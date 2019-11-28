@@ -228,9 +228,6 @@ template<typename _Scalar, int _Options, typename _StorageIndex>
     EIGEN_DEPRECATED inline DynamicSparseMatrix()
       : m_innerSize(0), m_data(0)
     {
-      #ifdef EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-        EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-      #endif
       eigen_assert(innerSize()==0 && outerSize()==0);
     }
 
@@ -238,9 +235,6 @@ template<typename _Scalar, int _Options, typename _StorageIndex>
     EIGEN_DEPRECATED inline DynamicSparseMatrix(Index rows, Index cols)
       : m_innerSize(0)
     {
-      #ifdef EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-        EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-      #endif
       resize(rows, cols);
     }
 
@@ -249,18 +243,12 @@ template<typename _Scalar, int _Options, typename _StorageIndex>
     EIGEN_DEPRECATED explicit inline DynamicSparseMatrix(const SparseMatrixBase<OtherDerived>& other)
       : m_innerSize(0)
     {
-      #ifdef EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-        EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-      #endif
-      Base::operator=(other.derived());
+    Base::operator=(other.derived());
     }
 
     inline DynamicSparseMatrix(const DynamicSparseMatrix& other)
       : Base(), m_innerSize(0)
     {
-      #ifdef EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-        EIGEN_SPARSE_CREATE_TEMPORARY_PLUGIN
-      #endif
       *this = other.derived();
     }
 
