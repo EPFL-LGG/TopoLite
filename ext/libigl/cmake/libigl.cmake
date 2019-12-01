@@ -97,11 +97,11 @@ if(TARGET Eigen3::Eigen)
   # If an imported target already exists, use it
   target_link_libraries(igl_common INTERFACE Eigen3::Eigen)
 else()
-  igl_download_eigen()
-  target_include_directories(igl_common SYSTEM INTERFACE
-    $<BUILD_INTERFACE:${LIBIGL_EXTERNAL}/eigen>
-    $<INSTALL_INTERFACE:include>
-  )
+  #igl_download_eigen()
+  #target_include_directories(igl_common SYSTEM INTERFACE
+    #$<BUILD_INTERFACE:${LIBIGL_EXTERNAL}/eigen>
+    #$<INSTALL_INTERFACE:include>
+  #)
 endif()
 
 # C++11 Thread library

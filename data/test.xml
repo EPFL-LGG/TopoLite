@@ -1,33 +1,24 @@
 <?xml version="1.0"?>
 <Documents>
 	<GUISettings>
-		<patternID value="4" />
-		<patternRadius value="15" />
+		<patternID value="1" />
+		<patternRadius value="20" />
 		<tiltAngle value="20" />
 		<cutUpper value="0.0299999993" />
 		<cutLower value="0.0299999993" />
 		<minCrossArea value="0.00100000005" />
-		<minBoundaryEdge value="0.00100000005" />
-		<textureScaleFactor value="1" />
-		<smooth_bdry value="1" />
-		<ground_touch_bdry value="1" />
-		<faceface_contact value="1" />
-		<edgeedge_contact value="1" />
-		<only_cut_bdry value="0" />
+		<minBoundaryEdge value="0.0399999991" />
 		<texturedModel value="1" />
-		<small_zero_eps value="1.00000001e-07" />
-		<big_zero_eps value="9.99999975e-06" />
-		<clipper_scale value="100000000" />
 		<ShapeOp_Settings>
-			<shapeop_meshFit value="1" />
+			<shapeop_meshFit value="0.5" />
 			<shapeop_regularity value="1" />
 			<shapeop_planarity value="1" />
 			<shapeop_bending value="0" />
-			<shapeop_boundary value="0" />
-			<shapeop_iterator value="0" />
+			<shapeop_boundary value="1" />
+			<shapeop_iterator value="30" />
 		</ShapeOp_Settings>
 		<Para_Mitsuba>
-			<wireframe_thickness value="0.00100000005" />
+			<wireframe_thickness value="0.00200000009" />
 			<wireframe_circle_vertex_num value="16" />
 			<mitsuba_PartYRotation value="50" />
 			<mitsuba_CameraRotation value="30" />
@@ -39,6 +30,16 @@
 			<mitsuba_SunStrength value="1.5" />
 			<output_mitsuba value="0" />
 		</Para_Mitsuba>
+		<pickPartIDs></pickPartIDs>
+		<Interact_Matrix>4.150637,-1.398370,0.000000,0.000000,1.398370,4.150637,0.000000,0.000000,0.000000,0.000000,0.875974,0.000000,-0.202607,-0.241100,0.000000,1.000000</Interact_Matrix>
+		<Camera>
+			<worldAxesMat>0.421705,-0.591770,0.687051,0.000000,-0.009110,0.754905,0.655815,0.000000,-0.906728,-0.282814,0.312945,0.000000,0.000000,0.000000,-4.000000,1.000000</worldAxesMat>
+			<worldMatrix>0.514807,-0.722421,0.838734,0.000000,-0.297231,0.800810,0.872197,0.000000,-1.066308,-0.572012,0.161810,0.000000,0.105000,0.045000,-3.800000,1.000000</worldMatrix>
+		</Camera>
+		<smooth_bdry value="1" />
+		<ground_touch_bdry value="1" />
+		<small_zero_eps value="1.00000001e-07" />
+		<big_zero_eps value="9.99999975e-06" />
 		<Para_ContactGraph>
 			<mosek_intpntCoTolRelGap value="9.99999996e-13" />
 			<mosek_intpntCoTolInfeas value="9.99999996e-13" />
@@ -48,8 +49,8 @@
 			<slope_binarySearch_eps value="0.100000001" />
 			<slope_bound_eps value="0.100000001" />
 			<slope_num_init_sample value="4" />
-			<kmeans_iteration value="100" />
 			<mosek_rbe_friction_coeff value="0" />
+			<kmeans_iteration value="100" />
 			<GravityX value="0" />
 			<GravityY value="-1" />
 			<GravityZ value="0" />
@@ -57,118 +58,69 @@
 		<Para_CrossMesh>
 			<crossmesh_quadTree_leafNodeSize value="0.00999999978" />
 		</Para_CrossMesh>
+		<textureScaleFactor value="1" />
+		<only_cut_bdry value="0" />
 		<Para_Opt>
-			<opt_compression_weight value="0.00999999978" />
-			<opt_tension_weight value="10000" />
 			<opt_activeset_eps value="9.99999975e-05" />
-			<opt_gravity_scale_factor value="100" />
-			<opt_knitro_opttol value="1.00000001e-10" />
+			<opt_gravity_scale_factor value="10000" />
+			<opt_knitro_opttol value="1.00000001e-07" />
 			<opt_iterations_times value="100" />
 			<opt_tiltAngle_width value="20" />
+			<opt_compression_weight value="0.00999999978" />
+			<opt_tension_weight value="10000" />
 			<opt_mod value="0" />
 			<opt_init_levelset value="0.00100000005" />
 			<opt_radius_scale_factor value="0.200000003" />
 			<opt_rs_factor_lower_bound value="0.00999999978" />
-			<opt_poly_size value="5" />
+			<opt_poly_size value="6" />
 			<opt_edge_sample value="10" />
 			<opt_tot_time value="0" />
 		</Para_Opt>
-		<pickPartIDs></pickPartIDs>
-		<Interact_Matrix>2.344562,-0.209693,0.000000,0.000000,0.209693,2.344562,0.000000,0.000000,0.000000,0.000000,0.470784,0.000000,0.000000,0.000000,0.000000,1.000000</Interact_Matrix>
-		<Camera>
-			<worldAxesMat>-0.411911,-0.389383,0.823854,0.000000,0.295346,0.798261,0.524959,0.000000,-0.862058,0.459556,-0.213802,0.000000,0.000000,0.000000,-4.000000,1.000000</worldAxesMat>
-			<worldMatrix>-0.438862,-0.414856,0.877758,0.000000,0.066234,0.948232,0.481290,0.000000,-0.968607,0.252816,-0.364790,0.000000,0.000000,0.000000,-3.800000,1.000000</worldMatrix>
-		</Camera>
+		<slopSample value="32" />
+		<Unit value="100" />
+		<faceface_contact value="1" />
+		<edgeedge_contact value="1" />
+		<clipper_scale value="100000000" />
+		<tilt_face_angle_min value="0" />
+		<tilt_face_angle_max value="0" />
 		<Para_Assembly>
 			<showAssembly value="0" />
 			<assembling_layer value="1" />
-			<assembling_Kth_part value="29" />
+			<assembling_Kth_part value="-1" />
 			<assembling_vec_length value="0.200000003" />
 		</Para_Assembly>
 		<Para_Support>
 			<showSupport value="0" />
-			<ground_height value="-0.350661218" />
-			<support_thickness value="0.0299999993" />
-			<support_layer value="0" />
+			<ground_height value="-0.176133901" />
+			<support_thickness value="0.100000001" />
+			<support_layer value="-1" />
 			<support_smallest_area value="0.00999999978" />
 		</Para_Support>
-		<Unit value="150" />
-		<slopSample value="10" />
-		<mult_move_scale value="1" />
 		<penetration_check value="0" />
-		<tilt_face_angle_min value="0" />
-		<tilt_face_angle_max value="0" />
-		<Boundary_PartIDs>61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102</Boundary_PartIDs>
+		<mult_move_scale value="1" />
+		<Boundary_PartIDs>4,7,8,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42</Boundary_PartIDs>
 	</GUISettings>
 	<Output>
 		<Structure path="test_data/test_Surface.obj" />
 		<CrossMesh path="test_data/test_CrossMesh.obj" />
 		<PartGeometry>test_data/PartGeometry/Part_13.obj
-test_data/PartGeometry/Part_07.obj
 test_data/PartGeometry/Part_06.obj
 test_data/PartGeometry/Part_12.obj
-test_data/PartGeometry/Part_04.obj
 test_data/PartGeometry/Part_10.obj
-test_data/PartGeometry/Part_38.obj
-test_data/PartGeometry/Part_39.obj
 test_data/PartGeometry/Part_11.obj
 test_data/PartGeometry/Part_05.obj
 test_data/PartGeometry/Boundary.obj
-test_data/PartGeometry/Part_29.obj
 test_data/PartGeometry/Part_01.obj
 test_data/PartGeometry/Part_15.obj
 test_data/PartGeometry/Part_14.obj
 test_data/PartGeometry/Part_00.obj
-test_data/PartGeometry/Part_28.obj
-test_data/PartGeometry/Part_16.obj
 test_data/PartGeometry/Part_02.obj
 test_data/PartGeometry/Part_03.obj
-test_data/PartGeometry/Part_17.obj
-test_data/PartGeometry/Part_58.obj
-test_data/PartGeometry/Part_59.obj
-test_data/PartGeometry/Part_49.obj
-test_data/PartGeometry/Part_60.obj
-test_data/PartGeometry/Part_48.obj
-test_data/PartGeometry/Part_51.obj
-test_data/PartGeometry/Part_45.obj
-test_data/PartGeometry/Part_44.obj
-test_data/PartGeometry/Part_50.obj
-test_data/PartGeometry/Part_46.obj
-test_data/PartGeometry/Part_52.obj
-test_data/PartGeometry/Part_53.obj
-test_data/PartGeometry/Part_47.obj
-test_data/PartGeometry/Part_43.obj
-test_data/PartGeometry/Part_57.obj
-test_data/PartGeometry/Part_56.obj
-test_data/PartGeometry/Part_42.obj
-test_data/PartGeometry/Part_54.obj
-test_data/PartGeometry/Part_40.obj
-test_data/PartGeometry/Part_41.obj
-test_data/PartGeometry/Part_55.obj
-test_data/PartGeometry/Part_32.obj
-test_data/PartGeometry/Part_26.obj
-test_data/PartGeometry/Part_27.obj
-test_data/PartGeometry/Part_33.obj
-test_data/PartGeometry/Part_25.obj
-test_data/PartGeometry/Part_31.obj
-test_data/PartGeometry/Part_19.obj
-test_data/PartGeometry/Part_18.obj
-test_data/PartGeometry/Part_30.obj
-test_data/PartGeometry/Part_24.obj
-test_data/PartGeometry/Part_08.obj
-test_data/PartGeometry/Part_20.obj
-test_data/PartGeometry/Part_34.obj
-test_data/PartGeometry/Part_35.obj
-test_data/PartGeometry/Part_21.obj
 test_data/PartGeometry/Part_09.obj
-test_data/PartGeometry/Part_37.obj
-test_data/PartGeometry/Part_23.obj
-test_data/PartGeometry/Part_22.obj
-test_data/PartGeometry/Part_36.obj
 </PartGeometry>
 	</Output>
 	<Mitsuba>
-		<MitsubaData path="minimal2_data/mitsuba.xml" />
+		<MitsubaData path="vase_data/mitsuba.xml" />
 	</Mitsuba>
 	<PartGeoData>
 		<CrossData path="test_data/CrossMesh.xml" />

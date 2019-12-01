@@ -3,10 +3,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 #EIGEN
 set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
+#set(EIGEN3_INCLUDE_DIR /usr/local/include/eigen3)
 
 #Boost
-#set(Boost_ADDITIONAL_VERSIONS 1.66.0) 
-#set(BOOST_ROOT  "C:\\local\\boost_1_66_0")
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
@@ -46,17 +45,6 @@ set(TBB_BUILD_TESTS           OFF  CACHE BOOL " " FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tbb)
 set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 
-#Nanogui
-if(USE_GUI)
-    set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/nanogui/include")
-    add_subdirectory(nanogui)
-    message(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/nanogui/resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-endif()
-
 
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}
@@ -66,18 +54,28 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${SHAPEOP_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
+                ${EIGEN3_INCLUDE_DIR}
                 PARENT_SCOPE)
 
 set(ext_lib pugixml
             QuickHull
             Clipper
             igl::core
-            #igl::triangle
             ShapeOp
             tbb_static
             ${Boost_LIBRARIES}
             PARENT_SCOPE)
+
+#Nanogui
 if(USE_GUI)
+    set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
+    set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
+    set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
+    set(NANOGUI_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/nanogui/include")
+    add_subdirectory(nanogui)
+    message(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/nanogui/resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
     set(ext_include
             ${ext_include}
             ${NANOGUI_INCLUDE_DIRS}
