@@ -117,6 +117,7 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 		crossMeshCreator->CreateCrossMesh(textureMode, tiltAngle, patternID, patternRadius, previewMode, interactMatrix);
 	}
 	pCrossMesh crossMesh = crossMeshCreator->crossMesh;
+	if(crossMesh == nullptr) return 0;
 	std::cout << "Compute Cross Mesh:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 
 	////////////////////////////////////////////////////////////////
@@ -168,7 +169,8 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
         struc->ComputeAveragePartSize();
         BuildPartsGraph();
         ComputeBoundaryParts();
-		struc->ComputeGroundY(true);
+        ComputePartContacts();
+        struc->ComputeGroundY(true);
 	}
 	return 1;
 }
@@ -221,9 +223,13 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 	if( !previewMode )
 	{
         struc->ComputeAveragePartSize();
+        std::cout << "1)" << std::endl;
 		BuildPartsGraph();
+        std::cout << "2)" << std::endl;
         ComputeBoundaryParts();
+        std::cout << "3)" << std::endl;
         ComputePartContacts();
+        std::cout << "4)" << std::endl;
 	}
 
 	return 1;

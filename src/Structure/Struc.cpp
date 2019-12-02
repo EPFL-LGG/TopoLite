@@ -95,6 +95,7 @@ void Struc::ComputeBoundaryParts()
 		for (int i = 0; i < partList.size(); i++)
 		{
 			shared_ptr<Part> part = partList[i];
+			if(part == nullptr || part->polyMesh == nullptr) continue;
 			part->atBoundary = part->cross.lock()->atBoundary;
 			if(part->atBoundary){
                 BoundPartIDs.push_back(part->partID);
@@ -429,13 +430,16 @@ double Struc::ComputeAveragePartSize()
 	for (int i = 0; i < partList.size(); i++)
 	{
 		pPart part = partList[i];
-
-		float partSize = len(part->polyMesh->bbox.maxPt - part->polyMesh->bbox.minPt);
-
-		avgPartSize += partSize;
+		if(part && part->polyMesh)
+		{
+            float partSize = len(part->polyMesh->bbox.maxPt - part->polyMesh->bbox.minPt);
+            avgPartSize += partSize;
+		}
 	}
 
-	avgPartSize /= (float)partList.size();
+	if(partList.size() != 0){
+        avgPartSize /= (float)partList.size();
+	}
 
 	return avgPartSize;}
 

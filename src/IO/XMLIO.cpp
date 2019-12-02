@@ -1099,10 +1099,12 @@ TEST_CASE("Class XMLIO")
 {
 XMLIO Reader;
 XMLData data;
-//        Reader.XMLReader("../data/origin.xml", data);
+//        Reader.XMLReader("../data/origin.xml", s=data);
 //        Reader.XMLWriter("../data/test.xml", data);
-Reader.XMLReader("/Users/ziqwang/Documents/GitHub/TopoLockProject/Result/Paper_Render/fig_result_surfaces/Vase_Quad3.xml", data);
-Reader.XMLWriter("../data/test.xml", data);
+    Reader.XMLReader("../data/origin.xml", data);
+    data.varList->set("tiltAngle", 80.0f);
+    data.strucCreator->CreateStructure(true, true, data.interactMatrix, false);
+    Reader.XMLWriter("../data/test.xml", data);
 }
 }
 
