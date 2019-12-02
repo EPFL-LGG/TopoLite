@@ -39,7 +39,7 @@ int deleteStructure(XMLData* data){
 
 void refresh(XMLData* data)
 {
-    if (data->strucCreator->crossMeshCreator) {
+    if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
         if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
             data->strucCreator->CreateStructure(true, true, data->interactMatrix, false);
         } else {
@@ -52,7 +52,7 @@ void refresh(XMLData* data)
 
 void preview(XMLData* data)
 {
-    if (data->strucCreator->crossMeshCreator) {
+    if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
         if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
             data->strucCreator->CreateStructure(true, true, data->interactMatrix, true);
         } else {
@@ -64,14 +64,14 @@ void preview(XMLData* data)
 
 
 int partNumber(XMLData* data){
-    if(data->strucCreator && data->strucCreator->struc)
+    if(data && data->strucCreator && data->strucCreator->struc)
         return data->strucCreator->struc->partList.size();
     else
         return 0;
 }
 
 bool initMesh(int partID, CMesh *mesh, XMLData* data){
-    if(data->strucCreator && data->strucCreator->struc){
+    if(data && data->strucCreator && data->strucCreator->struc){
         if(0 <= partID && partID < data->strucCreator->struc->partList.size())
         {
             shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
@@ -89,7 +89,7 @@ bool initMesh(int partID, CMesh *mesh, XMLData* data){
 
 
 bool assignMesh(int partID, CMesh *mesh, XMLData* data){
-    if(data->strucCreator && data->strucCreator->struc){
+    if(data && data->strucCreator && data->strucCreator->struc){
         if(0 <= partID && partID < data->strucCreator->struc->partList.size())
         {
             shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
@@ -116,7 +116,7 @@ bool assignMesh(int partID, CMesh *mesh, XMLData* data){
 
 bool isBoundary(int partID, XMLData* data)
 {
-    if(data->strucCreator && data->strucCreator->struc)
+    if(data && data->strucCreator && data->strucCreator->struc)
     {
         if(0 <= partID && partID < data->strucCreator->struc->partList.size()) {
             return data->strucCreator->struc->partList[partID]->atBoundary;
@@ -126,9 +126,9 @@ bool isBoundary(int partID, XMLData* data)
 }
 
 
-float ComputeGroundHeight(XMLData* data){
-
-    if(data->strucCreator && data->strucCreator->struc)
+float ComputeGroundHeight(XMLData* data)
+{
+    if(data && data->strucCreator && data->strucCreator->struc)
     {
         return data->strucCreator->struc->ComputeLowestY();
     }
@@ -138,7 +138,8 @@ float ComputeGroundHeight(XMLData* data){
 
 
 void setParaDouble(const char *name, double value, XMLData* data){
-    data->varList->set(name,  (float)value);
+    if(data && data->varList)
+        data->varList->set(name,  (float)value);
     return;
 }
 
