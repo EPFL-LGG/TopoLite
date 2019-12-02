@@ -31,7 +31,7 @@ file(GLOB API_SOURCES "api/*.cpp")
 # Shared library
 set(HEADERS ${SHAPEOP_HEADERS} ${API_HEADERS})
 set(SOURCES ${SHAPEOP_SOURCES} ${API_SOURCES})
-add_library(ShapeOp STATIC ${HEADERS} ${SOURCES})
+add_library(ShapeOp SHARED ${HEADERS} ${SOURCES})
 set_target_properties(ShapeOp PROPERTIES VERSION ${SHAPEOP_VERSION_STRING} SOVERSION ${SHAPEOP_VERSION_MAJOR})
 
 # Rename executable to contain version number on windows. On mac, a so-chain is generated from the SOVERSION specified above.

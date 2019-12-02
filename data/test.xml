@@ -103,20 +103,20 @@
 	<Output>
 		<Structure path="test_data/test_Surface.obj" />
 		<CrossMesh path="test_data/test_CrossMesh.obj" />
-		<PartGeometry>test_data/PartGeometry/Part_13.obj
-test_data/PartGeometry/Part_06.obj
-test_data/PartGeometry/Part_12.obj
-test_data/PartGeometry/Part_10.obj
-test_data/PartGeometry/Part_11.obj
-test_data/PartGeometry/Part_05.obj
-test_data/PartGeometry/Boundary.obj
-test_data/PartGeometry/Part_01.obj
-test_data/PartGeometry/Part_15.obj
-test_data/PartGeometry/Part_14.obj
+		<PartGeometry>test_data/PartGeometry/Boundary.obj
 test_data/PartGeometry/Part_00.obj
+test_data/PartGeometry/Part_01.obj
 test_data/PartGeometry/Part_02.obj
 test_data/PartGeometry/Part_03.obj
+test_data/PartGeometry/Part_05.obj
+test_data/PartGeometry/Part_06.obj
 test_data/PartGeometry/Part_09.obj
+test_data/PartGeometry/Part_10.obj
+test_data/PartGeometry/Part_11.obj
+test_data/PartGeometry/Part_12.obj
+test_data/PartGeometry/Part_13.obj
+test_data/PartGeometry/Part_14.obj
+test_data/PartGeometry/Part_15.obj
 </PartGeometry>
 	</Output>
 	<Mitsuba>
