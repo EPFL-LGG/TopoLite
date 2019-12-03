@@ -9,7 +9,6 @@
 unset (PUGIXML_LIBRARY CACHE)
 unset (PUGIXML_INCLUDE_DIR CACHE)
 
-set(BUILD_SHARED_LIBS ON)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/pugixml)
 set(PUGIXML_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pugixml/src)
 include_directories(${PUGIXML_INCLUDE_DIR})
