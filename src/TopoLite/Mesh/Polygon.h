@@ -15,8 +15,8 @@
 #ifndef _POLYGON_H
 #define _POLYGON_H
 
-#include "Utility/vec.h"
-#include "Utility/HelpStruct.h"
+#include "TopoLite/Utility/vec.h"
+#include "TopoLite/Utility/HelpStruct.h"
 #include <vector>
 
 using namespace std;
