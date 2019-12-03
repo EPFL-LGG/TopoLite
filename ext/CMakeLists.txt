@@ -57,8 +57,6 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${EIGEN3_INCLUDE_DIR}
                 PARENT_SCOPE)
 
-
-
 set(ext_lib pugixml
             QuickHull
             Clipper

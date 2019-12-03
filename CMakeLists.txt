@@ -11,7 +11,6 @@ set(CMAKE_CXX_STANDARD 11)
 #####                               #####
 #########################################
 
-option(USE_GUI "USE_GUI" OFF)
 option(USE_PYTHON_PLUGIN "USE PYBIND11 PLUGIN" OFF)
 option(USE_UNIT_TEST "USE CATCH2 TEST" ON)
 option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
@@ -57,22 +56,6 @@ target_include_directories(TpCorelib PUBLIC SYSTEM
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite)
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
-
-#########################################
-#####                               #####
-#####               GUI             #####
-#####                               #####
-#########################################
-
-IF(USE_GUI)
-    add_executable(TopoGUI
-            src/GUI/main.cpp
-            src/GUI/NanoViewer.cpp
-            src/GUI/NanoViewer.h)
-    target_link_libraries(TopoGUI PUBLIC TpCorelib)
-	set_target_properties(TopoGUI PROPERTIES CXX_STANDARD 17)
-endif()
-
 
 #########################################
 #####                               #####
