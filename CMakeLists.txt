@@ -58,8 +58,6 @@ target_include_directories(TpCorelib PUBLIC SYSTEM
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
 
-set(TOPOLIB_INCLUDE_DIR ${ext_include} ${CMAKE_CURRENT_SOURCE_DIR}/src PARENT_SCOPE)
-
 #########################################
 #####                               #####
 #####               GUI             #####
