@@ -40,7 +40,7 @@ endif()
 if(BUILD_SHARED_LIBS)
 	add_library(pugixml SHARED ${HEADERS} ${SOURCES})
 else()
-	add_library(pugixml SHARED ${HEADERS} ${SOURCES})
+	add_library(pugixml STATIC ${HEADERS} ${SOURCES})
 endif()
 
 # Export symbols for shared library builds

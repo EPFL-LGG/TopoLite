@@ -19,7 +19,6 @@ endif()
 configure_file("${PROJECT_SOURCE_DIR}/doc/DoxyShapeOp.in" "${PROJECT_BINARY_DIR}/doc/DoxyShapeOp")
 configure_file("${PROJECT_SOURCE_DIR}/doc/DoxyShapeOp.bib" "${PROJECT_BINARY_DIR}/doc/DoxyShapeOp.bib" COPYONLY)
 
-
 # Compiler flags
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang") #Tests for Clang and AppleClang which is defined in CMake 3.0 and higher
     message("Clang.")

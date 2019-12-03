@@ -24,6 +24,7 @@ option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
 
 #3rd party library
+set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 
 #########################################
@@ -32,8 +33,8 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 #####                               #####
 #########################################
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Release)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Release)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
 file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.h

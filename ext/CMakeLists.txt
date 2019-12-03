@@ -14,13 +14,8 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
 #PUGIXML
-set(BUILD_SHARED_LIBS 0)
+set(BUILD_SHARED_LIBS OFF)
 find_package(PUGIXML REQUIRED)
-#SET_TARGET_PROPERTIES(PUGIXML
-#PROPERTIES
-#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../RELEASE"
-#LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../RELEASE"
-#)
 
 #QuickHull
 find_package(QuickHull)
@@ -39,11 +34,9 @@ endif()
 #ShapeOp
 set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
-#set_target_properties(ShapeOp
-#PROPERTIES
-#RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"
-#LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"
-#)
+set_target_properties(ShapeOp  PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../Release"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../Release")
 
 #TBB
 set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
@@ -75,24 +68,3 @@ set(ext_lib pugixml
             tbb_static
             ${Boost_LIBRARIES}
             PARENT_SCOPE)
-
-#Nanogui
-if(USE_GUI)
-    set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_INCLUDE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/nanogui/include")
-    add_subdirectory(nanogui)
-    message(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/nanogui/resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
-    set(ext_include
-            ${ext_include}
-            ${NANOGUI_INCLUDE_DIRS}
-            ${NANOGUI_EXTRA_INCS})
-    set(ext_lib ${ext_lib}
-            nanogui
-            ${NANOGUI_EXTRA_LIBS})
-    set(ext_defs ${NANOGUI_EXTRA_DEFS}
-            PARENT_SCOPE)
-endif()

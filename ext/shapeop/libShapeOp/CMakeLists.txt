@@ -37,8 +37,6 @@ set_target_properties(ShapeOp PROPERTIES VERSION ${SHAPEOP_VERSION_STRING} SOVER
 # Rename executable to contain version number on windows. On mac, a so-chain is generated from the SOVERSION specified above.
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	set_target_properties(ShapeOp PROPERTIES OUTPUT_NAME ShapeOp.${SHAPEOP_VERSION_STRING})
-
-
 endif()
 
 #Adding subdirectories
