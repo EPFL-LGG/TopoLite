@@ -36,16 +36,16 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
-file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Utility/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Mesh/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/IO/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/IO/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/CrossMesh/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/CrossMesh/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Structure/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/Structure/*.h)
+file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Mesh/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Mesh/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/CrossMesh/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/CrossMesh/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.h)
 
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
@@ -53,9 +53,12 @@ target_compile_definitions(TpCorelib PUBLIC ${ext_defs})
 
 target_include_directories(TpCorelib PUBLIC SYSTEM
         ${ext_include}
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite)
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
+
+set(TOPOLIB_INCLUDE_DIR ${ext_include} ${CMAKE_CURRENT_SOURCE_DIR}/src PARENT_SCOPE)
 
 #########################################
 #####                               #####
@@ -81,10 +84,10 @@ endif()
 
 if(USE_PYTHON_PLUGIN)
     file(GLOB TpPythonFiles
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/PyInterface/*.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/PyInterface/*.h)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/TopoLite/PyInterface/*.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/PyInterface/*.h)
 
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/pybind11)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/TopoLite/pybind11)
     pybind11_add_module(pyTopo ${TpPythonFiles})
     target_link_libraries(pyTopo PUBLIC TpCorelib)
 endif()
@@ -103,10 +106,10 @@ if(USE_UNIT_TEST)
     include(CTest)
     include(ParseAndAddCatchTests)
     add_executable(testTopo
-            src/Mesh/Polygon.cpp
-            src/Mesh/PolyMesh.cpp
-            src/Mesh/Cross.cpp
-            src/IO/XMLIO.cpp)
+            src/TopoLite/Mesh/Polygon.cpp
+            src/TopoLite/Mesh/PolyMesh.cpp
+            src/TopoLite/Mesh/Cross.cpp
+            src/TopoLite/IO/XMLIO.cpp)
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)
     target_link_libraries(testTopo PUBLIC TpCorelib)
     target_compile_definitions(testTopo PUBLIC -DCATCH2_UNITTEST)
@@ -121,8 +124,8 @@ endif()
 ##########################################
 if(USE_C_EXTENSION)
     add_library(dllTopo SHARED
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternC/CSharpExtern.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/ExternC/CSharpExtern.cpp)
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/ExternC/CSharpExtern.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/ExternC/CSharpExtern.cpp)
     target_link_libraries(dllTopo PUBLIC TpCorelib)
     target_include_directories(dllTopo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
 endif()

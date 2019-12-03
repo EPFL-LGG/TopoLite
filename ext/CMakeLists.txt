@@ -14,7 +14,7 @@ find_package(Boost COMPONENTS system filesystem REQUIRED)
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
 #PUGIXML
-set(BUILD_SHARED_LIBS OFF)
+option(BUILD_SHARED_LIBS OFF)
 find_package(PUGIXML REQUIRED)
 
 #QuickHull
@@ -24,12 +24,9 @@ find_package(QuickHull)
 find_package(Clipper)
 
 #LIBIGL
-set(IGL_STATIC_LIBRARY ON)
-option(LIBIGL_WITH_TRIANGLE "Use Triangle" 0FF)
-find_package(LIBIGL REQUIRED)
-if(LIBIGL_FOUND)
-    add_definitions(-DLIBIGL_FOUND=1)
-endif()
+set(LIBIGL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libigl/include)
+list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../cmake")
+include(libigl)
 
 #ShapeOp
 set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
@@ -59,6 +56,8 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
                 PARENT_SCOPE)
+
+
 
 set(ext_lib pugixml
             QuickHull
