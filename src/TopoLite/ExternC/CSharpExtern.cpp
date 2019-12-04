@@ -84,8 +84,9 @@ PolyMeshRhino *initPolyMeshRhino(int partID ,XMLData* data){
     return NULL;
 }
 
-bool isNull(PolyMeshRhino *mesh){
-    return mesh == NULL;
+int isNull(PolyMeshRhino *mesh){
+	if (mesh) return 0;
+	else return 1;
 }
 
 bool deletePolyMeshRhino(PolyMeshRhino *mesh){

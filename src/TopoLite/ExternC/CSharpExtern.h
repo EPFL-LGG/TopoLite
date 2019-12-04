@@ -30,7 +30,7 @@ CSharp_LIBRARY_C_FUNCTION
 PolyMeshRhino *initPolyMeshRhino(int partID, XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-bool isNull(PolyMeshRhino *mesh);
+int isNull(PolyMeshRhino *mesh);
 
 CSharp_LIBRARY_C_FUNCTION
 bool deletePolyMeshRhino(PolyMeshRhino *mesh);
