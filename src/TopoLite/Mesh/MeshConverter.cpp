@@ -266,6 +266,42 @@ void MeshConverter::Convert2EigenMesh(const PolyMesh *polyMesh, Eigen::MatrixXd 
     return;
 }
 
+
+void MeshConverter::Convert2EigenMesh(  const PolyMesh *polyMesh,
+                                        PolyMeshRhino *rhinoMesh)
+                                      {
+
+    if(rhinoMesh == nullptr) return;
+
+    for(int id = 0; id < polyMesh->polyList.size(); id++)
+    {
+        //for each polygon
+        pPolygon poly = polyMesh->polyList[id];
+        if(poly->vers.size() < 3) continue;
+
+        //use center to avoid very thin triangles
+        poly->center = poly->ComputeCenter();
+        int cVertexIdx = rhinoMesh->vertices.size();
+        rhinoMesh->vertices.push_back(poly->center);
+
+        rhinoMesh->verticesGroups.push_back(vector<int>());
+        rhinoMesh->facesGroups.push_back(vector<int>());
+
+        for(int jd = 0; jd < poly->vers.size(); jd++)
+        {
+            rhinoMesh->vertices.push_back(poly->vers[jd].pos);
+            int pVertexIdx = cVertexIdx + 1 + jd;
+            int nVertexIdx = cVertexIdx + 1 + (jd + 1) % poly->vers.size();
+            rhinoMesh->faces.push_back(Vector3i(cVertexIdx, pVertexIdx,  nVertexIdx));
+
+            //create ngon
+            rhinoMesh->verticesGroups.back().push_back(pVertexIdx);
+            rhinoMesh->facesGroups.back().push_back(rhinoMesh->faces.size() - 1);
+        }
+    }
+
+    return;
+}
 void MeshConverter::Convert2EigenMesh(const vector<Vector3f> &inVerList,
                                       const vector<Vector3i> &inTriList,
                                       Eigen::MatrixXd &V,
@@ -279,7 +315,6 @@ void MeshConverter::Convert2EigenMesh(const vector<Vector3f> &inVerList,
     for(int id = 0; id < inTriList.size(); id++){
         F.row(id) << inTriList[id][0], inTriList[id][1], inTriList[id][2];
     }
-
 }
 
 //**************************************************************************************//
@@ -565,3 +600,5 @@ void MeshConverter::MergePolygons(pPolygon polyA, pPolygon polyB, const vector<V
     //newPoly->ComputeCenter();
     newPoly->ComputeNormal();
 }
+
+

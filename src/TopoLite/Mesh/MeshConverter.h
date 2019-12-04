@@ -34,6 +34,13 @@ using pPolyMesh = shared_ptr<PolyMesh>;
 using pPolygon = shared_ptr<_Polygon>;
 using pTriangle = shared_ptr<Triangle>;
 
+struct PolyMeshRhino{
+    vector<Vector3f> vertices;
+    vector<Vector3i> faces;
+    vector<vector<int>> verticesGroups;
+    vector<vector<int>> facesGroups;
+};
+
 class MeshConverter: public TopoObject
 {
 
@@ -75,6 +82,8 @@ public:
 
     void Convert2EigenMesh(const PolyMesh *polyMesh, Eigen::MatrixXd &V, Eigen::MatrixXi &F);
 
+    void Convert2EigenMesh( const PolyMesh *polyMesh,
+                            PolyMeshRhino *rhinoMesh);
 public:
 
     //Clipper Countour <-> Mesh

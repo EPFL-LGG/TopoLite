@@ -11,7 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#ifndef CATCH2_UNITTEST
+//#ifndef CATCH2_UNITTEST
 
 #include "Utility/HelpStruct.h"
 #include "Utility/HelpDefine.h"
@@ -308,17 +308,20 @@ vector<Vector2f> _Polygon::GetVerticesTex() {
 
 void _Polygon::Convert2Triangles(vector<pTriangle> &tris)
 {
-	for (int i = 1; i < (int)(vers.size()) - 1; i++)
+    if(vers.size() < 3)
+        return;
+
+    center = ComputeCenter();
+    for (int i = 0; i < (int)(vers.size()); i++)
 	{
 		pTriangle tri = make_shared<Triangle>();
-
-		tri->v[0] = vers[0].pos;
+		tri->v[0] = center;
 		tri->v[1] = vers[i].pos;
-		tri->v[2] = vers[i + 1].pos;
-
+		tri->v[2] = vers[(i + 1)%vers.size()].pos;
 		tris.push_back(tri);
 	}
 
+    return;
 }
 
 int _Polygon::GetVertexIndexInList(Vector3f tagtVerPos)
@@ -398,18 +401,18 @@ void test(){
 
 }
 
-#else
-
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
-#include "Polygon.h"
-#include <cmath>
-TEST_CASE("Class _Polygon"){
-    _Polygon a;
-    a.push_back(Vector3f(1, 0, 0));
-    a.push_back(Vector3f(0, 1, 0));
-    a.push_back(Vector3f(0, 0, 1));
-    REQUIRE(std::abs(a.ComputeArea() - std::sqrt(3.0)/2) < 1e-5);
-}
-
-#endif
+////#else
+//
+//#define CATCH_CONFIG_MAIN
+//#include <catch2/catch.hpp>
+//#include "Polygon.h"
+//#include <cmath>
+//TEST_CASE("Class _Polygon"){
+//    _Polygon a;
+//    a.push_back(Vector3f(1, 0, 0));
+//    a.push_back(Vector3f(0, 1, 0));
+//    a.push_back(Vector3f(0, 0, 1));
+//    REQUIRE(std::abs(a.ComputeArea() - std::sqrt(3.0)/2) < 1e-5);
+//}
+//
+////#endif

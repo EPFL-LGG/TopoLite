@@ -5,7 +5,7 @@
 #include <string>
 
 #include "CrossMesh/PatternCreator.h"
-#include "Mesh/MeshConverter.h"
+
 #include "Structure/Part.h"
 #include "IO/XMLIO.h"
 #include "Structure/StrucCreator.h"
@@ -14,9 +14,6 @@
  * GLOBAL VARIABLES
  */
 
-
-Eigen::MatrixXd V;
-Eigen::MatrixXi F;
 
 XMLData* readXML(const char *xmlstr)
 {
@@ -70,49 +67,120 @@ int partNumber(XMLData* data){
         return 0;
 }
 
-bool initMesh(int partID, CMesh *mesh, XMLData* data){
+PolyMeshRhino *initPolyMeshRhino(int partID ,XMLData* data){
+    PolyMeshRhino *mesh = NULL;
     if(data && data->strucCreator && data->strucCreator->struc){
         if(0 <= partID && partID < data->strucCreator->struc->partList.size())
         {
             shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
             if(part && part->polyMesh){
                 MeshConverter converter(data->varList);
-                converter.Convert2EigenMesh(part->polyMesh.get(), V , F);
-                mesh->n_vertices = V.rows();
-                mesh->n_faces = F.rows();
-                return true;
+                mesh = new PolyMeshRhino();
+                converter.Convert2EigenMesh(part->polyMesh.get(), mesh);
+                return mesh;
             }
         }
     }
-    return false;
+    return NULL;
 }
 
+bool isNull(PolyMeshRhino *mesh){
+    return mesh == NULL;
+}
 
-bool assignMesh(int partID, CMesh *mesh, XMLData* data){
-    if(data && data->strucCreator && data->strucCreator->struc){
-        if(0 <= partID && partID < data->strucCreator->struc->partList.size())
-        {
-            shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
-            if(part){
-                if(V.rows() != mesh->n_vertices) return false;
-                if(F.rows() != mesh->n_faces) return false;
-                for(int id = 0; id < V.rows(); id++){
-                    mesh->points[id].x = V(id, 0);
-                    mesh->points[id].y = V(id, 1);
-                    mesh->points[id].z = V(id, 2);
-                }
-                for(int id = 0; id < F.rows(); id++){
-                    mesh->faces[id].a = F(id, 0);
-                    mesh->faces[id].b = F(id, 1);
-                    mesh->faces[id].c = F(id, 2);
-                }
-                return true;
-            }
+bool deletePolyMeshRhino(PolyMeshRhino *mesh){
+    if(mesh){
+        delete mesh;
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+int getNVertices(PolyMeshRhino *mesh){
+    if(mesh){
+        return mesh->vertices.size();
+    }
+    return 0;
+}
+
+int getNFaces(PolyMeshRhino *mesh){
+    if(mesh){
+        return mesh->faces.size();
+    }
+    return 0;
+}
+
+void copyVertexI(PolyMeshRhino *mesh, int vID, float *point){
+    if(mesh && vID >= 0 && vID < mesh->vertices.size()){
+        point[0] = mesh->vertices[vID][0];
+        point[1] = mesh->vertices[vID][1];
+        point[2] = mesh->vertices[vID][2];
+    }
+}
+
+void copyFaceI(PolyMeshRhino *mesh, int fID, int *face){
+    if(mesh && fID >= 0 && fID < mesh->faces.size()){
+        face[0] = mesh->faces[fID][0];
+        face[1] = mesh->faces[fID][1];
+        face[2] = mesh->faces[fID][2];
+    }
+}
+
+int getNVertexGroup(PolyMeshRhino *mesh){
+    if(mesh)
+    {
+        return mesh->verticesGroups.size();
+    }
+    return 0;
+}
+
+int getNFaceGroup(PolyMeshRhino *mesh){
+    if(mesh)
+    {
+        return mesh->facesGroups.size();
+    }
+    return 0;
+}
+
+int getNVertexGroupI(PolyMeshRhino *mesh, int vgID){
+    if(mesh && vgID >= 0 && vgID < mesh->verticesGroups.size()){
+        return mesh->verticesGroups[vgID].size();
+    }
+    return 0;
+}
+
+int getNFaceGroupI(PolyMeshRhino *mesh, int vfID){
+    if(mesh && vfID >= 0 && vfID < mesh->facesGroups.size()){
+        return mesh->facesGroups[vfID].size();
+    }
+    return 0;
+}
+
+void copyVertexGroupI(PolyMeshRhino *mesh, int vgID, int* vg){
+
+    //vg should be not null
+    if(mesh && vgID >= 0 && vgID < mesh->verticesGroups.size() && vg)
+    {
+        for(int id = 0; id < mesh->verticesGroups[vgID].size(); id++){
+            vg[id] = mesh->verticesGroups[vgID][id];
         }
     }
-    return false;
+    return;
 }
 
+void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg){
+
+    //vg should be not null
+    if(mesh && fgID >= 0 && fgID < mesh->facesGroups.size() && fg)
+    {
+        for(int id = 0; id < mesh->facesGroups[fgID].size(); id++){
+            fg[id] = mesh->facesGroups[fgID][id];
+        }
+    }
+    return;
+}
 
 bool isBoundary(int partID, XMLData* data)
 {

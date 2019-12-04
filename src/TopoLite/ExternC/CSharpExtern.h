@@ -7,26 +7,10 @@
 
 #include "CSharpCommon.h"
 #include "Structure/StrucCreator.h"
+#include "Mesh/MeshConverter.h"
 #include "IO/XMLIO.h"
 
-typedef struct CPoint{
-    float x, y, z;
-}CPoint;
-
-typedef struct CFace
-{
-    int a, b, c;
-}CFace;
-
-typedef struct CMesh
-{
-    CPoint* points;
-    CFace* faces;
-    int n_vertices;
-    int n_faces;
-}CMesh;
-
-// CSharp_LIBRARY C Exports
+//CSharp_LIBRARY C Exports
 CSharp_LIBRARY_C_FUNCTION
 XMLData* readXML(const char *xmlstr);
 
@@ -43,10 +27,43 @@ CSharp_LIBRARY_C_FUNCTION
 int partNumber(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-bool initMesh(int partID, CMesh *mesh, XMLData* data);
+PolyMeshRhino *initPolyMeshRhino(int partID, XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
-bool assignMesh(int partID, CMesh *mesh, XMLData* data);
+bool isNull(PolyMeshRhino *mesh);
+
+CSharp_LIBRARY_C_FUNCTION
+bool deletePolyMeshRhino(PolyMeshRhino *mesh);
+
+CSharp_LIBRARY_C_FUNCTION
+int getNVertices(PolyMeshRhino *mesh);
+
+CSharp_LIBRARY_C_FUNCTION
+int getNFaces(PolyMeshRhino *mesh);
+
+CSharp_LIBRARY_C_FUNCTION
+void copyVertexI(PolyMeshRhino *mesh, int vID, float *point);
+
+CSharp_LIBRARY_C_FUNCTION
+void copyFaceI(PolyMeshRhino *mesh, int fID, int *face);
+
+CSharp_LIBRARY_C_FUNCTION
+int getNVertexGroup(PolyMeshRhino *mesh);
+
+CSharp_LIBRARY_C_FUNCTION
+int getNFaceGroup(PolyMeshRhino *mesh);
+
+CSharp_LIBRARY_C_FUNCTION
+int getNVertexGroupI(PolyMeshRhino *mesh, int vgID);
+
+CSharp_LIBRARY_C_FUNCTION
+int getNFaceGroupI(PolyMeshRhino *mesh, int vfID);
+
+CSharp_LIBRARY_C_FUNCTION
+void copyVertexGroupI(PolyMeshRhino *mesh, int vgID, int* vg);
+
+CSharp_LIBRARY_C_FUNCTION
+void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg);
 
 CSharp_LIBRARY_C_FUNCTION
 bool isBoundary(int partID, XMLData* data);
