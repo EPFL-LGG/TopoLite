@@ -77,4 +77,14 @@ float ComputeGroundHeight(XMLData* data);
 CSharp_LIBRARY_C_FUNCTION
 void setParaDouble(const char *name, double value, XMLData* data);
 
+CSharp_LIBRARY_C_FUNCTION
+void setPatternAngle(double angle, XMLData *data);
+
+CSharp_LIBRARY_C_FUNCTION
+void setPatternXY(double x, double y, XMLData *data);
+
+CSharp_LIBRARY_C_FUNCTION
+void setPatternScale(double s, XMLData *data);
+
+
 #endif

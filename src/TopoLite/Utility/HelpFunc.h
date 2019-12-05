@@ -73,6 +73,10 @@ void MultiplyPoint(vec inPt, double inMat[16], vec &outPt);
 void MultiplyVector(vec inVec, double inMat[16], vec &outVec);
 void MultiplyNormal(vec inNor, double inMat[16], vec &outNor);
 void MultiplyMatrix(double inLefMat[16], double inRigMat[16], double outMat[16]);
+void RotateMatrix(double angle, double x, double y, double z, double mat[16]);
+void ScaleMatrix(double x, double y, double z, double mat[16]);
+void TranslateMatrix(double x, double y, double z, double mat[16]);
+void LoadIdentityMatrix(double mat[16]);
 bool EqualMatrix(double matA[16], double matB[16]);
 void PrintMatrix(double matrix[]);
 

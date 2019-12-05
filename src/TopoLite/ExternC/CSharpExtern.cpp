@@ -5,7 +5,7 @@
 #include <string>
 
 #include "CrossMesh/PatternCreator.h"
-
+#include "Utility/HelpFunc.h"
 #include "Structure/Part.h"
 #include "IO/XMLIO.h"
 #include "Structure/StrucCreator.h"
@@ -14,21 +14,49 @@
  * GLOBAL VARIABLES
  */
 
+void getInteractMatrix(XMLData* data, double *interactMat)
+{
+    LoadIdentityMatrix(interactMat);
+
+    double scaleMat[16];
+    ScaleMatrix(data->interact_delta.scale, data->interact_delta.scale, data->interact_delta.scale, scaleMat);
+    MultiplyMatrix(scaleMat, interactMat, interactMat);
+
+    double transMat[16];
+    TranslateMatrix(data->interact_delta.x, data->interact_delta.y, 0, transMat);
+    MultiplyMatrix(transMat, interactMat, interactMat);
+
+    double rotMat[16];
+    RotateMatrix(data->interact_delta.angle, 0, 0, 1, rotMat);
+    MultiplyMatrix(rotMat, interactMat, interactMat);
+
+    MultiplyMatrix(interactMat, data->interactMatrix, interactMat);
+}
 
 XMLData* readXML(const char *xmlstr)
 {
     XMLData *data = new XMLData();
     XMLIO reader;
     reader.XMLReader(xmlstr, *data);
+
+    data->interact_delta.scale = 1;
+
     return data;
 }
 
 
 XMLData* initStructure(){
     XMLData *data = new XMLData();
+
     data->varList = make_shared<InputVarList>();
     InitVarLite(*data->varList);
+
     data->strucCreator = make_shared<StrucCreator>(data->varList);
+
+    LoadIdentityMatrix(data->interactMatrix);
+
+    data->interact_delta.scale = 1;
+
     return data;
 }
 
@@ -45,10 +73,14 @@ int deleteStructure(XMLData* data){
 void refresh(XMLData* data)
 {
     if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
-        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
-            data->strucCreator->CreateStructure(true, true, data->interactMatrix, false);
-        } else {
-            data->strucCreator->CreateStructure(true, false, data->interactMatrix, false);
+        double tmpMat[16];
+        getInteractMatrix(data, tmpMat);
+        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree)
+        {
+            data->strucCreator->CreateStructure(true, true, tmpMat, false);
+        }
+        else{
+            data->strucCreator->CreateStructure(true, false, tmpMat, false);
         }
     }
     return;
@@ -58,10 +90,12 @@ void refresh(XMLData* data)
 void preview(XMLData* data)
 {
     if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
+        double tmpMat[16];
+        getInteractMatrix(data, tmpMat);
         if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
-            data->strucCreator->CreateStructure(true, true, data->interactMatrix, true);
+            data->strucCreator->CreateStructure(true, true, tmpMat, true);
         } else {
-            data->strucCreator->CreateStructure(true, false, data->interactMatrix, true);
+            data->strucCreator->CreateStructure(true, false, tmpMat, true);
         }
     }
     return;
@@ -220,3 +254,24 @@ void setParaDouble(const char *name, double value, XMLData* data){
     return;
 }
 
+void setPatternAngle(double angle, XMLData *data){
+    if(data)
+    {
+        data->interact_delta.angle = angle;
+    }
+}
+
+void setPatternXY(double x, double y, XMLData *data){
+    if(data)
+    {
+        data->interact_delta.x = x;
+        data->interact_delta.y = y;
+    }
+}
+
+void setPatternScale(double s, XMLData *data){
+    if(data)
+    {
+        data->interact_delta.scale = s;
+    }
+}

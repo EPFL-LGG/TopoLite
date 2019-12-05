@@ -28,11 +28,18 @@
 
 using IgnoreList = std::unordered_map<int, bool> ;
 
+struct InteractData{
+    double angle;
+    double x, y;
+    double scale;
+};
+
 struct XMLData{
     shared_ptr<InputVarList> varList;
     shared_ptr<StrucCreator> strucCreator;
     vector<int> pickPartIDs;
     double interactMatrix[16];
+    InteractData interact_delta;
 };
 
 class XMLIO

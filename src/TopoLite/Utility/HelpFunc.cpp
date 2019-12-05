@@ -601,6 +601,107 @@ void MultiplyMatrix(double inLefMat[16], double inRigMat[16], double outMat[16])
 	transposeMat(outMat, 4);
 }
 
+void RotateMatrix(double angle, double x, double y, double z, double mat[16]){
+
+
+//    ( xx(1-c)+c	xy(1-c)-zs  xz(1-c)+ys	 0  )
+//    |					    |
+//    | yx(1-c)+zs	yy(1-c)+c   yz(1-c)-xs	 0  |
+//    | xz(1-c)-ys	yz(1-c)+xs  zz(1-c)+c	 0  |
+//    |					    |
+//    (	 0	     0		 0	 1  )
+
+    double c = std::cos(angle / 180 * M_PI);
+    double s = std::sin(angle / 180 * M_PI);
+
+
+    mat[0] =  x * x * (1 - c) + c;
+    mat[1] =  y * x * (1 - c) + z * s;
+    mat[2] =  x * z * (1 - c) - y * s;
+    mat[3] =  0;
+
+    mat[4] =  x * y * (1 - c) - z * s;
+    mat[5] =  y * y * (1 - c) + c;
+    mat[6] =  y * z * (1 - c) + x * s;
+    mat[7] =  0;
+
+    mat[8] =  x * z * (1 - c) + y * s;
+    mat[9] =  y * z * (1 - c) - x * s;
+    mat[10] = z * z * (1 - c) + c;
+    mat[11] = 0;
+
+    mat[12] = 0;
+    mat[13] = 0;
+    mat[14] = 0;
+    mat[15] = 1;
+}
+
+void ScaleMatrix(double x, double y, double z, double mat[16]){
+    mat[0] =  x;
+    mat[1] =  0;
+    mat[2] =  0;
+    mat[3] =  0;
+
+    mat[4] =  0;
+    mat[5] =  y;
+    mat[6] =  0;
+    mat[7] =  0;
+
+    mat[8] =  0;
+    mat[9] =  0;
+    mat[10] = z;
+    mat[11] = 0;
+
+    mat[12] = 0;
+    mat[13] = 0;
+    mat[14] = 0;
+    mat[15] = 1;
+}
+
+void TranslateMatrix(double x, double y, double z, double mat[16]){
+    mat[0] =  1;
+    mat[1] =  0;
+    mat[2] =  0;
+    mat[3] =  0;
+
+    mat[4] =  0;
+    mat[5] =  1;
+    mat[6] =  0;
+    mat[7] =  0;
+
+    mat[8] =  0;
+    mat[9] =  0;
+    mat[10] = 1;
+    mat[11] = 0;
+
+    mat[12] = x;
+    mat[13] = y;
+    mat[14] = z;
+    mat[15] = 1;
+}
+
+void LoadIdentityMatrix(double mat[16]){
+    mat[0] =  1;
+    mat[1] =  0;
+    mat[2] =  0;
+    mat[3] =  0;
+
+    mat[4] =  0;
+    mat[5] =  1;
+    mat[6] =  0;
+    mat[7] =  0;
+
+    mat[8] =  0;
+    mat[9] =  0;
+    mat[10] = 1;
+    mat[11] = 0;
+
+    mat[12] = 0;
+    mat[13] = 0;
+    mat[14] = 0;
+    mat[15] = 1;
+}
+
 bool EqualMatrix(double matA[16], double matB[16])
 {
 	bool isEqual = true;
