@@ -15,6 +15,9 @@ CSharp_LIBRARY_C_FUNCTION
 XMLData* readXML(const char *xmlstr);
 
 CSharp_LIBRARY_C_FUNCTION
+XMLData* initStructure();
+
+CSharp_LIBRARY_C_FUNCTION
 int deleteStructure(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION

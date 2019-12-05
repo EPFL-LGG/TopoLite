@@ -22,7 +22,15 @@ XMLData* readXML(const char *xmlstr)
     reader.XMLReader(xmlstr, *data);
     return data;
 }
-//
+
+
+XMLData* initStructure(){
+    XMLData *data = new XMLData();
+    data->varList = make_shared<InputVarList>();
+    InitVarLite(*data->varList);
+    data->strucCreator = make_shared<StrucCreator>(data->varList);
+    return data;
+}
 
 int deleteStructure(XMLData* data){
     if(data){
