@@ -11,7 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#ifndef CATCH2_UNITTEST
+//#ifdef CATCH2_UNITTEST
 
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
@@ -427,6 +427,21 @@ bool PolyMesh::ReadOBJModel(
 	}
 }
 
+shared_ptr<PolyMesh> PolyMesh::getTextureMesh()
+{
+    shared_ptr<PolyMesh> polymesh = make_shared<PolyMesh>(getVarList());
+    for (int i = 0; i < polyList.size(); i++) {
+        pPolygon poly = make_shared<_Polygon>(*polyList[i]);
+        for(int j = 0; j < poly->vers.size(); j++){
+            poly->vers[j].pos = Vector3f(poly->vers[j].texCoord[0], poly->vers[j].texCoord[1], 0);
+        }
+        polymesh->polyList.push_back(poly);
+    }
+
+    return polymesh;
+}
+
+
 void PolyMesh::WriteOBJModel(const char *objFileName, bool triangulate)
 {
 	FILE *fp;
@@ -564,29 +579,31 @@ void PolyMesh::UpdateVertices()
 	}
 }
 
-#else
-
-#include <catch2/catch.hpp>
-#include "PolyMesh.h"
-#include <cmath>
-TEST_CASE("Class Mesh")
-{
 
 
-    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    //CASE 1: Read Mesh
-    PolyMesh poly(varList);
-    bool textureModel;
-    REQUIRE(poly.ReadOBJModel("../data/igloo.obj", textureModel, false) == true);
-
-    //CASE 2: Copy and Construct
-    PolyMesh polyB(poly);
-    REQUIRE(poly.vertexList.size() == polyB.vertexList.size());
-    REQUIRE(poly.getVarList() == polyB.getVarList());
-
-    //CASE3: Compute Volume
-    REQUIRE(poly.ReadOBJModel("../data/tetrahedron.obj", textureModel, false) == true);
-    REQUIRE(std::abs(poly.ComputeVolume() - 1.0f/6) < 1e-5);
-}
-
-#endif
+//#else
+//
+//#include <catch2/catch.hpp>
+//#include "PolyMesh.h"
+//#include <cmath>
+//TEST_CASE("Class Mesh")
+//{
+//
+//
+//    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+//    //CASE 1: Read Mesh
+//    PolyMesh poly(varList);
+//    bool textureModel;
+//    REQUIRE(poly.ReadOBJModel("../data/igloo.obj", textureModel, false) == true);
+//
+//    //CASE 2: Copy and Construct
+//    PolyMesh polyB(poly);
+//    REQUIRE(poly.vertexList.size() == polyB.vertexList.size());
+//    REQUIRE(poly.getVarList() == polyB.getVarList());
+//
+//    //CASE3: Compute Volume
+//    REQUIRE(poly.ReadOBJModel("../data/tetrahedron.obj", textureModel, false) == true);
+//    REQUIRE(std::abs(poly.ComputeVolume() - 1.0f/6) < 1e-5);
+//}
+//
+//#endif

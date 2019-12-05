@@ -65,6 +65,7 @@ public:
 	void updateCrossID();
     float averageCrossSize();
     void TranslateMesh(Vector3f mv);
+    shared_ptr<PolyMesh> getPolyMesh();
 
 public:
 	// Save OBJ file

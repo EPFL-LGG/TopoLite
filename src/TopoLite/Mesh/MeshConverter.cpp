@@ -317,6 +317,54 @@ void MeshConverter::Convert2EigenMesh(const vector<Vector3f> &inVerList,
     }
 }
 
+void MeshConverter::Convert2PolyLines(const PolyMesh *polyMesh, PolyLineRhino *polylines){
+
+    if(polylines == nullptr) return;
+
+    for(int id = 0; id < polyMesh->polyList.size(); id++)
+    {
+        //for each polygon
+        pPolygon poly = polyMesh->polyList[id];
+        if(poly->vers.size() < 3) continue;
+
+        polylines->data.push_back(vector<Vector3f>());
+        for(int jd = 0; jd < poly->vers.size(); jd++)
+        {
+            polylines->data.back().push_back(poly->vers[jd].pos);
+        }
+        polylines->data.back().push_back(poly->vers[0].pos);
+    }
+
+    return;
+}
+
+void MeshConverter::Convert2PolyLines(const PolyMesh *polyMesh, PolyLineRhino *polylines, double mat[16]){
+
+    if(polylines == nullptr) return;
+
+    for(int id = 0; id < polyMesh->polyList.size(); id++)
+    {
+        //for each polygon
+        pPolygon poly = polyMesh->polyList[id];
+        if(poly->vers.size() < 3) continue;
+
+        polylines->data.push_back(vector<Vector3f>());
+        Vector3f matpt;
+        for(int jd = 0; jd < poly->vers.size(); jd++)
+        {
+            Vector3f pt = poly->vers[jd].pos;
+            MultiplyPoint(pt, mat, matpt);
+            polylines->data.back().push_back(matpt);
+        }
+        MultiplyPoint(poly->vers[0].pos, mat, matpt);
+        polylines->data.back().push_back(matpt);
+    }
+
+    return;
+}
+
+
+
 //**************************************************************************************//
 //                      ClipperPath <-> Mesh
 //**************************************************************************************//

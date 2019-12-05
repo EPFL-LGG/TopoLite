@@ -214,6 +214,17 @@ void CrossMesh::TranslateMesh(Vector3f mv) {
     }
 }
 
+shared_ptr<PolyMesh> CrossMesh::getPolyMesh()
+{
+    shared_ptr<PolyMesh> polymesh = make_shared<PolyMesh>(getVarList());
+    for (int i = 0; i < crossList.size(); i++) {
+        pPolygon poly = make_shared<_Polygon>(*crossList[i]);
+        polymesh->polyList.push_back(poly);
+    }
+
+    return polymesh;
+}
+
 //**************************************************************************************//
 //                                   Save OBJ File
 //**************************************************************************************//

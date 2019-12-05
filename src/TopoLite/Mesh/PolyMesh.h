@@ -78,6 +78,8 @@ public:
 	void TranslateMesh(Vector3f move);
 	void RotateMesh(Vector3f rotCenter, Vector3f rotAxis, float rotAngle);
 
+	shared_ptr<PolyMesh> getTextureMesh();
+
 private:
 
     float ComputeVolume(vector<pTriangle> triList);

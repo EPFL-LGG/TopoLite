@@ -41,6 +41,10 @@ struct PolyMeshRhino{
     vector<vector<int>> facesGroups;
 };
 
+struct PolyLineRhino{
+    vector<vector<Vector3f>> data;
+};
+
 class MeshConverter: public TopoObject
 {
 
@@ -82,8 +86,13 @@ public:
 
     void Convert2EigenMesh(const PolyMesh *polyMesh, Eigen::MatrixXd &V, Eigen::MatrixXi &F);
 
-    void Convert2EigenMesh( const PolyMesh *polyMesh,
-                            PolyMeshRhino *rhinoMesh);
+    void Convert2EigenMesh( const PolyMesh *polyMesh, PolyMeshRhino *rhinoMesh);
+
+public:
+
+    void Convert2PolyLines(const PolyMesh *polyMesh, PolyLineRhino *polylines);
+    void Convert2PolyLines(const PolyMesh *polyMesh, PolyLineRhino *polylines, double mat[16]);
+
 public:
 
     //Clipper Countour <-> Mesh
