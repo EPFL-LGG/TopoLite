@@ -45,6 +45,8 @@ file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/CrossMesh/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/CrossMesh/*.h
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.cpp
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.h
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.h)
 
 add_library(TpCorelib STATIC ${TpCoreFiles})

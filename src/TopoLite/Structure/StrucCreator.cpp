@@ -13,6 +13,8 @@
 #include <cmath>
 #include <tbb/tbb.h>
 
+#include "ContactGraph/ContactGraph.cpp"
+
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpStruct.h"
 #include "Utility/HelpFunc.h"
@@ -223,13 +225,9 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 	if( !previewMode )
 	{
         struc->ComputeAveragePartSize();
-        std::cout << "1)" << std::endl;
 		BuildPartsGraph();
-        std::cout << "2)" << std::endl;
         ComputeBoundaryParts();
-        std::cout << "3)" << std::endl;
         ComputePartContacts();
-        std::cout << "4)" << std::endl;
 	}
 
 	return 1;
