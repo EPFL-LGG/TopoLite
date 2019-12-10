@@ -34,6 +34,7 @@ public:
 	vector<pPolygon> polyList;           // Faces of polygonal mesh
     bool texturedModel;                  // Whether this mesh has texture
 
+public:
 	//Computed
 	Box bbox;                            // Bounding box of polygonal mesh
 	Vector3f centroid;                   // Centroid of polygonal mesh

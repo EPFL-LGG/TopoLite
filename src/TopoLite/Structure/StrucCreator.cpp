@@ -13,8 +13,6 @@
 #include <cmath>
 #include <tbb/tbb.h>
 
-#include "ContactGraph/ContactGraph.cpp"
-
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpStruct.h"
 #include "Utility/HelpFunc.h"

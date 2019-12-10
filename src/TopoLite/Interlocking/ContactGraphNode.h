@@ -16,12 +16,12 @@ using std::pair;
 
 class ContactGraphNode;
 
-typedef shared_ptr<ContactGraphNode> pContactGraphNode;
-typedef weak_ptr<ContactGraphNode> wpContactGraphNode;
-typedef shared_ptr<ContactGraphEdge> pContactGraphEdge;
-typedef weak_ptr<ContactGraphEdge> wpContactGraphEdge;
+using pContactGraphNode = shared_ptr<ContactGraphNode>;
+using pContactGraphEdge = shared_ptr<ContactGraphEdge>;
+using wpContactGraphEdge = weak_ptr<ContactGraphEdge>;
+using wpContactGraphNode = weak_ptr<ContactGraphNode>;
 
-typedef pair<wpContactGraphNode, wpContactGraphEdge> ContactNeighbor;
+using ContactNeighbor = pair<wpContactGraphNode, wpContactGraphEdge> ;
 
 /*!
  * \brief Graph node records one part's geometry and contacts with its neighbors.

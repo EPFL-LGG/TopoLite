@@ -116,7 +116,7 @@ void InitVar(InputVarList &varList)
     varList.find("mitsuba_SunTime")->visible = false;
     //varList.find("mitsuba_SunStrength")->visible = false;
 
-    //ContactGraph Para
+    //Interlocking Para
     varList.add(1e-12f, "mosek_intpntCoTolRelGap", "IntPnt RelGap")  = "Para_ContactGraph"; varList.find("mosek_intpntCoTolRelGap")->visible = false;
     varList.add(1e-12f, "mosek_intpntCoTolInfeas", "")  = "Para_ContactGraph";varList.find("mosek_intpntCoTolInfeas")->visible = false;
     varList.add(1e-7f, "mosek_interlocking_eps", "Interlock Eps")  = "Para_ContactGraph";varList.find("mosek_interlocking_eps")->visible = false;

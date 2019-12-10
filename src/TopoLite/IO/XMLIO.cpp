@@ -1091,20 +1091,28 @@ void MitsubaWriter::change_attribute(pugi::xml_node &node, string str_attr, stri
 
 #include <catch2/catch.hpp>
 #include "XMLIO.h"
+#include "Interlocking/ContactGraph.h"
 
 TEST_CASE("Class XMLIO")
 {
 
-    SECTION("Read XML")
+SECTION("Read XML")
 {
-XMLIO Reader;
-XMLData data;
-//        Reader.XMLReader("../data/origin.xml", s=data);
-//        Reader.XMLWriter("../data/test.xml", data);
+    XMLIO Reader;
+    XMLData data;
     Reader.XMLReader("../data/origin.xml", data);
-    data.varList->set("tiltAngle", 80.0f);
-    data.strucCreator->CreateStructure(true, true, data.interactMatrix, false);
-    Reader.XMLWriter("../data/test.xml", data);
+    ContactGraph graph;
+
+    vector<shared_ptr<PolyMesh>> meshes;
+    vector<bool> atBoundary;
+
+    for(int id = 0; id < data.strucCreator->struc->partList.size(); id++){
+        pPart part = data.strucCreator->struc->partList[id];
+        meshes.push_back(part->polyMesh);
+        atBoundary.push_back(part->atBoundary);
+    }
+
+    graph.constructFromPolyMeshes(meshes, atBoundary);
 }
 }
 
