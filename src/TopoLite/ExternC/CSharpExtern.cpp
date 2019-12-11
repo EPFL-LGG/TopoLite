@@ -53,7 +53,7 @@ XMLData* initStructure(){
     XMLData *data = new XMLData();
 
     data->varList = make_shared<InputVarList>();
-    InitVarLite(*data->varList);
+    InitVarLite(data->varList.get());
 
     data->strucCreator = make_shared<StrucCreator>(data->varList);
 

@@ -14,7 +14,6 @@ using std::map;
 using std::vector;
 using std::shared_ptr;
 
-using pairIJ = std::pair<int, int>;
 using EigenSpMat = Eigen::SparseMatrix<double>;
 using EigenTriple = Eigen::Triplet<double>;
 using stdvec_Vector3d = std::vector<Eigen::Vector3d,Eigen::aligned_allocator<Eigen::Vector3d>>;

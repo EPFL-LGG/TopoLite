@@ -3,6 +3,12 @@
         "locale": "cpp",
         "filesystem": "cpp",
         "*.ipp": "cpp",
-        "memory": "cpp"
-    }
+        "memory": "cpp",
+        "vector": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "__split_buffer": "cpp",
+        "list": "cpp"
+    },
+    "cmake.buildDirectory": "${workspaceRoot}/build",
 }

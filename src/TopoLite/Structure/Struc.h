@@ -146,16 +146,6 @@ public:
 	void WriteStructure(const char *folderPath);
 	void WriteStructureWireFrame(const char *folderPath);
 	void WritePartGraph(char *folderPath);
-
-private:
-
-    void ComputePolygonsIntersection(   const vector<Vector3f> &polyA,
-                                        const vector<Vector3f> &polyB,
-                                        vector<Vector3f> &polyInt);
-
-    void ProjectPolygonTo3D(            const vector<Vector3f> &poly,
-                                        double *projMat,
-                                        vector<Vector3f> &poly3D);
 };
 
 #endif

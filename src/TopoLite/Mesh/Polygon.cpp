@@ -397,6 +397,10 @@ void _Polygon::ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[])
 	if (invert4by4(projMat) == 0)  printf("Inverse Matrix Error \n");
 }
 
+//
+
+
+
 #else
 
 #define CATCH_CONFIG_MAIN

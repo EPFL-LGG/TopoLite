@@ -1111,7 +1111,7 @@ SECTION("Read XML")
     }
 
     Reader.XMLReader(debugxml_filepath.string(), data);
-    ContactGraph graph;
+    ContactGraph graph(data.varList);
 
     vector<shared_ptr<PolyMesh>> meshes;
     vector<bool> atBoundary;
