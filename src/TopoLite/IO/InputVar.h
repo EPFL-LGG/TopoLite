@@ -311,8 +311,8 @@ public:
     }
 };
 
-void InitVar(InputVarList &varList);
+void InitVar(InputVarList *varList);
 
-void InitVarLite(InputVarList &varList);
+void InitVarLite(InputVarList *varList);
 
 #endif //TOPOLOCKCREATOR_GLUIVAR_H

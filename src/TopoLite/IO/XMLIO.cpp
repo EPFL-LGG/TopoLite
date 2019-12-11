@@ -441,7 +441,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
         data.strucCreator = make_shared<StrucCreator>(data.varList);
 
         //1) read all gui settings
-        InitVar(*(data.varList));
+        InitVar(data.varList.get());
         XMLReader_GUISettings(xml_root, data);
 
         //2) construct the cross mesh
