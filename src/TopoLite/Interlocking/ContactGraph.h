@@ -35,7 +35,7 @@ public:
     bool constructFromPolyMeshes(   vector<shared_ptr<PolyMesh>> &meshes,
                                     vector<bool> &atBoundary);
 
-    void roundPlane(const _Polygon* poly, );
+    void roundPlane(const _Polygon* poly);
 
 public:
 

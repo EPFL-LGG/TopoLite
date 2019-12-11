@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "locale": "cpp",
+        "filesystem": "cpp",
+        "*.ipp": "cpp"
+    }
+}

@@ -441,7 +441,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
         data.strucCreator = make_shared<StrucCreator>(data.varList);
 
         //1) read all gui settings
-        InitVar(*data.varList);
+        InitVar(*(data.varList));
         XMLReader_GUISettings(xml_root, data);
 
         //2) construct the cross mesh
@@ -1100,16 +1100,28 @@ SECTION("Read XML")
 {
     XMLIO Reader;
     XMLData data;
-    Reader.XMLReader("../data/origin.xml", data);
+
+    boost::filesystem::path current_path(boost::filesystem::current_path());
+    boost::filesystem::path debugxml_filepath;
+    if(current_path.filename() == "TopoLite"){
+        debugxml_filepath = current_path / "data/origin.xml";
+    }
+    else{
+        debugxml_filepath = current_path / "../data/origin.xml";
+    }
+
+    Reader.XMLReader(debugxml_filepath.string(), data);
     ContactGraph graph;
 
     vector<shared_ptr<PolyMesh>> meshes;
     vector<bool> atBoundary;
 
-    for(int id = 0; id < data.strucCreator->struc->partList.size(); id++){
+    if(data.strucCreator && data.strucCreator->struc){
+        for(int id = 0; id < data.strucCreator->struc->partList.size(); id++){
         pPart part = data.strucCreator->struc->partList[id];
         meshes.push_back(part->polyMesh);
         atBoundary.push_back(part->atBoundary);
+        }
     }
 
     graph.constructFromPolyMeshes(meshes, atBoundary);
