@@ -23,7 +23,7 @@
 #include "Structure/PartGroup.h"
 #include "Structure/Struc.h"
 #include "IO/InputVar.h"
-#include "Utility/PolyPolyIntersec.h"
+#include "Utility/PolyPolyBoolean.h"
 
 #include <unordered_map>
 #include <queue>
@@ -490,7 +490,7 @@ void Struc::ComputePartFaceContactsBruteForce()
                     vector<Vector3f> currFace2D = currFace->ProjectPolygonTo2D(projMat);
                     vector<Vector3f> neiborFace2D = neiborFace->ProjectPolygonTo2D(projMat);
 
-            		PolyPolyIntersec ppIntersec(getVarList());
+            		PolyPolyBoolean ppIntersec(getVarList());
 
                     vector<Vector3f> overlapPolyPts;
                     ppIntersec.ComputePolygonsIntersection(currFace2D, neiborFace2D, overlapPolyPts);
@@ -566,7 +566,7 @@ void Struc::ComputePartFaceContacts()
 			vector<Vector3f> currFace2D = currFace->ProjectPolygonTo2D(projMat);
 			vector<Vector3f> neiborFace2D = neiborFace->ProjectPolygonTo2D(projMat);
 
-			PolyPolyIntersec ppIntersec(getVarList());
+			PolyPolyBoolean ppIntersec(getVarList());
 			vector<Vector3f> overlapPolyPts;
             ppIntersec.ComputePolygonsIntersection(currFace2D, neiborFace2D, overlapPolyPts);
 			if( overlapPolyPts.size() == 0 ) continue;

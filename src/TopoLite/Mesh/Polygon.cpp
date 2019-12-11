@@ -236,24 +236,13 @@ void _Polygon::ComputeFrame(Vector3f &x_axis, Vector3f &y_axis, Vector3f &origin
 	normal = ComputeNormal();
 	center = ComputeCenter();
 	x_axis = normal CROSS Vector3f(1, 0, 0);
-	if(len(x_axis) < FLOAT_ERROR_SMALL) x_axis = normal CROSS Vector3f(0, 1, 0);
+	if(len(x_axis) < FLOAT_ERROR_LARGE)
+	    x_axis = normal CROSS Vector3f(0, 1, 0);
 	x_axis /= len(x_axis);
 	y_axis = normal CROSS x_axis; y_axis /= len(y_axis);
 	origin = center;
 }
 
-vector<Vector3i> _Polygon::ProjectToNormalPlane(Vector3f x_axis, Vector3f y_axis, Vector3f origin, float Scale) {
-	vector<Vector3i> pts;
-	for(int id = 0; id < vers.size(); id++)
-	{
-		Vector3f pos = vers[id].pos;
-		int x = (int)((pos - origin) DOT x_axis * Scale);
-		int y = (int)((pos - origin) DOT y_axis * Scale);
-		int z = 0;
-		pts.push_back(Vector3i(x, y, z));
-	}
-	return pts;
-}
 
 //**************************************************************************************//
 //                                  Polygon Operations
@@ -371,6 +360,21 @@ vector<Vector3f> _Polygon::ProjectPolygonTo2D(double projMat[])
 
 	return poly2D;
 }
+
+vector<Vector3i> _Polygon::ProjectToNormalPlane(Vector3f x_axis, Vector3f y_axis, Vector3f origin, float Scale) {
+	vector<Vector3i> pts;
+	for(int id = 0; id < vers.size(); id++)
+	{
+		Vector3f pos = vers[id].pos;
+		int x = (int)(((pos - origin) DOT x_axis) * Scale);
+		int y = (int)(((pos - origin) DOT y_axis) * Scale);
+		int z = 0;
+		pts.push_back(Vector3i(x, y, z));
+	}
+
+	return pts;
+}
+
 
 void _Polygon::ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[])
 {

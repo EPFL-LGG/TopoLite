@@ -4,12 +4,13 @@
 
 #include "ContactGraph.h"
 
-#include "Utility/PolyPolyIntersec.h"
+#include "Utility/PolyPolyBoolean.h"
 #include <iostream>
 #include <algorithm>
+#include <set>
 #include <tbb/tbb.h>
-
-
+//
+#ifndef CATCH2_UNITTEST
 /*************************************************
 *
 *                  Basic Operation
@@ -26,75 +27,98 @@ ContactGraph::~ContactGraph()
     edges.clear();
 }
 
-void ContactGraph::roundPlane(shared_ptr<_Polygon> poly, int partID, plane_contact &plane)
+void ContactGraph::mergeFacesPolyMesh(vector<shared_ptr<PolyMesh>> &meshes, double eps)
 {
-    const float normal2int_scalefactor = 100000;
+    for(int id = 0; id < meshes.size(); id++)
+    {
+        pPolyMesh mesh = meshes[id];
+        vector<plane_contact> planes;
+        std::set<plane_contact, plane_contact_compare> setPlanes;
 
-    Vector3f nrm = poly->ComputeNormal();
-    Vector3f center = poly->ComputeCenter();
+        int groupID = 0;
+        for (shared_ptr<_Polygon> face : mesh->polyList)
+        {
 
-    plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
+            //1.1) construct plane
+            plane_contact plane;
+            Vector3f nrm = face->ComputeNormal();
+            Vector3f center = face->ComputeCenter();
+            plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
 
+            plane.D = nrm ^ center;
+            plane.partID = id;
+            plane.polygon = face;
+            plane.eps = eps;
 
-    plane.nx = (int)(nrm[0] * normal2int_scalefactor);
-    plane.ny = (int)(nrm[1] * normal2int_scalefactor);
-    plane.nz = (int)(nrm[2] * normal2int_scalefactor);
+            //1.2) find groupID
+            auto find_it = setPlanes.find(plane);
 
-    int reverse = 1;
-    if (plane.nx < 0)
-        reverse = -1;
-    if (plane.nx == 0 && plane.ny < 0)
-        reverse = -1;
-    if (plane.nx == 0 && plane.ny == 0 && plane.nz < 0)
-        reverse = -1;
+            if(find_it == setPlanes.end()){
+                plane.groupID = groupID ++;
+                setPlanes.insert(plane);
+            }
+            else{
+                plane.groupID = find_it->groupID;
+            }
 
-    nrm *= reverse;
-    plane.nx = (int)(nrm[0] * normal2int_scalefactor);
-    plane.ny = (int)(nrm[1] * normal2int_scalefactor);
-    plane.nz = (int)(nrm[2] * normal2int_scalefactor);
+            planes.push_back(plane);
+        }
 
-    plane.D = (int)std::floor((nrm ^ center) * normal2int_scalefactor);
-    plane.partID = partID;
-    plane.polygon = poly;
+        std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B){
+            return A.groupID < B.groupID;
+        });
+
+        int sta = 0, end = 0;
+        vector<shared_ptr<_Polygon>> polygons;
+        while(sta < planes.size())
+        {
+            for(end = sta + 1; end < planes.size(); end++)
+            {
+                if(planes[sta].groupID != planes[end].groupID)
+                {
+                    break;
+                }
+            }
+
+            if (end - sta > 1)
+            {
+                vector<vector<Vector3f>> allFaces;
+                for (int kd = sta; kd < end; kd++)
+                {
+                    if(planes[kd].polygon.lock())
+                        allFaces.push_back(planes[kd].polygon.lock()->GetVertices());
+                }
+                vector<vector<Vector3f>> mergeFaces;
+                PolyPolyBoolean polyBoolean(getVarList());
+                polyBoolean.ComputePolygonsUnion(allFaces, mergeFaces);
+                for(int kd = 0; kd < mergeFaces.size(); kd++){
+                    shared_ptr<_Polygon> poly = make_shared<_Polygon>();
+                    poly->SetVertices(mergeFaces[kd]);
+                    polygons.push_back(poly);
+                }
+            }
+            else{
+                polygons.push_back(planes[sta].polygon.lock());
+            }
+            sta = end;
+        }
+        meshes[id]->polyList = polygons;
+        meshes[id]->UpdateVertices();
+    }
 
     return;
 }
 
-bool ContactGraph::equalPlane(const plane_contact &A, const plane_contact &B)
-{
-    if (A.nx == B.nx && A.ny == B.ny && A.nz == B.nz && A.D == B.D){
-        return true;
-    }
-    return false;
-}
-
-bool ContactGraph::comparePlane(const plane_contact &A, const plane_contact &B)
-{
-    if (A.nx < B.nx)
-        return true;
-    if (A.nx > B.nx)
-        return false;
-    if (A.ny < B.ny)
-        return true;
-    if (A.ny > B.ny)
-        return false;
-    if (A.nz < B.nz)
-        return true;
-    if (A.nz > B.nz)
-        return false;
-    if (A.D < B.D)
-        return true;
-    if (A.D > B.D)
-        return false;
-    return false;
-}
-
 bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
-                                           vector<bool> &atBoundary)
+                                           vector<bool> &atBoundary,
+                                           double eps)
 {
 
     //1) create contact planes
     vector<plane_contact> planes;
+    std::set<plane_contact, plane_contact_compare> setPlanes;
+
+    int groupID = 0;
     for (int id = 0; id < meshes.size(); id++)
     {
         pPolyMesh poly = meshes[id];
@@ -102,118 +126,159 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
             return false;
         for (shared_ptr<_Polygon> face : poly->polyList)
         {
+            
+            //1.1) construct plane
             plane_contact plane;
-            roundPlane(face, id, plane);
+            Vector3f nrm = face->ComputeNormal();
+            Vector3f center = face->ComputeCenter();
+            plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
+            
+            plane.D = nrm ^ center;
+            plane.partID = id;
+            plane.polygon = face;
+            plane.eps = eps;
+
+            //1.2) find groupID
+            std::set<plane_contact, plane_contact_compare>::iterator find_it = setPlanes.end();
+            for(int reverse = -1; reverse <= 1; reverse += 2){
+                plane_contact tmp_plane = plane;
+                tmp_plane.nrm *= reverse;
+                tmp_plane.D *= reverse;
+                find_it = setPlanes.find(tmp_plane);
+                if(find_it != setPlanes.end()){
+                    plane.groupID = (*find_it).groupID;
+                    break;
+                }
+            }
+
+            if(find_it == setPlanes.end()){
+                plane.groupID = groupID ++;
+                setPlanes.insert(plane);
+            }
+            
             planes.push_back(plane);
         }
     }
 
-    std::sort(planes.begin(), planes.end(), comparePlane);
-
-    // for (int id = 0; id < planes.size(); id++)
-    // {
-    //     std::cout << planes[id].nx
-    //               << " " << planes[id].ny
-    //               << " " << planes[id].nz
-    //               << " " << planes[id].D << std::endl;
-    // }
-
-    //2) add nodes
-    for(int id = 0; id < meshes.size(); id++){
-        meshes[id]->ComputeVolume();
-        meshes[id]->ComputeCentroid();
-        EigenPoint centroid(meshes[id]->centroid.x, meshes[id]->centroid.y, meshes[id]->centroid.z);
-        pContactGraphNode node = make_shared<ContactGraphNode>(atBoundary[id], centroid, centroid, meshes[id]->volume);
-        addNode(node);
-    }
-
-    int sta = 0, end = 0;
-    vector<pairIJ> planeIJ;
-    while(sta < planes.size()){
-        for(end = sta + 1; end < planes.size(); end++){
-            if(!equalPlane(planes[sta], planes[end])){
-                break;
-            }
-        }
-        if (end - sta > 1)
-        {
-            for (int id = sta; id < end; id++)
-            {
-                for(int jd = id + 1; jd < end; jd++)
-                {
-                    int partI = planes[id].partID;
-                    int partJ = planes[jd].partID;
-                    if(partI != partJ)
-                        planeIJ.push_back(pairIJ(id, jd));
-                }
-            }
-        }
-        sta = end;
-    }
-
-    vector<shared_ptr<ContactGraphEdge>> planeIJEdges;
-    planeIJEdges.resize(planeIJ.size());
-
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, planeIJ.size()), [&](const tbb::blocked_range<size_t>& r)
-	{
-        for (size_t id = r.begin(); id != r.end(); ++id)
-		{
-            int planeI = planeIJ[id].first;
-            int planeJ = planeIJ[id].second;
-            
-            double projMat[16];
-            double invsProjMat[16];
-
-            pPolygon polyI = planes[planeI].polygon.lock();
-            pPolygon polyJ = planes[planeJ].polygon.lock();
-
-            polyI->ComputeProjectMatrixTo2D(projMat, invsProjMat);
-            vector<Vector3f> polyI2D = polyI->ProjectPolygonTo2D(projMat);
-            vector<Vector3f> polyJ2D = polyJ->ProjectPolygonTo2D(projMat);
-            vector<Vector3f> overlapPolyPts;
-
-            PolyPolyIntersec ppIntersec(getVarList());
-
-            ppIntersec.ComputePolygonsIntersection(polyI2D, polyJ2D, overlapPolyPts);
-            if (overlapPolyPts.size() == 0)
-                continue;
-
-            vector<Vector3f> contactPoly;
-            ppIntersec.ProjectPolygonTo3D(overlapPolyPts, invsProjMat, contactPoly);
-
-            if(!contactPoly.empty() && contactPoly.size() >= 3){
-                int partI = planes[planeI].partID;
-                int partJ = planes[planeJ].partID;
-
-                ContactPolygon contactPolyEigen;
-                EigenPoint ct(0, 0, 0);
-                for(Vector3f pt: contactPoly){
-                    EigenPoint ptEigen(pt[0], pt[1], pt[2]);
-                    contactPolyEigen.points.push_back(ptEigen);
-                    ct += ptEigen;
-                }
-                contactPolyEigen.center = ct/contactPoly.size();
-
-                shared_ptr<ContactGraphEdge> edge = make_shared<ContactGraphEdge>(contactPolyEigen, planes[planeI].nrm);
-                planeIJEdges[id] = edge;
-            }
-            else{
-                planeIJEdges[id] = nullptr;
-            }
-        }
+    std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B){
+        return A.groupID < B.groupID;
     });
 
-    for(int id = 0; id < planeIJ.size(); id++)
-    {
-        pContactGraphEdge edge = planeIJEdges[id];
-        if(edge != nullptr){
-            int planeI = planeIJ[id].first;
-            int planeJ = planeIJ[id].second;
-            int partI = planes[planeI].partID;
-            int partJ = planes[planeJ].partID;
-            addContact(nodes[partI], nodes[partJ], edge);
-        }
-    }
+//    for (int id = 0; id < planes.size(); id++)
+//    {
+//        std::cout   << "nrm:\t" << planes[id].nrm.transpose()
+//                    << ",\t D:\t" << planes[id].D
+//                    << ",\t GID:\t" << planes[id].groupID
+//                    << std::endl ;
+//    }
+
+     //2) add nodes
+     for(int id = 0; id < meshes.size(); id++){
+         meshes[id]->ComputeVolume();
+         meshes[id]->ComputeCentroid();
+         EigenPoint centroid(meshes[id]->centroid.x, meshes[id]->centroid.y, meshes[id]->centroid.z);
+         pContactGraphNode node = make_shared<ContactGraphNode>(atBoundary[id], centroid, centroid, meshes[id]->volume);
+         addNode(node);
+     }
+
+
+     //3) find all pairs of contact polygon
+     int sta = 0, end = 0;
+     vector<pairIJ> planeIJ;
+     while(sta < planes.size())
+     {
+          for(end = sta + 1; end < planes.size(); end++)
+          {
+              if(planes[sta].groupID != planes[end].groupID)
+              {
+                  break;
+              }
+          }
+          if (end - sta > 1)
+          {
+              for (int id = sta; id < end; id++)
+              {
+                  for(int jd = id + 1; jd < end; jd++)
+                  {
+                      int partI = planes[id].partID;
+                      int partJ = planes[jd].partID;
+
+                      EigenPoint nrmI = planes[id].nrm.normalized();
+                      EigenPoint nrmJ = planes[jd].nrm.normalized();
+
+                      if(partI != partJ
+                      && std::abs(nrmI.dot(nrmJ) + 1) < FLOAT_ERROR_LARGE
+                      && (!atBoundary[partI] || !atBoundary[partJ]))
+                          planeIJ.push_back(pairIJ(id, jd));
+                  }
+              }
+          }
+          sta = end;
+      }
+
+
+     //4) parallel compute contacts
+     vector<shared_ptr<ContactGraphEdge>> planeIJEdges;
+     planeIJEdges.resize(planeIJ.size());
+
+//     tbb::parallel_for(tbb::blocked_range<size_t>(0, planeIJ.size()), [&](const tbb::blocked_range<size_t>& r)
+//	 {
+         for (size_t id = 0; id != planeIJ.size(); ++id)
+	 	{
+             int planeI = planeIJ[id].first;
+             int planeJ = planeIJ[id].second;
+
+             double projMat[16];
+             double invsProjMat[16];
+
+             pPolygon polyI = planes[planeI].polygon.lock();
+             pPolygon polyJ = planes[planeJ].polygon.lock();
+
+             polyI->ComputeProjectMatrixTo2D(projMat, invsProjMat);
+             vector<Vector3f> polyI2D = polyI->ProjectPolygonTo2D(projMat);
+             vector<Vector3f> polyJ2D = polyJ->ProjectPolygonTo2D(projMat);
+             vector<Vector3f> overlapPolyPts;
+
+             PolyPolyBoolean ppIntersec(getVarList());
+
+             ppIntersec.ComputePolygonsIntersection(polyI2D, polyJ2D, overlapPolyPts);
+             if (overlapPolyPts.size() == 0)
+                 continue;
+
+             vector<Vector3f> contactPoly;
+             ppIntersec.ProjectPolygonTo3D(overlapPolyPts, invsProjMat, contactPoly);
+
+             if(!contactPoly.empty() && contactPoly.size() >= 3){
+                 int partI = planes[planeI].partID;
+                 int partJ = planes[planeJ].partID;
+
+                 ContactPolygon contactPolyEigen;
+                 EigenPoint ct(0, 0, 0);
+                 for(Vector3f pt: contactPoly){
+                     EigenPoint ptEigen(pt[0], pt[1], pt[2]);
+                     contactPolyEigen.points.push_back(ptEigen);
+                     ct += ptEigen;
+                 }
+                 contactPolyEigen.center = ct/contactPoly.size();
+
+                 shared_ptr<ContactGraphEdge> edge = make_shared<ContactGraphEdge>(contactPolyEigen, planes[planeI].nrm);
+                 planeIJEdges[id] = edge;
+             }
+         }
+//     });
+
+     //5) add contact edges
+     for(int id = 0; id < planeIJ.size(); id++)
+     {
+         pContactGraphEdge edge = planeIJEdges[id];
+         if(edge != nullptr){
+             int planeI = planeIJ[id].first;
+             int planeJ = planeIJ[id].second;
+             int partI = planes[planeI].partID;
+             int partJ = planes[planeJ].partID;
+             addContact(nodes[partI], nodes[partJ], edge);
+         }
+     }
 
     return true;
 }
@@ -274,3 +339,257 @@ void ContactGraph::finalize()
         }
     }
 }
+
+void ContactGraph::getContactMesh(pPolyMesh &mesh)
+{
+    mesh.reset();
+    mesh = make_shared<PolyMesh>(getVarList());
+    for(pContactGraphEdge edge: edges)
+    {
+        for(ContactPolygon poly: edge->polygons)
+        {
+            shared_ptr<_Polygon> face = make_shared<_Polygon>();
+            for(EigenPoint pt: poly.points)
+            {
+                face->push_back(Vector3f(pt[0], pt[1], pt[2]));
+            }
+            mesh->polyList.push_back(face);
+        }
+    }
+}
+
+#else
+
+#include <catch2/catch.hpp>
+#include "Interlocking/ContactGraph.h"
+#include "Mesh/PolyMesh.h"
+#include "IO/XMLIO.h"
+using pPolyMesh = shared_ptr<PolyMesh>;
+using pPolygon = shared_ptr<_Polygon>;
+
+
+TEST_CASE("Class ContactGraph")
+{
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+    InitVarLite(varList.get());
+
+
+    SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,-1]")
+    {
+        shared_ptr<_Polygon> pA = make_shared<_Polygon>();
+        pA->push_back(Vector3f(0, 0, 0));
+        pA->push_back(Vector3f(2, 0, 0));
+        pA->push_back(Vector3f(2, 2, 0));
+        pA->push_back(Vector3f(0, 2, 0));
+
+        shared_ptr<_Polygon> pB = make_shared<_Polygon>();
+        pB->push_back(Vector3f(1, 1, 0));
+        pB->push_back(Vector3f(1, 3, 0));
+        pB->push_back(Vector3f(3, 3, 0));
+        pB->push_back(Vector3f(3, 1, 0));
+
+        pPolyMesh meshA = make_shared<PolyMesh>(varList);
+        meshA->polyList.push_back(pA);
+
+        pPolyMesh meshB = make_shared<PolyMesh>(varList);
+        meshB->polyList.push_back(pB);
+
+        vector<pPolyMesh> meshes;
+        meshes.push_back(meshA);
+        meshes.push_back(meshB);
+
+        vector<bool> atBoundary;
+        atBoundary.push_back(false);
+        atBoundary.push_back(false);
+
+        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(varList);
+        graph->constructFromPolyMeshes(meshes, atBoundary);
+
+        REQUIRE(graph->nodes.size() == 2);
+        REQUIRE(graph->edges.size() == 1);
+
+        _Polygon contactPolygon;
+        for(EigenPoint pt: graph->edges[0]->polygons[0].points){
+           contactPolygon.push_back(Vector3f(pt[0], pt[1], pt[2]));
+        }
+        REQUIRE(std::abs(contactPolygon.ComputeArea() - 1) < FLOAT_ERROR_LARGE);
+    }
+
+    SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,1]")
+    {
+        shared_ptr<_Polygon> pA = make_shared<_Polygon>();
+        pA->push_back(Vector3f(0, 0, 0));
+        pA->push_back(Vector3f(2, 0, 0));
+        pA->push_back(Vector3f(2, 2, 0));
+        pA->push_back(Vector3f(0, 2, 0));
+
+        shared_ptr<_Polygon> pB = make_shared<_Polygon>();
+        pB->push_back(Vector3f(1, 1, 0));
+        pB->push_back(Vector3f(3, 1, 0));
+        pB->push_back(Vector3f(3, 3, 0));
+        pB->push_back(Vector3f(1, 3, 0));
+
+        pPolyMesh meshA = make_shared<PolyMesh>(varList);
+        meshA->polyList.push_back(pA);
+
+        pPolyMesh meshB = make_shared<PolyMesh>(varList);
+        meshB->polyList.push_back(pB);
+
+        vector<pPolyMesh> meshes;
+        meshes.push_back(meshA);
+        meshes.push_back(meshB);
+
+        vector<bool> atBoundary;
+        atBoundary.push_back(false);
+        atBoundary.push_back(false);
+
+        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(varList);
+        graph->constructFromPolyMeshes(meshes, atBoundary);
+
+        REQUIRE(graph->nodes.size() == 2);
+        REQUIRE(graph->edges.size() == 0);
+
+    }
+
+    SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,1] but centor at Z:-0.0004")
+    {
+        shared_ptr<_Polygon> pA = make_shared<_Polygon>();
+        pA->push_back(Vector3f(0, 0, 0));
+        pA->push_back(Vector3f(2, 0, 0));
+        pA->push_back(Vector3f(2, 2, 0));
+        pA->push_back(Vector3f(0, 2, 0));
+
+        shared_ptr<_Polygon> pB = make_shared<_Polygon>();
+        pB->push_back(Vector3f(1, 1, -0.0004));
+        pB->push_back(Vector3f(1, 3, -0.0004));
+        pB->push_back(Vector3f(3, 3, -0.0004));
+        pB->push_back(Vector3f(3, 1, -0.0004));
+
+        pPolyMesh meshA = make_shared<PolyMesh>(varList);
+        meshA->polyList.push_back(pA);
+
+        pPolyMesh meshB = make_shared<PolyMesh>(varList);
+        meshB->polyList.push_back(pB);
+
+        vector<pPolyMesh> meshes;
+        meshes.push_back(meshA);
+        meshes.push_back(meshB);
+
+        vector<bool> atBoundary;
+        atBoundary.push_back(false);
+        atBoundary.push_back(false);
+
+        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(varList);
+        graph->constructFromPolyMeshes(meshes, atBoundary);
+
+        REQUIRE(graph->nodes.size() == 2);
+        REQUIRE(graph->edges.size() == 1);
+
+        _Polygon contactPolygon;
+        if(graph->edges.size() > 0){
+            for(EigenPoint pt: graph->edges[0]->polygons[0].points){
+                contactPolygon.push_back(Vector3f(pt[0], pt[1], pt[2]));
+            }
+            REQUIRE(std::abs(contactPolygon.ComputeArea() - 1) < FLOAT_ERROR_LARGE);
+        }
+    }
+
+    SECTION("both A B at boundary")
+    {
+        shared_ptr<_Polygon> pA = make_shared<_Polygon>();
+        pA->push_back(Vector3f(0, 0, 0));
+        pA->push_back(Vector3f(2, 0, 0));
+        pA->push_back(Vector3f(2, 2, 0));
+        pA->push_back(Vector3f(0, 2, 0));
+
+        shared_ptr<_Polygon> pB = make_shared<_Polygon>();
+        pB->push_back(Vector3f(1, 1, 0.0004));
+        pB->push_back(Vector3f(1, 3, 0.0004));
+        pB->push_back(Vector3f(3, 3, 0.0004));
+        pB->push_back(Vector3f(3, 1, 0.0004));
+
+        pPolyMesh meshA = make_shared<PolyMesh>(varList);
+        meshA->polyList.push_back(pA);
+
+        pPolyMesh meshB = make_shared<PolyMesh>(varList);
+        meshB->polyList.push_back(pB);
+
+        vector<pPolyMesh> meshes;
+        meshes.push_back(meshA);
+        meshes.push_back(meshB);
+
+        vector<bool> atBoundary;
+        atBoundary.push_back(true);
+        atBoundary.push_back(true);
+
+        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(varList);
+        graph->constructFromPolyMeshes(meshes, atBoundary);
+
+        REQUIRE(graph->nodes.size() == 2);
+        REQUIRE(graph->edges.size() == 0);
+
+    }
+
+//    SECTION("read xml file and compare contact numbers"){
+//        XMLIO Reader;
+//        XMLData data;
+//
+//        boost::filesystem::path current_path(boost::filesystem::current_path());
+//        boost::filesystem::path debugxml_filepath;
+//        if(current_path.filename() == "TopoLite"){
+//            debugxml_filepath = current_path / "data/origin.xml";
+//        }
+//        else{
+//            debugxml_filepath = current_path / "../data/origin.xml";
+//        }
+//
+//        REQUIRE(Reader.XMLReader(debugxml_filepath.string(), data) == 1);
+//
+//        shared_ptr<Struc> struc = data.strucCreator->struc;
+//        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(data.varList);
+//
+//        vector<shared_ptr<PolyMesh>> meshes;
+//        vector<bool> atBoundary;
+//
+//        for(int partID = 0; partID < struc->partList.size(); partID++){
+//            pPart part = struc->partList[partID];
+//            meshes.push_back(part->polyMesh);
+//            atBoundary.push_back(part->atBoundary);
+//        }
+//        graph->constructFromPolyMeshes(meshes, atBoundary);
+//
+//        struc->contactList.clear();
+//        struc->innerContactList.clear();
+//        struc->ComputePartFaceContacts();
+//
+//        REQUIRE(graph->edges.size() == struc->innerContactList.size());
+//    }
+
+    SECTION("merge all face"){
+        shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+        InitVarLite(varList.get());
+        vector<shared_ptr<PolyMesh>> meshes;
+        pPolyMesh mesh = make_shared<PolyMesh>(varList);
+
+        boost::filesystem::path current_path(boost::filesystem::current_path());
+        boost::filesystem::path objfilepath;
+        if(current_path.filename() == "TopoLite"){
+            objfilepath = current_path / "data/origin_data/PartGeometry/Part_01.obj";
+        }
+        else{
+            objfilepath = current_path / "../data/origin_data/PartGeometry/Part_01.obj";
+        }
+
+        bool texture;
+        mesh->ReadOBJModel(objfilepath.string().c_str(), texture, false);
+        meshes.push_back(mesh);
+
+        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(varList);
+
+        graph->mergeFacesPolyMesh(meshes);
+
+        REQUIRE(meshes[0]->polyList.size() == 8);
+    }
+}
+
+#endif

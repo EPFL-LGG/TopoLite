@@ -11,7 +11,7 @@ set(CMAKE_CXX_STANDARD 11)
 #####                               #####
 #########################################
 
-option(USE_PYTHON_PLUGIN "USE PYBIND11 PLUGIN" OFF)
+option(USE_PYTHON_PLUGIN "USE PYBIND11 PLUGIN" ON)
 option(USE_UNIT_TEST "USE CATCH2 TEST" ON)
 option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
@@ -68,11 +68,10 @@ target_link_libraries(TpCorelib PUBLIC ${ext_lib})
 
 if(USE_PYTHON_PLUGIN)
     file(GLOB TpPythonFiles
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/TopoLite/PyInterface/*.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/PyInterface/*.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/PyInterface/*.h)
 
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/ext/TopoLite/pybind11)
-    pybind11_add_module(pyTopo ${TpPythonFiles})
+    pybind11_add_module(pyTopo MODULE ${TpPythonFiles})
     target_link_libraries(pyTopo PUBLIC TpCorelib)
 endif()
 
@@ -90,10 +89,12 @@ if(USE_UNIT_TEST)
     include(CTest)
     include(ParseAndAddCatchTests)
     add_executable(testTopo
+            src/TopoLite/Utility/PolyPolyBoolean.cpp
             src/TopoLite/Mesh/Polygon.cpp
             src/TopoLite/Mesh/PolyMesh.cpp
             src/TopoLite/Mesh/Cross.cpp
-            src/TopoLite/IO/XMLIO.cpp)
+            src/TopoLite/IO/XMLIO.cpp
+            src/TopoLite/Interlocking/ContactGraph.cpp)
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)
     target_link_libraries(testTopo PUBLIC TpCorelib)
     target_compile_definitions(testTopo PUBLIC -DCATCH2_UNITTEST)

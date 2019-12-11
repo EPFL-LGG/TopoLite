@@ -74,8 +74,8 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
         /*
      * 1.0 get interface and part
      */
-        shared_ptr<ContactGraphEdge> edge = edges[edgeID];
-        shared_ptr<ContactGraphNode> part = nodes[partID];
+        shared_ptr<ContactGraphEdge> edge = graph->edges[edgeID];
+        shared_ptr<ContactGraphNode> part = graph->nodes[partID];
 
         /*
          * 2.0 initialize the matrix Ajk
@@ -119,8 +119,8 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
         /*
         * 1.0 get interface and part
         */
-        shared_ptr<ContactGraphEdge> edge = edges[edgeID];
-        shared_ptr<ContactGraphNode> part = nodes[partID];
+        shared_ptr<ContactGraphEdge> edge = graph->edges[edgeID];
+        shared_ptr<ContactGraphNode> part = graph->nodes[partID];
 
         /*
          * 2.0 initialize the matrix Ajk
@@ -175,11 +175,11 @@ void InterlockingSolver::computeTranslationalInterlockingMatrix(vector<EigenTrip
 {
     int rowID = 0;
     tri.clear();
-    for(shared_ptr<ContactGraphEdge> edge: edges) {
+    for(shared_ptr<ContactGraphEdge> edge: graph->edges) {
 
-        int iA = nodes[edge->partIDA]->dynamicID;
+        int iA = graph->nodes[edge->partIDA]->dynamicID;
 
-        int iB = nodes[edge->partIDB]->dynamicID;
+        int iB = graph->nodes[edge->partIDB]->dynamicID;
 
         for (EigenPoint nrm : edge->normals) {
             if (iA != -1) {
@@ -196,17 +196,17 @@ void InterlockingSolver::computeTranslationalInterlockingMatrix(vector<EigenTrip
             rowID++;
         }
     }
-    size = Eigen::Vector2i(rowID, 3 * dynamic_nodes.size());
+    size = Eigen::Vector2i(rowID, 3 * graph->dynamic_nodes.size());
 }
 
 void InterlockingSolver::computeRotationalInterlockingMatrix(vector<EigenTriple> &tri, Eigen::Vector2i &size)
 {
     int rowID = 0;
     tri.clear();
-    for(shared_ptr<ContactGraphEdge> edge: edges)
+    for(shared_ptr<ContactGraphEdge> edge: graph->edges)
     {
-        shared_ptr<ContactGraphNode> nodeA = nodes[edge->partIDA];
-        shared_ptr<ContactGraphNode> nodeB = nodes[edge->partIDB];
+        shared_ptr<ContactGraphNode> nodeA = graph->nodes[edge->partIDA];
+        shared_ptr<ContactGraphNode> nodeB = graph->nodes[edge->partIDB];
 
         int iA = nodeA->dynamicID;
         int iB = nodeB->dynamicID;
@@ -244,7 +244,38 @@ void InterlockingSolver::computeRotationalInterlockingMatrix(vector<EigenTriple>
             }
         }
     }
-    size = Eigen::Vector2i(rowID, 6 * dynamic_nodes.size());
+    size = Eigen::Vector2i(rowID, 6 * graph->dynamic_nodes.size());
+}
+
+void InterlockingSolver::computeTranslationalInterlockingMatrixDense(Eigen::MatrixXd &mat){
+    vector<EigenTriple> tris;
+    Eigen::Vector2i size;
+
+    computeTranslationalInterlockingMatrix(tris, size);
+
+    mat = Eigen::MatrixXd::Zero(size[0], size[1]);
+
+    for(EigenTriple tri: tris){
+        mat(tri.row(), tri.col()) = tri.value();
+    }
+
+    return;
+}
+
+void InterlockingSolver::computeRotationalInterlockingMatrixDense(Eigen::MatrixXd &mat)
+{
+    vector<EigenTriple> tris;
+    Eigen::Vector2i size;
+
+    computeRotationalInterlockingMatrix(tris, size);
+
+    mat = Eigen::MatrixXd::Zero(size[0], size[1]);
+
+    for(EigenTriple tri: tris){
+        mat(tri.row(), tri.col()) = tri.value();
+    }
+
+    return;
 }
 
 void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool withFriction) {
@@ -255,21 +286,21 @@ void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool wi
          */
         vector<int> row_start_index;
         int start_index = 0;
-        for (shared_ptr<ContactGraphEdge> edge:edges) {
+        for (shared_ptr<ContactGraphEdge> edge: graph->edges) {
             row_start_index.push_back(start_index);
             //std::cout << edge->partIDA << ",\t" << edge->partIDB << ",\t" << edge->num_points() << std::endl;
             start_index += edge->num_points() * 2;
         }
-        Aeq = Eigen::MatrixXd::Zero(dynamic_nodes.size() * 6, start_index);
+        Aeq = Eigen::MatrixXd::Zero(graph->dynamic_nodes.size() * 6, start_index);
 
         /*
          * 2.0 build matrix
          */
 
-        for (int id = 0; id < edges.size(); id++) {
-            shared_ptr<ContactGraphEdge> edge = edges[id];
-            shared_ptr<ContactGraphNode> partA = nodes[edge->partIDA];
-            shared_ptr<ContactGraphNode> partB = nodes[edge->partIDB];
+        for (int id = 0; id < graph->edges.size(); id++) {
+            shared_ptr<ContactGraphEdge> edge = graph->edges[id];
+            shared_ptr<ContactGraphNode> partA = graph->nodes[edge->partIDA];
+            shared_ptr<ContactGraphNode> partB = graph->nodes[edge->partIDB];
             int dyn_partIDA = partA->dynamicID;
             int dyn_partIDB = partB->dynamicID;
             int num_vk = edge->num_points();
@@ -292,21 +323,21 @@ void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool wi
          */
         vector<int> row_start_index;
         int start_index = 0;
-        for (shared_ptr<ContactGraphEdge> edge:edges) {
+        for (shared_ptr<ContactGraphEdge> edge: graph->edges) {
             row_start_index.push_back(start_index);
             //std::cout << edge->partIDA << ",\t" << edge->partIDB << ",\t" << edge->num_points() << std::endl;
             start_index += edge->num_points() * 4;
         }
-        Aeq = Eigen::MatrixXd::Zero(dynamic_nodes.size() * 6, start_index);
+        Aeq = Eigen::MatrixXd::Zero(graph->dynamic_nodes.size() * 6, start_index);
 
         /*
          * 2.0 build matrix
          */
 
-        for (int id = 0; id < edges.size(); id++) {
-            shared_ptr<ContactGraphEdge> edge = edges[id];
-            shared_ptr<ContactGraphNode> partA = nodes[edge->partIDA];
-            shared_ptr<ContactGraphNode> partB = nodes[edge->partIDB];
+        for (int id = 0; id < graph->edges.size(); id++) {
+            shared_ptr<ContactGraphEdge> edge = graph->edges[id];
+            shared_ptr<ContactGraphNode> partA = graph->nodes[edge->partIDA];
+            shared_ptr<ContactGraphNode> partB = graph->nodes[edge->partIDB];
             int dyn_partIDA = partA->dynamicID;
             int dyn_partIDB = partB->dynamicID;
             int num_vk = edge->num_points();
@@ -345,3 +376,5 @@ double InterlockingSolver::computeEquilibriumMatrixConditonalNumber()
     }
 
 }
+
+

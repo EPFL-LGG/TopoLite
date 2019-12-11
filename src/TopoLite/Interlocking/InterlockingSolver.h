@@ -8,6 +8,7 @@
 #include <Eigen/SparseCore>
 #include <Eigen/Dense>
 #include "ContactGraph.h"
+#include "Utility/TopoObject.h"
 
 using std::string;
 using std::map;
@@ -31,12 +32,19 @@ struct EquilibriumData{
     vector<pairIJ> partIJ;
 };
 
-class InterlockingSolver{
+class InterlockingSolver: public TopoObject{
 public:
-    vector<shared_ptr<ContactGraphNode>> nodes;
-    vector<shared_ptr<ContactGraphEdge>> edges;
-    //automatic generate
-    vector<weak_ptr<ContactGraphNode>> dynamic_nodes;
+
+    shared_ptr<ContactGraph> graph;
+
+public:
+
+    InterlockingSolver(shared_ptr<ContactGraph> _graph, shared_ptr<InputVarList> varList):TopoObject(varList)
+    {
+        graph = _graph;
+    }
+
+
 protected:
 
     /*************************************************
@@ -70,6 +78,10 @@ public:
     void computeTranslationalInterlockingMatrix(vector<EigenTriple> &tri, Eigen::Vector2i &size);
 
     void computeRotationalInterlockingMatrix(vector<EigenTriple> &tri, Eigen::Vector2i &size);
+
+    void computeRotationalInterlockingMatrixDense(Eigen::MatrixXd &mat);
+
+    void computeTranslationalInterlockingMatrixDense(Eigen::MatrixXd &mat);
 
 public:
 

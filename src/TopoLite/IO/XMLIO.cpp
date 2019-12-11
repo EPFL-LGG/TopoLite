@@ -1110,21 +1110,8 @@ SECTION("Read XML")
         debugxml_filepath = current_path / "../data/origin.xml";
     }
 
-    Reader.XMLReader(debugxml_filepath.string(), data);
-    ContactGraph graph(data.varList);
-
-    vector<shared_ptr<PolyMesh>> meshes;
-    vector<bool> atBoundary;
-
-    if(data.strucCreator && data.strucCreator->struc){
-        for(int id = 0; id < data.strucCreator->struc->partList.size(); id++){
-        pPart part = data.strucCreator->struc->partList[id];
-        meshes.push_back(part->polyMesh);
-        atBoundary.push_back(part->atBoundary);
-        }
-    }
-
-    graph.constructFromPolyMeshes(meshes, atBoundary);
+//    REQUIRE(Reader.XMLReader(debugxml_filepath.string(), data) == 1);
+//    Reader.XMLWriter(debugxml_filepath.string(), data);
 }
 }
 

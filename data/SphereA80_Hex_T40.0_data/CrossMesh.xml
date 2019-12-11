@@ -1,0 +1,3864 @@
+<?xml version="1.0"?>
+<Documents>
+	<CrossData>
+		<Cross id="0" Normal="(-0.630707,0.773387,-0.063883)" Center="(-0.629720,0.163001,-0.061906)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.012718, -0.979639, 0.200365)" />
+				<Point XYZ="(-0.768278, 0.053016, -0.023638)" />
+				<Vertex XYZ="(-0.781530, 0.033257, -0.121084)" />
+				<Rotation_Axis XYZ="(0.132117, 0.196978, 0.971465)" />
+				<Rotation_Base XYZ="(-0.646843, -0.725489, 0.235072)" />
+				<Neighbor id="1" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.580941, 0.237536, 0.778514)" />
+				<Point XYZ="(-0.680068, 0.136587, 0.110271)" />
+				<Vertex XYZ="(-0.755026, 0.072774, 0.073807)" />
+				<Rotation_Axis XYZ="(0.714030, 0.607872, 0.347351)" />
+				<Rotation_Base XYZ="(-0.193872, -0.305059, 0.932391)" />
+				<Neighbor id="2" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.783572, -0.319526, 0.532839)" />
+				<Point XYZ="(-0.536588, 0.250071, 0.075754)" />
+				<Vertex XYZ="(-0.605110, 0.200401, 0.146736)" />
+				<Rotation_Axis XYZ="(0.620354, 0.449677, -0.642613)" />
+				<Rotation_Base XYZ="(0.578220, 0.291367, 0.762080)" />
+				<Neighbor id="3" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.359086, 0.899399, -0.249276)" />
+				<Point XYZ="(-0.485875, 0.276711, -0.103974)" />
+				<Vertex XYZ="(-0.468065, 0.299741, 0.004773)" />
+				<Rotation_Axis XYZ="(-0.158202, -0.204567, -0.965984)" />
+				<Rotation_Base XYZ="(0.866311, 0.440667, -0.235199)" />
+				<Neighbor id="4" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.624973, -0.531597, -0.571676)" />
+				<Point XYZ="(-0.584295, 0.185917, -0.237833)" />
+				<Vertex XYZ="(-0.503685, 0.253682, -0.212722)" />
+				<Rotation_Axis XYZ="(-0.744584, -0.625934, -0.231950)" />
+				<Rotation_Base XYZ="(0.328005, -0.040437, -0.943810)" />
+				<Neighbor id="5" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.763779, -0.028313, -0.644857)" />
+				<Point XYZ="(-0.723217, 0.075705, -0.192014)" />
+				<Vertex XYZ="(-0.664905, 0.118153, -0.262944)" />
+				<Rotation_Axis XYZ="(-0.576443, -0.419610, 0.701171)" />
+				<Rotation_Base XYZ="(-0.398397, -0.604866, -0.689505)" />
+				<Neighbor id="6" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="1" Normal="(-0.850064,0.526678,0.001592)" Center="(-0.852416,-0.083047,0.009138)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.291408, -0.947826, 0.129255)" />
+				<Point XYZ="(-0.931050, -0.209856, 0.038890)" />
+				<Vertex XYZ="(-0.939893, -0.224150, -0.045992)" />
+				<Rotation_Axis XYZ="(0.102197, 0.165193, 0.980952)" />
+				<Rotation_Base XYZ="(-0.388140, -0.901331, 0.192222)" />
+				<Neighbor id="43" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.610168, 0.000315, 0.792272)" />
+				<Point XYZ="(-0.878824, -0.125761, 0.157156)" />
+				<Vertex XYZ="(-0.922207, -0.195562, 0.123772)" />
+				<Rotation_Axis XYZ="(0.489065, 0.786883, 0.376340)" />
+				<Rotation_Base XYZ="(-0.066762, -0.396424, 0.915637)" />
+				<Neighbor id="7" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.855097, -0.068085, 0.513979)" />
+				<Point XYZ="(-0.795233, 0.008407, 0.132173)" />
+				<Vertex XYZ="(-0.835441, -0.055959, 0.190540)" />
+				<Rotation_Axis XYZ="(0.419963, 0.672299, -0.609627)" />
+				<Rotation_Base XYZ="(0.459609, 0.421670, 0.781636)" />
+				<Neighbor id="2" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.012718, 0.979639, -0.200365)" />
+				<Point XYZ="(-0.768278, 0.053016, -0.023638)" />
+				<Vertex XYZ="(-0.755026, 0.072774, 0.073807)" />
+				<Rotation_Axis XYZ="(-0.132117, -0.196978, -0.971465)" />
+				<Rotation_Base XYZ="(0.646843, 0.725489, -0.235072)" />
+				<Neighbor id="0" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.721859, -0.262286, -0.640411)" />
+				<Point XYZ="(-0.830964, -0.047693, -0.143650)" />
+				<Vertex XYZ="(-0.781530, 0.033257, -0.121084)" />
+				<Rotation_Axis XYZ="(-0.507022, -0.830274, -0.231459)" />
+				<Rotation_Base XYZ="(0.250218, 0.115190, -0.961313)" />
+				<Neighbor id="6" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.774466, -0.249392, -0.581383)" />
+				<Point XYZ="(-0.910145, -0.176397, -0.106105)" />
+				<Vertex XYZ="(-0.880397, -0.128643, -0.166217)" />
+				<Rotation_Axis XYZ="(-0.361311, -0.580002, 0.730104)" />
+				<Rotation_Base XYZ="(-0.259485, -0.689528, -0.676180)" />
+				<Neighbor id="44" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="2" Normal="(-0.694517,0.670560,0.260760)" Center="(-0.697794,0.058053,0.264642)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.087846, -0.988320, -0.124525)" />
+				<Point XYZ="(-0.811028, -0.065029, 0.279750)" />
+				<Vertex XYZ="(-0.835441, -0.055959, 0.190540)" />
+				<Rotation_Axis XYZ="(0.262692, -0.097599, 0.959931)" />
+				<Rotation_Base XYZ="(-0.550343, -0.832328, 0.065980)" />
+				<Neighbor id="7" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.488222, -0.083957, 0.868672)" />
+				<Point XYZ="(-0.719619, -0.021554, 0.411693)" />
+				<Vertex XYZ="(-0.786615, -0.074100, 0.368960)" />
+				<Rotation_Axis XYZ="(0.703251, 0.551573, 0.448559)" />
+				<Rotation_Base XYZ="(-0.041810, -0.597758, 0.800586)" />
+				<Neighbor id="8" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.865767, -0.374029, 0.332490)" />
+				<Point XYZ="(-0.602285, 0.102600, 0.403903)" />
+				<Vertex XYZ="(-0.652624, 0.030992, 0.454425)" />
+				<Rotation_Axis XYZ="(0.498081, 0.708537, -0.499891)" />
+				<Rotation_Base XYZ="(0.631972, 0.098119, 0.768755)" />
+				<Neighbor id="9" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.244025, 0.967917, 0.059904)" />
+				<Point XYZ="(-0.578529, 0.187305, 0.250059)" />
+				<Vertex XYZ="(-0.551947, 0.174208, 0.353382)" />
+				<Rotation_Axis XYZ="(-0.247298, 0.121838, -0.961249)" />
+				<Rotation_Base XYZ="(0.789681, 0.600212, -0.127082)" />
+				<Neighbor id="3" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.580941, -0.237536, -0.778514)" />
+				<Point XYZ="(-0.680068, 0.136587, 0.110271)" />
+				<Vertex XYZ="(-0.605110, 0.200401, 0.146736)" />
+				<Rotation_Axis XYZ="(-0.714030, -0.607872, -0.347351)" />
+				<Rotation_Base XYZ="(0.193872, 0.305059, -0.932391)" />
+				<Neighbor id="0" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.855097, 0.068085, -0.513979)" />
+				<Point XYZ="(-0.795233, 0.008407, 0.132173)" />
+				<Vertex XYZ="(-0.755026, 0.072774, 0.073807)" />
+				<Rotation_Axis XYZ="(-0.419963, -0.672299, 0.609627)" />
+				<Rotation_Base XYZ="(-0.459609, -0.421670, -0.781636)" />
+				<Neighbor id="1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="3" Normal="(-0.410467,0.884985,0.219815)" Center="(-0.409482,0.273055,0.220808)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.244025, -0.967917, -0.059904)" />
+				<Point XYZ="(-0.578529, 0.187305, 0.250059)" />
+				<Vertex XYZ="(-0.605110, 0.200401, 0.146736)" />
+				<Rotation_Axis XYZ="(0.247298, -0.121838, 0.961249)" />
+				<Rotation_Base XYZ="(-0.789681, -0.600212, 0.127082)" />
+				<Neighbor id="2" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.432055, 0.135492, 0.891611)" />
+				<Point XYZ="(-0.456873, 0.208118, 0.394300)" />
+				<Vertex XYZ="(-0.551947, 0.174208, 0.353382)" />
+				<Rotation_Axis XYZ="(0.872893, 0.311330, 0.375674)" />
+				<Rotation_Base XYZ="(-0.185263, -0.500809, 0.845499)" />
+				<Neighbor id="9" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.702197, -0.633364, 0.325221)" />
+				<Point XYZ="(-0.285356, 0.293446, 0.370303)" />
+				<Vertex XYZ="(-0.361799, 0.242027, 0.435217)" />
+				<Rotation_Axis XYZ="(0.678289, 0.456242, -0.575993)" />
+				<Rotation_Base XYZ="(0.677035, -0.083408, 0.731209)" />
+				<Neighbor id="10" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.580172, 0.814300, -0.017764)" />
+				<Point XYZ="(-0.234986, 0.360976, 0.192371)" />
+				<Vertex XYZ="(-0.208912, 0.344865, 0.305388)" />
+				<Rotation_Axis XYZ="(-0.222665, 0.137590, -0.965137)" />
+				<Rotation_Base XYZ="(0.948041, 0.261321, -0.181467)" />
+				<Neighbor id="11" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.451135, -0.485002, -0.749166)" />
+				<Point XYZ="(-0.364563, 0.338414, 0.042064)" />
+				<Vertex XYZ="(-0.261060, 0.377088, 0.079354)" />
+				<Rotation_Axis XYZ="(-0.887559, -0.331636, -0.319775)" />
+				<Rotation_Base XYZ="(0.285579, 0.148605, -0.946764)" />
+				<Neighbor id="4" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.783572, 0.319526, -0.532839)" />
+				<Point XYZ="(-0.536588, 0.250071, 0.075754)" />
+				<Vertex XYZ="(-0.468065, 0.299741, 0.004773)" />
+				<Rotation_Axis XYZ="(-0.620354, -0.449677, 0.642613)" />
+				<Rotation_Base XYZ="(-0.578220, -0.291367, -0.762080)" />
+				<Neighbor id="0" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="4" Normal="(-0.299491,0.942693,-0.147092)" Center="(-0.298551,0.329814,-0.146068)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.359086, -0.899399, 0.249276)" />
+				<Point XYZ="(-0.485875, 0.276711, -0.103974)" />
+				<Vertex XYZ="(-0.503685, 0.253682, -0.212722)" />
+				<Rotation_Axis XYZ="(0.158202, 0.204567, 0.965984)" />
+				<Rotation_Base XYZ="(-0.866311, -0.440667, 0.235199)" />
+				<Neighbor id="0" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.451135, 0.485002, 0.749166)" />
+				<Point XYZ="(-0.364563, 0.338414, 0.042064)" />
+				<Vertex XYZ="(-0.468065, 0.299741, 0.004773)" />
+				<Rotation_Axis XYZ="(0.887559, 0.331636, 0.319775)" />
+				<Rotation_Base XYZ="(-0.285579, -0.148605, 0.946764)" />
+				<Neighbor id="3" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.609629, -0.547918, 0.572834)" />
+				<Point XYZ="(-0.173267, 0.392439, 0.000605)" />
+				<Vertex XYZ="(-0.261060, 0.377088, 0.079354)" />
+				<Rotation_Axis XYZ="(0.738181, 0.129072, -0.662140)" />
+				<Rotation_Base XYZ="(0.652680, 0.111544, 0.749378)" />
+				<Neighbor id="11" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.678388, 0.676738, -0.286034)" />
+				<Point XYZ="(-0.108495, 0.382964, -0.191477)" />
+				<Vertex XYZ="(-0.085474, 0.407789, -0.078145)" />
+				<Rotation_Axis XYZ="(-0.194624, -0.209882, -0.958160)" />
+				<Rotation_Base XYZ="(0.975063, 0.064814, -0.212255)" />
+				<Neighbor id="12" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.416023, -0.768553, -0.486057)" />
+				<Point XYZ="(-0.236511, 0.320293, -0.334834)" />
+				<Vertex XYZ="(-0.131515, 0.358139, -0.304810)" />
+				<Rotation_Axis XYZ="(-0.908452, -0.327459, -0.259779)" />
+				<Rotation_Base XYZ="(0.344718, -0.235449, -0.908699)" />
+				<Neighbor id="13" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.689522, 0.187424, -0.699594)" />
+				<Point XYZ="(-0.422596, 0.268064, -0.288790)" />
+				<Vertex XYZ="(-0.341507, 0.282446, -0.364858)" />
+				<Rotation_Axis XYZ="(-0.723298, -0.128285, 0.678516)" />
+				<Rotation_Base XYZ="(-0.552259, -0.482414, -0.679917)" />
+				<Neighbor id="5" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="5" Normal="(-0.513979,0.759048,-0.399590)" Center="(-0.512087,0.148689,-0.400698)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.158951, -0.862527, 0.480397)" />
+				<Point XYZ="(-0.667213, 0.069560, -0.350954)" />
+				<Vertex XYZ="(-0.669522, 0.020967, -0.438964)" />
+				<Rotation_Axis XYZ="(0.022958, 0.483223, 0.875196)" />
+				<Rotation_Base XYZ="(-0.756208, -0.564224, 0.331362)" />
+				<Neighbor id="6" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.624973, 0.531597, 0.571676)" />
+				<Point XYZ="(-0.584295, 0.185917, -0.237833)" />
+				<Vertex XYZ="(-0.664905, 0.118153, -0.262944)" />
+				<Rotation_Axis XYZ="(0.744584, 0.625934, 0.231950)" />
+				<Rotation_Base XYZ="(-0.328005, 0.040437, 0.943810)" />
+				<Neighbor id="0" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.689522, -0.187424, 0.699594)" />
+				<Point XYZ="(-0.422596, 0.268064, -0.288790)" />
+				<Vertex XYZ="(-0.503685, 0.253682, -0.212722)" />
+				<Rotation_Axis XYZ="(0.723298, 0.128285, -0.678516)" />
+				<Rotation_Base XYZ="(0.552259, 0.482414, 0.679917)" />
+				<Neighbor id="4" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.491568, 0.715284, -0.496719)" />
+				<Point XYZ="(-0.353168, 0.226310, -0.457236)" />
+				<Vertex XYZ="(-0.341507, 0.282446, -0.364858)" />
+				<Rotation_Axis XYZ="(-0.107252, -0.516322, -0.849652)" />
+				<Rotation_Base XYZ="(0.932066, 0.245228, -0.266677)" />
+				<Neighbor id="13" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.606435, -0.743926, -0.280733)" />
+				<Point XYZ="(-0.446451, 0.108443, -0.562350)" />
+				<Vertex XYZ="(-0.364829, 0.170173, -0.549613)" />
+				<Rotation_Axis XYZ="(-0.791478, -0.598588, -0.123515)" />
+				<Rotation_Base XYZ="(0.415603, -0.378909, -0.826863)" />
+				<Neighbor id="14" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.667700, -0.167125, -0.725428)" />
+				<Point XYZ="(-0.598798, 0.033840, -0.507026)" />
+				<Vertex XYZ="(-0.528073, 0.046713, -0.575088)" />
+				<Rotation_Axis XYZ="(-0.714421, -0.130038, 0.687527)" />
+				<Rotation_Base XYZ="(-0.376993, -0.756236, -0.534774)" />
+				<Neighbor id="15" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="6" Normal="(-0.774353,0.560216,-0.294170)" Center="(-0.774264,-0.048819,-0.294806)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.160457, -0.899319, 0.406790)" />
+				<Point XYZ="(-0.876063, -0.163534, -0.245064)" />
+				<Vertex XYZ="(-0.871728, -0.198426, -0.323910)" />
+				<Rotation_Axis XYZ="(-0.050211, 0.404160, 0.913309)" />
+				<Rotation_Base XYZ="(-0.510720, -0.796246, 0.324279)" />
+				<Neighbor id="44" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.721859, 0.262286, 0.640411)" />
+				<Point XYZ="(-0.830964, -0.047693, -0.143650)" />
+				<Vertex XYZ="(-0.880397, -0.128643, -0.166217)" />
+				<Rotation_Axis XYZ="(0.507022, 0.830274, 0.231459)" />
+				<Rotation_Base XYZ="(-0.250218, -0.115190, 0.961313)" />
+				<Neighbor id="1" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.763779, 0.028313, 0.644857)" />
+				<Point XYZ="(-0.723217, 0.075705, -0.192014)" />
+				<Vertex XYZ="(-0.781530, 0.033257, -0.121084)" />
+				<Rotation_Axis XYZ="(0.576443, 0.419610, -0.701171)" />
+				<Rotation_Base XYZ="(0.398397, 0.604866, 0.689505)" />
+				<Neighbor id="0" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.158951, 0.862527, -0.480397)" />
+				<Point XYZ="(-0.667213, 0.069560, -0.350954)" />
+				<Vertex XYZ="(-0.664905, 0.118153, -0.262944)" />
+				<Rotation_Axis XYZ="(-0.022958, -0.483223, -0.875196)" />
+				<Rotation_Base XYZ="(0.756208, 0.564224, -0.331362)" />
+				<Neighbor id="5" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.776203, -0.484002, -0.404044)" />
+				<Point XYZ="(-0.723513, -0.058628, -0.447340)" />
+				<Vertex XYZ="(-0.669522, 0.020967, -0.438964)" />
+				<Rotation_Axis XYZ="(-0.559247, -0.824448, -0.086761)" />
+				<Rotation_Base XYZ="(0.407477, -0.182234, -0.894848)" />
+				<Neighbor id="15" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.682844, -0.343229, -0.644917)" />
+				<Point XYZ="(-0.824616, -0.168324, -0.389813)" />
+				<Vertex XYZ="(-0.777504, -0.138222, -0.455716)" />
+				<Rotation_Axis XYZ="(-0.545135, -0.348311, 0.762566)" />
+				<Rotation_Base XYZ="(-0.210458, -0.823620, -0.526648)" />
+				<Neighbor id="45" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="7" Normal="(-0.870445,0.406847,0.277129)" Center="(-0.872995,-0.199721,0.283365)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.361907, -0.916634, -0.169725)" />
+				<Point XYZ="(-0.930844, -0.326428, 0.287081)" />
+				<Vertex XYZ="(-0.951831, -0.320819, 0.212037)" />
+				<Rotation_Axis XYZ="(0.268634, -0.071796, 0.960563)" />
+				<Rotation_Base XYZ="(-0.296560, -0.954944, 0.011561)" />
+				<Neighbor id="46" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.467440, -0.278624, 0.838969)" />
+				<Point XYZ="(-0.870938, -0.275943, 0.402439)" />
+				<Vertex XYZ="(-0.909857, -0.332037, 0.362126)" />
+				<Rotation_Axis XYZ="(0.490865, 0.707484, 0.508447)" />
+				<Rotation_Base XYZ="(0.114512, -0.630922, 0.767349)" />
+				<Neighbor id="48" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.927183, -0.107090, 0.358976)" />
+				<Point XYZ="(-0.809317, -0.146975, 0.405856)" />
+				<Vertex XYZ="(-0.832019, -0.219849, 0.442752)" />
+				<Rotation_Axis XYZ="(0.267779, 0.859590, -0.435201)" />
+				<Rotation_Base XYZ="(0.541874, 0.239125, 0.805724)" />
+				<Neighbor id="8" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.087846, 0.988320, 0.124525)" />
+				<Point XYZ="(-0.811028, -0.065029, 0.279750)" />
+				<Vertex XYZ="(-0.786615, -0.074100, 0.368960)" />
+				<Rotation_Axis XYZ="(-0.262692, 0.097599, -0.959931)" />
+				<Rotation_Base XYZ="(0.550343, 0.832328, -0.065980)" />
+				<Neighbor id="2" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.610168, -0.000315, -0.792272)" />
+				<Point XYZ="(-0.878824, -0.125761, 0.157156)" />
+				<Vertex XYZ="(-0.835441, -0.055959, 0.190540)" />
+				<Rotation_Axis XYZ="(-0.489065, -0.786883, -0.376340)" />
+				<Rotation_Base XYZ="(0.066762, 0.396424, -0.915637)" />
+				<Neighbor id="1" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.847255, -0.157172, -0.507402)" />
+				<Point XYZ="(-0.937019, -0.258191, 0.167905)" />
+				<Vertex XYZ="(-0.922207, -0.195562, 0.123772)" />
+				<Rotation_Axis XYZ="(-0.189812, -0.802574, 0.565550)" />
+				<Rotation_Base XYZ="(-0.330138, -0.490309, -0.806602)" />
+				<Neighbor id="43" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="8" Normal="(-0.707626,0.476062,0.522140)" Center="(-0.712689,-0.132242,0.522538)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.122779, -0.875406, -0.467537)" />
+				<Point XYZ="(-0.800670, -0.253123, 0.513285)" />
+				<Vertex XYZ="(-0.832019, -0.219849, 0.442752)" />
+				<Rotation_Axis XYZ="(0.372968, -0.395867, 0.839157)" />
+				<Rotation_Base XYZ="(-0.497108, -0.848913, -0.179527)" />
+				<Neighbor id="48" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.344908, -0.364602, 0.864930)" />
+				<Point XYZ="(-0.710097, -0.242459, 0.625956)" />
+				<Vertex XYZ="(-0.769321, -0.286397, 0.583818)" />
+				<Rotation_Axis XYZ="(0.697303, 0.517320, 0.496134)" />
+				<Rotation_Base XYZ="(0.139672, -0.776972, 0.613845)" />
+				<Neighbor id="50" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.924832, -0.353459, 0.140544)" />
+				<Point XYZ="(-0.617778, -0.122049, 0.642637)" />
+				<Vertex XYZ="(-0.650873, -0.198522, 0.668094)" />
+				<Rotation_Axis XYZ="(0.379845, 0.877696, -0.292176)" />
+				<Rotation_Base XYZ="(0.695553, -0.062760, 0.715728)" />
+				<Neighbor id="16" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.164038, 0.917225, 0.363030)" />
+				<Point XYZ="(-0.618653, -0.007292, 0.535802)" />
+				<Vertex XYZ="(-0.584682, -0.045576, 0.617180)" />
+				<Rotation_Axis XYZ="(-0.353364, 0.398230, -0.846491)" />
+				<Rotation_Base XYZ="(0.717662, 0.695838, 0.027770)" />
+				<Neighbor id="9" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.488222, 0.083957, -0.868672)" />
+				<Point XYZ="(-0.719619, -0.021554, 0.411693)" />
+				<Vertex XYZ="(-0.652624, 0.030992, 0.454425)" />
+				<Rotation_Axis XYZ="(-0.703251, -0.551573, -0.448559)" />
+				<Rotation_Base XYZ="(0.041810, 0.597758, -0.800586)" />
+				<Neighbor id="2" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.927183, 0.107090, -0.358976)" />
+				<Point XYZ="(-0.809317, -0.146975, 0.405856)" />
+				<Vertex XYZ="(-0.786615, -0.074100, 0.368960)" />
+				<Rotation_Axis XYZ="(-0.267779, -0.859590, 0.435201)" />
+				<Rotation_Base XYZ="(-0.541874, -0.239125, -0.805724)" />
+				<Neighbor id="7" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="9" Normal="(-0.476822,0.703675,0.526766)" Center="(-0.478543,0.092688,0.529030)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.164038, -0.917225, -0.363030)" />
+				<Point XYZ="(-0.618653, -0.007292, 0.535802)" />
+				<Vertex XYZ="(-0.652624, 0.030992, 0.454425)" />
+				<Rotation_Axis XYZ="(0.353364, -0.398230, 0.846491)" />
+				<Rotation_Base XYZ="(-0.717662, -0.695838, -0.027770)" />
+				<Neighbor id="8" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.369167, -0.204169, 0.906659)" />
+				<Point XYZ="(-0.501929, -0.018981, 0.656864)" />
+				<Vertex XYZ="(-0.584682, -0.045576, 0.617180)" />
+				<Rotation_Axis XYZ="(0.866056, 0.278326, 0.415310)" />
+				<Rotation_Base XYZ="(-0.066089, -0.759682, 0.646928)" />
+				<Neighbor id="16" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.782892, -0.616450, 0.084080)" />
+				<Point XYZ="(-0.360104, 0.077239, 0.656987)" />
+				<Vertex XYZ="(-0.419176, 0.007613, 0.696547)" />
+				<Rotation_Axis XYZ="(0.593628, 0.699685, -0.397551)" />
+				<Rotation_Base XYZ="(0.719443, -0.240084, 0.651737)" />
+				<Neighbor id="17" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.487757, 0.829923, 0.270780)" />
+				<Point XYZ="(-0.331416, 0.194446, 0.526322)" />
+				<Vertex XYZ="(-0.301032, 0.146864, 0.617427)" />
+				<Rotation_Axis XYZ="(-0.283484, 0.443947, -0.850028)" />
+				<Rotation_Base XYZ="(0.904374, 0.418595, -0.082987)" />
+				<Neighbor id="10" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.432055, -0.135492, -0.891611)" />
+				<Point XYZ="(-0.456873, 0.208118, 0.394300)" />
+				<Vertex XYZ="(-0.361799, 0.242027, 0.435217)" />
+				<Rotation_Axis XYZ="(-0.872893, -0.311330, -0.375674)" />
+				<Rotation_Base XYZ="(0.185263, 0.500809, -0.845499)" />
+				<Neighbor id="3" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.865767, 0.374029, -0.332490)" />
+				<Point XYZ="(-0.602285, 0.102600, 0.403903)" />
+				<Vertex XYZ="(-0.551947, 0.174208, 0.353382)" />
+				<Rotation_Axis XYZ="(-0.498081, -0.708537, 0.499891)" />
+				<Rotation_Base XYZ="(-0.631972, -0.098119, -0.768755)" />
+				<Neighbor id="2" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="10" Normal="(-0.150244,0.854213,0.497742)" Center="(-0.150495,0.242611,0.498366)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.487757, -0.829923, -0.270780)" />
+				<Point XYZ="(-0.331416, 0.194446, 0.526322)" />
+				<Vertex XYZ="(-0.361799, 0.242027, 0.435217)" />
+				<Rotation_Axis XYZ="(0.283484, -0.443947, 0.850028)" />
+				<Rotation_Base XYZ="(-0.904374, -0.418595, 0.082987)" />
+				<Neighbor id="9" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.309203, -0.024817, 0.950672)" />
+				<Point XYZ="(-0.201137, 0.145541, 0.649883)" />
+				<Vertex XYZ="(-0.301032, 0.146864, 0.617427)" />
+				<Rotation_Axis XYZ="(0.950986, -0.012596, 0.308976)" />
+				<Rotation_Base XYZ="(-0.239631, -0.661549, 0.710584)" />
+				<Neighbor id="17" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.533247, -0.843721, 0.061501)" />
+				<Point XYZ="(-0.022130, 0.190183, 0.626985)" />
+				<Vertex XYZ="(-0.101242, 0.144218, 0.682340)" />
+				<Rotation_Axis XYZ="(0.739795, 0.429832, -0.517637)" />
+				<Rotation_Base XYZ="(0.672230, -0.439655, 0.595659)" />
+				<Neighbor id="18" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.774542, 0.612533, 0.157760)" />
+				<Point XYZ="(0.035008, 0.288845, 0.474911)" />
+				<Vertex XYZ="(0.056982, 0.236148, 0.571630)" />
+				<Rotation_Axis XYZ="(-0.195652, 0.469192, -0.861150)" />
+				<Rotation_Base XYZ="(0.979972, 0.060331, -0.189778)" />
+				<Neighbor id="19" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.288460, -0.340427, -0.894930)" />
+				<Point XYZ="(-0.097940, 0.343203, 0.341790)" />
+				<Vertex XYZ="(0.013033, 0.341542, 0.378191)" />
+				<Rotation_Axis XYZ="(-0.950090, 0.014224, -0.311650)" />
+				<Rotation_Base XYZ="(0.297352, 0.343543, -0.890820)" />
+				<Neighbor id="11" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.702197, 0.633364, -0.325221)" />
+				<Point XYZ="(-0.285356, 0.293446, 0.370303)" />
+				<Vertex XYZ="(-0.208912, 0.344865, 0.305388)" />
+				<Rotation_Axis XYZ="(-0.678289, -0.456242, 0.575993)" />
+				<Rotation_Base XYZ="(-0.677035, 0.083408, -0.731209)" />
+				<Neighbor id="3" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="11" Normal="(-0.034832,0.987935,0.150902)" Center="(-0.034966,0.374316,0.151670)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.580172, -0.814300, 0.017764)" />
+				<Point XYZ="(-0.234986, 0.360976, 0.192371)" />
+				<Vertex XYZ="(-0.261060, 0.377088, 0.079354)" />
+				<Rotation_Axis XYZ="(0.222665, -0.137590, 0.965137)" />
+				<Rotation_Base XYZ="(-0.948041, -0.261321, 0.181467)" />
+				<Neighbor id="3" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.288460, 0.340427, 0.894930)" />
+				<Point XYZ="(-0.097940, 0.343203, 0.341790)" />
+				<Vertex XYZ="(-0.208912, 0.344865, 0.305388)" />
+				<Rotation_Axis XYZ="(0.950090, -0.014224, 0.311650)" />
+				<Rotation_Base XYZ="(-0.297352, -0.343543, 0.890820)" />
+				<Neighbor id="10" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.434927, -0.829205, 0.351079)" />
+				<Point XYZ="(0.101227, 0.355939, 0.302938)" />
+				<Vertex XYZ="(0.013033, 0.341542, 0.378191)" />
+				<Rotation_Axis XYZ="(0.754911, 0.123233, -0.644145)" />
+				<Rotation_Base XYZ="(0.648695, -0.284767, 0.705764)" />
+				<Neighbor id="19" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.845335, 0.526221, -0.092197)" />
+				<Point XYZ="(0.166308, 0.387305, 0.112614)" />
+				<Vertex XYZ="(0.189421, 0.370336, 0.227684)" />
+				<Rotation_Axis XYZ="(-0.194905, 0.143092, -0.970328)" />
+				<Rotation_Base XYZ="(0.967296, -0.135690, -0.214305)" />
+				<Neighbor id="20" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.221622, -0.677816, -0.701034)" />
+				<Point XYZ="(0.028860, 0.406032, -0.040300)" />
+				<Vertex XYZ="(0.143194, 0.404274, -0.002455)" />
+				<Rotation_Axis XYZ="(-0.949244, 0.014594, -0.314201)" />
+				<Rotation_Base XYZ="(0.313243, -0.046733, -0.948522)" />
+				<Neighbor id="12" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.609629, 0.547918, -0.572834)" />
+				<Point XYZ="(-0.173267, 0.392439, 0.000605)" />
+				<Vertex XYZ="(-0.085474, 0.407789, -0.078145)" />
+				<Rotation_Axis XYZ="(-0.738181, -0.129072, 0.662140)" />
+				<Rotation_Base XYZ="(-0.652680, -0.111544, -0.749378)" />
+				<Neighbor id="4" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="12" Normal="(0.090550,0.969222,-0.228929)" Center="(0.090339,0.355895,-0.227689)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.678388, -0.676738, 0.286034)" />
+				<Point XYZ="(-0.108495, 0.382964, -0.191477)" />
+				<Vertex XYZ="(-0.131515, 0.358139, -0.304810)" />
+				<Rotation_Axis XYZ="(0.194624, 0.209882, 0.958160)" />
+				<Rotation_Base XYZ="(-0.975063, -0.064814, 0.212255)" />
+				<Neighbor id="4" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.221622, 0.677816, 0.701034)" />
+				<Point XYZ="(0.028860, 0.406032, -0.040300)" />
+				<Vertex XYZ="(-0.085474, 0.407789, -0.078145)" />
+				<Rotation_Axis XYZ="(0.949244, -0.014594, 0.314201)" />
+				<Rotation_Base XYZ="(-0.313243, 0.046733, 0.948522)" />
+				<Neighbor id="11" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.354691, -0.691849, 0.628920)" />
+				<Point XYZ="(0.228427, 0.377912, -0.079524)" />
+				<Vertex XYZ="(0.143194, 0.404274, -0.002455)" />
+				<Rotation_Axis XYZ="(0.722958, -0.223607, -0.653706)" />
+				<Rotation_Base XYZ="(0.652816, -0.088683, 0.752308)" />
+				<Neighbor id="20" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.891822, 0.345436, -0.292109)" />
+				<Point XYZ="(0.286738, 0.328403, -0.266158)" />
+				<Vertex XYZ="(0.313660, 0.351550, -0.156592)" />
+				<Rotation_Axis XYZ="(-0.233749, -0.200966, -0.951301)" />
+				<Rotation_Base XYZ="(0.932138, -0.324605, -0.160466)" />
+				<Neighbor id="21" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.121285, -0.907744, -0.401609)" />
+				<Point XYZ="(0.151083, 0.306808, -0.412067)" />
+				<Vertex XYZ="(0.259816, 0.305257, -0.375724)" />
+				<Rotation_Axis XYZ="(-0.948337, 0.013529, -0.316975)" />
+				<Rotation_Base XYZ="(0.281353, -0.425848, -0.859938)" />
+				<Neighbor id="22" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.528125, 0.365923, -0.766280)" />
+				<Point XYZ="(-0.044582, 0.333249, -0.376610)" />
+				<Vertex XYZ="(0.042350, 0.308360, -0.448410)" />
+				<Rotation_Axis XYZ="(-0.752895, 0.215562, 0.621838)" />
+				<Rotation_Base XYZ="(-0.657006, -0.301625, -0.690916)" />
+				<Neighbor id="13" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="13" Normal="(-0.166047,0.853003,-0.494786)" Center="(-0.166558,0.240500,-0.495622)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.491568, -0.715284, 0.496719)" />
+				<Point XYZ="(-0.353168, 0.226310, -0.457236)" />
+				<Vertex XYZ="(-0.364829, 0.170173, -0.549613)" />
+				<Rotation_Axis XYZ="(0.107252, 0.516322, 0.849652)" />
+				<Rotation_Base XYZ="(-0.932066, -0.245228, 0.266677)" />
+				<Neighbor id="5" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.416023, 0.768553, 0.486057)" />
+				<Point XYZ="(-0.236511, 0.320293, -0.334834)" />
+				<Vertex XYZ="(-0.341507, 0.282446, -0.364858)" />
+				<Rotation_Axis XYZ="(0.908452, 0.327459, 0.259779)" />
+				<Rotation_Base XYZ="(-0.344718, 0.235449, 0.908699)" />
+				<Neighbor id="4" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.528125, -0.365923, 0.766280)" />
+				<Point XYZ="(-0.044582, 0.333249, -0.376610)" />
+				<Vertex XYZ="(-0.131515, 0.358139, -0.304810)" />
+				<Rotation_Axis XYZ="(0.752895, -0.215562, -0.621838)" />
+				<Rotation_Base XYZ="(0.657006, 0.301625, 0.690916)" />
+				<Neighbor id="12" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.759807, 0.448367, -0.470809)" />
+				<Point XYZ="(0.019601, 0.251051, -0.539700)" />
+				<Vertex XYZ="(0.042350, 0.308360, -0.448410)" />
+				<Rotation_Axis XYZ="(-0.206506, -0.520219, -0.828690)" />
+				<Rotation_Base XYZ="(0.978312, -0.123753, -0.166104)" />
+				<Neighbor id="22" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.334710, -0.928587, -0.160295)" />
+				<Point XYZ="(-0.101924, 0.161942, -0.653020)" />
+				<Vertex XYZ="(-0.003148, 0.193743, -0.630990)" />
+				<Rotation_Axis XYZ="(-0.931131, -0.299778, -0.207670)" />
+				<Rotation_Base XYZ="(0.349470, -0.570720, -0.743068)" />
+				<Neighbor id="23" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.606715, 0.003319, -0.794913)" />
+				<Point XYZ="(-0.282765, 0.150157, -0.612331)" />
+				<Vertex XYZ="(-0.200701, 0.130141, -0.675050)" />
+				<Rotation_Axis XYZ="(-0.780015, 0.190253, 0.596138)" />
+				<Rotation_Base XYZ="(-0.563254, -0.628501, -0.536406)" />
+				<Neighbor id="14" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="14" Normal="(-0.369759,0.631293,-0.681723)" Center="(-0.368897,0.020730,-0.685466)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.324598, -0.659914, 0.677606)" />
+				<Point XYZ="(-0.524679, -0.020924, -0.639332)" />
+				<Vertex XYZ="(-0.521284, -0.088560, -0.703577)" />
+				<Rotation_Axis XYZ="(-0.036364, 0.724575, 0.688236)" />
+				<Rotation_Base XYZ="(-0.856189, -0.377763, 0.352470)" />
+				<Neighbor id="15" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.606435, 0.743926, 0.280733)" />
+				<Point XYZ="(-0.446451, 0.108443, -0.562350)" />
+				<Vertex XYZ="(-0.528073, 0.046713, -0.575088)" />
+				<Rotation_Axis XYZ="(0.791478, 0.598588, 0.123515)" />
+				<Rotation_Base XYZ="(-0.415603, 0.378909, 0.826863)" />
+				<Neighbor id="5" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.606715, -0.003319, 0.794913)" />
+				<Point XYZ="(-0.282765, 0.150157, -0.612331)" />
+				<Vertex XYZ="(-0.364829, 0.170173, -0.549613)" />
+				<Rotation_Axis XYZ="(0.780015, -0.190253, -0.596138)" />
+				<Rotation_Base XYZ="(0.563254, 0.628501, 0.536406)" />
+				<Neighbor id="13" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.610823, 0.461805, -0.643142)" />
+				<Point XYZ="(-0.211102, 0.056192, -0.738027)" />
+				<Vertex XYZ="(-0.200701, 0.130141, -0.675050)" />
+				<Rotation_Axis XYZ="(-0.106472, -0.757001, -0.644681)" />
+				<Rotation_Base XYZ="(0.972233, 0.056626, -0.227060)" />
+				<Neighbor id="23" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.533839, -0.844821, 0.035962)" />
+				<Point XYZ="(-0.299248, -0.067044, -0.804733)" />
+				<Vertex XYZ="(-0.221502, -0.017758, -0.801004)" />
+				<Rotation_Axis XYZ="(-0.843897, -0.534977, -0.040469)" />
+				<Rotation_Base XYZ="(0.443287, -0.652792, -0.614296)" />
+				<Neighbor id="24" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.596359, -0.322794, -0.734956)" />
+				<Point XYZ="(-0.449139, -0.102445, -0.756019)" />
+				<Vertex XYZ="(-0.376994, -0.116329, -0.808461)" />
+				<Rotation_Axis XYZ="(-0.799255, 0.153820, 0.580975)" />
+				<Rotation_Base XYZ="(-0.408960, -0.847565, -0.338209)" />
+				<Neighbor id="25" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="15" Normal="(-0.647324,0.505720,-0.570279)" Center="(-0.646333,-0.103599,-0.574794)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.011944, -0.769757, 0.638225)" />
+				<Point XYZ="(-0.763924, -0.189319, -0.517090)" />
+				<Vertex XYZ="(-0.750344, -0.240417, -0.578465)" />
+				<Rotation_Axis XYZ="(-0.167640, 0.630778, 0.757638)" />
+				<Rotation_Base XYZ="(-0.642794, -0.652625, 0.401119)" />
+				<Neighbor id="45" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.776203, 0.484002, 0.404044)" />
+				<Point XYZ="(-0.723513, -0.058628, -0.447340)" />
+				<Vertex XYZ="(-0.777504, -0.138222, -0.455716)" />
+				<Rotation_Axis XYZ="(0.559247, 0.824448, 0.086761)" />
+				<Rotation_Base XYZ="(-0.407477, 0.182234, 0.894848)" />
+				<Neighbor id="6" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.667700, 0.167125, 0.725428)" />
+				<Point XYZ="(-0.598798, 0.033840, -0.507026)" />
+				<Vertex XYZ="(-0.669522, 0.020967, -0.438964)" />
+				<Rotation_Axis XYZ="(0.714421, 0.130038, -0.687527)" />
+				<Rotation_Base XYZ="(0.376993, 0.756236, 0.534774)" />
+				<Neighbor id="5" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.324598, 0.659914, -0.677606)" />
+				<Point XYZ="(-0.524679, -0.020924, -0.639332)" />
+				<Vertex XYZ="(-0.528073, 0.046713, -0.575088)" />
+				<Rotation_Axis XYZ="(0.036364, -0.724575, -0.688236)" />
+				<Rotation_Base XYZ="(0.856189, 0.377763, -0.352470)" />
+				<Neighbor id="14" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.763461, -0.634821, -0.118866)" />
+				<Point XYZ="(-0.576278, -0.155317, -0.700265)" />
+				<Vertex XYZ="(-0.521284, -0.088560, -0.703577)" />
+				<Rotation_Axis XYZ="(-0.635357, -0.771270, 0.038259)" />
+				<Rotation_Base XYZ="(0.510304, -0.456532, -0.728813)" />
+				<Neighbor id="25" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.591687, -0.455543, -0.665122)" />
+				<Point XYZ="(-0.690807, -0.231246, -0.637709)" />
+				<Vertex XYZ="(-0.631271, -0.222074, -0.696954)" />
+				<Rotation_Axis XYZ="(-0.704654, -0.108548, 0.701199)" />
+				<Rotation_Base XYZ="(-0.201527, -0.916915, -0.344462)" />
+				<Neighbor id="51" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="16" Normal="(-0.501879,0.455956,0.734997)" Center="(-0.502872,-0.150879,0.738371)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.124734, -0.773295, -0.621657)" />
+				<Point XYZ="(-0.612729, -0.250030, 0.724513)" />
+				<Vertex XYZ="(-0.650873, -0.198522, 0.668094)" />
+				<Rotation_Axis XYZ="(0.446722, -0.603221, 0.660729)" />
+				<Rotation_Base XYZ="(-0.665019, -0.717910, -0.205802)" />
+				<Neighbor id="50" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.248315, -0.476873, 0.843168)" />
+				<Point XYZ="(-0.505288, -0.277490, 0.814940)" />
+				<Vertex XYZ="(-0.574584, -0.301538, 0.780931)" />
+				<Rotation_Axis XYZ="(0.857085, 0.297438, 0.420637)" />
+				<Rotation_Base XYZ="(0.099922, -0.896966, 0.430659)" />
+				<Neighbor id="53" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.840459, -0.530297, -0.111416)" />
+				<Point XYZ="(-0.393957, -0.183626, 0.833737)" />
+				<Vertex XYZ="(-0.435992, -0.253442, 0.848949)" />
+				<Rotation_Axis XYZ="(0.507044, 0.842160, -0.183502)" />
+				<Rotation_Base XYZ="(0.766692, -0.343410, 0.542451)" />
+				<Neighbor id="26" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.413824, 0.749004, 0.517438)" />
+				<Point XYZ="(-0.385549, -0.053098, 0.757536)" />
+				<Vertex XYZ="(-0.351922, -0.113810, 0.818524)" />
+				<Rotation_Axis XYZ="(-0.363957, 0.657111, -0.660107)" />
+				<Rotation_Base XYZ="(0.853374, 0.519234, 0.046361)" />
+				<Neighbor id="17" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.369167, 0.204169, -0.906659)" />
+				<Point XYZ="(-0.501929, -0.018981, 0.656864)" />
+				<Vertex XYZ="(-0.419176, 0.007613, 0.696547)" />
+				<Rotation_Axis XYZ="(-0.866056, -0.278326, -0.415310)" />
+				<Rotation_Base XYZ="(0.066089, 0.759682, -0.646928)" />
+				<Neighbor id="9" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.924832, 0.353459, -0.140544)" />
+				<Point XYZ="(-0.617778, -0.122049, 0.642637)" />
+				<Vertex XYZ="(-0.584682, -0.045576, 0.617180)" />
+				<Rotation_Axis XYZ="(-0.379845, -0.877696, 0.292176)" />
+				<Rotation_Base XYZ="(-0.695553, 0.062760, -0.715728)" />
+				<Neighbor id="8" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="17" Normal="(-0.234589,0.622127,0.746944)" Center="(-0.235296,0.012104,0.750381)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.413824, -0.749004, -0.517438)" />
+				<Point XYZ="(-0.385549, -0.053098, 0.757536)" />
+				<Vertex XYZ="(-0.419176, 0.007613, 0.696547)" />
+				<Rotation_Axis XYZ="(0.363957, -0.657111, 0.660107)" />
+				<Rotation_Base XYZ="(-0.853374, -0.519234, -0.046361)" />
+				<Neighbor id="16" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.291892, -0.346602, 0.891440)" />
+				<Point XYZ="(-0.267584, -0.114732, 0.845781)" />
+				<Vertex XYZ="(-0.351922, -0.113810, 0.818524)" />
+				<Rotation_Axis XYZ="(0.951489, -0.010408, 0.307507)" />
+				<Rotation_Base XYZ="(-0.161056, -0.868418, 0.468946)" />
+				<Neighbor id="26" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.623301, -0.760420, -0.182366)" />
+				<Point XYZ="(-0.119203, -0.056130, 0.843722)" />
+				<Vertex XYZ="(-0.183245, -0.115655, 0.873038)" />
+				<Rotation_Axis XYZ="(0.694471, 0.645484, -0.317898)" />
+				<Rotation_Base XYZ="(0.708527, -0.536557, 0.458362)" />
+				<Neighbor id="27" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.696801, 0.598600, 0.395153)" />
+				<Point XYZ="(-0.078201, 0.073806, 0.748373)" />
+				<Vertex XYZ="(-0.055160, 0.003395, 0.814407)" />
+				<Rotation_Axis XYZ="(-0.232166, 0.709488, -0.665376)" />
+				<Rotation_Base XYZ="(0.970009, 0.219505, -0.104403)" />
+				<Neighbor id="18" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.309203, 0.024817, -0.950672)" />
+				<Point XYZ="(-0.201137, 0.145541, 0.649883)" />
+				<Vertex XYZ="(-0.101242, 0.144218, 0.682340)" />
+				<Rotation_Axis XYZ="(-0.950986, 0.012596, -0.308976)" />
+				<Rotation_Base XYZ="(0.239631, 0.661549, -0.710584)" />
+				<Neighbor id="10" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.782892, 0.616450, -0.084080)" />
+				<Point XYZ="(-0.360104, 0.077239, 0.656987)" />
+				<Vertex XYZ="(-0.301032, 0.146864, 0.617427)" />
+				<Rotation_Axis XYZ="(-0.593628, -0.699685, 0.397551)" />
+				<Rotation_Base XYZ="(-0.719443, 0.240084, -0.651737)" />
+				<Neighbor id="9" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="18" Normal="(0.093129,0.696612,0.711378)" Center="(0.092451,0.085533,0.714485)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.696801, -0.598600, -0.395153)" />
+				<Point XYZ="(-0.078201, 0.073806, 0.748373)" />
+				<Vertex XYZ="(-0.101242, 0.144218, 0.682340)" />
+				<Rotation_Axis XYZ="(0.232166, -0.709488, 0.665376)" />
+				<Rotation_Base XYZ="(-0.970009, -0.219505, 0.104403)" />
+				<Neighbor id="17" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.236082, -0.205867, 0.949676)" />
+				<Point XYZ="(0.034156, -0.025116, 0.830429)" />
+				<Vertex XYZ="(-0.055160, 0.003395, 0.814407)" />
+				<Rotation_Axis XYZ="(0.939026, -0.299755, 0.168455)" />
+				<Rotation_Base XYZ="(-0.341540, -0.756485, 0.557746)" />
+				<Neighbor id="27" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.325296, -0.923473, -0.203421)" />
+				<Point XYZ="(0.199043, -0.016968, 0.800876)" />
+				<Vertex XYZ="(0.123472, -0.053628, 0.846452)" />
+				<Rotation_Axis XYZ="(0.790807, 0.383621, -0.476926)" />
+				<Rotation_Base XYZ="(0.582454, -0.711101, 0.393805)" />
+				<Neighbor id="28" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.904003, 0.351485, 0.243385)" />
+				<Point XYZ="(0.265328, 0.091534, 0.686041)" />
+				<Vertex XYZ="(0.274614, 0.019691, 0.755300)" />
+				<Rotation_Axis XYZ="(-0.092661, 0.716837, -0.691056)" />
+				<Rotation_Base XYZ="(0.960783, -0.117811, -0.251033)" />
+				<Neighbor id="29" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.173208, -0.131800, -0.976026)" />
+				<Point XYZ="(0.156512, 0.199762, 0.594206)" />
+				<Vertex XYZ="(0.256041, 0.163377, 0.616782)" />
+				<Rotation_Axis XYZ="(-0.918593, 0.335816, -0.208364)" />
+				<Rotation_Base XYZ="(0.361021, 0.498538, -0.788114)" />
+				<Neighbor id="19" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.533247, 0.843721, -0.061501)" />
+				<Point XYZ="(-0.022130, 0.190183, 0.626985)" />
+				<Vertex XYZ="(0.056982, 0.236148, 0.571630)" />
+				<Rotation_Axis XYZ="(-0.739795, -0.429832, 0.517637)" />
+				<Rotation_Base XYZ="(-0.672230, 0.439655, -0.595659)" />
+				<Neighbor id="10" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="19" Normal="(0.223034,0.875778,0.428099)" Center="(0.222121,0.264239,0.427800)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.774542, -0.612533, -0.157760)" />
+				<Point XYZ="(0.035008, 0.288845, 0.474911)" />
+				<Vertex XYZ="(0.013033, 0.341542, 0.378191)" />
+				<Rotation_Axis XYZ="(0.195652, -0.469192, 0.861150)" />
+				<Rotation_Base XYZ="(-0.979972, -0.060331, 0.189778)" />
+				<Neighbor id="10" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.173208, 0.131800, 0.976026)" />
+				<Point XYZ="(0.156512, 0.199762, 0.594206)" />
+				<Vertex XYZ="(0.056982, 0.236148, 0.571630)" />
+				<Rotation_Axis XYZ="(0.918593, -0.335816, 0.208364)" />
+				<Rotation_Base XYZ="(-0.361021, -0.498538, 0.788114)" />
+				<Neighbor id="18" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.208655, -0.974052, 0.087670)" />
+				<Point XYZ="(0.338163, 0.174936, 0.549760)" />
+				<Vertex XYZ="(0.256041, 0.163377, 0.616782)" />
+				<Rotation_Axis XYZ="(0.770171, 0.108408, -0.628558)" />
+				<Rotation_Base XYZ="(0.547276, -0.618463, 0.563909)" />
+				<Neighbor id="29" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.954729, 0.294905, 0.039030)" />
+				<Point XYZ="(0.408623, 0.237017, 0.386256)" />
+				<Vertex XYZ="(0.420285, 0.186495, 0.482739)" />
+				<Rotation_Axis XYZ="(-0.106465, 0.461251, -0.880859)" />
+				<Rotation_Base XYZ="(0.909914, -0.311991, -0.273346)" />
+				<Neighbor id="30" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.070337, -0.479601, -0.874663)" />
+				<Point XYZ="(0.293192, 0.328937, 0.258728)" />
+				<Vertex XYZ="(0.396962, 0.287539, 0.289773)" />
+				<Rotation_Axis XYZ="(-0.894909, 0.357015, -0.267726)" />
+				<Rotation_Base XYZ="(0.337138, 0.147847, -0.929774)" />
+				<Neighbor id="20" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.434927, 0.829205, -0.351079)" />
+				<Point XYZ="(0.101227, 0.355939, 0.302938)" />
+				<Vertex XYZ="(0.189421, 0.370336, 0.227684)" />
+				<Rotation_Axis XYZ="(-0.754911, -0.123233, 0.644145)" />
+				<Rotation_Base XYZ="(-0.648695, 0.284767, -0.705764)" />
+				<Neighbor id="11" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="20" Normal="(0.352900,0.933159,0.068382)" Center="(0.351681,0.320489,0.069244)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.845335, -0.526221, 0.092197)" />
+				<Point XYZ="(0.166308, 0.387305, 0.112614)" />
+				<Vertex XYZ="(0.143194, 0.404274, -0.002455)" />
+				<Rotation_Axis XYZ="(0.194905, -0.143092, 0.970328)" />
+				<Rotation_Base XYZ="(-0.967296, 0.135690, 0.214305)" />
+				<Neighbor id="11" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.070337, 0.479601, 0.874663)" />
+				<Point XYZ="(0.293192, 0.328937, 0.258728)" />
+				<Vertex XYZ="(0.189421, 0.370336, 0.227684)" />
+				<Rotation_Axis XYZ="(0.894909, -0.357015, 0.267726)" />
+				<Rotation_Base XYZ="(-0.337138, -0.147847, 0.929774)" />
+				<Neighbor id="19" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.116678, -0.906167, 0.406507)" />
+				<Point XYZ="(0.474723, 0.263290, 0.213397)" />
+				<Vertex XYZ="(0.396962, 0.287539, 0.289773)" />
+				<Rotation_Axis XYZ="(0.696407, -0.217172, -0.683998)" />
+				<Rotation_Base XYZ="(0.544538, -0.460895, 0.700753)" />
+				<Neighbor id="30" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.975313, 0.164092, -0.147775)" />
+				<Point XYZ="(0.533425, 0.254619, 0.028526)" />
+				<Vertex XYZ="(0.552484, 0.239040, 0.137022)" />
+				<Rotation_Axis XYZ="(-0.171320, 0.140033, -0.975213)" />
+				<Rotation_Base XYZ="(0.836694, -0.501951, -0.219062)" />
+				<Neighbor id="31" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.062342, -0.761485, -0.645178)" />
+				<Point XYZ="(0.414012, 0.310874, -0.118281)" />
+				<Vertex XYZ="(0.514365, 0.270198, -0.079969)" />
+				<Rotation_Axis XYZ="(-0.873691, 0.354132, -0.333548)" />
+				<Rotation_Base XYZ="(0.262369, -0.234367, -0.936074)" />
+				<Neighbor id="21" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.354691, 0.691849, -0.628920)" />
+				<Point XYZ="(0.228427, 0.377912, -0.079524)" />
+				<Vertex XYZ="(0.313660, 0.351550, -0.156592)" />
+				<Rotation_Axis XYZ="(-0.722958, 0.223607, 0.653706)" />
+				<Rotation_Base XYZ="(-0.652816, 0.088683, -0.752308)" />
+				<Neighbor id="12" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="21" Normal="(0.452032,0.844299,-0.287796)" Center="(0.452540,0.232010,-0.288642)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.891822, -0.345436, 0.292109)" />
+				<Point XYZ="(0.286738, 0.328403, -0.266158)" />
+				<Vertex XYZ="(0.259816, 0.305257, -0.375724)" />
+				<Rotation_Axis XYZ="(0.233749, 0.200966, 0.951301)" />
+				<Rotation_Base XYZ="(-0.932138, 0.324605, 0.160466)" />
+				<Neighbor id="12" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.062342, 0.761485, 0.645178)" />
+				<Point XYZ="(0.414012, 0.310874, -0.118281)" />
+				<Vertex XYZ="(0.313660, 0.351550, -0.156592)" />
+				<Rotation_Axis XYZ="(0.873691, -0.354132, 0.333548)" />
+				<Rotation_Base XYZ="(-0.262369, 0.234367, 0.936074)" />
+				<Neighbor id="20" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.077075, -0.722931, 0.686607)" />
+				<Point XYZ="(0.577247, 0.213460, -0.146768)" />
+				<Vertex XYZ="(0.514365, 0.270198, -0.079969)" />
+				<Rotation_Axis XYZ="(0.582958, -0.525996, -0.619264)" />
+				<Rotation_Base XYZ="(0.578954, -0.265833, 0.770808)" />
+				<Neighbor id="31" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.963184, -0.016787, -0.268318)" />
+				<Point XYZ="(0.612253, 0.138335, -0.312485)" />
+				<Vertex XYZ="(0.640130, 0.156722, -0.213567)" />
+				<Rotation_Axis XYZ="(-0.267009, -0.176112, -0.947466)" />
+				<Rotation_Base XYZ="(0.757993, -0.645508, -0.093627)" />
+				<Neighbor id="32" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.192616, -0.921324, -0.337728)" />
+				<Point XYZ="(0.493633, 0.154167, -0.452999)" />
+				<Vertex XYZ="(0.584377, 0.119949, -0.411404)" />
+				<Rotation_Axis XYZ="(-0.859928, 0.324271, -0.394172)" />
+				<Rotation_Base XYZ="(0.156278, -0.567899, -0.808126)" />
+				<Neighbor id="33" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.311220, 0.463075, -0.829882)" />
+				<Point XYZ="(0.331353, 0.246821, -0.435159)" />
+				<Vertex XYZ="(0.402890, 0.188386, -0.494594)" />
+				<Rotation_Axis XYZ="(-0.651284, 0.532009, 0.541105)" />
+				<Rotation_Base XYZ="(-0.683267, -0.100931, -0.723159)" />
+				<Neighbor id="22" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="22" Normal="(0.197556,0.807061,-0.556439)" Center="(0.198292,0.195137,-0.557330)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.759807, -0.448367, 0.470809)" />
+				<Point XYZ="(0.019601, 0.251051, -0.539700)" />
+				<Vertex XYZ="(-0.003148, 0.193743, -0.630990)" />
+				<Rotation_Axis XYZ="(0.206506, 0.520219, 0.828690)" />
+				<Rotation_Base XYZ="(-0.978312, 0.123753, 0.166104)" />
+				<Neighbor id="13" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.121285, 0.907744, 0.401609)" />
+				<Point XYZ="(0.151083, 0.306808, -0.412067)" />
+				<Vertex XYZ="(0.042350, 0.308360, -0.448410)" />
+				<Rotation_Axis XYZ="(0.948337, -0.013529, 0.316975)" />
+				<Rotation_Base XYZ="(-0.281353, 0.425848, 0.859938)" />
+				<Neighbor id="12" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.311220, -0.463075, 0.829882)" />
+				<Point XYZ="(0.331353, 0.246821, -0.435159)" />
+				<Vertex XYZ="(0.259816, 0.305257, -0.375724)" />
+				<Rotation_Axis XYZ="(0.651284, -0.532009, -0.541105)" />
+				<Rotation_Base XYZ="(0.683267, 0.100931, 0.723159)" />
+				<Neighbor id="21" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.907291, 0.118391, -0.403493)" />
+				<Point XYZ="(0.371753, 0.137350, -0.579583)" />
+				<Vertex XYZ="(0.402890, 0.188386, -0.494594)" />
+				<Rotation_Axis XYZ="(-0.299654, -0.491151, -0.817911)" />
+				<Rotation_Base XYZ="(0.884653, -0.464028, -0.045460)" />
+				<Neighbor id="33" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.010714, -0.997540, -0.069271)" />
+				<Point XYZ="(0.243922, 0.087537, -0.697131)" />
+				<Vertex XYZ="(0.340616, 0.086315, -0.664571)" />
+				<Rotation_Axis XYZ="(-0.947645, 0.011981, -0.319101)" />
+				<Rotation_Base XYZ="(0.213350, -0.719767, -0.660619)" />
+				<Neighbor id="34" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.475654, 0.135763, -0.869092)" />
+				<Point XYZ="(0.072040, 0.141252, -0.680340)" />
+				<Vertex XYZ="(0.147229, 0.088760, -0.729691)" />
+				<Rotation_Axis XYZ="(-0.722027, 0.504073, 0.473907)" />
+				<Rotation_Base XYZ="(-0.687325, -0.444248, -0.574655)" />
+				<Neighbor id="23" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="23" Normal="(-0.041145,0.651087,-0.757887)" Center="(-0.042370,0.039975,-0.761093)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.610823, -0.461805, 0.643142)" />
+				<Point XYZ="(-0.211102, 0.056192, -0.738027)" />
+				<Vertex XYZ="(-0.221502, -0.017758, -0.801004)" />
+				<Rotation_Axis XYZ="(0.106472, 0.757001, 0.644681)" />
+				<Rotation_Base XYZ="(-0.972233, -0.056626, 0.227060)" />
+				<Neighbor id="14" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.334710, 0.928587, 0.160295)" />
+				<Point XYZ="(-0.101924, 0.161942, -0.653020)" />
+				<Vertex XYZ="(-0.200701, 0.130141, -0.675050)" />
+				<Rotation_Axis XYZ="(0.931131, 0.299778, 0.207670)" />
+				<Rotation_Base XYZ="(-0.349470, 0.570720, 0.743068)" />
+				<Neighbor id="13" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.475654, -0.135763, 0.869092)" />
+				<Point XYZ="(0.072040, 0.141252, -0.680340)" />
+				<Vertex XYZ="(-0.003148, 0.193743, -0.630990)" />
+				<Rotation_Axis XYZ="(0.722027, -0.504073, -0.473907)" />
+				<Rotation_Base XYZ="(0.687325, 0.444248, 0.574655)" />
+				<Neighbor id="22" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.811207, 0.190567, -0.552835)" />
+				<Point XYZ="(0.123156, 0.017166, -0.789692)" />
+				<Vertex XYZ="(0.147229, 0.088760, -0.729691)" />
+				<Rotation_Axis XYZ="(-0.249548, -0.742178, -0.622011)" />
+				<Rotation_Base XYZ="(0.961351, -0.267033, -0.067068)" />
+				<Neighbor id="34" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.227100, -0.960976, 0.157959)" />
+				<Point XYZ="(0.011952, -0.077519, -0.864911)" />
+				<Vertex XYZ="(0.099084, -0.054427, -0.849694)" />
+				<Rotation_Axis XYZ="(-0.953143, -0.252609, -0.166455)" />
+				<Rotation_Base XYZ="(0.302437, -0.808628, -0.504631)" />
+				<Neighbor id="35" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.548834, -0.192411, -0.813486)" />
+				<Point XYZ="(-0.148341, -0.059185, -0.840566)" />
+				<Vertex XYZ="(-0.075179, -0.100612, -0.880127)" />
+				<Rotation_Axis XYZ="(-0.787371, 0.445840, 0.425762)" />
+				<Rotation_Base XYZ="(-0.600903, -0.709313, -0.368499)" />
+				<Neighbor id="24" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="24" Normal="(-0.229586,0.426505,-0.874862)" Center="(-0.230843,-0.179185,-0.877618)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.474717, -0.413814, 0.776790)" />
+				<Point XYZ="(-0.373981, -0.188958, -0.845311)" />
+				<Vertex XYZ="(-0.370968, -0.261587, -0.882161)" />
+				<Rotation_Axis XYZ="(-0.036965, 0.891172, 0.452157)" />
+				<Rotation_Base XYZ="(-0.928897, -0.197485, 0.313289)" />
+				<Neighbor id="25" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.533839, 0.844821, -0.035962)" />
+				<Point XYZ="(-0.299248, -0.067044, -0.804733)" />
+				<Vertex XYZ="(-0.376994, -0.116329, -0.808461)" />
+				<Rotation_Axis XYZ="(0.843897, 0.534977, 0.040469)" />
+				<Rotation_Base XYZ="(-0.443287, 0.652792, 0.614296)" />
+				<Neighbor id="14" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.548834, 0.192411, 0.813486)" />
+				<Point XYZ="(-0.148341, -0.059185, -0.840566)" />
+				<Vertex XYZ="(-0.221502, -0.017758, -0.801004)" />
+				<Rotation_Axis XYZ="(0.787371, -0.445840, -0.425762)" />
+				<Rotation_Base XYZ="(0.600903, 0.709313, 0.368499)" />
+				<Neighbor id="23" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.697667, 0.193342, -0.689840)" />
+				<Point XYZ="(-0.087716, -0.175162, -0.913701)" />
+				<Vertex XYZ="(-0.075179, -0.100612, -0.880127)" />
+				<Rotation_Axis XYZ="(-0.151567, -0.901269, -0.405885)" />
+				<Rotation_Base XYZ="(0.984528, -0.101120, -0.143109)" />
+				<Neighbor id="35" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.467843, -0.821956, 0.324826)" />
+				<Point XYZ="(-0.170208, -0.289412, -0.946978)" />
+				<Vertex XYZ="(-0.100254, -0.249712, -0.947274)" />
+				<Rotation_Axis XYZ="(-0.869702, -0.493563, 0.003684)" />
+				<Rotation_Base XYZ="(0.459495, -0.812351, -0.359096)" />
+				<Neighbor id="54" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.572040, -0.457892, -0.680518)" />
+				<Point XYZ="(-0.305566, -0.295349, -0.914421)" />
+				<Vertex XYZ="(-0.240163, -0.329111, -0.946681)" />
+				<Rotation_Axis XYZ="(-0.813848, 0.420122, 0.401433)" />
+				<Rotation_Base XYZ="(-0.503829, -0.854373, -0.127290)" />
+				<Neighbor id="55" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="25" Normal="(-0.499193,0.372247,-0.782457)" Center="(-0.497091,-0.233763,-0.788023)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.204129, -0.552254, 0.808298)" />
+				<Point XYZ="(-0.616502, -0.285190, -0.736347)" />
+				<Vertex XYZ="(-0.601734, -0.348307, -0.775740)" />
+				<Rotation_Axis XYZ="(-0.194700, 0.832092, 0.519341)" />
+				<Rotation_Base XYZ="(-0.773054, -0.456067, 0.440897)" />
+				<Neighbor id="51" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.763461, 0.634821, 0.118866)" />
+				<Point XYZ="(-0.576278, -0.155317, -0.700265)" />
+				<Vertex XYZ="(-0.631271, -0.222074, -0.696954)" />
+				<Rotation_Axis XYZ="(0.635357, 0.771270, -0.038259)" />
+				<Rotation_Base XYZ="(-0.510304, 0.456532, 0.728813)" />
+				<Neighbor id="15" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.596359, 0.322794, 0.734956)" />
+				<Point XYZ="(-0.449139, -0.102445, -0.756019)" />
+				<Vertex XYZ="(-0.521284, -0.088560, -0.703577)" />
+				<Rotation_Axis XYZ="(0.799255, -0.153820, -0.580975)" />
+				<Rotation_Base XYZ="(0.408960, 0.847565, 0.338209)" />
+				<Neighbor id="14" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.474717, 0.413814, -0.776790)" />
+				<Point XYZ="(-0.373981, -0.188958, -0.845311)" />
+				<Vertex XYZ="(-0.376994, -0.116329, -0.808461)" />
+				<Rotation_Axis XYZ="(0.036965, -0.891172, -0.452157)" />
+				<Rotation_Base XYZ="(0.928897, 0.197485, -0.313289)" />
+				<Neighbor id="24" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.696496, -0.696785, 0.171416)" />
+				<Point XYZ="(-0.425632, -0.313655, -0.871702)" />
+				<Vertex XYZ="(-0.370968, -0.261587, -0.882161)" />
+				<Rotation_Axis XYZ="(-0.717239, -0.683180, 0.137237)" />
+				<Rotation_Base XYZ="(0.547356, -0.674238, -0.495787)" />
+				<Neighbor id="55" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.528476, -0.562254, -0.636069)" />
+				<Point XYZ="(-0.541014, -0.357015, -0.818491)" />
+				<Vertex XYZ="(-0.480295, -0.365723, -0.861243)" />
+				<Rotation_Axis XYZ="(-0.812098, 0.116466, 0.571779)" />
+				<Rotation_Base XYZ="(-0.245807, -0.956976, -0.154194)" />
+				<Neighbor id="56" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="26" Normal="(-0.283241,0.357763,0.889820)" Center="(-0.284495,-0.247436,0.894056)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.363642, -0.614263, -0.700318)" />
+				<Point XYZ="(-0.401674, -0.312783, 0.883179)" />
+				<Vertex XYZ="(-0.435992, -0.253442, 0.848949)" />
+				<Rotation_Axis XYZ="(0.447889, -0.774478, 0.446743)" />
+				<Rotation_Base XYZ="(-0.803594, -0.567749, -0.178600)" />
+				<Neighbor id="53" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.251417, -0.591968, 0.765744)" />
+				<Point XYZ="(-0.300157, -0.372660, 0.939058)" />
+				<Vertex XYZ="(-0.367356, -0.372124, 0.917409)" />
+				<Rotation_Axis XYZ="(0.951797, -0.007590, 0.306636)" />
+				<Rotation_Base XYZ="(-0.079654, -0.971513, 0.223200)" />
+				<Neighbor id="57" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.693327, -0.624643, -0.359331)" />
+				<Point XYZ="(-0.184227, -0.314792, 0.953206)" />
+				<Vertex XYZ="(-0.232957, -0.373196, 0.960707)" />
+				<Rotation_Axis XYZ="(0.637562, 0.764123, -0.098139)" />
+				<Rotation_Base XYZ="(0.747016, -0.582027, 0.321266)" />
+				<Neighbor id="58" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.626767, 0.514715, 0.585005)" />
+				<Point XYZ="(-0.159371, -0.186022, 0.909372)" />
+				<Vertex XYZ="(-0.135497, -0.256389, 0.945705)" />
+				<Rotation_Axis XYZ="(-0.288635, 0.850725, -0.439268)" />
+				<Rotation_Base XYZ="(0.945366, 0.325860, 0.009906)" />
+				<Neighbor id="27" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.291892, 0.346602, -0.891440)" />
+				<Point XYZ="(-0.267584, -0.114732, 0.845781)" />
+				<Vertex XYZ="(-0.183245, -0.115655, 0.873038)" />
+				<Rotation_Axis XYZ="(-0.951489, 0.010408, -0.307507)" />
+				<Rotation_Base XYZ="(0.161056, 0.868418, -0.468946)" />
+				<Neighbor id="17" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.840459, 0.530297, 0.111416)" />
+				<Point XYZ="(-0.393957, -0.183626, 0.833737)" />
+				<Vertex XYZ="(-0.351922, -0.113810, 0.818524)" />
+				<Rotation_Axis XYZ="(-0.507044, -0.842160, 0.183502)" />
+				<Rotation_Base XYZ="(-0.766692, 0.343410, -0.542451)" />
+				<Neighbor id="16" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="27" Normal="(-0.013988,0.450352,0.892741)" Center="(-0.015144,-0.155897,0.895902)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.626767, -0.514715, -0.585005)" />
+				<Point XYZ="(-0.159371, -0.186022, 0.909372)" />
+				<Vertex XYZ="(-0.183245, -0.115655, 0.873038)" />
+				<Rotation_Axis XYZ="(0.288635, -0.850725, 0.439268)" />
+				<Rotation_Base XYZ="(-0.945366, -0.325860, -0.009906)" />
+				<Neighbor id="26" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.296210, -0.476617, 0.827705)" />
+				<Point XYZ="(-0.059893, -0.281516, 0.958292)" />
+				<Vertex XYZ="(-0.135497, -0.256389, 0.945705)" />
+				<Rotation_Axis XYZ="(0.937334, -0.311531, 0.156054)" />
+				<Rotation_Base XYZ="(-0.344847, -0.893521, 0.287578)" />
+				<Neighbor id="58" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.452188, -0.778266, -0.435693)" />
+				<Point XYZ="(0.079784, -0.256554, 0.947905)" />
+				<Vertex XYZ="(0.015710, -0.306644, 0.970880)" />
+				<Rotation_Axis XYZ="(0.758161, 0.592696, -0.271853)" />
+				<Rotation_Base XYZ="(0.648382, -0.729499, 0.217791)" />
+				<Neighbor id="59" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.839171, 0.332802, 0.430157)" />
+				<Point XYZ="(0.133665, -0.130046, 0.885691)" />
+				<Vertex XYZ="(0.143857, -0.206464, 0.924930)" />
+				<Rotation_Axis XYZ="(-0.117823, 0.883384, -0.453598)" />
+				<Rotation_Base XYZ="(0.984131, 0.042845, -0.172190)" />
+				<Neighbor id="28" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.236082, 0.205867, -0.949676)" />
+				<Point XYZ="(0.034156, -0.025116, 0.830429)" />
+				<Vertex XYZ="(0.123472, -0.053628, 0.846452)" />
+				<Rotation_Axis XYZ="(-0.939026, 0.299755, -0.168455)" />
+				<Rotation_Base XYZ="(0.341540, 0.756485, -0.557746)" />
+				<Neighbor id="18" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.623301, 0.760420, 0.182366)" />
+				<Point XYZ="(-0.119203, -0.056130, 0.843722)" />
+				<Vertex XYZ="(-0.055160, 0.003395, 0.814407)" />
+				<Rotation_Axis XYZ="(-0.694471, -0.645484, 0.317898)" />
+				<Rotation_Base XYZ="(-0.708527, 0.536557, -0.458362)" />
+				<Neighbor id="17" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="28" Normal="(0.277297,0.466046,0.840183)" Center="(0.280137,-0.142782,0.844002)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.839171, -0.332802, -0.430157)" />
+				<Point XYZ="(0.133665, -0.130046, 0.885691)" />
+				<Vertex XYZ="(0.123472, -0.053628, 0.846452)" />
+				<Rotation_Axis XYZ="(0.117823, -0.883384, 0.453598)" />
+				<Rotation_Base XYZ="(-0.984131, -0.042845, 0.172190)" />
+				<Neighbor id="27" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.226571, -0.367759, 0.901897)" />
+				<Point XYZ="(0.216092, -0.251101, 0.924876)" />
+				<Vertex XYZ="(0.143857, -0.206464, 0.924930)" />
+				<Rotation_Axis XYZ="(0.850690, -0.525667, -0.000639)" />
+				<Rotation_Base XYZ="(-0.478458, -0.774796, 0.413242)" />
+				<Neighbor id="59" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.156770, -0.877522, -0.453187)" />
+				<Point XYZ="(0.354602, -0.264200, 0.886682)" />
+				<Vertex XYZ="(0.288327, -0.295737, 0.924822)" />
+				<Rotation_Axis XYZ="(0.801251, 0.381280, -0.461110)" />
+				<Rotation_Base XYZ="(0.491255, -0.859161, 0.143214)" />
+				<Neighbor id="60" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.963329, 0.089276, 0.253034)" />
+				<Point XYZ="(0.425275, -0.160278, 0.806256)" />
+				<Vertex XYZ="(0.420876, -0.232663, 0.848542)" />
+				<Rotation_Axis XYZ="(0.052401, 0.862274, -0.503723)" />
+				<Rotation_Base XYZ="(0.907106, -0.252047, -0.337092)" />
+				<Neighbor id="36" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.116814, 0.088650, -0.989189)" />
+				<Point XYZ="(0.352144, -0.034101, 0.759635)" />
+				<Vertex XYZ="(0.429674, -0.087892, 0.763970)" />
+				<Rotation_Axis XYZ="(-0.820743, 0.569451, -0.045889)" />
+				<Rotation_Base XYZ="(0.448949, 0.593216, -0.668236)" />
+				<Neighbor id="29" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.325296, 0.923473, 0.203421)" />
+				<Point XYZ="(0.199043, -0.016968, 0.800876)" />
+				<Vertex XYZ="(0.274614, 0.019691, 0.755300)" />
+				<Rotation_Axis XYZ="(-0.790807, -0.383621, 0.476926)" />
+				<Rotation_Base XYZ="(-0.582454, 0.711101, -0.393805)" />
+				<Neighbor id="18" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="29" Normal="(0.422085,0.655968,0.625740)" Center="(0.422141,0.044255,0.630063)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.904003, -0.351485, -0.243385)" />
+				<Point XYZ="(0.265328, 0.091534, 0.686041)" />
+				<Vertex XYZ="(0.256041, 0.163377, 0.616782)" />
+				<Rotation_Axis XYZ="(0.092661, -0.716837, 0.691056)" />
+				<Rotation_Base XYZ="(-0.960783, 0.117811, 0.251033)" />
+				<Neighbor id="18" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.116814, -0.088650, 0.989189)" />
+				<Point XYZ="(0.352144, -0.034101, 0.759635)" />
+				<Vertex XYZ="(0.274614, 0.019691, 0.755300)" />
+				<Rotation_Axis XYZ="(0.820743, -0.569451, 0.045889)" />
+				<Rotation_Base XYZ="(-0.448949, -0.593216, 0.668236)" />
+				<Neighbor id="28" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.018038, -0.987114, -0.158997)" />
+				<Point XYZ="(0.501223, -0.080035, 0.707072)" />
+				<Vertex XYZ="(0.429674, -0.087892, 0.763970)" />
+				<Rotation_Axis XYZ="(0.779813, 0.085636, -0.620128)" />
+				<Rotation_Base XYZ="(0.388408, -0.843061, 0.372004)" />
+				<Neighbor id="36" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.994717, 0.046938, 0.091290)" />
+				<Point XYZ="(0.576115, -0.008071, 0.580794)" />
+				<Vertex XYZ="(0.572773, -0.072178, 0.650174)" />
+				<Rotation_Axis XYZ="(0.035360, 0.678220, -0.734007)" />
+				<Rotation_Base XYZ="(0.823942, -0.435436, -0.362649)" />
+				<Neighbor id="37" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.012535, -0.229230, -0.973292)" />
+				<Point XYZ="(0.499871, 0.121265, 0.497077)" />
+				<Vertex XYZ="(0.579457, 0.056035, 0.511415)" />
+				<Rotation_Axis XYZ="(-0.766013, 0.627837, -0.138002)" />
+				<Rotation_Base XYZ="(0.403519, 0.302521, -0.863513)" />
+				<Neighbor id="30" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.208655, 0.974052, -0.087670)" />
+				<Point XYZ="(0.338163, 0.174936, 0.549760)" />
+				<Vertex XYZ="(0.420285, 0.186495, 0.482739)" />
+				<Rotation_Axis XYZ="(-0.770171, -0.108408, 0.628558)" />
+				<Rotation_Base XYZ="(-0.547276, 0.618463, -0.563909)" />
+				<Neighbor id="19" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="30" Normal="(0.564448,0.756578,0.330134)" Center="(0.561548,0.147444,0.330674)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.954729, -0.294905, -0.039030)" />
+				<Point XYZ="(0.408623, 0.237017, 0.386256)" />
+				<Vertex XYZ="(0.396962, 0.287539, 0.289773)" />
+				<Rotation_Axis XYZ="(0.106465, -0.461251, 0.880859)" />
+				<Rotation_Base XYZ="(-0.909914, 0.311991, 0.273346)" />
+				<Neighbor id="19" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.012535, 0.229230, 0.973292)" />
+				<Point XYZ="(0.499871, 0.121265, 0.497077)" />
+				<Vertex XYZ="(0.420285, 0.186495, 0.482739)" />
+				<Rotation_Axis XYZ="(0.766013, -0.627837, 0.138002)" />
+				<Rotation_Base XYZ="(-0.403519, -0.302521, 0.863513)" />
+				<Neighbor id="29" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.131146, -0.978023, 0.162085)" />
+				<Point XYZ="(0.646520, 0.035484, 0.441674)" />
+				<Vertex XYZ="(0.579457, 0.056035, 0.511415)" />
+				<Rotation_Axis XYZ="(0.678007, -0.207767, -0.705082)" />
+				<Rotation_Base XYZ="(0.364440, -0.738008, 0.567915)" />
+				<Neighbor id="37" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.996758, -0.050293, -0.062809)" />
+				<Point XYZ="(0.710049, 0.057776, 0.281548)" />
+				<Vertex XYZ="(0.713583, 0.014934, 0.371933)" />
+				<Rotation_Axis XYZ="(-0.035307, 0.428053, -0.903064)" />
+				<Rotation_Base XYZ="(0.717085, -0.618548, -0.321228)" />
+				<Neighbor id="38" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.173841, -0.520440, -0.836016)" />
+				<Point XYZ="(0.629500, 0.169829, 0.164092)" />
+				<Vertex XYZ="(0.706515, 0.100619, 0.191163)" />
+				<Rotation_Axis XYZ="(-0.719603, 0.646679, -0.252939)" />
+				<Rotation_Base XYZ="(0.298959, -0.040243, -0.953417)" />
+				<Neighbor id="31" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.116678, 0.906167, -0.406507)" />
+				<Point XYZ="(0.474723, 0.263290, 0.213397)" />
+				<Vertex XYZ="(0.552484, 0.239040, 0.137022)" />
+				<Rotation_Axis XYZ="(-0.696407, 0.217172, 0.683998)" />
+				<Rotation_Base XYZ="(-0.544538, 0.460895, -0.700753)" />
+				<Neighbor id="20" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="31" Normal="(0.668973,0.743257,-0.006682)" Center="(0.667864,0.133387,-0.008221)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.975313, -0.164092, 0.147775)" />
+				<Point XYZ="(0.533425, 0.254619, 0.028526)" />
+				<Vertex XYZ="(0.514365, 0.270198, -0.079969)" />
+				<Rotation_Axis XYZ="(0.171320, -0.140033, 0.975213)" />
+				<Rotation_Base XYZ="(-0.836694, 0.501951, 0.219062)" />
+				<Neighbor id="20" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.173841, 0.520440, 0.836016)" />
+				<Point XYZ="(0.629500, 0.169829, 0.164092)" />
+				<Vertex XYZ="(0.552484, 0.239040, 0.137022)" />
+				<Rotation_Axis XYZ="(0.719603, -0.646679, 0.252939)" />
+				<Rotation_Base XYZ="(-0.298959, 0.040243, 0.953417)" />
+				<Neighbor id="30" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.178943, -0.862520, 0.473327)" />
+				<Point XYZ="(0.759358, 0.051920, 0.122399)" />
+				<Vertex XYZ="(0.706515, 0.100619, 0.191163)" />
+				<Rotation_Axis XYZ="(0.531294, -0.489628, -0.691369)" />
+				<Rotation_Base XYZ="(0.395197, -0.578607, 0.713466)" />
+				<Neighbor id="38" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.965685, -0.185690, -0.181582)" />
+				<Point XYZ="(0.796845, 0.016871, -0.041988)" />
+				<Vertex XYZ="(0.812201, 0.003221, 0.053636)" />
+				<Rotation_Axis XYZ="(-0.157004, 0.139555, -0.977688)" />
+				<Rotation_Base XYZ="(0.606773, -0.767453, -0.206986)" />
+				<Neighbor id="39" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.333124, -0.731324, -0.595142)" />
+				<Point XYZ="(0.710809, 0.093621, -0.175589)" />
+				<Vertex XYZ="(0.781489, 0.030520, -0.137611)" />
+				<Rotation_Axis XYZ="(-0.692416, 0.618173, -0.372052)" />
+				<Rotation_Base XYZ="(0.156190, -0.375010, -0.913768)" />
+				<Neighbor id="32" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.077075, 0.722931, -0.686607)" />
+				<Point XYZ="(0.577247, 0.213460, -0.146768)" />
+				<Vertex XYZ="(0.640130, 0.156722, -0.213567)" />
+				<Rotation_Axis XYZ="(-0.582958, 0.525996, 0.619264)" />
+				<Rotation_Base XYZ="(-0.578954, 0.265833, -0.770808)" />
+				<Neighbor id="21" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="32" Normal="(0.719558,0.618881,-0.314997)" Center="(0.721297,0.007758,-0.319908)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.963184, 0.016787, 0.268318)" />
+				<Point XYZ="(0.612253, 0.138335, -0.312485)" />
+				<Vertex XYZ="(0.584377, 0.119949, -0.411404)" />
+				<Rotation_Axis XYZ="(0.267009, 0.176112, 0.947466)" />
+				<Rotation_Base XYZ="(-0.757993, 0.645508, 0.093627)" />
+				<Neighbor id="21" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.333124, 0.731324, 0.595142)" />
+				<Point XYZ="(0.710809, 0.093621, -0.175589)" />
+				<Vertex XYZ="(0.640130, 0.156722, -0.213567)" />
+				<Rotation_Axis XYZ="(0.692416, -0.618173, 0.372052)" />
+				<Rotation_Base XYZ="(-0.156190, 0.375010, 0.913768)" />
+				<Neighbor id="31" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.161065, -0.661990, 0.732002)" />
+				<Point XYZ="(0.815735, -0.036587, -0.190764)" />
+				<Vertex XYZ="(0.781489, 0.030520, -0.137611)" />
+				<Rotation_Axis XYZ="(0.371419, -0.727817, -0.576481)" />
+				<Rotation_Base XYZ="(0.464374, -0.392037, 0.794144)" />
+				<Neighbor id="39" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.913166, -0.337963, -0.227837)" />
+				<Point XYZ="(0.824208, -0.116265, -0.328563)" />
+				<Vertex XYZ="(0.849981, -0.103693, -0.243917)" />
+				<Rotation_Axis XYZ="(-0.288374, -0.140673, -0.947128)" />
+				<Rotation_Base XYZ="(0.514375, -0.857064, -0.029316)" />
+				<Neighbor id="40" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.463690, -0.833607, -0.300151)" />
+				<Point XYZ="(0.735904, -0.078476, -0.456476)" />
+				<Vertex XYZ="(0.798436, -0.128838, -0.413209)" />
+				<Rotation_Axis XYZ="(-0.685609, 0.552176, -0.474386)" />
+				<Rotation_Base XYZ="(0.005517, -0.647696, -0.761879)" />
+				<Neighbor id="41" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.087717, 0.470981, -0.877771)" />
+				<Point XYZ="(0.628875, 0.045917, -0.455574)" />
+				<Vertex XYZ="(0.673373, -0.028114, -0.499743)" />
+				<Rotation_Axis XYZ="(-0.458678, 0.763102, 0.455291)" />
+				<Rotation_Base XYZ="(-0.635588, 0.076326, -0.768246)" />
+				<Neighbor id="33" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="33" Normal="(0.505829,0.644594,-0.573267)" Center="(0.508880,0.033346,-0.575500)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.907291, -0.118391, 0.403493)" />
+				<Point XYZ="(0.371753, 0.137350, -0.579583)" />
+				<Vertex XYZ="(0.340616, 0.086315, -0.664571)" />
+				<Rotation_Axis XYZ="(0.299654, 0.491151, 0.817911)" />
+				<Rotation_Base XYZ="(-0.884653, 0.464028, 0.045460)" />
+				<Neighbor id="22" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.192616, 0.921324, 0.337728)" />
+				<Point XYZ="(0.493633, 0.154167, -0.452999)" />
+				<Vertex XYZ="(0.402890, 0.188386, -0.494594)" />
+				<Rotation_Axis XYZ="(0.859928, -0.324271, 0.394172)" />
+				<Rotation_Base XYZ="(-0.156278, 0.567899, 0.808126)" />
+				<Neighbor id="21" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.087717, -0.470981, 0.877771)" />
+				<Point XYZ="(0.628875, 0.045917, -0.455574)" />
+				<Vertex XYZ="(0.584377, 0.119949, -0.411404)" />
+				<Rotation_Axis XYZ="(0.458678, -0.763102, -0.455291)" />
+				<Rotation_Base XYZ="(0.635588, -0.076326, 0.768246)" />
+				<Neighbor id="32" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.925269, -0.208537, -0.316843)" />
+				<Point XYZ="(0.638476, -0.068150, -0.575299)" />
+				<Vertex XYZ="(0.673373, -0.028114, -0.499743)" />
+				<Rotation_Axis XYZ="(-0.377851, -0.433507, -0.818108)" />
+				<Rotation_Base XYZ="(0.687423, -0.723273, 0.065762)" />
+				<Neighbor id="41" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.297421, -0.954565, -0.018636)" />
+				<Point XYZ="(0.526012, -0.083228, -0.691345)" />
+				<Vertex XYZ="(0.603580, -0.108187, -0.650856)" />
+				<Rotation_Axis XYZ="(-0.852490, 0.274304, -0.444991)" />
+				<Rotation_Base XYZ="(0.048487, -0.806100, -0.589790)" />
+				<Neighbor id="42" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.306656, 0.203832, -0.929739)" />
+				<Point XYZ="(0.394530, 0.014023, -0.698203)" />
+				<Vertex XYZ="(0.448445, -0.058270, -0.731835)" />
+				<Rotation_Axis XYZ="(-0.560151, 0.751090, 0.349421)" />
+				<Rotation_Base XYZ="(-0.729564, -0.247491, -0.637562)" />
+				<Neighbor id="34" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="34" Normal="(0.270261,0.560683,-0.782684)" Center="(0.272481,-0.050360,-0.786329)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.811207, -0.190567, 0.552835)" />
+				<Point XYZ="(0.123156, 0.017166, -0.789692)" />
+				<Vertex XYZ="(0.099084, -0.054427, -0.849694)" />
+				<Rotation_Axis XYZ="(0.249548, 0.742178, 0.622011)" />
+				<Rotation_Base XYZ="(-0.961351, 0.267033, 0.067068)" />
+				<Neighbor id="23" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.010714, 0.997540, 0.069271)" />
+				<Point XYZ="(0.243922, 0.087537, -0.697131)" />
+				<Vertex XYZ="(0.147229, 0.088760, -0.729691)" />
+				<Rotation_Axis XYZ="(0.947645, -0.011981, 0.319101)" />
+				<Rotation_Base XYZ="(-0.213350, 0.719767, 0.660619)" />
+				<Neighbor id="22" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.306656, -0.203832, 0.929739)" />
+				<Point XYZ="(0.394530, 0.014023, -0.698203)" />
+				<Vertex XYZ="(0.340616, 0.086315, -0.664571)" />
+				<Rotation_Axis XYZ="(0.560151, -0.751090, -0.349421)" />
+				<Rotation_Base XYZ="(0.729564, 0.247491, 0.637562)" />
+				<Neighbor id="33" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.899945, -0.100314, -0.424306)" />
+				<Point XYZ="(0.415207, -0.120678, -0.787578)" />
+				<Vertex XYZ="(0.448445, -0.058270, -0.731835)" />
+				<Rotation_Axis XYZ="(-0.369155, -0.693136, -0.619102)" />
+				<Rotation_Base XYZ="(0.838523, -0.535662, 0.099727)" />
+				<Neighbor id="42" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.090569, -0.966630, 0.239632)" />
+				<Point XYZ="(0.299757, -0.182268, -0.871090)" />
+				<Vertex XYZ="(0.381969, -0.183087, -0.843320)" />
+				<Rotation_Axis XYZ="(-0.947368, 0.009433, -0.320008)" />
+				<Rotation_Base XYZ="(0.128000, -0.905037, -0.405616)" />
+				<Neighbor id="61" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.458960, -0.085736, -0.884311)" />
+				<Point XYZ="(0.158314, -0.117939, -0.874277)" />
+				<Vertex XYZ="(0.217545, -0.181450, -0.898860)" />
+				<Rotation_Axis XYZ="(-0.656244, 0.703675, 0.272369)" />
+				<Rotation_Base XYZ="(-0.736559, -0.519055, -0.433662)" />
+				<Neighbor id="35" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="35" Normal="(0.054010,0.398158,-0.915726)" Center="(0.053956,-0.208616,-0.919710)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.697667, -0.193342, 0.689840)" />
+				<Point XYZ="(-0.087716, -0.175162, -0.913701)" />
+				<Vertex XYZ="(-0.100254, -0.249712, -0.947274)" />
+				<Rotation_Axis XYZ="(0.151567, 0.901269, 0.405885)" />
+				<Rotation_Base XYZ="(-0.984528, 0.101120, 0.143109)" />
+				<Neighbor id="24" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.227100, 0.960976, -0.157959)" />
+				<Point XYZ="(0.011952, -0.077519, -0.864911)" />
+				<Vertex XYZ="(-0.075179, -0.100612, -0.880127)" />
+				<Rotation_Axis XYZ="(0.953143, 0.252609, 0.166455)" />
+				<Rotation_Base XYZ="(-0.302437, 0.808628, 0.504631)" />
+				<Neighbor id="23" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.458960, 0.085736, 0.884311)" />
+				<Point XYZ="(0.158314, -0.117939, -0.874277)" />
+				<Vertex XYZ="(0.099084, -0.054427, -0.849694)" />
+				<Rotation_Axis XYZ="(0.656244, -0.703675, -0.272369)" />
+				<Rotation_Base XYZ="(0.736559, 0.519055, 0.433662)" />
+				<Neighbor id="34" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.829443, -0.062724, -0.555058)" />
+				<Point XYZ="(0.191740, -0.249920, -0.929685)" />
+				<Vertex XYZ="(0.217545, -0.181450, -0.898860)" />
+				<Rotation_Axis XYZ="(-0.325006, -0.862356, -0.388218)" />
+				<Rotation_Base XYZ="(0.927413, -0.370987, 0.047674)" />
+				<Neighbor id="61" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.113846, -0.901503, 0.417530)" />
+				<Point XYZ="(0.091270, -0.332748, -0.971151)" />
+				<Vertex XYZ="(0.165935, -0.318390, -0.960509)" />
+				<Rotation_Axis XYZ="(-0.972526, -0.187020, -0.138626)" />
+				<Rotation_Base XYZ="(0.217735, -0.941456, -0.257394)" />
+				<Neighbor id="62" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.528121, -0.361284, -0.768481)" />
+				<Point XYZ="(-0.041824, -0.298409, -0.964534)" />
+				<Vertex XYZ="(0.016605, -0.347106, -0.981794)" />
+				<Rotation_Axis XYZ="(-0.749134, 0.624360, 0.221296)" />
+				<Rotation_Base XYZ="(-0.661588, -0.721933, -0.202768)" />
+				<Neighbor id="54" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="36" Normal="(0.548012,0.392918,0.738444)" Center="(0.546401,-0.214121,0.745090)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.963329, -0.089276, -0.253034)" />
+				<Point XYZ="(0.425275, -0.160278, 0.806256)" />
+				<Vertex XYZ="(0.429674, -0.087892, 0.763970)" />
+				<Rotation_Axis XYZ="(-0.052401, -0.862274, 0.503723)" />
+				<Rotation_Base XYZ="(-0.907106, 0.252047, 0.337092)" />
+				<Neighbor id="28" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.113819, -0.284326, 0.951947)" />
+				<Point XYZ="(0.474775, -0.288679, 0.838255)" />
+				<Vertex XYZ="(0.420876, -0.232663, 0.848542)" />
+				<Rotation_Axis XYZ="(0.687366, -0.714366, -0.131181)" />
+				<Rotation_Base XYZ="(-0.548286, -0.628809, 0.551346)" />
+				<Neighbor id="60" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.207297, -0.912695, -0.352159)" />
+				<Point XYZ="(0.588364, -0.340013, 0.780699)" />
+				<Vertex XYZ="(0.528674, -0.344695, 0.827969)" />
+				<Rotation_Axis XYZ="(0.782475, 0.061369, -0.619651)" />
+				<Rotation_Base XYZ="(0.218623, -0.958856, 0.181106)" />
+				<Neighbor id="63" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.980087, -0.176197, 0.091569)" />
+				<Point XYZ="(0.663206, -0.273648, 0.689945)" />
+				<Vertex XYZ="(0.648054, -0.335332, 0.733430)" />
+				<Rotation_Axis XYZ="(0.196841, 0.801330, -0.564911)" />
+				<Rotation_Base XYZ="(0.733975, -0.502448, -0.456975)" />
+				<Neighbor id="64" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.025292, 0.007454, -0.999652)" />
+				<Point XYZ="(0.625566, -0.142071, 0.648317)" />
+				<Vertex XYZ="(0.678358, -0.211964, 0.646460)" />
+				<Rotation_Axis XYZ="(-0.602588, 0.797771, 0.021195)" />
+				<Rotation_Base XYZ="(0.493346, 0.393256, -0.775861)" />
+				<Neighbor id="37" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.018038, 0.987114, 0.158997)" />
+				<Point XYZ="(0.501223, -0.080035, 0.707072)" />
+				<Vertex XYZ="(0.572773, -0.072178, 0.650174)" />
+				<Rotation_Axis XYZ="(-0.779813, -0.085636, 0.620128)" />
+				<Rotation_Base XYZ="(-0.388408, 0.843061, -0.372004)" />
+				<Neighbor id="29" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="37" Normal="(0.693505,0.510144,0.508728)" Center="(0.691533,-0.100134,0.516128)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.994717, -0.046938, -0.091290)" />
+				<Point XYZ="(0.576115, -0.008071, 0.580794)" />
+				<Vertex XYZ="(0.579457, 0.056035, 0.511415)" />
+				<Rotation_Axis XYZ="(-0.035360, -0.678220, 0.734007)" />
+				<Rotation_Base XYZ="(-0.823942, 0.435436, 0.362649)" />
+				<Neighbor id="29" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.025292, -0.007454, 0.999652)" />
+				<Point XYZ="(0.625566, -0.142071, 0.648317)" />
+				<Vertex XYZ="(0.572773, -0.072178, 0.650174)" />
+				<Rotation_Axis XYZ="(0.602588, -0.797771, -0.021195)" />
+				<Rotation_Base XYZ="(-0.493346, -0.393256, 0.775861)" />
+				<Neighbor id="36" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.326619, -0.942193, -0.074777)" />
+				<Point XYZ="(0.734182, -0.226426, 0.584852)" />
+				<Vertex XYZ="(0.678358, -0.211964, 0.646460)" />
+				<Rotation_Axis XYZ="(0.661529, -0.171382, -0.730074)" />
+				<Rotation_Base XYZ="(0.183713, -0.906836, 0.379340)" />
+				<Neighbor id="64" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.963977, -0.265893, -0.007068)" />
+				<Point XYZ="(0.802514, -0.193816, 0.458395)" />
+				<Vertex XYZ="(0.790006, -0.240888, 0.523244)" />
+				<Rotation_Axis XYZ="(0.154229, 0.580401, -0.799592)" />
+				<Rotation_Base XYZ="(0.599151, -0.698438, -0.391410)" />
+				<Neighbor id="65" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.202467, -0.253478, -0.945915)" />
+				<Point XYZ="(0.764303, -0.065905, 0.382739)" />
+				<Vertex XYZ="(0.815023, -0.146744, 0.393545)" />
+				<Rotation_Axis XYZ="(-0.528098, 0.841696, -0.112514)" />
+				<Rotation_Base XYZ="(0.375004, 0.112277, -0.920199)" />
+				<Neighbor id="38" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.131146, 0.978023, -0.162085)" />
+				<Point XYZ="(0.646520, 0.035484, 0.441674)" />
+				<Vertex XYZ="(0.713583, 0.014934, 0.371933)" />
+				<Rotation_Axis XYZ="(-0.678007, 0.207767, 0.705082)" />
+				<Rotation_Base XYZ="(-0.364440, 0.738008, -0.567915)" />
+				<Neighbor id="30" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="38" Normal="(0.807606,0.542410,0.231438)" Center="(0.808590,-0.066700,0.229340)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.996758, 0.050293, 0.062809)" />
+				<Point XYZ="(0.710049, 0.057776, 0.281548)" />
+				<Vertex XYZ="(0.706515, 0.100619, 0.191163)" />
+				<Rotation_Axis XYZ="(0.035307, -0.428053, 0.903064)" />
+				<Rotation_Base XYZ="(-0.717085, 0.618548, 0.321228)" />
+				<Neighbor id="30" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.202467, 0.253478, 0.945915)" />
+				<Point XYZ="(0.764303, -0.065905, 0.382739)" />
+				<Vertex XYZ="(0.713583, 0.014934, 0.371933)" />
+				<Rotation_Axis XYZ="(0.528098, -0.841696, 0.112514)" />
+				<Rotation_Base XYZ="(-0.375004, -0.112277, 0.920199)" />
+				<Neighbor id="37" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.386987, -0.893309, 0.228560)" />
+				<Point XYZ="(0.857335, -0.181810, 0.328133)" />
+				<Vertex XYZ="(0.815023, -0.146744, 0.393545)" />
+				<Rotation_Axis XYZ="(0.495269, -0.410454, -0.765661)" />
+				<Rotation_Base XYZ="(0.203502, -0.802010, 0.561575)" />
+				<Neighbor id="65" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.926260, -0.360388, -0.110281)" />
+				<Point XYZ="(0.902109, -0.186116, 0.182882)" />
+				<Vertex XYZ="(0.899647, -0.216876, 0.262720)" />
+				<Rotation_Axis XYZ="(0.028769, 0.359369, -0.932752)" />
+				<Rotation_Base XYZ="(0.468007, -0.829384, -0.305109)" />
+				<Neighbor id="66" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.387979, -0.472551, -0.791308)" />
+				<Point XYZ="(0.858386, -0.076068, 0.078340)" />
+				<Vertex XYZ="(0.904572, -0.155357, 0.103045)" />
+				<Rotation_Axis XYZ="(-0.486025, 0.834382, -0.259975)" />
+				<Rotation_Base XYZ="(0.206160, -0.179616, -0.961892)" />
+				<Neighbor id="39" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.178943, 0.862520, -0.473327)" />
+				<Point XYZ="(0.759358, 0.051920, 0.122399)" />
+				<Vertex XYZ="(0.812201, 0.003221, 0.053636)" />
+				<Rotation_Axis XYZ="(-0.531294, 0.489628, 0.691369)" />
+				<Rotation_Base XYZ="(-0.395197, 0.578607, -0.713466)" />
+				<Neighbor id="31" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="39" Normal="(0.868354,0.491624,-0.065320)" Center="(0.872149,-0.119801,-0.068320)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.965685, 0.185690, 0.181582)" />
+				<Point XYZ="(0.796845, 0.016871, -0.041988)" />
+				<Vertex XYZ="(0.781489, 0.030520, -0.137611)" />
+				<Rotation_Axis XYZ="(0.157004, -0.139555, 0.977688)" />
+				<Rotation_Base XYZ="(-0.606773, 0.767453, 0.206986)" />
+				<Neighbor id="31" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.387979, 0.472551, 0.791308)" />
+				<Point XYZ="(0.858386, -0.076068, 0.078340)" />
+				<Vertex XYZ="(0.812201, 0.003221, 0.053636)" />
+				<Rotation_Axis XYZ="(0.486025, -0.834382, 0.259975)" />
+				<Rotation_Base XYZ="(-0.206160, 0.179616, 0.961892)" />
+				<Neighbor id="38" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.384877, -0.769418, 0.509770)" />
+				<Point XYZ="(0.929246, -0.205646, 0.045770)" />
+				<Vertex XYZ="(0.904572, -0.155357, 0.103045)" />
+				<Rotation_Axis XYZ="(0.307988, -0.627723, -0.714918)" />
+				<Rotation_Base XYZ="(0.264434, -0.665355, 0.698124)" />
+				<Neighbor id="66" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.864312, -0.470762, -0.177054)" />
+				<Point XYZ="(0.942325, -0.246749, -0.092535)" />
+				<Vertex XYZ="(0.953920, -0.255936, -0.011505)" />
+				<Rotation_Axis XYZ="(-0.140774, 0.111526, -0.983740)" />
+				<Rotation_Base XYZ="(0.351729, -0.923181, -0.154994)" />
+				<Neighbor id="67" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.547446, -0.623527, -0.558136)" />
+				<Point XYZ="(0.890355, -0.170628, -0.208741)" />
+				<Vertex XYZ="(0.930729, -0.237563, -0.173565)" />
+				<Rotation_Axis XYZ="(-0.471011, 0.780866, -0.410363)" />
+				<Rotation_Base XYZ="(0.025249, -0.453072, -0.891116)" />
+				<Neighbor id="40" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.161065, 0.661990, -0.732002)" />
+				<Point XYZ="(0.815735, -0.036587, -0.190764)" />
+				<Vertex XYZ="(0.849981, -0.103693, -0.243917)" />
+				<Rotation_Axis XYZ="(-0.371419, 0.727817, 0.576481)" />
+				<Rotation_Base XYZ="(-0.464374, 0.392037, -0.794144)" />
+				<Neighbor id="32" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="40" Normal="(0.876570,0.360722,-0.318598)" Center="(0.879025,-0.247033,-0.326202)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.913166, 0.337963, 0.227837)" />
+				<Point XYZ="(0.824208, -0.116265, -0.328563)" />
+				<Vertex XYZ="(0.798436, -0.128838, -0.413209)" />
+				<Rotation_Axis XYZ="(0.288374, 0.140673, 0.947128)" />
+				<Rotation_Base XYZ="(-0.514375, 0.857064, 0.029316)" />
+				<Neighbor id="32" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.547446, 0.623527, 0.558136)" />
+				<Point XYZ="(0.890355, -0.170628, -0.208741)" />
+				<Vertex XYZ="(0.849981, -0.103693, -0.243917)" />
+				<Rotation_Axis XYZ="(0.471011, -0.780866, 0.410363)" />
+				<Rotation_Base XYZ="(-0.025249, 0.453072, 0.891116)" />
+				<Neighbor id="39" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.332629, -0.558034, 0.760234)" />
+				<Point XYZ="(0.941342, -0.299584, -0.214447)" />
+				<Vertex XYZ="(0.930729, -0.237563, -0.173565)" />
+				<Rotation_Axis XYZ="(0.141431, -0.826539, -0.544822)" />
+				<Rotation_Base XYZ="(0.344521, -0.474854, 0.809826)" />
+				<Neighbor id="67" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.794679, -0.576984, -0.188612)" />
+				<Point XYZ="(0.929662, -0.369510, -0.325072)" />
+				<Vertex XYZ="(0.951955, -0.361605, -0.255329)" />
+				<Rotation_Axis XYZ="(-0.302701, -0.107335, -0.947022)" />
+				<Rotation_Base XYZ="(0.270543, -0.962442, 0.022608)" />
+				<Neighbor id="68" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.669994, -0.684689, -0.286896)" />
+				<Point XYZ="(0.871524, -0.325250, -0.435596)" />
+				<Vertex XYZ="(0.907370, -0.377414, -0.394815)" />
+				<Rotation_Axis XYZ="(-0.476083, 0.692814, -0.541621)" />
+				<Rotation_Base XYZ="(-0.147109, -0.669963, -0.727674)" />
+				<Neighbor id="69" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.098110, 0.420342, -0.902046)" />
+				<Point XYZ="(0.817057, -0.200962, -0.444793)" />
+				<Vertex XYZ="(0.835678, -0.273086, -0.476376)" />
+				<Rotation_Axis XYZ="(-0.230151, 0.891430, 0.390363)" />
+				<Rotation_Base XYZ="(-0.547188, 0.213171, -0.809409)" />
+				<Neighbor id="41" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="41" Normal="(0.719339,0.417224,-0.555406)" Center="(0.723762,-0.188909,-0.555736)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.925269, 0.208537, 0.316843)" />
+				<Point XYZ="(0.638476, -0.068150, -0.575299)" />
+				<Vertex XYZ="(0.603580, -0.108187, -0.650856)" />
+				<Rotation_Axis XYZ="(0.377851, 0.433507, 0.818108)" />
+				<Rotation_Base XYZ="(-0.687423, 0.723273, -0.065762)" />
+				<Neighbor id="33" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.463690, 0.833607, 0.300151)" />
+				<Point XYZ="(0.735904, -0.078476, -0.456476)" />
+				<Vertex XYZ="(0.673373, -0.028114, -0.499743)" />
+				<Rotation_Axis XYZ="(0.685609, -0.552176, 0.474386)" />
+				<Rotation_Base XYZ="(-0.005517, 0.647696, 0.761879)" />
+				<Neighbor id="32" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.098110, -0.420342, 0.902046)" />
+				<Point XYZ="(0.817057, -0.200962, -0.444793)" />
+				<Vertex XYZ="(0.798436, -0.128838, -0.413209)" />
+				<Rotation_Axis XYZ="(0.230151, -0.891430, -0.390363)" />
+				<Rotation_Base XYZ="(0.547188, -0.213171, 0.809409)" />
+				<Neighbor id="40" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.858467, -0.473201, -0.197776)" />
+				<Point XYZ="(0.803053, -0.305491, -0.540453)" />
+				<Vertex XYZ="(0.835678, -0.273086, -0.476376)" />
+				<Rotation_Axis XYZ="(-0.413655, -0.410877, -0.812447)" />
+				<Rotation_Base XYZ="(0.462738, -0.863398, 0.201042)" />
+				<Neighbor id="69" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.579215, -0.814729, -0.026970)" />
+				<Point XYZ="(0.715752, -0.297615, -0.647116)" />
+				<Vertex XYZ="(0.770429, -0.337897, -0.604530)" />
+				<Rotation_Axis XYZ="(-0.682094, 0.502506, -0.531258)" />
+				<Rotation_Base XYZ="(-0.156774, -0.810088, -0.564960)" />
+				<Neighbor id="70" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.133211, 0.201399, -0.970409)" />
+				<Point XYZ="(0.632327, -0.182761, -0.670279)" />
+				<Vertex XYZ="(0.661075, -0.257334, -0.689702)" />
+				<Rotation_Axis XYZ="(-0.349518, 0.906681, 0.236152)" />
+				<Rotation_Base XYZ="(-0.698174, -0.083958, -0.710988)" />
+				<Neighbor id="42" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="42" Normal="(0.521256,0.391455,-0.758324)" Center="(0.523478,-0.213430,-0.760729)">
+			<OrientPoint id="0">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.899945, 0.100314, 0.424306)" />
+				<Point XYZ="(0.415207, -0.120678, -0.787578)" />
+				<Vertex XYZ="(0.381969, -0.183087, -0.843320)" />
+				<Rotation_Axis XYZ="(0.369155, 0.693136, 0.619102)" />
+				<Rotation_Base XYZ="(-0.838523, 0.535662, -0.099727)" />
+				<Neighbor id="34" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.297421, 0.954565, 0.018636)" />
+				<Point XYZ="(0.526012, -0.083228, -0.691345)" />
+				<Vertex XYZ="(0.448445, -0.058270, -0.731835)" />
+				<Rotation_Axis XYZ="(0.852490, -0.274304, 0.444991)" />
+				<Rotation_Base XYZ="(-0.048487, 0.806100, 0.589790)" />
+				<Neighbor id="33" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.133211, -0.201399, 0.970409)" />
+				<Point XYZ="(0.632327, -0.182761, -0.670279)" />
+				<Vertex XYZ="(0.603580, -0.108187, -0.650856)" />
+				<Rotation_Axis XYZ="(0.349518, -0.906681, -0.236152)" />
+				<Rotation_Base XYZ="(0.698174, 0.083958, 0.710988)" />
+				<Neighbor id="41" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.880009, -0.375063, -0.291398)" />
+				<Point XYZ="(0.624654, -0.304773, -0.738630)" />
+				<Vertex XYZ="(0.661075, -0.257334, -0.689702)" />
+				<Rotation_Axis XYZ="(-0.471330, -0.613932, -0.633195)" />
+				<Rotation_Base XYZ="(0.636465, -0.733770, 0.237683)" />
+				<Neighbor id="70" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.355917, -0.898486, 0.256993)" />
+				<Point XYZ="(0.522900, -0.336850, -0.824331)" />
+				<Vertex XYZ="(0.588234, -0.352212, -0.787557)" />
+				<Rotation_Axis XYZ="(-0.853706, 0.200739, -0.480509)" />
+				<Rotation_Base XYZ="(-0.028297, -0.939236, -0.342103)" />
+				<Neighbor id="71" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.321031, -0.053860, -0.945536)" />
+				<Point XYZ="(0.419768, -0.252287, -0.852212)" />
+				<Vertex XYZ="(0.457567, -0.321487, -0.861104)" />
+				<Rotation_Axis XYZ="(-0.476356, 0.872083, 0.112057)" />
+				<Rotation_Base XYZ="(-0.772078, -0.353902, -0.527872)" />
+				<Neighbor id="61" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="43" Normal="(-0.961574,0.267232,0.062954)" Center="(-0.962718,-0.327571,0.059650)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.099527, -0.319998, 0.942176)" />
+				<Point XYZ="(-0.967111, -0.376072, 0.194885)" />
+				<Vertex XYZ="(-0.982390, -0.431326, 0.177733)" />
+				<Rotation_Axis XYZ="(0.255348, 0.923382, 0.286641)" />
+				<Rotation_Base XYZ="(0.099527, -0.319998, 0.942176)" />
+				<Neighbor id="46" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.847255, 0.157172, 0.507402)" />
+				<Point XYZ="(-0.937019, -0.258191, 0.167905)" />
+				<Vertex XYZ="(-0.951831, -0.320819, 0.212037)" />
+				<Rotation_Axis XYZ="(0.189812, 0.802574, -0.565550)" />
+				<Rotation_Base XYZ="(0.330138, 0.490309, 0.806602)" />
+				<Neighbor id="7" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.291408, 0.947826, -0.129255)" />
+				<Point XYZ="(-0.931050, -0.209856, 0.038890)" />
+				<Vertex XYZ="(-0.922207, -0.195562, 0.123772)" />
+				<Rotation_Axis XYZ="(-0.102197, -0.165193, -0.980952)" />
+				<Rotation_Base XYZ="(0.388140, 0.901331, -0.192222)" />
+				<Neighbor id="1" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.133734, 0.208885, -0.968753)" />
+				<Point XYZ="(-0.960311, -0.291362, -0.063303)" />
+				<Vertex XYZ="(-0.939893, -0.224150, -0.045992)" />
+				<Rotation_Axis XYZ="(-0.282221, -0.929030, -0.239279)" />
+				<Rotation_Base XYZ="(0.133734, 0.208885, -0.968753)" />
+				<Neighbor id="44" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.108143, -0.537989, -0.835987)" />
+				<Point XYZ="(-0.989994, -0.396785, -0.054825)" />
+				<Vertex XYZ="(-0.980728, -0.358573, -0.080614)" />
+				<Rotation_Axis XYZ="(-0.197043, -0.812635, 0.548450)" />
+				<Rotation_Base XYZ="(-0.108143, -0.537988, -0.835986)" />
+				<Neighbor id="47" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.265207, -0.963413, 0.038743)" />
+				<Point XYZ="(-0.990825, -0.433162, 0.074349)" />
+				<Vertex XYZ="(-0.999259, -0.434997, -0.029035)" />
+				<Rotation_Axis XYZ="(0.081303, 0.017694, 0.996532)" />
+				<Rotation_Base XYZ="(-0.265207, -0.963413, 0.038743)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="44" Normal="(-0.923748,0.329969,-0.194448)" Center="(-0.934316,-0.298408,-0.198124)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.291210, -0.796781, 0.529468)" />
+				<Point XYZ="(-0.981695, -0.391910, -0.131314)" />
+				<Vertex XYZ="(-0.982662, -0.425247, -0.182014)" />
+				<Rotation_Axis XYZ="(0.015930, 0.549340, 0.835447)" />
+				<Rotation_Base XYZ="(-0.291210, -0.796781, 0.529468)" />
+				<Neighbor id="47" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.133734, -0.208885, 0.968753)" />
+				<Point XYZ="(-0.960311, -0.291362, -0.063303)" />
+				<Vertex XYZ="(-0.980728, -0.358573, -0.080614)" />
+				<Rotation_Axis XYZ="(0.282221, 0.929030, 0.239279)" />
+				<Rotation_Base XYZ="(-0.133734, -0.208885, 0.968753)" />
+				<Neighbor id="43" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.774466, 0.249392, 0.581383)" />
+				<Point XYZ="(-0.910145, -0.176397, -0.106105)" />
+				<Vertex XYZ="(-0.939893, -0.224150, -0.045992)" />
+				<Rotation_Axis XYZ="(0.361311, 0.580002, -0.730104)" />
+				<Rotation_Base XYZ="(0.259485, 0.689528, 0.676180)" />
+				<Neighbor id="1" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.160457, 0.899319, -0.406790)" />
+				<Point XYZ="(-0.876063, -0.163534, -0.245064)" />
+				<Vertex XYZ="(-0.880397, -0.128643, -0.166217)" />
+				<Rotation_Axis XYZ="(0.050211, -0.404160, -0.913309)" />
+				<Rotation_Base XYZ="(0.510720, 0.796246, -0.324279)" />
+				<Neighbor id="6" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.332680, -0.033459, -0.942446)" />
+				<Point XYZ="(-0.894753, -0.264845, -0.329680)" />
+				<Vertex XYZ="(-0.871728, -0.198426, -0.323910)" />
+				<Rotation_Axis XYZ="(-0.326442, -0.941671, -0.081801)" />
+				<Rotation_Base XYZ="(0.332680, -0.033459, -0.942446)" />
+				<Neighbor id="45" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.016707, -0.676587, -0.736173)" />
+				<Point XYZ="(-0.942400, -0.376909, -0.294059)" />
+				<Vertex XYZ="(-0.917778, -0.331265, -0.335450)" />
+				<Rotation_Axis XYZ="(-0.371062, -0.687892, 0.623793)" />
+				<Rotation_Base XYZ="(0.016707, -0.676587, -0.736173)" />
+				<Neighbor id="49" />
+			</OrientPoint>
+			<OrientPoint id="6">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.314715, -0.943290, -0.105630)" />
+				<Point XYZ="(-0.974842, -0.423901, -0.217341)" />
+				<Vertex XYZ="(-0.967021, -0.422554, -0.252668)" />
+				<Rotation_Axis XYZ="(-0.215988, -0.037197, 0.975687)" />
+				<Rotation_Base XYZ="(-0.314715, -0.943290, -0.105630)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="45" Normal="(-0.832345,0.325362,-0.448711)" Center="(-0.842937,-0.304371,-0.454230)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.465270, -0.621213, 0.630569)" />
+				<Point XYZ="(-0.912645, -0.377407, -0.377120)" />
+				<Vertex XYZ="(-0.907512, -0.423549, -0.418789)" />
+				<Rotation_Axis XYZ="(-0.082279, 0.739639, 0.667955)" />
+				<Rotation_Base XYZ="(-0.465270, -0.621213, 0.630569)" />
+				<Neighbor id="49" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.332680, 0.033459, 0.942446)" />
+				<Point XYZ="(-0.894753, -0.264845, -0.329680)" />
+				<Vertex XYZ="(-0.917778, -0.331265, -0.335450)" />
+				<Rotation_Axis XYZ="(0.326442, 0.941671, 0.081801)" />
+				<Rotation_Base XYZ="(-0.332680, 0.033459, 0.942446)" />
+				<Neighbor id="44" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.682844, 0.343229, 0.644917)" />
+				<Point XYZ="(-0.824616, -0.168324, -0.389813)" />
+				<Vertex XYZ="(-0.871728, -0.198426, -0.323910)" />
+				<Rotation_Axis XYZ="(0.545135, 0.348311, -0.762566)" />
+				<Rotation_Base XYZ="(0.210458, 0.823620, 0.526648)" />
+				<Neighbor id="6" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.011944, 0.769757, -0.638225)" />
+				<Point XYZ="(-0.763924, -0.189319, -0.517090)" />
+				<Vertex XYZ="(-0.777504, -0.138222, -0.455716)" />
+				<Rotation_Axis XYZ="(0.167640, -0.630778, -0.757638)" />
+				<Rotation_Base XYZ="(0.642794, 0.652625, -0.401119)" />
+				<Neighbor id="15" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.498235, -0.270890, -0.823638)" />
+				<Point XYZ="(-0.778802, -0.306111, -0.574073)" />
+				<Vertex XYZ="(-0.750344, -0.240417, -0.578465)" />
+				<Rotation_Axis XYZ="(-0.396751, -0.915882, 0.061227)" />
+				<Rotation_Base XYZ="(0.498235, -0.270890, -0.823638)" />
+				<Neighbor id="51" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.088724, -0.826179, -0.556378)" />
+				<Point XYZ="(-0.837845, -0.399360, -0.533641)" />
+				<Vertex XYZ="(-0.807260, -0.371804, -0.569681)" />
+				<Rotation_Axis XYZ="(-0.559000, -0.503622, 0.658698)" />
+				<Rotation_Base XYZ="(0.088724, -0.826179, -0.556378)" />
+				<Neighbor id="52" />
+			</OrientPoint>
+			<OrientPoint id="6">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.308494, -0.944534, -0.112638)" />
+				<Point XYZ="(-0.887971, -0.425232, -0.458195)" />
+				<Vertex XYZ="(-0.868430, -0.426915, -0.497601)" />
+				<Rotation_Axis XYZ="(-0.443945, 0.038237, 0.895238)" />
+				<Rotation_Base XYZ="(-0.308494, -0.944534, -0.112638)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="46" Normal="(-0.944544,0.163605,0.284728)" Center="(-0.940242,-0.380429,0.286863)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.429932, 0.246565, 0.868542)" />
+				<Point XYZ="(-0.913373, -0.384785, 0.378841)" />
+				<Vertex XYZ="(-0.916890, -0.437533, 0.395556)" />
+				<Rotation_Axis XYZ="(0.063426, 0.951363, -0.301473)" />
+				<Rotation_Base XYZ="(0.429932, 0.246565, 0.868542)" />
+				<Neighbor id="48" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.361907, 0.916634, 0.169725)" />
+				<Point XYZ="(-0.930844, -0.326428, 0.287081)" />
+				<Vertex XYZ="(-0.909857, -0.332037, 0.362126)" />
+				<Rotation_Axis XYZ="(-0.268634, 0.071796, -0.960563)" />
+				<Rotation_Base XYZ="(0.296560, 0.954944, -0.011561)" />
+				<Neighbor id="7" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.099527, 0.319998, -0.942176)" />
+				<Point XYZ="(-0.967111, -0.376072, 0.194885)" />
+				<Vertex XYZ="(-0.951831, -0.320819, 0.212037)" />
+				<Rotation_Axis XYZ="(-0.255348, -0.923382, -0.286641)" />
+				<Rotation_Base XYZ="(-0.099527, 0.319998, -0.942176)" />
+				<Neighbor id="43" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.164385, -0.986166, 0.021329)" />
+				<Point XYZ="(-0.949640, -0.434429, 0.286644)" />
+				<Vertex XYZ="(-0.982390, -0.431326, 0.177733)" />
+				<Rotation_Axis XYZ="(0.287859, -0.027279, 0.957284)" />
+				<Rotation_Base XYZ="(-0.164385, -0.986166, 0.021329)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="47" Normal="(-0.980236,0.173363,-0.095302)" Center="(-0.987550,-0.406273,-0.097221)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.108143, 0.537989, 0.835987)" />
+				<Point XYZ="(-0.989994, -0.396785, -0.054825)" />
+				<Vertex XYZ="(-0.999259, -0.434997, -0.029035)" />
+				<Rotation_Axis XYZ="(0.197043, 0.812635, -0.548450)" />
+				<Rotation_Base XYZ="(0.108143, 0.537988, 0.835986)" />
+				<Neighbor id="43" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.291210, 0.796781, -0.529468)" />
+				<Point XYZ="(-0.981695, -0.391910, -0.131314)" />
+				<Vertex XYZ="(-0.980728, -0.358573, -0.080614)" />
+				<Rotation_Axis XYZ="(-0.015930, -0.549340, -0.835447)" />
+				<Rotation_Base XYZ="(0.291210, 0.796781, -0.529468)" />
+				<Neighbor id="44" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.165980, -0.982826, -0.080647)" />
+				<Point XYZ="(-0.990961, -0.430122, -0.105524)" />
+				<Vertex XYZ="(-0.982662, -0.425247, -0.182014)" />
+				<Rotation_Axis XYZ="(-0.107647, -0.063235, 0.992176)" />
+				<Rotation_Base XYZ="(-0.165980, -0.982826, -0.080647)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="48" Normal="(-0.843024,0.217516,0.491932)" Center="(-0.843287,-0.340868,0.478966)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.623200, 0.063330, 0.779494)" />
+				<Point XYZ="(-0.778836, -0.357461, 0.597199)" />
+				<Vertex XYZ="(-0.788351, -0.428525, 0.610580)" />
+				<Rotation_Axis XYZ="(0.130459, 0.974332, -0.183460)" />
+				<Rotation_Base XYZ="(0.623200, 0.063330, 0.779494)" />
+				<Neighbor id="50" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.122779, 0.875406, 0.467537)" />
+				<Point XYZ="(-0.800670, -0.253123, 0.513285)" />
+				<Vertex XYZ="(-0.769321, -0.286397, 0.583818)" />
+				<Rotation_Axis XYZ="(-0.372968, 0.395867, -0.839157)" />
+				<Rotation_Base XYZ="(0.497108, 0.848913, 0.179527)" />
+				<Neighbor id="8" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.467440, 0.278624, -0.838969)" />
+				<Point XYZ="(-0.870938, -0.275943, 0.402439)" />
+				<Vertex XYZ="(-0.832019, -0.219849, 0.442752)" />
+				<Rotation_Axis XYZ="(-0.490865, -0.707484, -0.508447)" />
+				<Rotation_Base XYZ="(-0.114512, 0.630922, -0.767349)" />
+				<Neighbor id="7" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.429932, -0.246565, -0.868542)" />
+				<Point XYZ="(-0.913373, -0.384785, 0.378841)" />
+				<Vertex XYZ="(-0.909857, -0.332037, 0.362126)" />
+				<Rotation_Axis XYZ="(-0.063426, -0.951363, 0.301473)" />
+				<Rotation_Base XYZ="(-0.429932, -0.246565, -0.868542)" />
+				<Neighbor id="46" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.168904, -0.975375, 0.141829)" />
+				<Point XYZ="(-0.852621, -0.433029, 0.503068)" />
+				<Vertex XYZ="(-0.916890, -0.437533, 0.395556)" />
+				<Rotation_Axis XYZ="(0.512766, 0.035934, 0.857776)" />
+				<Rotation_Base XYZ="(-0.168904, -0.975375, 0.141829)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="49" Normal="(-0.922614,0.196902,-0.331681)" Center="(-0.930771,-0.392456,-0.335636)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.016707, 0.676587, 0.736173)" />
+				<Point XYZ="(-0.942400, -0.376909, -0.294059)" />
+				<Vertex XYZ="(-0.967021, -0.422554, -0.252668)" />
+				<Rotation_Axis XYZ="(0.371062, 0.687892, -0.623793)" />
+				<Rotation_Base XYZ="(-0.016707, 0.676587, 0.736173)" />
+				<Neighbor id="44" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.465270, 0.621213, -0.630569)" />
+				<Point XYZ="(-0.912645, -0.377407, -0.377120)" />
+				<Vertex XYZ="(-0.917778, -0.331265, -0.335450)" />
+				<Rotation_Axis XYZ="(0.082279, -0.739639, -0.667955)" />
+				<Rotation_Base XYZ="(0.465270, 0.621213, -0.630569)" />
+				<Neighbor id="45" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.187234, -0.980407, -0.061199)" />
+				<Point XYZ="(-0.937267, -0.423051, -0.335729)" />
+				<Vertex XYZ="(-0.907512, -0.423549, -0.418789)" />
+				<Rotation_Axis XYZ="(-0.337233, 0.005639, 0.941404)" />
+				<Rotation_Base XYZ="(-0.187234, -0.980407, -0.061199)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="50" Normal="(-0.683420,0.232986,0.691849)" Center="(-0.678238,-0.329299,0.686707)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.764645, -0.152743, 0.626089)" />
+				<Point XYZ="(-0.591323, -0.366526, 0.785521)" />
+				<Vertex XYZ="(-0.608063, -0.431515, 0.790110)" />
+				<Rotation_Axis XYZ="(0.248853, 0.966135, -0.068224)" />
+				<Rotation_Base XYZ="(0.764645, -0.152743, 0.626089)" />
+				<Neighbor id="53" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.124734, 0.773295, 0.621657)" />
+				<Point XYZ="(-0.612729, -0.250030, 0.724513)" />
+				<Vertex XYZ="(-0.574584, -0.301538, 0.780931)" />
+				<Rotation_Axis XYZ="(-0.446722, 0.603221, -0.660729)" />
+				<Rotation_Base XYZ="(0.665019, 0.717910, 0.205802)" />
+				<Neighbor id="16" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.344908, 0.364602, -0.864930)" />
+				<Point XYZ="(-0.710097, -0.242459, 0.625956)" />
+				<Vertex XYZ="(-0.650873, -0.198522, 0.668094)" />
+				<Rotation_Axis XYZ="(-0.697303, -0.517320, -0.496134)" />
+				<Rotation_Base XYZ="(-0.139672, 0.776972, -0.613845)" />
+				<Neighbor id="8" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.623200, -0.063330, -0.779494)" />
+				<Point XYZ="(-0.778836, -0.357461, 0.597199)" />
+				<Vertex XYZ="(-0.769321, -0.286397, 0.583818)" />
+				<Rotation_Axis XYZ="(-0.130459, -0.974332, 0.183460)" />
+				<Rotation_Base XYZ="(-0.623200, -0.063330, -0.779494)" />
+				<Neighbor id="48" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.172516, -0.972406, 0.157052)" />
+				<Point XYZ="(-0.698207, -0.430020, 0.700345)" />
+				<Vertex XYZ="(-0.788351, -0.428525, 0.610580)" />
+				<Rotation_Axis XYZ="(0.708548, -0.011749, 0.705565)" />
+				<Rotation_Base XYZ="(-0.172516, -0.972406, 0.157052)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="51" Normal="(-0.698575,0.255431,-0.668392)" Center="(-0.704526,-0.342598,-0.665968)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.631192, -0.477395, 0.611303)" />
+				<Point XYZ="(-0.801152, -0.404430, -0.588854)" />
+				<Vertex XYZ="(-0.795044, -0.437055, -0.608026)" />
+				<Rotation_Axis XYZ="(-0.159346, 0.851142, 0.500167)" />
+				<Rotation_Base XYZ="(-0.631192, -0.477395, 0.611303)" />
+				<Neighbor id="52" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.498235, 0.270890, 0.823638)" />
+				<Point XYZ="(-0.778802, -0.306111, -0.574073)" />
+				<Vertex XYZ="(-0.807260, -0.371804, -0.569681)" />
+				<Rotation_Axis XYZ="(0.396751, 0.915882, -0.061227)" />
+				<Rotation_Base XYZ="(-0.498235, 0.270890, 0.823638)" />
+				<Neighbor id="45" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.591687, 0.455543, 0.665122)" />
+				<Point XYZ="(-0.690807, -0.231246, -0.637709)" />
+				<Vertex XYZ="(-0.750344, -0.240417, -0.578465)" />
+				<Rotation_Axis XYZ="(0.704654, 0.108548, -0.701199)" />
+				<Rotation_Base XYZ="(0.201527, 0.916915, 0.344462)" />
+				<Neighbor id="15" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.204129, 0.552254, -0.808298)" />
+				<Point XYZ="(-0.616502, -0.285190, -0.736347)" />
+				<Vertex XYZ="(-0.631271, -0.222074, -0.696954)" />
+				<Rotation_Axis XYZ="(0.194700, -0.832092, -0.519341)" />
+				<Rotation_Base XYZ="(0.773054, 0.456067, -0.440897)" />
+				<Neighbor id="25" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.662021, -0.366140, -0.653965)" />
+				<Point XYZ="(-0.621621, -0.392120, -0.771342)" />
+				<Vertex XYZ="(-0.601734, -0.348307, -0.775740)" />
+				<Rotation_Axis XYZ="(-0.411600, -0.906807, 0.091030)" />
+				<Rotation_Base XYZ="(0.662021, -0.366140, -0.653965)" />
+				<Neighbor id="56" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.180303, -0.966809, -0.181028)" />
+				<Point XYZ="(-0.718275, -0.436494, -0.687485)" />
+				<Vertex XYZ="(-0.641507, -0.435933, -0.766944)" />
+				<Rotation_Axis XYZ="(-0.694815, -0.005081, 0.719171)" />
+				<Rotation_Base XYZ="(-0.180303, -0.966809, -0.181028)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="52" Normal="(-0.812582,0.174642,-0.556067)" Center="(-0.823578,-0.411925,-0.558436)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.088724, 0.826179, 0.556378)" />
+				<Point XYZ="(-0.837845, -0.399360, -0.533641)" />
+				<Vertex XYZ="(-0.868430, -0.426915, -0.497601)" />
+				<Rotation_Axis XYZ="(0.559000, 0.503622, -0.658698)" />
+				<Rotation_Base XYZ="(-0.088724, 0.826179, 0.556378)" />
+				<Neighbor id="45" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.631192, 0.477395, -0.611303)" />
+				<Point XYZ="(-0.801152, -0.404430, -0.588854)" />
+				<Vertex XYZ="(-0.807260, -0.371804, -0.569681)" />
+				<Rotation_Axis XYZ="(0.159346, -0.851142, -0.500167)" />
+				<Rotation_Base XYZ="(0.631192, 0.477395, -0.611303)" />
+				<Neighbor id="51" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.187432, -0.981675, -0.034415)" />
+				<Point XYZ="(-0.831737, -0.431985, -0.552813)" />
+				<Vertex XYZ="(-0.795044, -0.437055, -0.608026)" />
+				<Rotation_Axis XYZ="(-0.551887, 0.076259, 0.830425)" />
+				<Rotation_Base XYZ="(-0.187432, -0.981675, -0.034415)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="53" Normal="(-0.492591,0.193527,0.848470)" Center="(-0.475749,-0.360251,0.851011)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.850285, -0.304702, 0.429152)" />
+				<Point XYZ="(-0.380053, -0.407381, 0.917531)" />
+				<Vertex XYZ="(-0.392749, -0.442639, 0.917654)" />
+				<Rotation_Axis XYZ="(0.338805, 0.940851, -0.003266)" />
+				<Rotation_Base XYZ="(0.850285, -0.304702, 0.429152)" />
+				<Neighbor id="57" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.363642, 0.614263, 0.700318)" />
+				<Point XYZ="(-0.401674, -0.312783, 0.883179)" />
+				<Vertex XYZ="(-0.367356, -0.372124, 0.917409)" />
+				<Rotation_Axis XYZ="(-0.447889, 0.774478, -0.446743)" />
+				<Rotation_Base XYZ="(0.803594, 0.567749, 0.178600)" />
+				<Neighbor id="26" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.248315, 0.476873, -0.843168)" />
+				<Point XYZ="(-0.505288, -0.277490, 0.814940)" />
+				<Vertex XYZ="(-0.435992, -0.253442, 0.848949)" />
+				<Rotation_Axis XYZ="(-0.857085, -0.297438, -0.420637)" />
+				<Rotation_Base XYZ="(-0.099922, 0.896966, -0.430659)" />
+				<Neighbor id="16" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.764645, 0.152743, -0.626089)" />
+				<Point XYZ="(-0.591323, -0.366526, 0.785521)" />
+				<Vertex XYZ="(-0.574584, -0.301538, 0.780931)" />
+				<Rotation_Axis XYZ="(-0.248853, -0.966135, 0.068224)" />
+				<Rotation_Base XYZ="(-0.764645, 0.152743, -0.626089)" />
+				<Neighbor id="50" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.136212, -0.980089, 0.144469)" />
+				<Point XYZ="(-0.500406, -0.437077, 0.853882)" />
+				<Vertex XYZ="(-0.608063, -0.431515, 0.790110)" />
+				<Rotation_Axis XYZ="(0.859530, -0.044406, 0.509153)" />
+				<Rotation_Base XYZ="(-0.136212, -0.980089, 0.144469)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="54" Normal="(-0.119952,0.192993,-0.973840)" Center="(-0.112973,-0.360696,-0.968150)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.970757, -0.021337, 0.239115)" />
+				<Point XYZ="(-0.241483, -0.383013, -0.956850)" />
+				<Vertex XYZ="(-0.242803, -0.436915, -0.967019)" />
+				<Rotation_Axis XYZ="(0.024059, 0.982381, 0.185334)" />
+				<Rotation_Base XYZ="(-0.970757, -0.021337, 0.239115)" />
+				<Neighbor id="55" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.467843, 0.821956, -0.324826)" />
+				<Point XYZ="(-0.170208, -0.289412, -0.946978)" />
+				<Vertex XYZ="(-0.240163, -0.329111, -0.946681)" />
+				<Rotation_Axis XYZ="(0.869702, 0.493563, -0.003684)" />
+				<Rotation_Base XYZ="(-0.459495, 0.812351, 0.359096)" />
+				<Neighbor id="24" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.528121, 0.361284, 0.768481)" />
+				<Point XYZ="(-0.041824, -0.298409, -0.964534)" />
+				<Vertex XYZ="(-0.100254, -0.249712, -0.947274)" />
+				<Rotation_Axis XYZ="(0.749134, -0.624360, -0.221296)" />
+				<Rotation_Base XYZ="(0.661588, 0.721933, 0.202768)" />
+				<Neighbor id="35" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.987949, -0.151024, -0.033896)" />
+				<Point XYZ="(0.009178, -0.393871, -0.989886)" />
+				<Vertex XYZ="(0.016605, -0.347106, -0.981794)" />
+				<Rotation_Axis XYZ="(-0.154597, -0.973511, -0.168455)" />
+				<Rotation_Base XYZ="(0.987949, -0.151024, -0.033896)" />
+				<Neighbor id="62" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.038930, -0.981083, -0.189633)" />
+				<Point XYZ="(-0.120526, -0.438775, -0.982499)" />
+				<Vertex XYZ="(0.001752, -0.440635, -0.997978)" />
+				<Rotation_Axis XYZ="(-0.991969, 0.015090, 0.125577)" />
+				<Rotation_Base XYZ="(-0.038930, -0.981083, -0.189633)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="55" Normal="(-0.354053,0.184607,-0.916824)" Center="(-0.361356,-0.367181,-0.907327)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.886409, -0.189819, 0.422193)" />
+				<Point XYZ="(-0.476422, -0.404145, -0.870387)" />
+				<Vertex XYZ="(-0.472550, -0.442568, -0.879532)" />
+				<Rotation_Axis XYZ="(-0.097579, 0.968185, 0.230427)" />
+				<Rotation_Base XYZ="(-0.886409, -0.189819, 0.422193)" />
+				<Neighbor id="56" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.696496, 0.696785, -0.171416)" />
+				<Point XYZ="(-0.425632, -0.313655, -0.871702)" />
+				<Vertex XYZ="(-0.480295, -0.365723, -0.861243)" />
+				<Rotation_Axis XYZ="(0.717239, 0.683180, -0.137237)" />
+				<Rotation_Base XYZ="(-0.547356, 0.674238, 0.495787)" />
+				<Neighbor id="25" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.572040, 0.457892, 0.680518)" />
+				<Point XYZ="(-0.305566, -0.295349, -0.914421)" />
+				<Vertex XYZ="(-0.370968, -0.261587, -0.882161)" />
+				<Rotation_Axis XYZ="(0.813848, -0.420122, -0.401433)" />
+				<Rotation_Base XYZ="(0.503829, 0.854373, 0.127290)" />
+				<Neighbor id="24" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.970757, 0.021337, -0.239115)" />
+				<Point XYZ="(-0.241483, -0.383013, -0.956850)" />
+				<Vertex XYZ="(-0.240163, -0.329111, -0.946681)" />
+				<Rotation_Axis XYZ="(-0.024059, -0.982381, -0.185334)" />
+				<Rotation_Base XYZ="(0.970757, 0.021337, -0.239115)" />
+				<Neighbor id="54" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.044603, -0.982542, -0.180616)" />
+				<Point XYZ="(-0.357677, -0.439742, -0.923276)" />
+				<Vertex XYZ="(-0.242803, -0.436915, -0.967019)" />
+				<Rotation_Axis XYZ="(-0.934288, -0.022989, 0.355777)" />
+				<Rotation_Base XYZ="(-0.044603, -0.982542, -0.180616)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="56" Normal="(-0.547149,0.155121,-0.822536)" Center="(-0.549022,-0.398133,-0.820865)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.662021, 0.366140, 0.653965)" />
+				<Point XYZ="(-0.621621, -0.392120, -0.771342)" />
+				<Vertex XYZ="(-0.641507, -0.435933, -0.766944)" />
+				<Rotation_Axis XYZ="(0.411600, 0.906807, -0.091030)" />
+				<Rotation_Base XYZ="(-0.662021, 0.366140, 0.653965)" />
+				<Neighbor id="51" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.528476, 0.562254, 0.636069)" />
+				<Point XYZ="(-0.541014, -0.357015, -0.818491)" />
+				<Vertex XYZ="(-0.601734, -0.348307, -0.775740)" />
+				<Rotation_Axis XYZ="(0.812098, -0.116466, -0.571779)" />
+				<Rotation_Base XYZ="(0.245807, 0.956976, 0.154194)" />
+				<Neighbor id="25" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.886409, 0.189819, -0.422193)" />
+				<Point XYZ="(-0.476422, -0.404145, -0.870387)" />
+				<Vertex XYZ="(-0.480295, -0.365723, -0.861243)" />
+				<Rotation_Axis XYZ="(0.097579, -0.968185, -0.230427)" />
+				<Rotation_Base XYZ="(0.886409, 0.189819, -0.422193)" />
+				<Neighbor id="55" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.112842, -0.987377, -0.111146)" />
+				<Point XYZ="(-0.557029, -0.439250, -0.823238)" />
+				<Vertex XYZ="(-0.472550, -0.442568, -0.879532)" />
+				<Rotation_Axis XYZ="(-0.831721, 0.032665, 0.554232)" />
+				<Rotation_Base XYZ="(-0.112842, -0.987377, -0.111146)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="57" Normal="(-0.303643,0.112162,0.946161)" Center="(-0.301320,-0.407718,0.942840)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.939709, 0.310239, 0.143874)" />
+				<Point XYZ="(-0.222588, -0.408055, 0.968150)" />
+				<Vertex XYZ="(-0.212219, -0.442914, 0.975592)" />
+				<Rotation_Axis XYZ="(-0.279322, 0.939035, -0.200482)" />
+				<Rotation_Base XYZ="(0.939709, 0.310239, 0.143874)" />
+				<Neighbor id="58" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.251417, 0.591968, -0.765744)" />
+				<Point XYZ="(-0.300157, -0.372660, 0.939058)" />
+				<Vertex XYZ="(-0.232957, -0.373196, 0.960707)" />
+				<Rotation_Axis XYZ="(-0.951797, 0.007590, -0.306636)" />
+				<Rotation_Base XYZ="(0.079654, 0.971513, -0.223200)" />
+				<Neighbor id="26" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.850285, 0.304702, -0.429152)" />
+				<Point XYZ="(-0.380053, -0.407381, 0.917531)" />
+				<Vertex XYZ="(-0.367356, -0.372124, 0.917409)" />
+				<Rotation_Axis XYZ="(-0.338805, -0.940851, 0.003266)" />
+				<Rotation_Base XYZ="(-0.850285, 0.304702, -0.429152)" />
+				<Neighbor id="53" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.035650, -0.993689, 0.106355)" />
+				<Point XYZ="(-0.302484, -0.442776, 0.946623)" />
+				<Vertex XYZ="(-0.392749, -0.442639, 0.917654)" />
+				<Rotation_Axis XYZ="(0.952164, -0.001453, 0.305584)" />
+				<Rotation_Base XYZ="(-0.035650, -0.993689, 0.106355)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="58" Normal="(-0.091265,0.192083,0.977126)" Center="(-0.105741,-0.362353,0.969917)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.986926, 0.147807, -0.064262)" />
+				<Point XYZ="(0.025985, -0.369633, 0.983791)" />
+				<Vertex XYZ="(0.036259, -0.432622, 0.996702)" />
+				<Rotation_Axis XYZ="(-0.157788, 0.967360, -0.198287)" />
+				<Rotation_Base XYZ="(0.986926, 0.147807, -0.064262)" />
+				<Neighbor id="59" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.296210, 0.476617, -0.827705)" />
+				<Point XYZ="(-0.059893, -0.281516, 0.958292)" />
+				<Vertex XYZ="(0.015710, -0.306644, 0.970880)" />
+				<Rotation_Axis XYZ="(-0.937334, 0.311531, -0.156054)" />
+				<Rotation_Base XYZ="(0.344847, 0.893521, -0.287578)" />
+				<Neighbor id="27" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.693327, 0.624643, 0.359331)" />
+				<Point XYZ="(-0.184227, -0.314792, 0.953206)" />
+				<Vertex XYZ="(-0.135497, -0.256389, 0.945705)" />
+				<Rotation_Axis XYZ="(-0.637562, -0.764123, 0.098139)" />
+				<Rotation_Base XYZ="(-0.747016, 0.582027, -0.321266)" />
+				<Neighbor id="26" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.939709, -0.310239, -0.143874)" />
+				<Point XYZ="(-0.222588, -0.408055, 0.968150)" />
+				<Vertex XYZ="(-0.232957, -0.373196, 0.960707)" />
+				<Rotation_Axis XYZ="(0.279322, -0.939035, 0.200482)" />
+				<Rotation_Base XYZ="(-0.939709, -0.310239, -0.143874)" />
+				<Neighbor id="57" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.024047, -0.980510, 0.194994)" />
+				<Point XYZ="(-0.087980, -0.437768, 0.986147)" />
+				<Vertex XYZ="(-0.212219, -0.442914, 0.975592)" />
+				<Rotation_Axis XYZ="(0.995563, 0.041237, 0.084581)" />
+				<Rotation_Base XYZ="(0.024047, -0.980510, 0.194994)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="59" Normal="(0.154553,0.228101,0.961292)" Center="(0.154208,-0.334390,0.954566)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.960080, -0.071827, -0.270345)" />
+				<Point XYZ="(0.287606, -0.363111, 0.940160)" />
+				<Vertex XYZ="(0.286885, -0.430485, 0.955498)" />
+				<Rotation_Axis XYZ="(0.010440, 0.974998, -0.221968)" />
+				<Rotation_Base XYZ="(0.960081, -0.071827, -0.270345)" />
+				<Neighbor id="60" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.226571, 0.367759, -0.901897)" />
+				<Point XYZ="(0.216092, -0.251101, 0.924876)" />
+				<Vertex XYZ="(0.288327, -0.295737, 0.924822)" />
+				<Rotation_Axis XYZ="(-0.850690, 0.525667, 0.000639)" />
+				<Rotation_Base XYZ="(0.478458, 0.774796, -0.413242)" />
+				<Neighbor id="28" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.452188, 0.778266, 0.435693)" />
+				<Point XYZ="(0.079784, -0.256554, 0.947905)" />
+				<Vertex XYZ="(0.143857, -0.206464, 0.924930)" />
+				<Rotation_Axis XYZ="(-0.758161, -0.592696, 0.271853)" />
+				<Rotation_Base XYZ="(-0.648382, 0.729499, -0.217791)" />
+				<Neighbor id="27" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.986926, -0.147807, 0.064262)" />
+				<Point XYZ="(0.025985, -0.369633, 0.983791)" />
+				<Vertex XYZ="(0.015710, -0.306644, 0.970880)" />
+				<Rotation_Axis XYZ="(0.157788, -0.967360, 0.198287)" />
+				<Rotation_Base XYZ="(-0.986926, -0.147807, 0.064262)" />
+				<Neighbor id="58" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.045090, -0.973598, 0.223772)" />
+				<Point XYZ="(0.161572, -0.431554, 0.976100)" />
+				<Vertex XYZ="(0.036259, -0.432622, 0.996702)" />
+				<Rotation_Axis XYZ="(0.986719, 0.008412, -0.162221)" />
+				<Rotation_Base XYZ="(0.045090, -0.973598, 0.223772)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="60" Normal="(0.400108,0.210033,0.892076)" Center="(0.408077,-0.348569,0.882495)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.854432, -0.251021, -0.454899)" />
+				<Point XYZ="(0.522150, -0.391980, 0.841807)" />
+				<Vertex XYZ="(0.515625, -0.439265, 0.855645)" />
+				<Rotation_Axis XYZ="(0.131279, 0.951439, -0.278441)" />
+				<Rotation_Base XYZ="(0.854432, -0.251021, -0.454899)" />
+				<Neighbor id="63" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.113819, 0.284326, -0.951947)" />
+				<Point XYZ="(0.474775, -0.288679, 0.838255)" />
+				<Vertex XYZ="(0.528674, -0.344695, 0.827969)" />
+				<Rotation_Axis XYZ="(-0.687366, 0.714366, 0.131181)" />
+				<Rotation_Base XYZ="(0.548286, 0.628809, -0.551346)" />
+				<Neighbor id="36" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.156770, 0.877522, 0.453187)" />
+				<Point XYZ="(0.354602, -0.264200, 0.886682)" />
+				<Vertex XYZ="(0.420876, -0.232663, 0.848542)" />
+				<Rotation_Axis XYZ="(-0.801251, -0.381280, 0.461110)" />
+				<Rotation_Base XYZ="(-0.491255, 0.859161, -0.143214)" />
+				<Neighbor id="28" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.960080, 0.071827, 0.270345)" />
+				<Point XYZ="(0.287606, -0.363111, 0.940160)" />
+				<Vertex XYZ="(0.288327, -0.295737, 0.924822)" />
+				<Rotation_Axis XYZ="(-0.010440, -0.974998, 0.221968)" />
+				<Rotation_Base XYZ="(-0.960081, 0.071827, 0.270345)" />
+				<Neighbor id="59" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.052618, -0.977044, 0.206438)" />
+				<Point XYZ="(0.401255, -0.434875, 0.905572)" />
+				<Vertex XYZ="(0.286885, -0.430485, 0.955498)" />
+				<Rotation_Axis XYZ="(0.915915, -0.035154, -0.399830)" />
+				<Rotation_Base XYZ="(0.052618, -0.977044, 0.206438)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="61" Normal="(0.310815,0.279432,-0.908467)" Center="(0.310525,-0.310808,-0.907398)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.858502, -0.424502, -0.287702)" />
+				<Point XYZ="(0.195528, -0.374216, -0.966444)" />
+				<Vertex XYZ="(0.225122, -0.430042, -0.972380)" />
+				<Rotation_Axis XYZ="(-0.466311, 0.879662, 0.093533)" />
+				<Rotation_Base XYZ="(-0.858502, -0.424502, -0.287702)" />
+				<Neighbor id="62" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.829443, 0.062724, 0.555058)" />
+				<Point XYZ="(0.191740, -0.249920, -0.929685)" />
+				<Vertex XYZ="(0.165935, -0.318390, -0.960509)" />
+				<Rotation_Axis XYZ="(0.325006, 0.862356, 0.388218)" />
+				<Rotation_Base XYZ="(-0.927413, 0.370987, -0.047674)" />
+				<Neighbor id="35" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.090569, 0.966630, -0.239632)" />
+				<Point XYZ="(0.299757, -0.182268, -0.871090)" />
+				<Vertex XYZ="(0.217545, -0.181450, -0.898860)" />
+				<Rotation_Axis XYZ="(0.947368, -0.009433, 0.320008)" />
+				<Rotation_Base XYZ="(-0.128000, 0.905037, 0.405616)" />
+				<Neighbor id="34" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="40" />
+				<Normal XYZ="(0.321031, 0.053860, 0.945536)" />
+				<Point XYZ="(0.419768, -0.252287, -0.852212)" />
+				<Vertex XYZ="(0.381969, -0.183087, -0.843320)" />
+				<Rotation_Axis XYZ="(0.476356, -0.872083, -0.112057)" />
+				<Rotation_Base XYZ="(0.772078, 0.353902, 0.527872)" />
+				<Neighbor id="42" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.844748, -0.453213, 0.284604)" />
+				<Point XYZ="(0.436289, -0.375939, -0.884659)" />
+				<Vertex XYZ="(0.457567, -0.321487, -0.861104)" />
+				<Rotation_Axis XYZ="(-0.337592, -0.863925, -0.373720)" />
+				<Rotation_Base XYZ="(0.844748, -0.453213, 0.284604)" />
+				<Neighbor id="71" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.087876, -0.960162, -0.265268)" />
+				<Point XYZ="(0.320066, -0.430217, -0.940297)" />
+				<Vertex XYZ="(0.415011, -0.430391, -0.908214)" />
+				<Rotation_Axis XYZ="(-0.947371, 0.001739, -0.320132)" />
+				<Rotation_Base XYZ="(0.087876, -0.960162, -0.265268)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="62" Normal="(0.106471,0.157721,-0.981727)" Center="(0.102353,-0.384043,-0.978165)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.987949, 0.151024, 0.033896)" />
+				<Point XYZ="(0.009178, -0.393871, -0.989886)" />
+				<Vertex XYZ="(0.001752, -0.440635, -0.997978)" />
+				<Rotation_Axis XYZ="(0.154597, 0.973511, 0.168455)" />
+				<Rotation_Base XYZ="(-0.987949, 0.151024, 0.033896)" />
+				<Neighbor id="54" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(-0.113846, 0.901503, -0.417530)" />
+				<Point XYZ="(0.091270, -0.332748, -0.971151)" />
+				<Vertex XYZ="(0.016605, -0.347106, -0.981794)" />
+				<Rotation_Axis XYZ="(0.972526, 0.187020, 0.138626)" />
+				<Rotation_Base XYZ="(-0.217735, 0.941456, 0.257394)" />
+				<Neighbor id="35" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.858502, 0.424502, 0.287702)" />
+				<Point XYZ="(0.195528, -0.374216, -0.966444)" />
+				<Vertex XYZ="(0.165935, -0.318390, -0.960509)" />
+				<Rotation_Axis XYZ="(0.466311, -0.879662, -0.093533)" />
+				<Rotation_Base XYZ="(0.858502, 0.424502, 0.287702)" />
+				<Neighbor id="61" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.064141, -0.986372, -0.151511)" />
+				<Point XYZ="(0.113437, -0.435339, -0.985179)" />
+				<Vertex XYZ="(0.225122, -0.430042, -0.972380)" />
+				<Rotation_Axis XYZ="(-0.992397, -0.047063, -0.113728)" />
+				<Rotation_Base XYZ="(0.064141, -0.986372, -0.151511)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="63" Normal="(0.600147,0.156504,0.784430)" Center="(0.594890,-0.388334,0.785327)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.637936, 0.318140, -0.701302)" />
+				<Point XYZ="(0.667631, -0.384688, 0.728848)" />
+				<Vertex XYZ="(0.687207, -0.434043, 0.724266)" />
+				<Rotation_Axis XYZ="(-0.367331, 0.926108, 0.085980)" />
+				<Rotation_Base XYZ="(0.637936, 0.318140, -0.701302)" />
+				<Neighbor id="64" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.207297, 0.912695, 0.352159)" />
+				<Point XYZ="(0.588364, -0.340013, 0.780699)" />
+				<Vertex XYZ="(0.648054, -0.335332, 0.733430)" />
+				<Rotation_Axis XYZ="(-0.782475, -0.061369, 0.619651)" />
+				<Rotation_Base XYZ="(-0.218623, 0.958856, -0.181106)" />
+				<Neighbor id="36" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.854432, 0.251021, 0.454899)" />
+				<Point XYZ="(0.522150, -0.391980, 0.841807)" />
+				<Vertex XYZ="(0.528674, -0.344695, 0.827969)" />
+				<Rotation_Axis XYZ="(-0.131279, -0.951439, 0.278441)" />
+				<Rotation_Base XYZ="(-0.854432, 0.251021, 0.454899)" />
+				<Neighbor id="60" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.114066, -0.987395, 0.109730)" />
+				<Point XYZ="(0.601416, -0.436654, 0.789955)" />
+				<Vertex XYZ="(0.515625, -0.439265, 0.855645)" />
+				<Rotation_Axis XYZ="(0.793748, 0.024154, -0.607768)" />
+				<Rotation_Base XYZ="(0.114066, -0.987395, 0.109730)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="64" Normal="(0.741194,0.253355,0.621645)" Center="(0.745626,-0.338890,0.617442)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.591005, -0.509867, -0.625099)" />
+				<Point XYZ="(0.835065, -0.405556, 0.538626)" />
+				<Vertex XYZ="(0.829374, -0.435678, 0.557814)" />
+				<Rotation_Axis XYZ="(0.157366, 0.832900, -0.530578)" />
+				<Rotation_Base XYZ="(0.591005, -0.509867, -0.625099)" />
+				<Neighbor id="72" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.471362, 0.202086, -0.858475)" />
+				<Point XYZ="(0.815381, -0.308161, 0.521341)" />
+				<Vertex XYZ="(0.840756, -0.375434, 0.519437)" />
+				<Rotation_Axis XYZ="(-0.352801, 0.935324, 0.026464)" />
+				<Rotation_Base XYZ="(0.471362, 0.202086, -0.858475)" />
+				<Neighbor id="65" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.326619, 0.942193, 0.074777)" />
+				<Point XYZ="(0.734182, -0.226426, 0.584852)" />
+				<Vertex XYZ="(0.790006, -0.240888, 0.523244)" />
+				<Rotation_Axis XYZ="(-0.661529, 0.171382, 0.730074)" />
+				<Rotation_Base XYZ="(-0.183713, 0.906836, -0.379340)" />
+				<Neighbor id="37" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.980087, 0.176197, -0.091569)" />
+				<Point XYZ="(0.663206, -0.273648, 0.689945)" />
+				<Vertex XYZ="(0.678358, -0.211964, 0.646460)" />
+				<Rotation_Axis XYZ="(-0.196841, -0.801330, 0.564911)" />
+				<Rotation_Base XYZ="(-0.733975, 0.502448, 0.456975)" />
+				<Neighbor id="36" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.637936, -0.318140, 0.701302)" />
+				<Point XYZ="(0.667631, -0.384688, 0.728848)" />
+				<Vertex XYZ="(0.648054, -0.335332, 0.733430)" />
+				<Rotation_Axis XYZ="(0.367331, -0.926108, -0.085980)" />
+				<Rotation_Base XYZ="(-0.637936, -0.318140, 0.701302)" />
+				<Neighbor id="63" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.188008, -0.967330, 0.170077)" />
+				<Point XYZ="(0.758290, -0.434861, 0.641040)" />
+				<Vertex XYZ="(0.687207, -0.434043, 0.724266)" />
+				<Rotation_Axis XYZ="(0.649439, -0.007467, -0.760377)" />
+				<Rotation_Base XYZ="(0.188008, -0.967330, 0.170077)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="65" Normal="(0.862267,0.318869,0.393469)" Center="(0.872699,-0.311985,0.399740)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.421314, -0.665738, -0.615863)" />
+				<Point XYZ="(0.937906, -0.388051, 0.318773)" />
+				<Vertex XYZ="(0.934786, -0.426010, 0.357672)" />
+				<Rotation_Axis XYZ="(0.057312, 0.697262, -0.714521)" />
+				<Rotation_Base XYZ="(0.421314, -0.665738, -0.615863)" />
+				<Neighbor id="73" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.294232, -0.031610, -0.955211)" />
+				<Point XYZ="(0.920337, -0.283484, 0.271297)" />
+				<Vertex XYZ="(0.941026, -0.350091, 0.279874)" />
+				<Rotation_Axis XYZ="(-0.294421, 0.947850, -0.122056)" />
+				<Rotation_Base XYZ="(0.294232, -0.031610, -0.955211)" />
+				<Neighbor id="66" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.386987, 0.893309, -0.228560)" />
+				<Point XYZ="(0.857335, -0.181810, 0.328133)" />
+				<Vertex XYZ="(0.899647, -0.216876, 0.262720)" />
+				<Rotation_Axis XYZ="(-0.495269, 0.410454, 0.765661)" />
+				<Rotation_Base XYZ="(-0.203502, 0.802010, -0.561575)" />
+				<Neighbor id="38" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.963977, 0.265893, 0.007068)" />
+				<Point XYZ="(0.802514, -0.193816, 0.458395)" />
+				<Vertex XYZ="(0.815023, -0.146744, 0.393545)" />
+				<Rotation_Axis XYZ="(-0.154229, -0.580401, 0.799592)" />
+				<Rotation_Base XYZ="(-0.599151, 0.698438, 0.391410)" />
+				<Neighbor id="37" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.471362, -0.202086, 0.858475)" />
+				<Point XYZ="(0.815381, -0.308161, 0.521341)" />
+				<Vertex XYZ="(0.790006, -0.240888, 0.523244)" />
+				<Rotation_Axis XYZ="(0.352801, -0.935324, -0.026464)" />
+				<Rotation_Base XYZ="(-0.471362, -0.202086, 0.858475)" />
+				<Neighbor id="64" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.107465, -0.778075, 0.618911)" />
+				<Point XYZ="(0.864203, -0.401642, 0.490561)" />
+				<Vertex XYZ="(0.840756, -0.375434, 0.519437)" />
+				<Rotation_Axis XYZ="(0.515301, -0.575965, -0.634610)" />
+				<Rotation_Base XYZ="(-0.107465, -0.778075, 0.618911)" />
+				<Neighbor id="72" />
+			</OrientPoint>
+			<OrientPoint id="6">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.296742, -0.947676, 0.117707)" />
+				<Point XYZ="(0.911219, -0.426930, 0.409678)" />
+				<Vertex XYZ="(0.887651, -0.427850, 0.461685)" />
+				<Rotation_Axis XYZ="(0.412709, 0.016113, -0.910720)" />
+				<Rotation_Base XYZ="(0.296742, -0.947676, 0.117707)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="66" Normal="(0.941088,0.307228,0.141297)" Center="(0.951993,-0.317729,0.136654)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.238026, -0.759253, -0.605705)" />
+				<Point XYZ="(0.994424, -0.409314, 0.052440)" />
+				<Vertex XYZ="(0.997363, -0.429699, 0.079147)" />
+				<Rotation_Axis XYZ="(-0.087152, 0.604416, -0.791887)" />
+				<Rotation_Base XYZ="(0.238026, -0.759253, -0.605705)" />
+				<Neighbor id="74" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.084079, -0.246577, -0.965469)" />
+				<Point XYZ="(0.972703, -0.322432, 0.007113)" />
+				<Vertex XYZ="(0.991485, -0.388929, 0.025732)" />
+				<Rotation_Axis XYZ="(-0.262457, 0.929208, -0.260172)" />
+				<Rotation_Base XYZ="(0.084079, -0.246577, -0.965469)" />
+				<Neighbor id="67" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.384877, 0.769418, -0.509770)" />
+				<Point XYZ="(0.929246, -0.205646, 0.045770)" />
+				<Vertex XYZ="(0.953920, -0.255936, -0.011505)" />
+				<Rotation_Axis XYZ="(-0.307988, 0.627723, 0.714918)" />
+				<Rotation_Base XYZ="(-0.264434, 0.665355, -0.698124)" />
+				<Neighbor id="39" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.926260, 0.360388, 0.110281)" />
+				<Point XYZ="(0.902109, -0.186116, 0.182882)" />
+				<Vertex XYZ="(0.904572, -0.155357, 0.103045)" />
+				<Rotation_Axis XYZ="(-0.028769, -0.359369, 0.932752)" />
+				<Rotation_Base XYZ="(-0.468007, 0.829384, 0.305109)" />
+				<Neighbor id="38" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.294232, 0.031610, 0.955211)" />
+				<Point XYZ="(0.920337, -0.283484, 0.271297)" />
+				<Vertex XYZ="(0.899647, -0.216876, 0.262720)" />
+				<Rotation_Axis XYZ="(0.294421, -0.947850, 0.122056)" />
+				<Rotation_Base XYZ="(-0.294232, 0.031610, 0.955211)" />
+				<Neighbor id="65" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.000999, -0.628697, 0.777650)" />
+				<Point XYZ="(0.958484, -0.388655, 0.248719)" />
+				<Vertex XYZ="(0.941026, -0.350091, 0.279874)" />
+				<Rotation_Axis XYZ="(0.332140, -0.733711, -0.592748)" />
+				<Rotation_Base XYZ="(-0.000999, -0.628697, 0.777650)" />
+				<Neighbor id="73" />
+			</OrientPoint>
+			<OrientPoint id="6">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.301065, -0.951478, 0.063635)" />
+				<Point XYZ="(0.986652, -0.428459, 0.148356)" />
+				<Vertex XYZ="(0.975941, -0.427220, 0.217564)" />
+				<Rotation_Axis XYZ="(0.152921, -0.017696, -0.988080)" />
+				<Rotation_Base XYZ="(0.301065, -0.951478, 0.063635)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="67" Normal="(0.964774,0.236950,-0.114305)" Center="(0.966774,-0.353178,-0.107971)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.150378, -0.330727, -0.931668)" />
+				<Point XYZ="(0.962153, -0.399930, -0.243371)" />
+				<Vertex XYZ="(0.972352, -0.438254, -0.231412)" />
+				<Rotation_Axis XYZ="(-0.246214, 0.925220, -0.288697)" />
+				<Rotation_Base XYZ="(-0.150378, -0.330727, -0.931668)" />
+				<Neighbor id="68" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.332629, 0.558034, -0.760234)" />
+				<Point XYZ="(0.941342, -0.299584, -0.214447)" />
+				<Vertex XYZ="(0.951955, -0.361605, -0.255329)" />
+				<Rotation_Axis XYZ="(-0.141431, 0.826539, 0.544822)" />
+				<Rotation_Base XYZ="(-0.344521, 0.474854, -0.809826)" />
+				<Neighbor id="40" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.864312, 0.470762, 0.177054)" />
+				<Point XYZ="(0.942325, -0.246749, -0.092535)" />
+				<Vertex XYZ="(0.930729, -0.237563, -0.173565)" />
+				<Rotation_Axis XYZ="(0.140774, -0.111526, 0.983740)" />
+				<Rotation_Base XYZ="(-0.351729, 0.923181, 0.154994)" />
+				<Neighbor id="39" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.084079, 0.246577, 0.965469)" />
+				<Point XYZ="(0.972703, -0.322432, 0.007113)" />
+				<Vertex XYZ="(0.953920, -0.255936, -0.011505)" />
+				<Rotation_Axis XYZ="(0.262457, -0.929208, 0.260172)" />
+				<Rotation_Base XYZ="(-0.084079, 0.246577, 0.965469)" />
+				<Neighbor id="66" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.140467, -0.473614, 0.869459)" />
+				<Point XYZ="(0.995845, -0.412856, 0.011994)" />
+				<Vertex XYZ="(0.991485, -0.388929, 0.025732)" />
+				<Rotation_Axis XYZ="(0.156102, -0.856588, -0.491823)" />
+				<Rotation_Base XYZ="(0.140467, -0.473614, 0.869459)" />
+				<Neighbor id="74" />
+			</OrientPoint>
+			<OrientPoint id="5">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.235951, -0.971507, -0.022394)" />
+				<Point XYZ="(0.986279, -0.437519, -0.116579)" />
+				<Vertex XYZ="(1.000206, -0.436783, -0.001745)" />
+				<Rotation_Axis XYZ="(-0.120393, -0.006357, -0.992706)" />
+				<Rotation_Base XYZ="(0.235951, -0.971507, -0.022394)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="68" Normal="(0.936477,0.133827,-0.324192)" Center="(0.935262,-0.405274,-0.323493)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.447362, 0.216525, -0.867747)" />
+				<Point XYZ="(0.908370, -0.410619, -0.403616)" />
+				<Vertex XYZ="(0.909371, -0.443824, -0.412417)" />
+				<Rotation_Axis XYZ="(-0.029104, 0.966212, 0.256099)" />
+				<Rotation_Base XYZ="(-0.447362, 0.216525, -0.867747)" />
+				<Neighbor id="69" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.794679, 0.576984, 0.188612)" />
+				<Point XYZ="(0.929662, -0.369510, -0.325072)" />
+				<Vertex XYZ="(0.907370, -0.377414, -0.394815)" />
+				<Rotation_Axis XYZ="(0.302701, 0.107335, 0.947022)" />
+				<Rotation_Base XYZ="(-0.270543, 0.962442, -0.022608)" />
+				<Neighbor id="40" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.150378, 0.330727, 0.931668)" />
+				<Point XYZ="(0.962153, -0.399930, -0.243371)" />
+				<Vertex XYZ="(0.951955, -0.361605, -0.255329)" />
+				<Rotation_Axis XYZ="(0.246214, -0.925220, 0.288697)" />
+				<Rotation_Base XYZ="(0.150378, 0.330727, 0.931668)" />
+				<Neighbor id="67" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.135761, -0.990600, -0.016757)" />
+				<Point XYZ="(0.940861, -0.441039, -0.321915)" />
+				<Vertex XYZ="(0.972352, -0.438254, -0.231412)" />
+				<Rotation_Axis XYZ="(-0.328490, -0.029050, -0.944061)" />
+				<Rotation_Base XYZ="(0.135761, -0.990600, -0.016757)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="69" Normal="(0.839769,0.168902,-0.516003)" Center="(0.840696,-0.374150,-0.501708)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.629764, 0.058308, -0.774595)" />
+				<Point XYZ="(0.775530, -0.388214, -0.612465)" />
+				<Vertex XYZ="(0.780631, -0.438531, -0.620400)" />
+				<Rotation_Axis XYZ="(-0.099641, 0.982877, 0.154997)" />
+				<Rotation_Base XYZ="(-0.629764, 0.058308, -0.774595)" />
+				<Neighbor id="70" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.858467, 0.473201, 0.197776)" />
+				<Point XYZ="(0.803053, -0.305491, -0.540453)" />
+				<Vertex XYZ="(0.770429, -0.337897, -0.604530)" />
+				<Rotation_Axis XYZ="(0.413655, 0.410877, 0.812447)" />
+				<Rotation_Base XYZ="(-0.462738, 0.863398, -0.201042)" />
+				<Neighbor id="41" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.669994, 0.684689, 0.286896)" />
+				<Point XYZ="(0.871524, -0.325250, -0.435596)" />
+				<Vertex XYZ="(0.835678, -0.273086, -0.476376)" />
+				<Rotation_Axis XYZ="(0.476083, -0.692814, 0.541621)" />
+				<Rotation_Base XYZ="(0.147109, 0.669963, 0.727674)" />
+				<Neighbor id="40" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.447362, -0.216525, 0.867747)" />
+				<Point XYZ="(0.908370, -0.410619, -0.403616)" />
+				<Vertex XYZ="(0.907370, -0.377414, -0.394815)" />
+				<Rotation_Axis XYZ="(0.029104, -0.966212, -0.256099)" />
+				<Rotation_Base XYZ="(0.447362, -0.216525, 0.867747)" />
+				<Neighbor id="68" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.132418, -0.985397, -0.107044)" />
+				<Point XYZ="(0.845001, -0.441177, -0.516409)" />
+				<Vertex XYZ="(0.909371, -0.443824, -0.412417)" />
+				<Rotation_Axis XYZ="(-0.526197, 0.021634, -0.850087)" />
+				<Rotation_Base XYZ="(0.132418, -0.985397, -0.107044)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="70" Normal="(0.689160,0.185958,-0.700341)" Center="(0.681231,-0.365501,-0.699107)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.771186, -0.110906, -0.626875)" />
+				<Point XYZ="(0.597010, -0.396872, -0.790452)" />
+				<Vertex XYZ="(0.605785, -0.441531, -0.793346)" />
+				<Rotation_Axis XYZ="(-0.192418, 0.979259, 0.063465)" />
+				<Rotation_Base XYZ="(-0.771185, -0.110906, -0.626875)" />
+				<Neighbor id="71" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="40" />
+				<Normal XYZ="(-0.880009, 0.375063, 0.291398)" />
+				<Point XYZ="(0.624654, -0.304773, -0.738630)" />
+				<Vertex XYZ="(0.588234, -0.352212, -0.787557)" />
+				<Rotation_Axis XYZ="(0.471330, 0.613932, 0.633195)" />
+				<Rotation_Base XYZ="(-0.636465, 0.733770, -0.237683)" />
+				<Neighbor id="42" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.579215, 0.814729, 0.026970)" />
+				<Point XYZ="(0.715752, -0.297615, -0.647116)" />
+				<Vertex XYZ="(0.661075, -0.257334, -0.689702)" />
+				<Rotation_Axis XYZ="(0.682094, -0.502506, 0.531258)" />
+				<Rotation_Base XYZ="(0.156774, 0.810088, 0.564960)" />
+				<Neighbor id="41" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.629764, -0.058308, 0.774595)" />
+				<Point XYZ="(0.775530, -0.388214, -0.612465)" />
+				<Vertex XYZ="(0.770429, -0.337897, -0.604530)" />
+				<Rotation_Axis XYZ="(0.099641, -0.982877, -0.154997)" />
+				<Rotation_Base XYZ="(0.629764, -0.058308, 0.774595)" />
+				<Neighbor id="69" />
+			</OrientPoint>
+			<OrientPoint id="4">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.139307, -0.982481, -0.123791)" />
+				<Point XYZ="(0.693208, -0.440031, -0.706873)" />
+				<Vertex XYZ="(0.780631, -0.438531, -0.620400)" />
+				<Rotation_Axis XYZ="(-0.710906, -0.012200, -0.703182)" />
+				<Rotation_Base XYZ="(0.139307, -0.982481, -0.123791)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="71" Normal="(0.514888,0.160275,-0.842141)" Center="(0.516649,-0.386405,-0.837555)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.844748, 0.453213, -0.284604)" />
+				<Point XYZ="(0.436289, -0.375939, -0.884659)" />
+				<Vertex XYZ="(0.415011, -0.430391, -0.908214)" />
+				<Rotation_Axis XYZ="(0.337592, 0.863925, 0.373720)" />
+				<Rotation_Base XYZ="(-0.844748, 0.453213, -0.284604)" />
+				<Neighbor id="61" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="-40" />
+				<Normal XYZ="(0.355917, 0.898486, -0.256993)" />
+				<Point XYZ="(0.522900, -0.336850, -0.824331)" />
+				<Vertex XYZ="(0.457567, -0.321487, -0.861104)" />
+				<Rotation_Axis XYZ="(0.853706, -0.200739, 0.480509)" />
+				<Rotation_Base XYZ="(0.028297, 0.939236, 0.342103)" />
+				<Neighbor id="42" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.771186, 0.110906, 0.626875)" />
+				<Point XYZ="(0.597010, -0.396872, -0.790452)" />
+				<Vertex XYZ="(0.588234, -0.352212, -0.787557)" />
+				<Rotation_Axis XYZ="(0.192418, -0.979259, -0.063465)" />
+				<Rotation_Base XYZ="(0.771185, 0.110906, 0.626875)" />
+				<Neighbor id="70" />
+			</OrientPoint>
+			<OrientPoint id="3">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.040493, -0.985818, -0.162861)" />
+				<Point XYZ="(0.510398, -0.435961, -0.850780)" />
+				<Vertex XYZ="(0.605785, -0.441531, -0.793346)" />
+				<Rotation_Axis XYZ="(-0.855623, 0.049965, -0.515182)" />
+				<Rotation_Base XYZ="(0.040493, -0.985818, -0.162861)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="72" Normal="(0.835765,0.173875,0.520831)" Center="(0.852593,-0.412988,0.512979)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.107465, 0.778075, -0.618911)" />
+				<Point XYZ="(0.864203, -0.401642, 0.490561)" />
+				<Vertex XYZ="(0.887651, -0.427850, 0.461685)" />
+				<Rotation_Axis XYZ="(-0.515301, 0.575965, 0.634610)" />
+				<Rotation_Base XYZ="(0.107465, 0.778075, -0.618911)" />
+				<Neighbor id="65" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.591005, 0.509867, 0.625099)" />
+				<Point XYZ="(0.835065, -0.405556, 0.538626)" />
+				<Vertex XYZ="(0.840756, -0.375434, 0.519437)" />
+				<Rotation_Axis XYZ="(-0.157366, -0.832900, 0.530578)" />
+				<Rotation_Base XYZ="(-0.591005, 0.509867, 0.625099)" />
+				<Neighbor id="64" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.184506, -0.982315, 0.031865)" />
+				<Point XYZ="(0.858512, -0.431764, 0.509749)" />
+				<Vertex XYZ="(0.829374, -0.435678, 0.557814)" />
+				<Rotation_Axis XYZ="(0.517161, 0.069465, -0.853065)" />
+				<Rotation_Base XYZ="(0.184506, -0.982315, 0.031865)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="73" Normal="(0.939795,0.203836,0.274293)" Center="(0.950584,-0.401107,0.285037)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.000999, 0.628697, -0.777650)" />
+				<Point XYZ="(0.958484, -0.388655, 0.248719)" />
+				<Vertex XYZ="(0.975941, -0.427220, 0.217564)" />
+				<Rotation_Axis XYZ="(-0.332140, 0.733711, 0.592748)" />
+				<Rotation_Base XYZ="(0.000999, 0.628697, -0.777650)" />
+				<Neighbor id="66" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.421314, 0.665738, 0.615863)" />
+				<Point XYZ="(0.937906, -0.388051, 0.318773)" />
+				<Vertex XYZ="(0.941026, -0.350091, 0.279874)" />
+				<Rotation_Axis XYZ="(-0.057312, -0.697262, 0.714521)" />
+				<Rotation_Base XYZ="(-0.421314, 0.665738, 0.615863)" />
+				<Neighbor id="65" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.193295, -0.978970, 0.065230)" />
+				<Point XYZ="(0.955364, -0.426615, 0.287618)" />
+				<Vertex XYZ="(0.934786, -0.426010, 0.357672)" />
+				<Rotation_Axis XYZ="(0.281821, -0.008283, -0.959431)" />
+				<Rotation_Base XYZ="(0.193295, -0.978970, 0.065230)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+		<Cross id="74" Normal="(0.985556,0.168179,0.019898)" Center="(0.996351,-0.418470,0.034378)">
+			<OrientPoint id="0">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.140467, 0.473614, -0.869459)" />
+				<Point XYZ="(0.995845, -0.412856, 0.011994)" />
+				<Vertex XYZ="(1.000206, -0.436783, -0.001745)" />
+				<Rotation_Axis XYZ="(-0.156102, 0.856588, 0.491823)" />
+				<Rotation_Base XYZ="(-0.140467, 0.473614, -0.869459)" />
+				<Neighbor id="67" />
+			</OrientPoint>
+			<OrientPoint id="1">
+				<Angle Radian="0" />
+				<Normal XYZ="(-0.238026, 0.759253, 0.605705)" />
+				<Point XYZ="(0.994424, -0.409314, 0.052440)" />
+				<Vertex XYZ="(0.991485, -0.388929, 0.025732)" />
+				<Rotation_Axis XYZ="(0.087152, -0.604416, 0.791887)" />
+				<Rotation_Base XYZ="(-0.238026, 0.759253, 0.605705)" />
+				<Neighbor id="66" />
+			</OrientPoint>
+			<OrientPoint id="2">
+				<Angle Radian="0" />
+				<Normal XYZ="(0.165700, -0.981892, 0.091821)" />
+				<Point XYZ="(0.998784, -0.433241, 0.038701)" />
+				<Vertex XYZ="(0.997363, -0.429699, 0.079147)" />
+				<Rotation_Axis XYZ="(0.034980, -0.087197, -0.995577)" />
+				<Rotation_Base XYZ="(0.165700, -0.981892, 0.091821)" />
+				<Neighbor id="-1" />
+			</OrientPoint>
+		</Cross>
+	</CrossData>
+	<TiltNormal>[[[-0.768278, 0.053016, -0.023638], [-0.769251, -0.021955, -0.008305]], [[-0.680068, 0.136587, 0.110271], [-0.724527, 0.154766, 0.169850]], [[-0.536588, 0.250071, 0.075754], [-0.476622, 0.225618, 0.116532]], [[-0.485875, 0.276711, -0.103974], [-0.458394, 0.345541, -0.123051]], [[-0.584295, 0.185917, -0.237833], [-0.536466, 0.145235, -0.281583]], [[-0.723217, 0.075705, -0.192014], [-0.781669, 0.073538, -0.241364]], [[-0.931050, -0.209856, 0.038890], [-0.911778, -0.272540, 0.047438]], [[-0.878824, -0.125761, 0.157156], [-0.919177, -0.125740, 0.209552]], [[-0.795233, 0.008407, 0.132173], [-0.738682, 0.003905, 0.166165]], [[-0.768278, 0.053016, -0.023638], [-0.767437, 0.117803, -0.036889]], [[-0.830964, -0.047693, -0.143650], [-0.783224, -0.065039, -0.186003]], [[-0.910145, -0.176397, -0.106105], [-0.961364, -0.192890, -0.144554]], [[-0.811028, -0.065029, 0.279750], [-0.804730, -0.135889, 0.270822]], [[-0.719619, -0.021554, 0.411693], [-0.754623, -0.027573, 0.473973]], [[-0.602285, 0.102600, 0.403903], [-0.540213, 0.075784, 0.427742]], [[-0.578529, 0.187305, 0.250059], [-0.561033, 0.256701, 0.254354]], [[-0.680068, 0.136587, 0.110271], [-0.638416, 0.119557, 0.054454]], [[-0.795233, 0.008407, 0.132173], [-0.856541, 0.013289, 0.095323]], [[-0.578529, 0.187305, 0.250059], [-0.598244, 0.109103, 0.245219]], [[-0.456873, 0.208118, 0.394300], [-0.491780, 0.219065, 0.466336]], [[-0.285356, 0.293446, 0.370303], [-0.228623, 0.242274, 0.396579]], [[-0.234986, 0.360976, 0.192371], [-0.188112, 0.426766, 0.190936]], [[-0.364563, 0.338414, 0.042064], [-0.328114, 0.299230, -0.018464]], [[-0.536588, 0.250071, 0.075754], [-0.599895, 0.275886, 0.032705]], [[-0.485875, 0.276711, -0.103974], [-0.515784, 0.201800, -0.083212]], [[-0.364563, 0.338414, 0.042064], [-0.402138, 0.378811, 0.104462]], [[-0.173267, 0.392439, 0.000605], [-0.122491, 0.346802, 0.048316]], [[-0.108495, 0.382964, -0.191477], [-0.051991, 0.439330, -0.215301]], [[-0.236511, 0.320293, -0.334834], [-0.201860, 0.256279, -0.375318]], [[-0.422596, 0.268064, -0.288790], [-0.480027, 0.283675, -0.347060]], [[-0.667213, 0.069560, -0.350954], [-0.679264, 0.004169, -0.314534]], [[-0.584295, 0.185917, -0.237833], [-0.631676, 0.226219, -0.194492]], [[-0.422596, 0.268064, -0.288790], [-0.370321, 0.253855, -0.235751]], [[-0.353168, 0.226310, -0.457236], [-0.315900, 0.280538, -0.494893]], [[-0.446451, 0.108443, -0.562350], [-0.400475, 0.052044, -0.583634]], [[-0.598798, 0.033840, -0.507026], [-0.649418, 0.021169, -0.562023]], [[-0.876063, -0.163534, -0.245064], [-0.865116, -0.224887, -0.217312]], [[-0.830964, -0.047693, -0.143650], [-0.880210, -0.029799, -0.099960]], [[-0.723217, 0.075705, -0.192014], [-0.671111, 0.077636, -0.148021]], [[-0.667213, 0.069560, -0.350954], [-0.656369, 0.128403, -0.383727]], [[-0.723513, -0.058628, -0.447340], [-0.670559, -0.091647, -0.474905]], [[-0.824616, -0.168324, -0.389813], [-0.871201, -0.191739, -0.433811]], [[-0.930844, -0.326428, 0.287081], [-0.909048, -0.381631, 0.276860]], [[-0.870938, -0.275943, 0.402439], [-0.899089, -0.292723, 0.452965]], [[-0.809317, -0.146975, 0.405856], [-0.753478, -0.153424, 0.427475]], [[-0.811028, -0.065029, 0.279750], [-0.816318, -0.005509, 0.287249]], [[-0.878824, -0.125761, 0.157156], [-0.842077, -0.125780, 0.109442]], [[-0.937019, -0.258191, 0.167905], [-0.988044, -0.267656, 0.137347]], [[-0.800670, -0.253123, 0.513285], [-0.792827, -0.309040, 0.483421]], [[-0.710097, -0.242459, 0.625956], [-0.732128, -0.265748, 0.681204]], [[-0.617778, -0.122049, 0.642637], [-0.558704, -0.144626, 0.651614]], [[-0.618653, -0.007292, 0.535802], [-0.608175, 0.051296, 0.558991]], [[-0.719619, -0.021554, 0.411693], [-0.688434, -0.016191, 0.356206]], [[-0.809317, -0.146975, 0.405856], [-0.868541, -0.140134, 0.382926]], [[-0.618653, -0.007292, 0.535802], [-0.630628, -0.074252, 0.509300]], [[-0.501929, -0.018981, 0.656864], [-0.528879, -0.033886, 0.723053]], [[-0.360104, 0.077239, 0.656987], [-0.302951, 0.032236, 0.663125]], [[-0.331416, 0.194446, 0.526322], [-0.295808, 0.255032, 0.546090]], [[-0.456873, 0.208118, 0.394300], [-0.425332, 0.198227, 0.329210]], [[-0.602285, 0.102600, 0.403903], [-0.665489, 0.129906, 0.379631]], [[-0.331416, 0.194446, 0.526322], [-0.370103, 0.128618, 0.504845]], [[-0.201137, 0.145541, 0.649883], [-0.225662, 0.143572, 0.725288]], [[-0.022130, 0.190183, 0.626985], [0.020166, 0.123261, 0.631863]], [[0.035008, 0.288845, 0.474911], [0.096442, 0.337429, 0.487424]], [[-0.097940, 0.343203, 0.341790], [-0.075060, 0.316201, 0.270806]], [[-0.285356, 0.293446, 0.370303], [-0.341052, 0.343683, 0.344507]], [[-0.234986, 0.360976, 0.192371], [-0.284326, 0.291725, 0.193882]], [[-0.097940, 0.343203, 0.341790], [-0.122471, 0.372154, 0.417898]], [[0.101227, 0.355939, 0.302938], [0.138215, 0.285420, 0.332795]], [[0.166308, 0.387305, 0.112614], [0.238198, 0.432056, 0.104773]], [[0.028860, 0.406032, -0.040300], [0.047708, 0.348388, -0.099919]], [[-0.173267, 0.392439, 0.000605], [-0.225113, 0.439036, -0.048111]], [[-0.108495, 0.382964, -0.191477], [-0.165636, 0.325962, -0.167385]], [[0.028860, 0.406032, -0.040300], [0.010193, 0.463124, 0.018748]], [[0.228427, 0.377912, -0.079524], [0.258303, 0.319637, -0.026550]], [[0.286738, 0.328403, -0.266158], [0.361857, 0.357500, -0.290762]], [[0.151083, 0.306808, -0.412067], [0.161299, 0.230349, -0.445895]], [[-0.044582, 0.333249, -0.376610], [-0.089067, 0.364071, -0.441154]], [[-0.353168, 0.226310, -0.457236], [-0.392172, 0.169555, -0.417823]], [[-0.236511, 0.320293, -0.334834], [-0.269521, 0.381274, -0.296267]], [[-0.044582, 0.333249, -0.376610], [-0.002678, 0.304215, -0.315809]], [[0.019601, 0.251051, -0.539700], [0.079889, 0.286628, -0.577057]], [[-0.101924, 0.161942, -0.653020], [-0.075366, 0.088262, -0.665739]], [[-0.282765, 0.150157, -0.612331], [-0.330905, 0.150420, -0.675405]], [[-0.524679, -0.020924, -0.639332], [-0.547339, -0.066993, -0.592028]], [[-0.446451, 0.108443, -0.562350], [-0.488787, 0.160378, -0.542752]], [[-0.282765, 0.150157, -0.612331], [-0.240409, 0.149925, -0.556838]], [[-0.211102, 0.056192, -0.738027], [-0.168459, 0.088431, -0.782926]], [[-0.299248, -0.067044, -0.804733], [-0.261980, -0.126022, -0.802222]], [[-0.449139, -0.102445, -0.756019], [-0.490772, -0.124979, -0.807327]], [[-0.763924, -0.189319, -0.517090], [-0.764699, -0.239286, -0.475662]], [[-0.723513, -0.058628, -0.447340], [-0.773898, -0.027210, -0.421113]], [[-0.598798, 0.033840, -0.507026], [-0.555456, 0.044688, -0.459937]], [[-0.524679, -0.020924, -0.639332], [-0.503608, 0.021913, -0.683317]], [[-0.576278, -0.155317, -0.700265], [-0.526719, -0.196525, -0.707981]], [[-0.690807, -0.231246, -0.637709], [-0.729215, -0.260816, -0.680884]], [[-0.612729, -0.250030, 0.724513], [-0.620575, -0.298675, 0.685407]], [[-0.505288, -0.277490, 0.814940], [-0.520908, -0.307488, 0.867980]], [[-0.393957, -0.183626, 0.833737], [-0.341087, -0.216984, 0.826728]], [[-0.385549, -0.053098, 0.757536], [-0.359517, -0.005982, 0.790086]], [[-0.501929, -0.018981, 0.656864], [-0.478706, -0.006138, 0.599830]], [[-0.617778, -0.122049, 0.642637], [-0.675955, -0.099814, 0.633796]], [[-0.385549, -0.053098, 0.757536], [-0.414204, -0.104963, 0.721706]], [[-0.267584, -0.114732, 0.845781], [-0.287796, -0.138733, 0.907509]], [[-0.119203, -0.056130, 0.843722], [-0.076042, -0.108785, 0.831094]], [[-0.078201, 0.073806, 0.748373], [-0.029951, 0.115257, 0.775736]], [[-0.201137, 0.145541, 0.649883], [-0.179726, 0.147259, 0.584054]], [[-0.360104, 0.077239, 0.656987], [-0.414316, 0.119925, 0.651165]], [[-0.078201, 0.073806, 0.748373], [-0.128825, 0.030317, 0.719665]], [[0.034156, -0.025116, 0.830429], [0.017004, -0.040073, 0.899425]], [[0.199043, -0.016968, 0.800876], [0.222677, -0.084060, 0.786097]], [[0.265328, 0.091534, 0.686041], [0.331005, 0.117070, 0.703723]], [[0.156512, 0.199762, 0.594206], [0.169096, 0.190187, 0.523296]], [[-0.022130, 0.190183, 0.626985], [-0.060871, 0.251480, 0.622517]], [[0.035008, 0.288845, 0.474911], [-0.027229, 0.239626, 0.462234]], [[0.156512, 0.199762, 0.594206], [0.142594, 0.210353, 0.672633]], [[0.338163, 0.174936, 0.549760], [0.354929, 0.096668, 0.556805]], [[0.408623, 0.237017, 0.386256], [0.485339, 0.260714, 0.389392]], [[0.293192, 0.328937, 0.258728], [0.298843, 0.290400, 0.188447]], [[0.101227, 0.355939, 0.302938], [0.066279, 0.422568, 0.274727]], [[0.166308, 0.387305, 0.112614], [0.096293, 0.343720, 0.120251]], [[0.293192, 0.328937, 0.258728], [0.287366, 0.368661, 0.331173]], [[0.474723, 0.263290, 0.213397], [0.484387, 0.188236, 0.247066]], [[0.533425, 0.254619, 0.028526], [0.614205, 0.268210, 0.016287]], [[0.414012, 0.310874, -0.118281], [0.408849, 0.247804, -0.171718]], [[0.228427, 0.377912, -0.079524], [0.199050, 0.435214, -0.131614]], [[0.286738, 0.328403, -0.266158], [0.216355, 0.301141, -0.243105]], [[0.414012, 0.310874, -0.118281], [0.418932, 0.370971, -0.067363]], [[0.577247, 0.213460, -0.146768], [0.583330, 0.156406, -0.092581]], [[0.612253, 0.138335, -0.312485], [0.688268, 0.137010, -0.333661]], [[0.493633, 0.154167, -0.452999], [0.478432, 0.081456, -0.479653]], [[0.331353, 0.246821, -0.435159], [0.306791, 0.283367, -0.500654]], [[0.019601, 0.251051, -0.539700], [-0.039184, 0.216362, -0.503274]], [[0.151083, 0.306808, -0.412067], [0.141700, 0.377039, -0.380995]], [[0.331353, 0.246821, -0.435159], [0.355432, 0.210994, -0.370952]], [[0.371753, 0.137350, -0.579583], [0.441949, 0.146510, -0.610800]], [[0.243922, 0.087537, -0.697131], [0.244751, 0.010359, -0.702490]], [[0.072040, 0.141252, -0.680340], [0.035240, 0.151755, -0.747581]], [[-0.211102, 0.056192, -0.738027], [-0.254253, 0.023568, -0.692593]], [[-0.101924, 0.161942, -0.653020], [-0.125570, 0.227541, -0.641696]], [[0.072040, 0.141252, -0.680340], [0.105643, 0.131661, -0.618944]], [[0.123156, 0.017166, -0.789692], [0.180464, 0.030629, -0.828747]], [[0.011952, -0.077519, -0.864911], [0.027996, -0.145407, -0.853752]], [[-0.148341, -0.059185, -0.840566], [-0.187113, -0.072778, -0.898034]], [[-0.373981, -0.188958, -0.845311], [-0.403037, -0.214287, -0.797766]], [[-0.299248, -0.067044, -0.804733], [-0.331923, -0.015335, -0.806934]], [[-0.148341, -0.059185, -0.840566], [-0.114748, -0.047408, -0.790775]], [[-0.087716, -0.175162, -0.913701], [-0.045014, -0.163328, -0.955924]], [[-0.170208, -0.289412, -0.946978], [-0.141573, -0.339721, -0.927096]], [[-0.305566, -0.295349, -0.914421], [-0.340578, -0.323376, -0.956074]], [[-0.616502, -0.285190, -0.736347], [-0.628386, -0.317342, -0.689289]], [[-0.576278, -0.155317, -0.700265], [-0.620725, -0.118359, -0.693345]], [[-0.449139, -0.102445, -0.756019], [-0.414420, -0.083652, -0.713231]], [[-0.373981, -0.188958, -0.845311], [-0.346344, -0.164867, -0.890535]], [[-0.425632, -0.313655, -0.871702], [-0.385083, -0.354221, -0.861722]], [[-0.541014, -0.357015, -0.818491], [-0.571781, -0.389748, -0.855522]], [[-0.401674, -0.312783, 0.883179], [-0.422528, -0.348010, 0.843016]], [[-0.300157, -0.372660, 0.939058], [-0.314575, -0.406609, 0.982973]], [[-0.184227, -0.314792, 0.953206], [-0.144465, -0.350615, 0.932599]], [[-0.159371, -0.186022, 0.909372], [-0.123427, -0.156503, 0.942921]], [[-0.267584, -0.114732, 0.845781], [-0.250844, -0.094855, 0.794658]], [[-0.393957, -0.183626, 0.833737], [-0.442157, -0.153214, 0.840126]], [[-0.159371, -0.186022, 0.909372], [-0.198611, -0.218246, 0.872747]], [[-0.059893, -0.281516, 0.958292], [-0.078438, -0.311356, 1.010112]], [[0.079784, -0.256554, 0.947905], [0.108094, -0.305279, 0.920628]], [[0.133665, -0.130046, 0.885691], [0.186202, -0.109210, 0.912622]], [[0.034156, -0.025116, 0.830429], [0.048936, -0.012228, 0.770973]], [[-0.119203, -0.056130, 0.843722], [-0.158226, -0.008523, 0.855140]], [[0.133665, -0.130046, 0.885691], [0.080484, -0.151137, 0.858431]], [[0.216092, -0.251101, 0.924876], [0.201734, -0.274406, 0.982032]], [[0.354602, -0.264200, 0.886682], [0.364537, -0.319811, 0.857962]], [[0.425275, -0.160278, 0.806256], [0.486323, -0.154620, 0.822291]], [[0.352144, -0.034101, 0.759635], [0.359547, -0.028483, 0.696947]], [[0.199043, -0.016968, 0.800876], [0.178428, 0.041555, 0.813767]], [[0.265328, 0.091534, 0.686041], [0.201164, 0.066586, 0.668766]], [[0.352144, -0.034101, 0.759635], [0.343853, -0.040393, 0.829845]], [[0.501223, -0.080035, 0.707072], [0.499943, -0.150098, 0.695786]], [[0.576115, -0.008071, 0.580794], [0.646718, -0.004740, 0.587274]], [[0.499871, 0.121265, 0.497077], [0.498981, 0.104995, 0.427994]], [[0.338163, 0.174936, 0.549760], [0.323353, 0.244072, 0.543538]], [[0.408623, 0.237017, 0.386256], [0.336318, 0.214683, 0.383300]], [[0.499871, 0.121265, 0.497077], [0.500820, 0.138625, 0.570787]], [[0.646520, 0.035484, 0.441674], [0.636588, -0.038585, 0.453949]], [[0.710049, 0.057776, 0.281548], [0.785537, 0.053967, 0.276791]], [[0.629500, 0.169829, 0.164092], [0.616334, 0.130415, 0.100778]], [[0.474723, 0.263290, 0.213397], [0.465887, 0.331917, 0.182611]], [[0.533425, 0.254619, 0.028526], [0.460219, 0.242303, 0.039618]], [[0.629500, 0.169829, 0.164092], [0.642548, 0.208893, 0.226843]], [[0.759358, 0.051920, 0.122399], [0.745927, -0.012820, 0.157927]], [[0.796845, 0.016871, -0.041988], [0.869328, 0.002933, -0.055617]], [[0.710809, 0.093621, -0.175589], [0.685806, 0.038729, -0.220259]], [[0.577247, 0.213460, -0.146768], [0.571462, 0.267722, -0.198304]], [[0.612253, 0.138335, -0.312485], [0.545646, 0.139496, -0.293931]], [[0.710809, 0.093621, -0.175589], [0.733846, 0.144194, -0.134433]], [[0.815735, -0.036587, -0.190764], [0.804597, -0.082365, -0.140144]], [[0.824208, -0.116265, -0.328563], [0.887356, -0.139637, -0.344318]], [[0.735904, -0.078476, -0.456476], [0.703839, -0.136122, -0.477232]], [[0.628875, 0.045917, -0.455574], [0.622809, 0.078487, -0.516274]], [[0.371753, 0.137350, -0.579583], [0.307948, 0.129024, -0.551207]], [[0.493633, 0.154167, -0.452999], [0.507179, 0.218959, -0.429248]], [[0.628875, 0.045917, -0.455574], [0.635043, 0.012796, -0.393844]], [[0.638476, -0.068150, -0.575299], [0.703546, -0.082816, -0.597581]], [[0.526012, -0.083228, -0.691345], [0.505096, -0.150358, -0.692656]], [[0.394530, 0.014023, -0.698203], [0.372965, 0.028357, -0.763587]], [[0.123156, 0.017166, -0.789692], [0.068466, 0.004319, -0.752421]], [[0.243922, 0.087537, -0.697131], [0.243200, 0.154790, -0.692461]], [[0.394530, 0.014023, -0.698203], [0.415205, 0.000280, -0.635521]], [[0.415207, -0.120678, -0.787578], [0.475880, -0.127441, -0.816184]], [[0.299757, -0.182268, -0.871090], [0.293651, -0.247438, -0.854935]], [[0.158314, -0.117939, -0.874277], [0.127372, -0.123719, -0.933896]], [[-0.087716, -0.175162, -0.913701], [-0.129456, -0.186729, -0.872430]], [[0.011952, -0.077519, -0.864911], [-0.001634, -0.020027, -0.874361]], [[0.158314, -0.117939, -0.874277], [0.185772, -0.112809, -0.821372]], [[0.191740, -0.249920, -0.929685], [0.241363, -0.253672, -0.962892]], [[0.091270, -0.332748, -0.971151], [0.098081, -0.386682, -0.946172]], [[-0.041824, -0.298409, -0.964534], [-0.073420, -0.320024, -1.010510]], [[0.425275, -0.160278, 0.806256], [0.368055, -0.165580, 0.791226]], [[0.474775, -0.288679, 0.838255], [0.468014, -0.305567, 0.894799]], [[0.588364, -0.340013, 0.780699], [0.576051, -0.394226, 0.759782]], [[0.663206, -0.273648, 0.689945], [0.721422, -0.284114, 0.695384]], [[0.625566, -0.142071, 0.648317], [0.624063, -0.141628, 0.588939]], [[0.501223, -0.080035, 0.707072], [0.502294, -0.021402, 0.716516]], [[0.576115, -0.008071, 0.580794], [0.511350, -0.011128, 0.574850]], [[0.625566, -0.142071, 0.648317], [0.627212, -0.142556, 0.713403]], [[0.734182, -0.226426, 0.584852], [0.712916, -0.287772, 0.579983]], [[0.802514, -0.193816, 0.458395], [0.865278, -0.211128, 0.457935]], [[0.764303, -0.065905, 0.382739], [0.751120, -0.082409, 0.321151]], [[0.646520, 0.035484, 0.441674], [0.655059, 0.099162, 0.431121]], [[0.710049, 0.057776, 0.281548], [0.642870, 0.061166, 0.285781]], [[0.764303, -0.065905, 0.382739], [0.777948, -0.048821, 0.446491]], [[0.857335, -0.181810, 0.328133], [0.831253, -0.242016, 0.343537]], [[0.902109, -0.186116, 0.182882], [0.964537, -0.210405, 0.175450]], [[0.858386, -0.076068, 0.078340], [0.832238, -0.107916, 0.025008]], [[0.759358, 0.051920, 0.122399], [0.771418, 0.110052, 0.090498]], [[0.796845, 0.016871, -0.041988], [0.735052, 0.028753, -0.030369]], [[0.858386, -0.076068, 0.078340], [0.883213, -0.045830, 0.128975]], [[0.929246, -0.205646, 0.045770], [0.904618, -0.254880, 0.078389]], [[0.942325, -0.246749, -0.092535], [0.997631, -0.276873, -0.103865]], [[0.890355, -0.170628, -0.208741], [0.855325, -0.210527, -0.244455]], [[0.815735, -0.036587, -0.190764], [0.826041, 0.005773, -0.237604]], [[0.824208, -0.116265, -0.328563], [0.771613, -0.096800, -0.315440]], [[0.890355, -0.170628, -0.208741], [0.921886, -0.134715, -0.176594]], [[0.941342, -0.299584, -0.214447], [0.922184, -0.331725, -0.170660]], [[0.929662, -0.369510, -0.325072], [0.975433, -0.402742, -0.335936]], [[0.871524, -0.325250, -0.435596], [0.832935, -0.364686, -0.452120]], [[0.817057, -0.200962, -0.444793], [0.822708, -0.176751, -0.496748]], [[0.638476, -0.068150, -0.575299], [0.582322, -0.055494, -0.556070]], [[0.735904, -0.078476, -0.456476], [0.764046, -0.027884, -0.438260]], [[0.817057, -0.200962, -0.444793], [0.811103, -0.226472, -0.390048]], [[0.803053, -0.305491, -0.540453], [0.855154, -0.334210, -0.552456]], [[0.715752, -0.297615, -0.647116], [0.680599, -0.347061, -0.648753]], [[0.632327, -0.182761, -0.670279], [0.624243, -0.170538, -0.729173]], [[0.415207, -0.120678, -0.787578], [0.361596, -0.114703, -0.762301]], [[0.526012, -0.083228, -0.691345], [0.543730, -0.026364, -0.690235]], [[0.632327, -0.182761, -0.670279], [0.640263, -0.194758, -0.612471]], [[0.624654, -0.304773, -0.738630], [0.677078, -0.327116, -0.755989]], [[0.522900, -0.336850, -0.824331], [0.501698, -0.390374, -0.809021]], [[0.419768, -0.252287, -0.852212], [0.400643, -0.255496, -0.908539]], [[-0.967111, -0.376072, 0.194885], [-0.961766, -0.393257, 0.245482]], [[-0.937019, -0.258191, 0.167905], [-0.891520, -0.249750, 0.195153]], [[-0.931050, -0.209856, 0.038890], [-0.946699, -0.158956, 0.031949]], [[-0.960311, -0.291362, -0.063303], [-0.953129, -0.280144, -0.115327]], [[-0.989994, -0.396785, -0.054825], [-0.995801, -0.425676, -0.099719]], [[-0.990825, -0.433162, 0.074349], [-1.005067, -0.484899, 0.076430]], [[-0.981695, -0.391910, -0.131314], [-0.995917, -0.430822, -0.105457]], [[-0.960311, -0.291362, -0.063303], [-0.966842, -0.301563, -0.015994]], [[-0.910145, -0.176397, -0.106105], [-0.872324, -0.164217, -0.077713]], [[-0.876063, -0.163534, -0.245064], [-0.883899, -0.119615, -0.264930]], [[-0.894753, -0.264845, -0.329680], [-0.878506, -0.266479, -0.375705]], [[-0.942400, -0.376909, -0.294059], [-0.941584, -0.409951, -0.330010]], [[-0.974842, -0.423901, -0.217341], [-0.990211, -0.469967, -0.222499]], [[-0.912645, -0.377407, -0.377120], [-0.935176, -0.407490, -0.346584]], [[-0.894753, -0.264845, -0.329680], [-0.910863, -0.263225, -0.284041]], [[-0.824616, -0.168324, -0.389813], [-0.791549, -0.151702, -0.358583]], [[-0.763924, -0.189319, -0.517090], [-0.763345, -0.152043, -0.547997]], [[-0.778802, -0.306111, -0.574073], [-0.754674, -0.319229, -0.613958]], [[-0.837845, -0.399360, -0.533641], [-0.833548, -0.439368, -0.560584]], [[-0.887971, -0.425232, -0.458195], [-0.902910, -0.470972, -0.463650]], [[-0.913373, -0.384785, 0.378841], [-0.889601, -0.371152, 0.426864]], [[-0.930844, -0.326428, 0.287081], [-0.950854, -0.275745, 0.296466]], [[-0.967111, -0.376072, 0.194885], [-0.972614, -0.358379, 0.142790]], [[-0.949640, -0.434429, 0.286644], [-0.958729, -0.488957, 0.287824]], [[-0.989994, -0.396785, -0.054825], [-0.985198, -0.372924, -0.017747]], [[-0.981695, -0.391910, -0.131314], [-0.968779, -0.356571, -0.154797]], [[-0.990961, -0.430122, -0.105524], [-0.998322, -0.473713, -0.109101]], [[-0.778836, -0.357461, 0.597199], [-0.741409, -0.353658, 0.644013]], [[-0.800670, -0.253123, 0.513285], [-0.808043, -0.200549, 0.541364]], [[-0.870938, -0.275943, 0.402439], [-0.842865, -0.259210, 0.352053]], [[-0.913373, -0.384785, 0.378841], [-0.939193, -0.399593, 0.326679]], [[-0.852621, -0.433029, 0.503068], [-0.862764, -0.491607, 0.511586]], [[-0.942400, -0.376909, -0.294059], [-0.943270, -0.341678, -0.255724]], [[-0.912645, -0.377407, -0.377120], [-0.888418, -0.345059, -0.409955]], [[-0.937267, -0.423051, -0.335729], [-0.947017, -0.474104, -0.338915]], [[-0.591323, -0.366526, 0.785521], [-0.543123, -0.376155, 0.824987]], [[-0.612729, -0.250030, 0.724513], [-0.604866, -0.201285, 0.763699]], [[-0.710097, -0.242459, 0.625956], [-0.688356, -0.219476, 0.571435]], [[-0.778836, -0.357461, 0.597199], [-0.818120, -0.361453, 0.548063]], [[-0.698207, -0.430020, 0.700345], [-0.709082, -0.491316, 0.710245]], [[-0.801152, -0.404430, -0.588854], [-0.833661, -0.429018, -0.557369]], [[-0.778802, -0.306111, -0.574073], [-0.804463, -0.292159, -0.531652]], [[-0.690807, -0.231246, -0.637709], [-0.660333, -0.207783, -0.603452]], [[-0.616502, -0.285190, -0.736347], [-0.605989, -0.256747, -0.777978]], [[-0.621621, -0.392120, -0.771342], [-0.587524, -0.410977, -0.805024]], [[-0.718275, -0.436494, -0.687485], [-0.727562, -0.486289, -0.696809]], [[-0.837845, -0.399360, -0.533641], [-0.841242, -0.367727, -0.512339]], [[-0.801152, -0.404430, -0.588854], [-0.776985, -0.386151, -0.612259]], [[-0.831737, -0.431985, -0.552813], [-0.838913, -0.469571, -0.554131]], [[-0.380053, -0.407381, 0.917531], [-0.332611, -0.424382, 0.941476]], [[-0.401674, -0.312783, 0.883179], [-0.381385, -0.278510, 0.922253]], [[-0.505288, -0.277490, 0.814940], [-0.491433, -0.250883, 0.767896]], [[-0.591323, -0.366526, 0.785521], [-0.633986, -0.358004, 0.750588]], [[-0.500406, -0.437077, 0.853882], [-0.508006, -0.491761, 0.861942]], [[-0.241483, -0.383013, -0.956850], [-0.295246, -0.384195, -0.943608]], [[-0.170208, -0.289412, -0.946978], [-0.196119, -0.243889, -0.964968]], [[-0.041824, -0.298409, -0.964534], [-0.012576, -0.278400, -0.921974]], [[0.009178, -0.393871, -0.989886], [0.063894, -0.402235, -0.991764]], [[-0.120526, -0.438775, -0.982499], [-0.122682, -0.493111, -0.993001]], [[-0.476422, -0.404145, -0.870387], [-0.524172, -0.414371, -0.847644]], [[-0.425632, -0.313655, -0.871702], [-0.463151, -0.276121, -0.880936]], [[-0.305566, -0.295349, -0.914421], [-0.274751, -0.270684, -0.877763]], [[-0.241483, -0.383013, -0.956850], [-0.189190, -0.381864, -0.969731]], [[-0.357677, -0.439742, -0.923276], [-0.360079, -0.492669, -0.933005]], [[-0.621621, -0.392120, -0.771342], [-0.653121, -0.374698, -0.740225]], [[-0.541014, -0.357015, -0.818491], [-0.515869, -0.330262, -0.788226]], [[-0.476422, -0.404145, -0.870387], [-0.434246, -0.395114, -0.890476]], [[-0.557029, -0.439250, -0.823238], [-0.562398, -0.486231, -0.828526]], [[-0.222588, -0.408055, 0.968150], [-0.181993, -0.394653, 0.974365]], [[-0.300157, -0.372660, 0.939058], [-0.289296, -0.347087, 0.905978]], [[-0.380053, -0.407381, 0.917531], [-0.416785, -0.394218, 0.898992]], [[-0.302484, -0.442776, 0.946623], [-0.304024, -0.485704, 0.951217]], [[0.025985, -0.369633, 0.983791], [0.080575, -0.361457, 0.980236]], [[-0.059893, -0.281516, 0.958292], [-0.043509, -0.255153, 0.912509]], [[-0.184227, -0.314792, 0.953206], [-0.222577, -0.280241, 0.973082]], [[-0.222588, -0.408055, 0.968150], [-0.274567, -0.425215, 0.960192]], [[-0.087980, -0.437768, 0.986147], [-0.086650, -0.492003, 0.996933]], [[0.287606, -0.363111, 0.940160], [0.347143, -0.367565, 0.923395]], [[0.216092, -0.251101, 0.924876], [0.230142, -0.228295, 0.868947]], [[0.079784, -0.256554, 0.947905], [0.051743, -0.208292, 0.974923]], [[0.025985, -0.369633, 0.983791], [-0.035217, -0.378799, 0.987776]], [[0.161572, -0.431554, 0.976100], [0.164368, -0.491929, 0.989977]], [[0.522150, -0.391980, 0.841807], [0.571955, -0.406612, 0.815290]], [[0.474775, -0.288679, 0.838255], [0.481409, -0.272105, 0.782765]], [[0.354602, -0.264200, 0.886682], [0.345463, -0.213048, 0.913098]], [[0.287606, -0.363111, 0.940160], [0.231642, -0.358924, 0.955919]], [[0.401255, -0.434875, 0.905572], [0.404322, -0.491828, 0.917605]], [[0.195528, -0.374216, -0.966444], [0.146878, -0.398272, -0.982748]], [[0.191740, -0.249920, -0.929685], [0.144736, -0.246365, -0.898230]], [[0.299757, -0.182268, -0.871090], [0.304889, -0.127491, -0.884670]], [[0.419768, -0.252287, -0.852212], [0.437960, -0.249235, -0.798630]], [[0.436289, -0.375939, -0.884659], [0.484159, -0.401622, -0.868531]], [[0.320066, -0.430217, -0.940297], [0.325046, -0.484628, -0.955329]], [[0.009178, -0.393871, -0.989886], [-0.044316, -0.385693, -0.988051]], [[0.091270, -0.332748, -0.971151], [0.085105, -0.283935, -0.993759]], [[0.195528, -0.374216, -0.966444], [0.242013, -0.351231, -0.950866]], [[0.113437, -0.435339, -0.985179], [0.116910, -0.488748, -0.993383]], [[0.667631, -0.384688, 0.728848], [0.700628, -0.368232, 0.692573]], [[0.588364, -0.340013, 0.780699], [0.599086, -0.292805, 0.798915]], [[0.522150, -0.391980, 0.841807], [0.477954, -0.378996, 0.865336]], [[0.601416, -0.436654, 0.789955], [0.607316, -0.487727, 0.795631]], [[0.835065, -0.405556, 0.538626], [0.865717, -0.432000, 0.506206]], [[0.815381, -0.308161, 0.521341], [0.839827, -0.297680, 0.476817]], [[0.734182, -0.226426, 0.584852], [0.751122, -0.177560, 0.588730]], [[0.663206, -0.273648, 0.689945], [0.612375, -0.264510, 0.685196]], [[0.667631, -0.384688, 0.728848], [0.634545, -0.401188, 0.765220]], [[0.758290, -0.434861, 0.641040], [0.768041, -0.485030, 0.649861]], [[0.937906, -0.388051, 0.318773], [0.958091, -0.419945, 0.289268]], [[0.920337, -0.283484, 0.271297], [0.934433, -0.284998, 0.225534]], [[0.857335, -0.181810, 0.328133], [0.875875, -0.139012, 0.317183]], [[0.802514, -0.193816, 0.458395], [0.756331, -0.181077, 0.458733]], [[0.815381, -0.308161, 0.521341], [0.792798, -0.317843, 0.562469]], [[0.864203, -0.401642, 0.490561], [0.859055, -0.438919, 0.520212]], [[0.911219, -0.426930, 0.409678], [0.925435, -0.472332, 0.415318]], [[0.994424, -0.409314, 0.052440], [1.005781, -0.445540, 0.023540]], [[0.972703, -0.322432, 0.007113], [0.976714, -0.334197, -0.038952]], [[0.929246, -0.205646, 0.045770], [0.947610, -0.168935, 0.021447]], [[0.902109, -0.186116, 0.182882], [0.857915, -0.168921, 0.188144]], [[0.920337, -0.283484, 0.271297], [0.906298, -0.281976, 0.316873]], [[0.958484, -0.388655, 0.248719], [0.958436, -0.418652, 0.285823]], [[0.986652, -0.428459, 0.148356], [1.001017, -0.473857, 0.151392]], [[0.962153, -0.399930, -0.243371], [0.954682, -0.416360, -0.289656]], [[0.941342, -0.299584, -0.214447], [0.957867, -0.271861, -0.252216]], [[0.942325, -0.246749, -0.092535], [0.899386, -0.223362, -0.083739]], [[0.972703, -0.322432, 0.007113], [0.968525, -0.310182, 0.055078]], [[0.995845, -0.412856, 0.011994], [1.002824, -0.436385, 0.055189]], [[0.986279, -0.437519, -0.116579], [0.998001, -0.485783, -0.117691]], [[0.908370, -0.410619, -0.403616], [0.888618, -0.401059, -0.441930]], [[0.929662, -0.369510, -0.325072], [0.894575, -0.344034, -0.316744]], [[0.962153, -0.399930, -0.243371], [0.968793, -0.385327, -0.202234]], [[0.940861, -0.441039, -0.321915], [0.946856, -0.484777, -0.322655]], [[0.775530, -0.388214, -0.612465], [0.742697, -0.385174, -0.652849]], [[0.803053, -0.305491, -0.540453], [0.758297, -0.280821, -0.530142]], [[0.871524, -0.325250, -0.435596], [0.906455, -0.289553, -0.420638]], [[0.908370, -0.410619, -0.403616], [0.931694, -0.421908, -0.358376]], [[0.845001, -0.441177, -0.516409], [0.851904, -0.492551, -0.521989]], [[0.597010, -0.396872, -0.790452], [0.555121, -0.402896, -0.824502]], [[0.624654, -0.304773, -0.738630], [0.576855, -0.284401, -0.722802]], [[0.715752, -0.297615, -0.647116], [0.747213, -0.253361, -0.645652]], [[0.775530, -0.388214, -0.612465], [0.809737, -0.391381, -0.570391]], [[0.693208, -0.440031, -0.706873], [0.700775, -0.493397, -0.713597]], [[0.436289, -0.375939, -0.884659], [0.391182, -0.351739, -0.899856]], [[0.522900, -0.336850, -0.824331], [0.541905, -0.288874, -0.838053]], [[0.597010, -0.396872, -0.790452], [0.638188, -0.390950, -0.756979]], [[0.510398, -0.435961, -0.850780], [0.512560, -0.488600, -0.859476]], [[0.864203, -0.401642, 0.490561], [0.867763, -0.375870, 0.470061]], [[0.835065, -0.405556, 0.538626], [0.815489, -0.388668, 0.559331]], [[0.858512, -0.431764, 0.509749], [0.864624, -0.464301, 0.510805]], [[0.958484, -0.388655, 0.248719], [0.958527, -0.361493, 0.215122]], [[0.937906, -0.388051, 0.318773], [0.919704, -0.359288, 0.345381]], [[0.955364, -0.426615, 0.287618], [0.963715, -0.468910, 0.290436]], [[0.995845, -0.412856, 0.011994], [0.992397, -0.401230, -0.009350]], [[0.994424, -0.409314, 0.052440], [0.988581, -0.390675, 0.067309]], [[0.998784, -0.433241, 0.038701], [1.002852, -0.457345, 0.040955]]]</TiltNormal>
+</Documents>

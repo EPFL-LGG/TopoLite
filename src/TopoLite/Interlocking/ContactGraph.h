@@ -9,6 +9,7 @@
 #include "Mesh/PolyMesh.h"
 #include "Utility/TopoObject.h"
 #include <string>
+
 #include <map>
 
 using pairIJ = std::pair<int, int>;
@@ -17,8 +18,48 @@ using pContactGraphNode = shared_ptr<ContactGraphNode>;
 using pContactGraphEdge = shared_ptr<ContactGraphEdge>;
 using wpContactGraphEdge = weak_ptr<ContactGraphEdge>;
 using wpContactGraphNode = weak_ptr<ContactGraphNode>;
+using pPolyMesh = shared_ptr<PolyMesh>;
+struct plane_contact
+{
+    EigenPoint nrm;
+    double D;
+    int partID;
+    int groupID;
+    weak_ptr<_Polygon> polygon;
+    double eps;
+};
 
-class ContactGraph : TopoObject
+struct plane_contact_compare
+{
+    bool operator()(const plane_contact& A, const plane_contact& B) const
+    {
+        double eps = A.eps / 2;
+
+        if (A.nrm[0] - B.nrm[0] < -eps)
+            return true;
+        if (A.nrm[0] - B.nrm[0] > eps)
+            return false;
+
+        if (A.nrm[1] - B.nrm[1] < -eps)
+            return true;
+        if (A.nrm[1] - B.nrm[1] > eps)
+            return false;
+
+        if (A.nrm[2] - B.nrm[2] < -eps)
+            return true;
+        if (A.nrm[2] - B.nrm[2] > eps)
+            return false;
+
+        if (A.D - B.D < -eps)
+            return true;
+        if (A.D - B.D > eps)
+            return false;
+
+        return false;
+    }
+};
+
+class ContactGraph : public TopoObject
 {
 public:
 
@@ -35,24 +76,11 @@ public:
 
 public:
 
-    struct plane_contact{
-        EigenPoint nrm;
-        int nx, ny, nz;
-        int D;
-        int partID;
-        weak_ptr<_Polygon> polygon;
-    };
-
     bool constructFromPolyMeshes(   vector<shared_ptr<PolyMesh>> &meshes,
-                                    vector<bool> &atBoundary);
+                                    vector<bool> &atBoundary,
+                                    double eps = 0.001);
 
-    void roundPlane(shared_ptr<_Polygon> poly, int partID, plane_contact &plane);
-
-    bool equalPlane(const plane_contact &A, const plane_contact &B);
-
-    static bool comparePlane(const plane_contact &A, const plane_contact &B);
-
-
+    void mergeFacesPolyMesh(vector<shared_ptr<PolyMesh>> &meshes, double eps = 1e-4);
 
 public:
 
@@ -65,6 +93,10 @@ public:
     void addContact(pContactGraphNode _nodeA, pContactGraphNode _nodeB, pContactGraphEdge _edge);
 
     void finalize();
+
+public:
+
+    void getContactMesh(pPolyMesh &mesh);
 };
 
 #endif //TOPOLOCKCREATOR_CONTACTGRAPH_H

@@ -49,6 +49,10 @@
 			<slope_bound_eps value="0.100000001" />
 			<slope_num_init_sample value="4" />
 			<kmeans_iteration value="100" />
+			<mosek_rbe_friction_coeff value="0" />
+			<GravityX value="0" />
+			<GravityY value="-1" />
+			<GravityZ value="0" />
 		</Para_ContactGraph>
 		<Para_CrossMesh>
 			<crossmesh_quadTree_leafNodeSize value="0.00999999978" />
@@ -61,6 +65,13 @@
 			<opt_knitro_opttol value="1.00000001e-10" />
 			<opt_iterations_times value="100" />
 			<opt_tiltAngle_width value="20" />
+			<opt_mod value="0" />
+			<opt_init_levelset value="0.00100000005" />
+			<opt_radius_scale_factor value="0.200000003" />
+			<opt_rs_factor_lower_bound value="0.00999999978" />
+			<opt_poly_size value="5" />
+			<opt_edge_sample value="10" />
+			<opt_tot_time value="0" />
 		</Para_Opt>
 		<pickPartIDs></pickPartIDs>
 		<Interact_Matrix>2.344562,-0.209693,0.000000,0.000000,0.209693,2.344562,0.000000,0.000000,0.000000,0.000000,0.470784,0.000000,0.000000,0.000000,0.000000,1.000000</Interact_Matrix>
@@ -82,17 +93,20 @@
 			<support_smallest_area value="0.00999999978" />
 		</Para_Support>
 		<Unit value="150" />
+		<slopSample value="10" />
+		<mult_move_scale value="1" />
+		<penetration_check value="0" />
+		<tilt_face_angle_min value="0" />
+		<tilt_face_angle_max value="0" />
+		<Boundary_PartIDs>61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102</Boundary_PartIDs>
 	</GUISettings>
 	<Output>
 		<Structure path="origin_data/origin_Surface.obj" />
 		<CrossMesh path="origin_data/origin_CrossMesh.obj" />
-		<PartGeometry>origin_data/PartGeometry/PartWire_60.obj
-origin_data/PartGeometry/PartWire_48.obj
-origin_data/PartGeometry/Part_13.obj
+		<PartGeometry>origin_data/PartGeometry/Part_13.obj
 origin_data/PartGeometry/Part_07.obj
 origin_data/PartGeometry/Part_06.obj
 origin_data/PartGeometry/Part_12.obj
-origin_data/PartGeometry/PartWire_49.obj
 origin_data/PartGeometry/Part_04.obj
 origin_data/PartGeometry/Part_10.obj
 origin_data/PartGeometry/Part_38.obj
@@ -106,110 +120,51 @@ origin_data/PartGeometry/Part_15.obj
 origin_data/PartGeometry/Part_14.obj
 origin_data/PartGeometry/Part_00.obj
 origin_data/PartGeometry/Part_28.obj
-origin_data/PartGeometry/PartWire_59.obj
 origin_data/PartGeometry/Part_16.obj
 origin_data/PartGeometry/Part_02.obj
 origin_data/PartGeometry/Part_03.obj
 origin_data/PartGeometry/Part_17.obj
-origin_data/PartGeometry/PartWire_58.obj
-origin_data/PartGeometry/PartWire_03.obj
-origin_data/PartGeometry/PartWire_17.obj
 origin_data/PartGeometry/Part_58.obj
 origin_data/PartGeometry/Part_59.obj
-origin_data/PartGeometry/PartWire_16.obj
-origin_data/PartGeometry/PartWire_02.obj
-origin_data/PartGeometry/PartWire_14.obj
-origin_data/PartGeometry/PartWire_00.obj
-origin_data/PartGeometry/PartWire_28.obj
-origin_data/PartGeometry/PartWire_29.obj
-origin_data/PartGeometry/PartWire_01.obj
-origin_data/PartGeometry/PartWire_15.obj
-origin_data/PartGeometry/PartWire_39.obj
-origin_data/PartGeometry/PartWire_11.obj
-origin_data/PartGeometry/PartWire_05.obj
-origin_data/PartGeometry/PartWire_04.obj
-origin_data/PartGeometry/PartWire_10.obj
-origin_data/PartGeometry/PartWire_38.obj
-origin_data/PartGeometry/BoundaryWire.obj
-origin_data/PartGeometry/PartWire_06.obj
-origin_data/PartGeometry/PartWire_12.obj
 origin_data/PartGeometry/Part_49.obj
 origin_data/PartGeometry/Part_60.obj
 origin_data/PartGeometry/Part_48.obj
-origin_data/PartGeometry/PartWire_13.obj
-origin_data/PartGeometry/PartWire_07.obj
-origin_data/PartGeometry/PartWire_22.obj
-origin_data/PartGeometry/PartWire_36.obj
 origin_data/PartGeometry/Part_51.obj
 origin_data/PartGeometry/Part_45.obj
 origin_data/PartGeometry/Part_44.obj
 origin_data/PartGeometry/Part_50.obj
-origin_data/PartGeometry/PartWire_37.obj
-origin_data/PartGeometry/PartWire_23.obj
-origin_data/PartGeometry/PartWire_35.obj
-origin_data/PartGeometry/PartWire_21.obj
-origin_data/PartGeometry/PartWire_09.obj
 origin_data/PartGeometry/Part_46.obj
 origin_data/PartGeometry/Part_52.obj
 origin_data/PartGeometry/Part_53.obj
 origin_data/PartGeometry/Part_47.obj
-origin_data/PartGeometry/PartWire_08.obj
-origin_data/PartGeometry/PartWire_20.obj
-origin_data/PartGeometry/PartWire_34.obj
-origin_data/PartGeometry/PartWire_18.obj
-origin_data/PartGeometry/PartWire_30.obj
-origin_data/PartGeometry/PartWire_24.obj
 origin_data/PartGeometry/Part_43.obj
 origin_data/PartGeometry/Part_57.obj
 origin_data/PartGeometry/Part_56.obj
 origin_data/PartGeometry/Part_42.obj
-origin_data/PartGeometry/PartWire_25.obj
-origin_data/PartGeometry/PartWire_31.obj
-origin_data/PartGeometry/PartWire_19.obj
-origin_data/PartGeometry/PartWire_27.obj
-origin_data/PartGeometry/PartWire_33.obj
 origin_data/PartGeometry/Part_54.obj
 origin_data/PartGeometry/Part_40.obj
 origin_data/PartGeometry/Part_41.obj
 origin_data/PartGeometry/Part_55.obj
-origin_data/PartGeometry/PartWire_32.obj
-origin_data/PartGeometry/PartWire_26.obj
-origin_data/PartGeometry/PartWire_41.obj
-origin_data/PartGeometry/PartWire_55.obj
 origin_data/PartGeometry/Part_32.obj
 origin_data/PartGeometry/Part_26.obj
 origin_data/PartGeometry/Part_27.obj
 origin_data/PartGeometry/Part_33.obj
-origin_data/PartGeometry/PartWire_54.obj
-origin_data/PartGeometry/PartWire_40.obj
-origin_data/PartGeometry/PartWire_56.obj
-origin_data/PartGeometry/PartWire_42.obj
 origin_data/PartGeometry/Part_25.obj
 origin_data/PartGeometry/Part_31.obj
 origin_data/PartGeometry/Part_19.obj
 origin_data/PartGeometry/Part_18.obj
 origin_data/PartGeometry/Part_30.obj
 origin_data/PartGeometry/Part_24.obj
-origin_data/PartGeometry/PartWire_43.obj
-origin_data/PartGeometry/PartWire_57.obj
-origin_data/PartGeometry/PartWire_53.obj
-origin_data/PartGeometry/PartWire_47.obj
 origin_data/PartGeometry/Part_08.obj
 origin_data/PartGeometry/Part_20.obj
 origin_data/PartGeometry/Part_34.obj
 origin_data/PartGeometry/Part_35.obj
 origin_data/PartGeometry/Part_21.obj
 origin_data/PartGeometry/Part_09.obj
-origin_data/PartGeometry/PartWire_46.obj
-origin_data/PartGeometry/PartWire_52.obj
-origin_data/PartGeometry/PartWire_44.obj
-origin_data/PartGeometry/PartWire_50.obj
 origin_data/PartGeometry/Part_37.obj
 origin_data/PartGeometry/Part_23.obj
 origin_data/PartGeometry/Part_22.obj
 origin_data/PartGeometry/Part_36.obj
-origin_data/PartGeometry/PartWire_51.obj
-origin_data/PartGeometry/PartWire_45.obj
 </PartGeometry>
 	</Output>
 	<Mitsuba>

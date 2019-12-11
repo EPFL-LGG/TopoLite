@@ -33,6 +33,9 @@ CSharp_LIBRARY_C_FUNCTION
 PolyLineRhino *initBaseMesh2DPtr(XMLData *data);
 
 CSharp_LIBRARY_C_FUNCTION
+PolyMeshRhino *initContact(XMLData *data);
+
+CSharp_LIBRARY_C_FUNCTION
 int deleteStructure(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION

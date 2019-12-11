@@ -9,6 +9,7 @@
 #include "Structure/Part.h"
 #include "IO/XMLIO.h"
 #include "Structure/StrucCreator.h"
+#include "Interlocking/ContactGraph.h"
 
 /*
  * GLOBAL VARIABLES
@@ -161,6 +162,36 @@ PolyLineRhino *initTextureMeshPtr(XMLData *data){
     return NULL;
 }
 
+PolyMeshRhino *initContact(XMLData *data){
+    PolyMeshRhino *mesh = NULL;
+    if(data && data->strucCreator && data->strucCreator->struc)
+    {
+        shared_ptr<Struc> struc = data->strucCreator->struc;
+        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(data->varList);
+
+        vector<shared_ptr<PolyMesh>> meshes;
+        vector<bool> atBoundary;
+
+        for(int partID = 0; partID < struc->partList.size(); partID++){
+            pPart part = struc->partList[partID];
+            meshes.push_back(part->polyMesh);
+            atBoundary.push_back(part->atBoundary);
+        }
+        graph->constructFromPolyMeshes(meshes, atBoundary);
+
+        pPolyMesh contactMesh;
+        graph->getContactMesh(contactMesh);
+        if(contactMesh){
+            MeshConverter converter(data->varList);
+            mesh = new PolyMeshRhino();
+            converter.Convert2EigenMesh(contactMesh.get(), mesh);
+            return mesh;
+        }
+    }
+    return NULL;
+}
+
+
 int deleteStructure(XMLData* data){
     if(data){
         delete data;
@@ -190,7 +221,6 @@ int deletePolyLineRhino(PolyLineRhino *lines){
         return 0;
     }
 }
-
 
 
 //Create Geometry

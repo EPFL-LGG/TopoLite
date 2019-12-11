@@ -8,7 +8,10 @@
         "deque": "cpp",
         "string": "cpp",
         "__split_buffer": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "set": "cpp",
+        "algorithm": "cpp"
     },
     "cmake.buildDirectory": "${workspaceRoot}/build",
+    "python.pythonPath": "/Users/ziqwang/anaconda3/envs/interlock/bin/python",
 }

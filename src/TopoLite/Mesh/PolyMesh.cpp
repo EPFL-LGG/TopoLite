@@ -11,7 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////
 
-//#ifdef CATCH2_UNITTEST
+#ifndef CATCH2_UNITTEST
 
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
@@ -581,29 +581,29 @@ void PolyMesh::UpdateVertices()
 
 
 
-//#else
-//
-//#include <catch2/catch.hpp>
-//#include "PolyMesh.h"
-//#include <cmath>
-//TEST_CASE("Class Mesh")
-//{
-//
-//
-//    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-//    //CASE 1: Read Mesh
-//    PolyMesh poly(varList);
-//    bool textureModel;
-//    REQUIRE(poly.ReadOBJModel("../data/igloo.obj", textureModel, false) == true);
-//
-//    //CASE 2: Copy and Construct
-//    PolyMesh polyB(poly);
-//    REQUIRE(poly.vertexList.size() == polyB.vertexList.size());
-//    REQUIRE(poly.getVarList() == polyB.getVarList());
-//
-//    //CASE3: Compute Volume
-//    REQUIRE(poly.ReadOBJModel("../data/tetrahedron.obj", textureModel, false) == true);
-//    REQUIRE(std::abs(poly.ComputeVolume() - 1.0f/6) < 1e-5);
-//}
-//
-//#endif
+#else
+
+#include <catch2/catch.hpp>
+#include "PolyMesh.h"
+#include <cmath>
+TEST_CASE("Class Mesh")
+{
+
+
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+    //CASE 1: Read Mesh
+    PolyMesh poly(varList);
+    bool textureModel;
+    REQUIRE(poly.ReadOBJModel("../data/igloo.obj", textureModel, false) == true);
+
+    //CASE 2: Copy and Construct
+    PolyMesh polyB(poly);
+    REQUIRE(poly.vertexList.size() == polyB.vertexList.size());
+    REQUIRE(poly.getVarList() == polyB.getVarList());
+
+    //CASE3: Compute Volume
+    REQUIRE(poly.ReadOBJModel("../data/tetrahedron.obj", textureModel, false) == true);
+    REQUIRE(std::abs(poly.ComputeVolume() - 1.0f/6) < 1e-5);
+}
+
+#endif
