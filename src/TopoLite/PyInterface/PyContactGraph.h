@@ -5,6 +5,7 @@
 #ifndef TOPOLITE_PYCONTACTGRAPH_H
 #define TOPOLITE_PYCONTACTGRAPH_H
 
+#include "igl/writeOBJ.h"
 #include "Interlocking/ContactGraph.h"
 #include "PyTopoCreator.h"
 #include "IO/InputVar.h"
@@ -23,12 +24,14 @@ public:
 
 public:
 
-    PyContactGraph(){
+    PyContactGraph()
+    {
 
     }
 
     PyContactGraph(const PyTopoCreator &instance)
     {
+        PyContactGraph();
         const XMLData *data = instance.data.get();
         shared_ptr<Struc> struc = data->strucCreator->struc;
 
@@ -51,6 +54,7 @@ public:
 
     PyContactGraph(py::list pyMeshes, py::list pyAtBoundary, bool triMesh)
     {
+        PyContactGraph();
         shared_ptr<InputVarList> varList = make_shared<InputVarList>();
         InitVarLite(varList.get());
         graph = make_shared<ContactGraph>(varList);
@@ -94,20 +98,35 @@ public:
 
         pyMeshes = py::list();
 
-        py::object compas_datastructrue = py::module::import("compas.datastructures");
-        py::object compas_mesh = compas_datastructrue.attr("Mesh");
-
         for(int id = 0; id < meshes.size(); id++)
         {
             py::object pyMesh;
-            PolyMesh2Compas(pyMesh, meshes[id], compas_mesh);
+            PolyMesh2Compas(pyMesh, meshes[id]);
             pyMeshes.append(pyMesh);
         }
 
         return pyMeshes;
     }
 
-    void PolyMesh2Compas(py::object &pyMesh, const pPolyMesh &polyMesh, py::object &compas_mesh)
+    py::object getContacts()
+    {
+        if (graph)
+        {
+            pPolyMesh contact_mesh = make_shared<PolyMesh>(graph->getVarList());
+            graph->getContactMesh(contact_mesh);
+
+            if (contact_mesh)
+            {
+                contact_mesh->UpdateVertices();
+                py::object compas_mesh;
+                PolyMesh2Compas(compas_mesh, contact_mesh);
+                return compas_mesh;
+            }
+        }
+        return py::object();
+    }
+
+    void PolyMesh2Compas(py::object &pyMesh, const pPolyMesh &polyMesh)
     {
         py::list vs;
         py::list fs;
@@ -119,7 +138,6 @@ public:
             v.append(polyMesh->vertexList[id].z);
             vs.append(v);
         }
-
         for(int id = 0; id < polyMesh->polyList.size(); id++){
             py::list f;
             for(int jd = 0; jd < polyMesh->polyList[id]->verIDs.size(); jd++){
@@ -127,8 +145,11 @@ public:
             }
             fs.append(f);
         }
-
-        pyMesh = compas_mesh.attr("from_vertices_and_faces")(vs, fs);
+        py::object module_compas_datastructures;
+        py::object module_compas_mesh;
+        module_compas_datastructures = py::module::import("compas.datastructures");
+        module_compas_mesh = module_compas_datastructures.attr("Mesh");
+        pyMesh = module_compas_mesh.attr("from_vertices_and_faces")(vs, fs);
     }
 
     void Compas2PolyMesh(const py::object &compasMesh, pPolyMesh &polyMesh, shared_ptr<InputVarList> varList)
@@ -162,6 +183,8 @@ public:
             }
             polyMesh->polyList.push_back(poly);
         }
+
+        polyMesh->UpdateVertices();
     }
 
 public:

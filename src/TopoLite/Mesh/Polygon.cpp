@@ -137,7 +137,15 @@ Vector3f _Polygon::ComputeNormal()
 {
 	ComputeCenter();
 
-	Vector3f tempNor = (vers[0].pos - center) CROSS (vers[1].pos - center);
+	 Vector3f tempNor(0, 0, 0);
+	for(int id = 0; id < vers.size() - 1; id++){
+	    tempNor += (vers[id].pos - center) CROSS (vers[id + 1].pos - center);
+	}
+	if(len(tempNor) < FLOAT_ERROR_LARGE)
+	    return Vector3f(0, 0, 0);
+
+	tempNor = tempNor / len(tempNor);
+
 
 	PlaneNormalFit();
 	if((normal DOT tempNor) < 0) normal *= -1;

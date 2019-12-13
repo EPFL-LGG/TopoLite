@@ -78,7 +78,7 @@ public:
 
     bool constructFromPolyMeshes(   vector<shared_ptr<PolyMesh>> &meshes,
                                     vector<bool> &atBoundary,
-                                    double eps = 0.001);
+                                    double eps = 0.002);
 
     void mergeFacesPolyMesh(vector<shared_ptr<PolyMesh>> &meshes, double eps = 1e-4);
 

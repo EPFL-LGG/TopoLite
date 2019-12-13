@@ -46,8 +46,58 @@ TEST_CASE("Class PolyPolyBoolean")
         vector<vector<Vector3f>> polyUnions;
         polyBoolean.ComputePolygonsUnion(polys, polyUnions);
 
+
         REQUIRE(polyUnions.size() == 1);
-        REQUIRE(polyUnions[0].size() == 5);
+
+        //REQUIRE(polyUnions[0].size() == 6);
+
+        std::cout << "[";
+        for (int id = 0; id < polyUnions[0].size(); id++) {
+                std::cout << "[" << polyUnions[0][id].x << ", " << polyUnions[0][id].y << "], ";
+        }
+        std::cout << "]" << std::endl;
+    }
+
+    SECTION("2 faces Intersec -> triangle")
+    {
+        vector<Vector3f> A;
+        A.push_back(Vector3f(0, 0, 0));
+        A.push_back(Vector3f(1, 0, 0));
+        A.push_back(Vector3f(1, 0.8, 0));
+        A.push_back(Vector3f(1, 1, 0));
+        A.push_back(Vector3f(0.8, 1, 0));
+        A.push_back(Vector3f(0, 1, 0));
+
+        vector<Vector3f> B;
+        B.push_back(Vector3f(0.5, 0.5, 0));
+        B.push_back(Vector3f(1.5, 0.5, 0));
+        B.push_back(Vector3f(1.5, 1.5, 0));
+
+        vector<Vector3f> polyIntersec;
+        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+
+        REQUIRE(polyIntersec.size() == 3);
+    }
+
+    SECTION("2 faces Intersec -> quad")
+    {
+        vector<Vector3f> A;
+        A.push_back(Vector3f(0, 0, 0));
+        A.push_back(Vector3f(1, 0, 0));
+        A.push_back(Vector3f(1, 0.8, 0));
+        A.push_back(Vector3f(1, 1, 0));
+        A.push_back(Vector3f(0.8, 1, 0));
+        A.push_back(Vector3f(0, 1, 0));
+
+        vector<Vector3f> B;
+        B.push_back(Vector3f(0.4, 0.5, 0));
+        B.push_back(Vector3f(1.5, 0.5, 0));
+        B.push_back(Vector3f(1.5, 1.5, 0));
+
+        vector<Vector3f> polyIntersec;
+        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+
+        REQUIRE(polyIntersec.size() == 4);
     }
 
     SECTION("2 faces Intersec -> triangle")

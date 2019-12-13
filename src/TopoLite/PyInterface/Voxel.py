@@ -50,22 +50,26 @@ if __name__ == "__main__":
     meshes = []
     atBoundary = []
     for partID in range(1, int(np.amax(puzMat)) + 1):
-        vfs = puzOBJ.compute_puz_partOBJ(puzMat, partID)
-        meshes.append(Mesh.from_vertices_and_faces(vfs["vertices"], vfs["faces"]))
-        atBoundary.append(False)
+        if partID == 1 or partID == 4:
+            vfs = puzOBJ.compute_puz_partOBJ(puzMat, partID)
+            meshes.append(Mesh.from_vertices_and_faces(vfs["vertices"], vfs["faces"]))
+            atBoundary.append(False)
     
-    atBoundary[0] = True;
-    atBoundary[1] = True;
+    #atBoundary[0] = True;
+    #atBoundary[1] = True;
 
     graph = PyContactGraph(meshes, atBoundary, True)
-    check = PyInterlockCheck(graph, PyInterlockCheck.CVXOPT)
+    #check = PyInterlockCheck(graph, PyInterlockCheck.CVXOPT)
 
-    mergeMeshes = graph.mergeFaces(meshes)
+    filename = dir_path + "/../../../data/puz/" + "generate.obj"
+    contact = graph.getContacts()
+    contact.to_obj(filename)
+
     id = 0;
-    for mesh in mergeMeshes:
+    for mesh in meshes:
         filename = dir_path + "/../../../data/puz/" + str(id) + ".obj"
         mesh.to_obj(filename)
         id = id + 1
 
-    check_interlock(check)
+    # check_interlock(check)
 

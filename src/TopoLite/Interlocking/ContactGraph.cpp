@@ -102,6 +102,7 @@ void ContactGraph::mergeFacesPolyMesh(vector<shared_ptr<PolyMesh>> &meshes, doub
             }
             sta = end;
         }
+
         meshes[id]->polyList = polygons;
         meshes[id]->UpdateVertices();
     }
@@ -126,11 +127,12 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
             return false;
         for (shared_ptr<_Polygon> face : poly->polyList)
         {
-            
+            if(face->vers.size() < 3) continue;
+
             //1.1) construct plane
             plane_contact plane;
             Vector3f nrm = face->ComputeNormal();
-            Vector3f center = face->ComputeCenter();
+            Vector3f center = face->vers[0].pos;
             plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
             
             plane.D = nrm ^ center;
@@ -164,14 +166,6 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
         return A.groupID < B.groupID;
     });
 
-//    for (int id = 0; id < planes.size(); id++)
-//    {
-//        std::cout   << "nrm:\t" << planes[id].nrm.transpose()
-//                    << ",\t D:\t" << planes[id].D
-//                    << ",\t GID:\t" << planes[id].groupID
-//                    << std::endl ;
-//    }
-
      //2) add nodes
      for(int id = 0; id < meshes.size(); id++){
          meshes[id]->ComputeVolume();
@@ -180,7 +174,6 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
          pContactGraphNode node = make_shared<ContactGraphNode>(atBoundary[id], centroid, centroid, meshes[id]->volume);
          addNode(node);
      }
-
 
      //3) find all pairs of contact polygon
      int sta = 0, end = 0;
@@ -225,6 +218,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
 //	 {
          for (size_t id = 0; id != planeIJ.size(); ++id)
 	 	{
+
              int planeI = planeIJ[id].first;
              int planeJ = planeIJ[id].second;
 
@@ -237,7 +231,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
              polyI->ComputeProjectMatrixTo2D(projMat, invsProjMat);
              vector<Vector3f> polyI2D = polyI->ProjectPolygonTo2D(projMat);
              vector<Vector3f> polyJ2D = polyJ->ProjectPolygonTo2D(projMat);
-             vector<Vector3f> overlapPolyPts;
+             vector<vector<Vector3f>> overlapPolyPts;
 
              PolyPolyBoolean ppIntersec(getVarList());
 
@@ -245,23 +239,29 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
              if (overlapPolyPts.size() == 0)
                  continue;
 
-             vector<Vector3f> contactPoly;
-             ppIntersec.ProjectPolygonTo3D(overlapPolyPts, invsProjMat, contactPoly);
+             vector<ContactPolygon> contactPolyEigens;
+             for(vector<Vector3f> overlapPoly: overlapPolyPts){
+                 vector<Vector3f> contactPoly;
+                 ppIntersec.ProjectPolygonTo3D(overlapPoly, invsProjMat, contactPoly);
+                 if(contactPoly.size() >= 3){
+                     ContactPolygon contactPolyEigen;
+                     EigenPoint ct(0, 0, 0);
+                     for(Vector3f pt: contactPoly)
+                     {
+                        EigenPoint ptEigen(pt[0], pt[1], pt[2]);
+                        contactPolyEigen.points.push_back(ptEigen);
+                        ct += ptEigen;
+                     }
+                     contactPolyEigen.center = ct/contactPoly.size();
+                     contactPolyEigens.push_back(contactPolyEigen);
+                 }
+             }
 
-             if(!contactPoly.empty() && contactPoly.size() >= 3){
+             if(!contactPolyEigens.empty()){
                  int partI = planes[planeI].partID;
                  int partJ = planes[planeJ].partID;
 
-                 ContactPolygon contactPolyEigen;
-                 EigenPoint ct(0, 0, 0);
-                 for(Vector3f pt: contactPoly){
-                     EigenPoint ptEigen(pt[0], pt[1], pt[2]);
-                     contactPolyEigen.points.push_back(ptEigen);
-                     ct += ptEigen;
-                 }
-                 contactPolyEigen.center = ct/contactPoly.size();
-
-                 shared_ptr<ContactGraphEdge> edge = make_shared<ContactGraphEdge>(contactPolyEigen, planes[planeI].nrm);
+                 shared_ptr<ContactGraphEdge> edge = make_shared<ContactGraphEdge>(contactPolyEigens, planes[planeI].nrm);
                  planeIJEdges[id] = edge;
              }
          }
@@ -589,6 +589,60 @@ TEST_CASE("Class ContactGraph")
         graph->mergeFacesPolyMesh(meshes);
 
         REQUIRE(meshes[0]->polyList.size() == 8);
+    }
+
+    SECTION("construct from file"){
+        shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+        InitVarLite(varList.get());
+        vector<shared_ptr<PolyMesh>> meshes;
+
+        vector<bool> atBoundary;
+        int partID[9] = {0, 1};
+        for (int id = 0; id < 2; id++)
+        {
+            pPolyMesh mesh = make_shared<PolyMesh>(varList);
+            boost::filesystem::path current_path(boost::filesystem::current_path());
+            boost::filesystem::path objfilepath;
+            boost::filesystem::path filename = string("puz/") + std::to_string(partID[id]) + ".obj";
+            if (current_path.filename() == "TopoLite")
+            {
+                objfilepath = current_path / "data" / filename;
+            }
+            else
+            {
+               objfilepath = current_path.parent_path() / "data" / filename;
+            }
+
+            bool texture;
+            REQUIRE(mesh->ReadOBJModel(objfilepath.c_str(), texture, false) == true);
+            meshes.push_back(mesh);
+            atBoundary.push_back(false);
+        }
+
+        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(varList);
+
+        graph->mergeFacesPolyMesh(meshes);
+
+        graph->constructFromPolyMeshes(meshes, atBoundary);
+
+        pPolyMesh contact_mesh;
+        graph->getContactMesh(contact_mesh);
+        if(contact_mesh)
+        {
+            boost::filesystem::path current_path(boost::filesystem::current_path());
+            boost::filesystem::path objfilepath;
+            boost::filesystem::path filename = string("puz/generated.obj");
+            if (current_path.filename() == "TopoLite")
+            {
+                objfilepath = current_path / "data" / filename;
+            }
+            else
+            {
+               objfilepath = current_path / "../data" / filename;
+            }
+            contact_mesh->WriteOBJModel(objfilepath.c_str());
+        }
+      
     }
 }
 

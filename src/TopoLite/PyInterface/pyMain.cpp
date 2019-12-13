@@ -27,6 +27,7 @@ PYBIND11_MODULE(pyTopo, m)
             .def(py::init<>())
             .def(py::init<const PyTopoCreator &>())
             .def(py::init<py::list, py::list, bool>())
+            .def("getContacts", &PyContactGraph::getContacts)
             .def("mergeFaces", &PyContactGraph::mergeFaces)
             .def("numContacts", &PyContactGraph::numContacts);
 

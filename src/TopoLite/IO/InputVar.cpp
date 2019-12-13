@@ -79,7 +79,7 @@ void InitVar(InputVarList *varList)
     varList->add(false, "penetration_check", "Penetration Check") = "Para_Basic";
     varList->add(1e-7f, "small_zero_eps", "") = "Para_Basic";
     varList->add(1e-5f, "big_zero_eps", "") = "Para_Basic";
-    varList->add(1e7f, "clipper_scale", "") = "Para_Basic";
+    varList->add(1e8f, "clipper_scale", "") = "Para_Basic";
     varList->add(0.0f, "tilt_face_angle_min", "") = "Para_Basic";
     varList->find("tilt_face_angle_min")->visible = false;
     varList->add(0.0f, "tilt_face_angle_max", "") = "Para_Basic";

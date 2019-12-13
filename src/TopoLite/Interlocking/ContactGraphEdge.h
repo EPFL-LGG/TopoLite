@@ -42,6 +42,14 @@ public:
         normals = _normals;
     }
 
+    ContactGraphEdge(vector<ContactPolygon> &_polygons, EigenPoint &_normals)
+    {
+        polygons = _polygons;
+        for(int id = 0; id < polygons.size(); id++){
+            normals.push_back(_normals);
+        }
+    }
+
     /*!
      * \return the contact normal starts from partID
      */

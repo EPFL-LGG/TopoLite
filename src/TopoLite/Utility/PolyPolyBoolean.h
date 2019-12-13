@@ -14,7 +14,6 @@ public:
     }
     
 public:
-
     void ComputePolygonsUnion(
             vector<vector<Vector3f>> &polys,
             vector<vector<Vector3f>> &polysUnion
@@ -77,8 +76,22 @@ public:
                 Vector3f pos = x_axis * x + y_axis * y + origin;
                 polyUnion.push_back(pos);
             }
-            cleanPath(polyUnion);
+            //cleanPath(polyUnion);
             polysUnion.push_back(polyUnion);
+        }
+
+        return;
+    }
+
+    void ComputePolygonsIntersection(
+            const vector<Vector3f> &polyA,
+            const vector<Vector3f> &polyB,
+            vector<Vector3f> &polyIntsec)
+    {
+        vector<vector<Vector3f>> polylists;
+        ComputePolygonsIntersection(polyA, polyB, polylists);
+        if(!polylists.empty()){
+            polyIntsec = polylists[0];
         }
 
         return;
@@ -87,7 +100,7 @@ public:
     void ComputePolygonsIntersection(
         const vector<Vector3f> &polyA,
         const vector<Vector3f> &polyB,
-        vector<Vector3f> &polyIntsec)
+        vector<vector<Vector3f>> &polyIntsec)
     {
         polyIntsec.clear();
 
@@ -105,36 +118,46 @@ public:
         ClipperLib::Path pathA, pathB;
         for (int id = 0; id < intPA.size(); id++)
         {
+            if(intPA.size() == 8)
+                std::cout <<  "[" <<  polyA[id].x << ", " << polyA[id].y << "], ";
             int x = intPA[id].x;
             int y = intPA[id].y;
             pathA.push_back(ClipperLib::IntPoint(x, y));
         }
+        std::cout << std::endl;
 
         for (int id = 0; id < intPB.size(); id++)
         {
+            if(intPB.size() == 10)
+                std::cout <<  "[" <<  polyB[id].x << ", " << polyB[id].y << "], ";
             int x = intPB[id].x;
             int y = intPB[id].y;
             pathB.push_back(ClipperLib::IntPoint(x, y));
         }
+        std::cout << std::endl;
 
         ClipperLib::Clipper solver;
         solver.AddPath(pathA, ClipperLib::ptSubject, true);
         solver.AddPath(pathB, ClipperLib::ptClip, true);
         ClipperLib::Paths path_int;
-        solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
-
+        solver.StrictlySimple(true);
+        solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
         if (path_int.empty())
             return;
 
-        for (ClipperLib::IntPoint pt : path_int[0])
-        {
-            float x = pt.X / Scale;
-            float y = pt.Y / Scale;
-            Vector3f pos = x_axis * x + y_axis * y + origin;
-            polyIntsec.push_back(pos);
+        for(int id = 0; id < path_int.size(); id++){
+            vector<Vector3f> polylist;
+            for (ClipperLib::IntPoint pt : path_int[id])
+            {
+                float x = pt.X / Scale;
+                float y = pt.Y / Scale;
+                Vector3f pos = x_axis * x + y_axis * y + origin;
+                polylist.push_back(pos);
+            }
+            //cleanPath(polylist);
+            polyIntsec.push_back(polylist);
         }
 
-        cleanPath(polyIntsec);
         return;
     }
 
@@ -142,7 +165,7 @@ public:
     {
         vector<Vector3f> polySimplest;
         bool doAgain = true;
-        float big_zero_eps = getVarList()->get<float>("big_zero_eps");
+        float big_zero_eps = FLOAT_ERROR_LARGE;
         while (doAgain) {
             doAgain = false;
             polySimplest.clear();
