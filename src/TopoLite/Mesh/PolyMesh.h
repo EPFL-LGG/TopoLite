@@ -24,6 +24,39 @@ using namespace std;
 using pPolygon = shared_ptr<_Polygon> ;
 using pTriangle = shared_ptr<Triangle> ;
 
+struct duplicate_vertex
+{
+    Vector3f pos;
+    int vID;
+    double eps;
+};
+
+struct duplicate_vertex_compare
+{
+    bool operator()(const duplicate_vertex& A, const duplicate_vertex& B) const
+    {
+        double eps = A.eps / 2;
+
+        if (A.pos[0] - B.pos[0] < -eps)
+            return true;
+        if (A.pos[0] - B.pos[0] > eps)
+            return false;
+
+        if (A.pos[1] - B.pos[1] < -eps)
+            return true;
+        if (A.pos[1] - B.pos[1] > eps)
+            return false;
+
+        if (A.pos[2] - B.pos[2] < -eps)
+            return true;
+        if (A.pos[2] - B.pos[2] > eps)
+            return false;
+
+        return false;
+    }
+};
+
+
 class PolyMesh : public TopoObject
 {
 
@@ -59,7 +92,7 @@ public:
                         bool normalized);
     void WriteOBJModel(const char *objFileName, bool triangulate = false);
 
-    void UpdateVertices();
+    void UpdateVertices(double eps = FLOAT_ERROR_LARGE);
 
 public:
 

@@ -11,8 +11,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#ifndef CATCH2_UNITTEST
-
 #include "Utility/HelpStruct.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
@@ -410,21 +408,3 @@ void _Polygon::ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[])
 }
 
 //
-
-
-
-#else
-
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
-#include "Polygon.h"
-#include <cmath>
-TEST_CASE("Class _Polygon"){
-    _Polygon a;
-    a.push_back(Vector3f(1, 0, 0));
-    a.push_back(Vector3f(0, 1, 0));
-    a.push_back(Vector3f(0, 0, 1));
-    REQUIRE(std::abs(a.ComputeArea() - std::sqrt(3.0)/2) < 1e-5);
-}
-
-#endif

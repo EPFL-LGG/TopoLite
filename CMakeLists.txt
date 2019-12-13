@@ -83,21 +83,17 @@ endif()
 ##########################################
 
 if(USE_UNIT_TEST)
+
     set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
                             ${CMAKE_CURRENT_SOURCE_DIR}/ext/Catch2/contrib)
     add_subdirectory(ext/Catch2)
     include(CTest)
     include(ParseAndAddCatchTests)
-    add_executable(testTopo
-            src/TopoLite/Utility/PolyPolyBoolean.cpp
-            src/TopoLite/Mesh/Polygon.cpp
-            src/TopoLite/Mesh/PolyMesh.cpp
-            src/TopoLite/Mesh/Cross.cpp
-            src/TopoLite/IO/XMLIO.cpp
-            src/TopoLite/Interlocking/ContactGraph.cpp)
+
+    file(GLOB testTopoFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/*.cpp)
+    add_executable(testTopo ${testTopoFiles})
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)
     target_link_libraries(testTopo PUBLIC TpCorelib)
-    target_compile_definitions(testTopo PUBLIC -DCATCH2_UNITTEST)
     ParseAndAddCatchTests(testTopo)
 endif()
 

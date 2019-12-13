@@ -6,7 +6,6 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
-#ifndef CATCH2_UNITTEST
 //**************************************************************************************//
 //                                  XML Writer
 //**************************************************************************************//
@@ -1086,33 +1085,3 @@ void MitsubaWriter::change_attribute(pugi::xml_node &node, string str_attr, stri
     attr.set_value(str_value.c_str());
     return;
 }
-
-#else
-
-#include <catch2/catch.hpp>
-#include "XMLIO.h"
-#include "Interlocking/ContactGraph.h"
-
-TEST_CASE("Class XMLIO")
-{
-
-SECTION("Read XML")
-{
-    XMLIO Reader;
-    XMLData data;
-
-    boost::filesystem::path current_path(boost::filesystem::current_path());
-    boost::filesystem::path debugxml_filepath;
-    if(current_path.filename() == "TopoLite"){
-        debugxml_filepath = current_path / "data/origin.xml";
-    }
-    else{
-        debugxml_filepath = current_path / "../data/origin.xml";
-    }
-
-//    REQUIRE(Reader.XMLReader(debugxml_filepath.string(), data) == 1);
-//    Reader.XMLWriter(debugxml_filepath.string(), data);
-}
-}
-
-#endif

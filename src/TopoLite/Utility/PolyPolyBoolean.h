@@ -76,7 +76,7 @@ public:
                 Vector3f pos = x_axis * x + y_axis * y + origin;
                 polyUnion.push_back(pos);
             }
-            //cleanPath(polyUnion);
+            cleanPath(polyUnion);
             polysUnion.push_back(polyUnion);
         }
 
@@ -95,6 +95,14 @@ public:
         }
 
         return;
+    }
+
+    void printPolygon(vector<Vector3f> poly){
+        std::cout << "{";
+        for (int id = 0; id < poly.size(); id++) {
+            std::cout << "{" << poly[id].x << ", " << poly[id].y << "}, ";
+        }
+        std::cout << "}\n";
     }
 
     void ComputePolygonsIntersection(
@@ -116,25 +124,19 @@ public:
         vector<Vector3i> intPB = PB.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
 
         ClipperLib::Path pathA, pathB;
+
         for (int id = 0; id < intPA.size(); id++)
         {
-            if(intPA.size() == 8)
-                std::cout <<  "[" <<  polyA[id].x << ", " << polyA[id].y << "], ";
             int x = intPA[id].x;
             int y = intPA[id].y;
             pathA.push_back(ClipperLib::IntPoint(x, y));
         }
-        std::cout << std::endl;
 
-        for (int id = 0; id < intPB.size(); id++)
-        {
-            if(intPB.size() == 10)
-                std::cout <<  "[" <<  polyB[id].x << ", " << polyB[id].y << "], ";
+        for (int id = 0; id < intPB.size(); id++) {
             int x = intPB[id].x;
             int y = intPB[id].y;
             pathB.push_back(ClipperLib::IntPoint(x, y));
         }
-        std::cout << std::endl;
 
         ClipperLib::Clipper solver;
         solver.AddPath(pathA, ClipperLib::ptSubject, true);
@@ -142,10 +144,15 @@ public:
         ClipperLib::Paths path_int;
         solver.StrictlySimple(true);
         solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+        ClipperLib::ClipperOffset offset;
+        offset.AddPaths(path_int, ClipperLib::jtSquare, ClipperLib::etClosedPolygon);
+        offset.Execute(path_int, -100);
+        ClipperLib::SimplifyPolygons(path_int);
         if (path_int.empty())
             return;
 
-        for(int id = 0; id < path_int.size(); id++){
+        for(int id = 0; id < path_int.size(); id++)
+        {
             vector<Vector3f> polylist;
             for (ClipperLib::IntPoint pt : path_int[id])
             {
@@ -154,7 +161,7 @@ public:
                 Vector3f pos = x_axis * x + y_axis * y + origin;
                 polylist.push_back(pos);
             }
-            //cleanPath(polylist);
+            cleanPath(polylist);
             polyIntsec.push_back(polylist);
         }
 
@@ -166,29 +173,43 @@ public:
         vector<Vector3f> polySimplest;
         bool doAgain = true;
         float big_zero_eps = FLOAT_ERROR_LARGE;
-        while (doAgain) {
-            doAgain = false;
-            polySimplest.clear();
-            int N = polyIntsec.size();
-            for (int id = 0; id < polyIntsec.size(); id++) {
-                Vector3f ppt = polyIntsec[(id - 1 + N) % N];
-                Vector3f pt = polyIntsec[id];
-                Vector3f npt = polyIntsec[(id + 1) % N];
-                Vector3f tA = ppt - pt;
-                Vector3f tB = npt - pt;
-                if (len(tA) < big_zero_eps) {
-                    doAgain = true;
-                    continue;
-                }
-                double cross_product = len(tA CROSS tB) / len(tA) / len(tB);
-                if (cross_product < big_zero_eps) {
-                    doAgain = true;
-                    continue;
-                }
+
+
+        int N = polyIntsec.size();
+        //remove duplicate points first
+        for (int id = 0; id < polyIntsec.size(); id++) {
+
+            Vector3f ppt = polyIntsec[(id - 1 + N) % N];
+            Vector3f pt = polyIntsec[id];
+            Vector3f npt = polyIntsec[(id + 1) % N];
+            Vector3f tA = ppt - pt;
+            Vector3f tB = npt - pt;
+            if (len(tA) < big_zero_eps)
+            {
+                doAgain = true;
+                continue;
+            }
+            else {
                 polySimplest.push_back(pt);
             }
-            polyIntsec = polySimplest;
         }
+
+        //remove points in a same line
+        polyIntsec = polySimplest;
+        polySimplest.clear();
+        N = polyIntsec.size();
+        for(int id = 0; id < polyIntsec.size(); id++){
+            Vector3f ppt = polyIntsec[(id - 1 + N) % N];
+            Vector3f pt = polyIntsec[id];
+            Vector3f npt = polyIntsec[(id + 1) % N];
+            Vector3f tA = ppt - pt;
+            Vector3f tB = npt - pt;
+            double cross_product = len(tA CROSS tB) / len(tA) / len(tB);
+            if (cross_product > big_zero_eps) {
+                polySimplest.push_back(pt);
+            }
+        }
+        polyIntsec = polySimplest;
     }
 
     void ProjectPolygonTo3D(const vector<Vector3f> &poly, double *projMat, vector<Vector3f> &poly3D)

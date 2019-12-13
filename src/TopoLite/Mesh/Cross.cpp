@@ -15,9 +15,6 @@
 #include "Utility/HelpFunc.h"
 #include "Cross.h"
 
-#ifndef CATCH2_UNITTEST
-
-
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
@@ -300,24 +297,3 @@ int Cross::GetShareEdge(weak_ptr<Cross> ncross) {
     }
     return -1;
 }
-
-#else
-
-#include <catch2/catch.hpp>
-#include "CrossMesh.h"
-#include <cmath>
-
-TEST_CASE("Class CrossMesh"){
-
-    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    Cross cross(varList);
-    //CASE 1: Init Cross
-
-    //CASE 2: Copy and Construct
-    Cross crossB(cross);
-    REQUIRE(cross.getVarList() == crossB.getVarList());
-
-    //
-}
-
-#endif

@@ -11,8 +11,6 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#ifndef CATCH2_UNITTEST
-
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
@@ -25,6 +23,7 @@
 #include "PolyMesh.h"
 #include "MeshConverter.h"
 
+#include <set>
 
 //**************************************************************************************//
 //                                   Initialization
@@ -320,8 +319,6 @@ Vector3f PolyMesh::ComputeExtremeVertex(Vector3f rayDir)
 }
 
 
-
-
 //**************************************************************************************//
 //                                   Transform Mesh
 //**************************************************************************************//
@@ -441,7 +438,6 @@ shared_ptr<PolyMesh> PolyMesh::getTextureMesh()
     return polymesh;
 }
 
-
 void PolyMesh::WriteOBJModel(const char *objFileName, bool triangulate)
 {
 	FILE *fp;
@@ -536,76 +532,33 @@ void PolyMesh::WriteOBJModel(const char *objFileName, bool triangulate)
 	}
 }
 
-void PolyMesh::UpdateVertices()
+void PolyMesh::UpdateVertices(double eps)
 {
+    std::set<duplicate_vertex, duplicate_vertex_compare> setVertices;
 	vertexList.clear();
+	int vID = 0;
 	for (int i = 0; i < polyList.size(); i++)
 	{
 		pPolygon poly = polyList[i];
-
+		if(poly == nullptr) continue;
+		poly->verIDs.clear();
 		for (int j = 0; j < poly->vers.size(); j++)
 		{
-			Vector3f ver = poly->vers[j].pos;
-			if( GetPointIndexInList(ver, vertexList) == ELEMENT_OUT_LIST)
+            duplicate_vertex ver;
+            ver.pos = poly->vers[j].pos;
+            ver.vID = 0;
+            ver.eps = eps;
+			auto find_it = setVertices.find(ver);
+			if(find_it != setVertices.end())
 			{
-				vertexList.push_back(ver);
+			    poly->verIDs.push_back(find_it->vID);
 			}
-		}
-	}
-
-	for (int i = 0; i < polyList.size(); i++)
-	{
-		pPolygon poly = polyList[i];
-		poly->ComputeNormal();
-
-		poly->verIDs.clear();  // Note: verIDs mostly should be empty
-
-		for (int j = 0; j < poly->vers.size(); j++)
-		{
-			Vector3f ver = poly->vers[j].pos;
-
-			int index = GetPointIndexInList(ver, vertexList);
-
-			if (index == ELEMENT_OUT_LIST)
-			{
-				//vertexList.push_back(ver);
-				//poly->verIDs.push_back(vertexList.size()-1);
-				printf("Warning: the vertex should be in the list. \n");
-			}
-			else
-			{
-				poly->verIDs.push_back(index);
+			else{
+                vertexList.push_back(ver.pos);
+			    ver.vID = vID ++;
+                poly->verIDs.push_back(ver.vID);
+			    setVertices.insert(ver);
 			}
 		}
 	}
 }
-
-
-
-#else
-
-#include <catch2/catch.hpp>
-#include "PolyMesh.h"
-#include <cmath>
-TEST_CASE("Class Mesh")
-{
-
-
-//     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-//     //CASE 1: Read Mesh
-//     PolyMesh poly(varList);
-//     bool textureModel;
-//     REQUIRE(poly.ReadOBJModel("../../data/igloo.obj", textureModel, false) == true);
-
-//     //CASE 2: Copy and Construct
-//     PolyMesh polyB(poly);
-//     REQUIRE(poly.vertexList.size() == polyB.vertexList.size());
-//     REQUIRE(poly.getVarList() == polyB.getVarList());
-
-//     //CASE3: Compute Volume
-//     REQUIRE(poly.ReadOBJModel("../../data/tetrahedron.obj", textureModel, false) == true);
-//     REQUIRE(std::abs(poly.ComputeVolume() - 1.0f/6) < 1e-5);
-// }
-}
-
-#endif
