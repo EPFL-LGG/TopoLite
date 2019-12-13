@@ -31,9 +31,12 @@ include(libigl)
 #ShapeOp
 set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
+
+if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
 set_target_properties(ShapeOp  PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release")
+endif()
 
 #TBB
 set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)

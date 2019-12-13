@@ -23,8 +23,11 @@ option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
 
 #3rd party library
-set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
-#set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/MacBin)
+if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
+    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
+    #set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/MacBin)
+endif()
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 
 #########################################
