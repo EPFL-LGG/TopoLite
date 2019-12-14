@@ -50,21 +50,9 @@ set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 
 #Pybind11
 if(USE_PYTHON_PLUGIN)
-    #Boost
-    if (WIN32)
-        set(BOOST_ROOT "$ENV{USERPROFILE}/anaconda3/envs/interlock/Library/include")
-    else ()
-        set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
-    endif()
-
     #Pybind11
     set(PYBIND11_CPP_STANDARD -std=c++11)
     set(PYBIND11_PYTHON_VERSION 3.7)
-    if (WIN32)
-        set(PYTHON_EXECUTABLE "$ENV{USERPROFILE}/anaconda3/envs/interlock/python.exe")
-    else ()
-        set(PYTHON_EXECUTABLE "$ENV{HOME}/anaconda3/envs/interlock/bin/python3.7")
-    endif()
     add_subdirectory(pybind11)
 endif()
 

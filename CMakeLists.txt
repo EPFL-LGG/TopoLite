@@ -86,7 +86,6 @@ endif()
 ##########################################
 
 if(USE_UNIT_TEST)
-
     set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
                             ${CMAKE_CURRENT_SOURCE_DIR}/ext/Catch2/contrib)
     add_subdirectory(ext/Catch2)
