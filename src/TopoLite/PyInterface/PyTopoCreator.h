@@ -4,7 +4,7 @@
 
 #ifndef TOPOLITE_PYTOPOCREATOR_H
 #define TOPOLITE_PYTOPOCREATOR_H
-
+#include "IO/XMLIO.h"
 class PyTopoCreator{
 public:
 
