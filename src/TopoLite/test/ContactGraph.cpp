@@ -207,30 +207,5 @@ TEST_CASE("Class ContactGraph")
         REQUIRE(graph->edges.size() == struc->innerContactList.size());
     }
 
-    SECTION("merge all face")
-    {
-        shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-        InitVarLite(varList.get());
-        vector<shared_ptr<PolyMesh>> meshes;
-        pPolyMesh mesh = make_shared<PolyMesh>(varList);
 
-        boost::filesystem::path current_path(boost::filesystem::current_path());
-        boost::filesystem::path objfilepath;
-        if(current_path.filename() == "TopoLite"){
-            objfilepath = current_path / "data/TopoInterock/XML/origin_data/PartGeometry/Part_01.obj";
-        }
-        else{
-            objfilepath = current_path / "../data/TopoInterock/XML/origin_data/PartGeometry/Part_01.obj";
-        }
-
-        bool texture;
-        REQUIRE(mesh->ReadOBJModel(objfilepath.string().c_str(), texture, false));
-        meshes.push_back(mesh);
-
-        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(varList);
-
-        graph->mergeFacesPolyMesh(meshes);
-
-        REQUIRE(meshes[0]->polyList.size() == 8);
-    }
 }

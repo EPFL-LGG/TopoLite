@@ -38,15 +38,20 @@ def check_interlock(check):
 if __name__ == "__main__":
     meshes = []
     atBoundary = []
+
+    varList = PyParamList();
+
     for id in range(0, 61):
-        filename = dir_path + "/../../../data/origin_data/PartGeometry/Part_" + str(id).zfill(2) + ".obj"
-        atBoundary.append(False)
-        meshes.append(Mesh.from_obj(filename))
+        filename = dir_path + "/../../../data/TopoInterlock/XML/origin_data/PartGeometry/Part_" + str(id).zfill(2) + ".obj"
+        compas_mesh = Mesh.from_obj(filename)
+        poly_mesh = PyPolyMesh(compas_mesh, False, varList);
+        meshes.append(poly_mesh)
 
-    filename = dir_path + "/../../../data/origin_data/PartGeometry/Boundary.obj"
-    meshes.append(Mesh.from_obj(filename))
-    atBoundary.append(True)
+    filename = dir_path + "/../../../data/TopoInterlock/XML/origin_data/PartGeometry/Boundary.obj"
+    compas_mesh = Mesh.from_obj(filename)
+    poly_mesh = PyPolyMesh(compas_mesh, True, varList);
+    meshes.append(poly_mesh)
 
-    graph = PyContactGraph(meshes, atBoundary, True)
+    graph = PyContactGraph(meshes, 0.001)
     check = PyInterlockCheck(graph, PyInterlockCheck.CVXOPT)
     check_interlock(check)

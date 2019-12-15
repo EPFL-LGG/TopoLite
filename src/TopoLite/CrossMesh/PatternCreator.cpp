@@ -68,7 +68,7 @@ void PatternCreator::CreateMesh_Merge(vector<pPolyMesh> polyMeshes, pPolyMesh &p
 		}
 	}
 
-	polyMesh->UpdateVertices();
+    polyMesh->removeDuplicatedVertices();
 
 	//MeshConverter myMeshConverter;
 	//myMeshConverter.Convert2PolyMesh( polyMesh, true );
@@ -144,7 +144,7 @@ void PatternCreator::CreateMesh_2DPattern( int patternID,
                 }
             }
         }
-        polyMesh->UpdateVertices();
+        polyMesh->removeDuplicatedVertices();
         polyMesh->NormalizeMesh();
 
         BaseMeshCreator meshCreator(getVarList());
@@ -365,7 +365,7 @@ void PatternCreator::CreateMesh_2DPattern(vector<_Polygon> &root_polys, Vector3f
         }
     }
 
-    polyMesh->UpdateVertices();
+    polyMesh->removeDuplicatedVertices();
     polyMesh->NormalizeMesh();
 
     BaseMeshCreator meshCreator(getVarList());

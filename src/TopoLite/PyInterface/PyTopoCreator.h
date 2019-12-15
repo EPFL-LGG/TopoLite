@@ -5,6 +5,10 @@
 #ifndef TOPOLITE_PYTOPOCREATOR_H
 #define TOPOLITE_PYTOPOCREATOR_H
 
+#include "IO/XMLIO.h"
+#include "PyParamList.h"
+#include "PyPolyMesh.h"
+
 class PyTopoCreator{
 public:
 
@@ -23,6 +27,28 @@ public:
             return data->strucCreator->struc->partList.size();
         else
             return 0;
+    }
+
+public:
+
+    vector<PyPolyMesh> getStruc()
+    {
+        vector<PyPolyMesh> pyPolyMeshes;
+        if(data && data->strucCreator && data->strucCreator->struc){
+            shared_ptr<Struc> struc = data->strucCreator->struc;
+            for(pPart part : struc->partList){
+                if(part)
+                    pyPolyMeshes.push_back(PyPolyMesh(part->polyMesh, part->atBoundary));
+            }
+        }
+        return pyPolyMeshes;
+    }
+
+    PyParamList getParamList(){
+        if(data && data->varList){
+            return PyParamList(data->varList);
+        }
+        return PyParamList();
     }
 };
 

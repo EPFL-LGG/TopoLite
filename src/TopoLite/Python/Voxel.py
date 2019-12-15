@@ -43,7 +43,8 @@ def check_interlock(check, isPrint = False):
 
 def outputContacts(graph, filename):
     contact_mesh = graph.getContacts();
-    contact_mesh.to_obj(filename)
+    contact_mesh.convert2PolyMesh(1e-4)
+    contact_mesh.getCompasMesh().to_obj(filename)
 
 def outputPuzzles(meshes, dirname):
     for id in range(0, len(meshes)):
@@ -53,24 +54,22 @@ def outputPuzzles(meshes, dirname):
 if __name__ == "__main__":
     filename = dir_path + "/../../../data/Voxel/bunny_15x14x11_K80.puz"
     puzMat = puzIO.read_puzfile_into_numpy(filename)
-    print(np.amax(puzMat))
     meshes = []
-    atBoundary = []
+    varList = PyParamList();
     for partID in range(1, int(np.amax(puzMat)) + 1):
         vfs = puzOBJ.compute_puz_partOBJ(puzMat, partID)
-        meshes.append(Mesh.from_vertices_and_faces(vfs["vertices"], vfs["faces"]))
-        atBoundary.append(False)
-
-    outputPuzzles(meshes, dir_path + "/../../../data/Voxel/puz/")
-    
-    atBoundary[0] = True;
-    atBoundary[1] = True;
-
-    graph = PyContactGraph(meshes, atBoundary, True)
+        compas_mesh = Mesh.from_vertices_and_faces(vfs["vertices"], vfs["faces"])
+        if partID < 3:
+            poly_mesh = PyPolyMesh(compas_mesh, True, varList)
+            poly_mesh.convert2PolyMesh(1e-4)
+            meshes.append(poly_mesh)
+        else:
+            poly_mesh = PyPolyMesh(compas_mesh, False, varList)
+            poly_mesh.convert2PolyMesh(1e-4)
+            meshes.append(poly_mesh)
+        
+    graph = PyContactGraph(meshes, 0.001)
     outputContacts(graph, dir_path + "/../../../data/Voxel/puz/contact_remesh.obj")
-
-    graph = PyContactGraph(meshes, atBoundary, False)
-    outputContacts(graph, dir_path + "/../../../data/Voxel/puz/contact.obj")
 
     check = PyInterlockCheck(graph, PyInterlockCheck.CVXOPT)
     check_interlock(check)

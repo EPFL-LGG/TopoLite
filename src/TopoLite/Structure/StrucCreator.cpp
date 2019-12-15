@@ -154,7 +154,7 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 			part->ComputePartGeometry( true, Vector2f(cutUpper, cutLower), previewMode);
 			if( !previewMode )
 			{
-				part->polyMesh->UpdateVertices();
+                part->polyMesh->removeDuplicatedVertices();
 				part->Compute3DTextPosition();
 			}
 		}
@@ -215,7 +215,7 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 
 		if( !previewMode )
 		{
-			part->polyMesh->UpdateVertices();
+            part->polyMesh->removeDuplicatedVertices();
 			part->Compute3DTextPosition();
 		}
 	}
