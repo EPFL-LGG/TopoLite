@@ -430,7 +430,8 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
 {
 
     //load xmlfile
-    xmldoc.load_file(xmlFileName.c_str());
+    if(!xmldoc.load_file(xmlFileName.c_str()))
+        return false;
     pugi::xml_node xml_root = xmldoc.child("Documents");
 
     if (xml_root)

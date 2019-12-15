@@ -21,11 +21,11 @@ TEST_CASE("Class XMLIO")
         boost::filesystem::path debugxml_filepath;
         if (current_path.filename() == "TopoLite")
         {
-            debugxml_filepath = current_path / "data/TopoInterock/XML/origin.xml";
+            debugxml_filepath = current_path / "data/TopoInterlock/XML/origin.xml";
         }
         else
         {
-            debugxml_filepath = current_path / "../data/TopoInterock/XML/origin.xml";
+            debugxml_filepath = current_path / "../data/TopoInterlock/XML/origin.xml";
         }
 
         REQUIRE(Reader.XMLReader(debugxml_filepath.string(), data) == 1);

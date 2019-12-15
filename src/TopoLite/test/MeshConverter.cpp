@@ -21,10 +21,10 @@ TEST_CASE("Class MeshConverter")
         boost::filesystem::path current_path(boost::filesystem::current_path());
         boost::filesystem::path objfilepath;
         if(current_path.filename() == "TopoLite"){
-            objfilepath = current_path / "data/TopoInterock/XML/origin_data/PartGeometry/Part_01.obj";
+            objfilepath = current_path / "data/TopoInterlock/XML/origin_data/PartGeometry/Part_01.obj";
         }
         else{
-            objfilepath = current_path / "../data/TopoInterock/XML/origin_data/PartGeometry/Part_01.obj";
+            objfilepath = current_path / "../data/TopoInterlock/XML/origin_data/PartGeometry/Part_01.obj";
         }
 
         bool texture;
