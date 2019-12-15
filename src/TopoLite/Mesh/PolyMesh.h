@@ -92,7 +92,7 @@ public:
                         bool normalized);
     void WriteOBJModel(const char *objFileName, bool triangulate = false);
 
-    void UpdateVertices(double eps = FLOAT_ERROR_LARGE);
+    void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
 
 public:
 

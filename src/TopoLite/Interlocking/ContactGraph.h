@@ -80,8 +80,6 @@ public:
                                     vector<bool> &atBoundary,
                                     double eps = 0.002);
 
-    void mergeFacesPolyMesh(vector<shared_ptr<PolyMesh>> &meshes, double eps = 1e-4);
-
 public:
 
     /*************************************************

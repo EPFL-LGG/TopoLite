@@ -29,7 +29,7 @@ TEST_CASE("Class PolyMesh")
         polyMesh->polyList.push_back(PA);
         polyMesh->polyList.push_back(PB);
 
-        polyMesh->UpdateVertices();
+        polyMesh->removeDuplicatedVertices();
 
         REQUIRE(polyMesh->vertexList.size() == 7);
         REQUIRE(polyMesh->polyList[0]->verIDs[0] == 0);

@@ -25,89 +25,6 @@ ContactGraph::~ContactGraph()
     edges.clear();
 }
 
-void ContactGraph::mergeFacesPolyMesh(vector<shared_ptr<PolyMesh>> &meshes, double eps)
-{
-    for(int id = 0; id < meshes.size(); id++)
-    {
-        pPolyMesh mesh = meshes[id];
-        vector<plane_contact> planes;
-        std::set<plane_contact, plane_contact_compare> setPlanes;
-
-        int groupID = 0;
-        for (shared_ptr<_Polygon> face : mesh->polyList)
-        {
-
-            //1.1) construct plane
-            plane_contact plane;
-            Vector3f nrm = face->ComputeNormal();
-            Vector3f center = face->ComputeCenter();
-            plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
-
-            plane.D = nrm ^ center;
-            plane.partID = id;
-            plane.polygon = face;
-            plane.eps = eps;
-
-            //1.2) find groupID
-            auto find_it = setPlanes.find(plane);
-
-            if(find_it == setPlanes.end()){
-                plane.groupID = groupID ++;
-                setPlanes.insert(plane);
-            }
-            else{
-                plane.groupID = find_it->groupID;
-            }
-
-            planes.push_back(plane);
-        }
-
-        std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B){
-            return A.groupID < B.groupID;
-        });
-
-        int sta = 0, end = 0;
-        vector<shared_ptr<_Polygon>> polygons;
-        while(sta < planes.size())
-        {
-            for(end = sta + 1; end < planes.size(); end++)
-            {
-                if(planes[sta].groupID != planes[end].groupID)
-                {
-                    break;
-                }
-            }
-
-            if (end - sta > 1)
-            {
-                vector<vector<Vector3f>> allFaces;
-                for (int kd = sta; kd < end; kd++)
-                {
-                    if(planes[kd].polygon.lock())
-                        allFaces.push_back(planes[kd].polygon.lock()->GetVertices());
-                }
-                vector<vector<Vector3f>> mergeFaces;
-                PolyPolyBoolean polyBoolean(getVarList());
-                polyBoolean.ComputePolygonsUnion(allFaces, mergeFaces);
-                for(int kd = 0; kd < mergeFaces.size(); kd++){
-                    shared_ptr<_Polygon> poly = make_shared<_Polygon>();
-                    poly->SetVertices(mergeFaces[kd]);
-                    polygons.push_back(poly);
-                }
-            }
-            else{
-                polygons.push_back(planes[sta].polygon.lock());
-            }
-            sta = end;
-        }
-
-        meshes[id]->polyList = polygons;
-        meshes[id]->UpdateVertices();
-    }
-
-    return;
-}
-
 bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
                                            vector<bool> &atBoundary,
                                            double eps)
@@ -355,4 +272,6 @@ void ContactGraph::getContactMesh(pPolyMesh &mesh)
             mesh->polyList.push_back(face);
         }
     }
+    if(mesh)
+        mesh->removeDuplicatedVertices();
 }

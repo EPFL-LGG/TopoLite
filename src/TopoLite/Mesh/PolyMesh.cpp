@@ -416,7 +416,7 @@ bool PolyMesh::ReadOBJModel(
             texturedModel = textureModel_ = true;
 	    }
 	    if(normalized) NormalizeMesh();
-        UpdateVertices();
+        removeDuplicatedVertices();
 		return true;
 	}
 	else {
@@ -451,7 +451,7 @@ void PolyMesh::WriteOBJModel(const char *objFileName, bool triangulate)
 		///////////////////////////////////////////////////////////////////
 		// 1. Compute vertices and vertexIDs in case they are missing
 
-		UpdateVertices();
+        removeDuplicatedVertices();
 
 		///////////////////////////////////////////////////////////////////
 		// 2. Write the vertex info of the mesh
@@ -532,7 +532,7 @@ void PolyMesh::WriteOBJModel(const char *objFileName, bool triangulate)
 	}
 }
 
-void PolyMesh::UpdateVertices(double eps)
+void PolyMesh::removeDuplicatedVertices(double eps)
 {
     std::set<duplicate_vertex, duplicate_vertex_compare> setVertices;
 	vertexList.clear();

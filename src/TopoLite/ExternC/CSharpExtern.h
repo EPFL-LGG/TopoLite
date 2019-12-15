@@ -8,7 +8,22 @@
 #include "CSharpCommon.h"
 #include "Structure/StrucCreator.h"
 #include "Mesh/MeshConverter.h"
+#include "Interlocking/ContactGraph.h"
 #include "IO/XMLIO.h"
+#define MAXIMUM_MESHSIZE 4096
+
+struct CMesh{
+    float points[MAXIMUM_MESHSIZE];
+    int faces[MAXIMUM_MESHSIZE];
+    int n_vertices;
+    int n_faces;
+};
+
+struct ContactGraphData{
+    vector<pPolyMesh> meshes;
+    vector<bool> atBoundary;
+    shared_ptr<ContactGraph> graph;
+};
 
 //IO
 CSharp_LIBRARY_C_FUNCTION
@@ -16,6 +31,9 @@ XMLData* readXML(const char *xmlstr);
 
 CSharp_LIBRARY_C_FUNCTION
 XMLData* initStructure();
+
+CSharp_LIBRARY_C_FUNCTION
+ContactGraphData* initContactGraph();
 
 CSharp_LIBRARY_C_FUNCTION
 PolyMeshRhino *initPartMeshPtr(int partID, XMLData *data);
@@ -33,10 +51,13 @@ CSharp_LIBRARY_C_FUNCTION
 PolyLineRhino *initBaseMesh2DPtr(XMLData *data);
 
 CSharp_LIBRARY_C_FUNCTION
-PolyMeshRhino *initContact(XMLData *data);
+PolyMeshRhino *initContactMesh(ContactGraphData *data);
 
 CSharp_LIBRARY_C_FUNCTION
 int deleteStructure(XMLData* data);
+
+CSharp_LIBRARY_C_FUNCTION
+int deleteContactGraph(ContactGraphData* data);
 
 CSharp_LIBRARY_C_FUNCTION
 int deletePolyMeshRhino(PolyMeshRhino *mesh);
@@ -52,6 +73,8 @@ void refresh(XMLData* data);
 CSharp_LIBRARY_C_FUNCTION
 void preview(XMLData* data);
 
+CSharp_LIBRARY_C_FUNCTION
+void addMeshesToContactGraph(ContactGraphData *data, CMesh *cmesh, bool brdy);
 
 //Get Info
 CSharp_LIBRARY_C_FUNCTION
@@ -111,6 +134,9 @@ void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg);
 //Set Para
 CSharp_LIBRARY_C_FUNCTION
 void setParaDouble(const char *name, double value, XMLData* data);
+
+CSharp_LIBRARY_C_FUNCTION
+void setParaInt(const char *name, int value, XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
 void setPatternAngle(double angle, XMLData *data);

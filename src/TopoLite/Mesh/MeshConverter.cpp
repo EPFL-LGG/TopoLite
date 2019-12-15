@@ -17,6 +17,8 @@
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
 #include "Utility/ConvexHull2D.h"
+#include "Utility/PolyPolyBoolean.h"
+
 #include "IO/InputVar.h"
 #include "Mesh/Polygon.h"
 #include "Mesh/PolyMesh.h"
@@ -35,7 +37,7 @@
 void MeshConverter::generateTexture(const PolyMesh *polyMesh, shared_ptr<PolyMesh> &out)
 {
     Convert2TriMesh(polyMesh, out);
-    out->UpdateVertices();
+    out->removeDuplicatedVertices();
     Eigen::MatrixXd V(out->vertexList.size(), 3);
     Eigen::MatrixXi F(out->polyList.size(), 3);
 
@@ -192,44 +194,111 @@ void MeshConverter::Convert2PolyMesh(const vector<Vector3f> &inVerList, const ve
 	Convert2PolyMesh(polyMesh);
 }
 
-void MeshConverter::Convert2PolyMesh(pPolyMesh polyMesh)
+void MeshConverter::Convert2PolyMesh(pPolyMesh polyMesh, double eps)
 {
-	// Keep merging neighboring faces that are co-planar
-	while (true)
-	{
-		bool isFinish = true;
+    struct plane_contact
+    {
+        Vector3f nrm;
+        double D;
+        int groupID;
+        weak_ptr<_Polygon> polygon;
+        double eps;
+    };
 
-		for (int i = 0; i < polyMesh->polyList.size(); i++)
-		{
-			for (int j = 0; j < polyMesh->polyList.size(); j++)
-			{
-				if (j == i)
-					continue;
+    struct plane_contact_compare
+    {
+        bool operator()(const plane_contact& A, const plane_contact& B) const
+        {
+            double eps = A.eps / 2;
 
-				pPolygon polyA = polyMesh->polyList[i];
-				pPolygon polyB = polyMesh->polyList[j];
+            for(int id = 0; id < 3; id++){
+                if (A.nrm[id] - B.nrm[id] < -eps)
+                    return true;
+                if (A.nrm[id] - B.nrm[id] > eps)
+                    return false;
+            }
 
-				if (IsCoplanar(polyA, polyB) == true)
-				{
-					isFinish = false;
+            if (A.D - B.D < -eps)
+                return true;
+            if (A.D - B.D > eps)
+                return false;
 
-					UpdatePolyList(polyA, i, polyB, j, polyMesh->vertexList, polyMesh->polyList);
+            return false;
+        }
+    };
 
-					break;
-				}
-			}
+    vector<plane_contact> planes;
+    std::set<plane_contact, plane_contact_compare> setPlanes;
 
-			if (isFinish == false)
-			{
-				break;
-			}
-		}
+    int groupID = 0;
+    for (shared_ptr<_Polygon> face : polyMesh->polyList)
+    {
 
-		if (isFinish == true)
-		{
-			break;
-		}
-	}
+        //1.1) construct plane
+        plane_contact plane;
+        Vector3f nrm = face->ComputeNormal();
+        Vector3f center = face->ComputeCenter();
+        plane.nrm = nrm;
+
+        plane.D = nrm ^ center;
+        plane.polygon = face;
+        plane.eps = eps;
+
+        //1.2) find groupID
+        auto find_it = setPlanes.find(plane);
+
+        if(find_it == setPlanes.end()){
+            plane.groupID = groupID ++;
+            setPlanes.insert(plane);
+        }
+        else{
+            plane.groupID = find_it->groupID;
+        }
+
+        planes.push_back(plane);
+    }
+
+    std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B){
+        return A.groupID < B.groupID;
+    });
+
+    int sta = 0, end = 0;
+    vector<shared_ptr<_Polygon>> polygons;
+    while(sta < planes.size())
+    {
+        for(end = sta + 1; end < planes.size(); end++)
+        {
+            if(planes[sta].groupID != planes[end].groupID)
+            {
+                break;
+            }
+        }
+
+        if (end - sta > 1)
+        {
+            vector<vector<Vector3f>> allFaces;
+            for (int kd = sta; kd < end; kd++)
+            {
+                if(planes[kd].polygon.lock())
+                    allFaces.push_back(planes[kd].polygon.lock()->GetVertices());
+            }
+            vector<vector<Vector3f>> mergeFaces;
+            PolyPolyBoolean polyBoolean(getVarList());
+            polyBoolean.ComputePolygonsUnion(allFaces, mergeFaces);
+            for(int kd = 0; kd < mergeFaces.size(); kd++){
+                shared_ptr<_Polygon> poly = make_shared<_Polygon>();
+                poly->SetVertices(mergeFaces[kd]);
+                polygons.push_back(poly);
+            }
+        }
+        else{
+            polygons.push_back(planes[sta].polygon.lock());
+        }
+        sta = end;
+    }
+
+    polyMesh->polyList = polygons;
+    polyMesh->removeDuplicatedVertices();
 }
 
 void MeshConverter::Convert2PolyMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, pPolyMesh &out){

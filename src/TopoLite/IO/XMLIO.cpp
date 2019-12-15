@@ -251,7 +251,7 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
                     shared_ptr<_Polygon> poly = make_shared<_Polygon>(*((_Polygon *)crossMesh->crossList[id].get()));
                     polyMesh->polyList.push_back(poly);
                 }
-                polyMesh->UpdateVertices();
+                polyMesh->removeDuplicatedVertices();
                 part->polyMesh = polyMesh;
                 polyMesh->TranslateMesh(Vector3f(0, -data.varList->get<float>("ground_height"), 0));
                 part->WriteOBJWireFrameModel(surface_wire_path.c_str());
@@ -430,7 +430,8 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
 {
 
     //load xmlfile
-    xmldoc.load_file(xmlFileName.c_str());
+    if(!xmldoc.load_file(xmlFileName.c_str()))
+        return false;
     pugi::xml_node xml_root = xmldoc.child("Documents");
 
     if (xml_root)
