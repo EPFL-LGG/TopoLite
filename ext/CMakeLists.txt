@@ -3,9 +3,15 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 #EIGEN
 set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
+
 #set(EIGEN3_INCLUDE_DIR /usr/local/include/eigen3)
 
-#Boost
+if (WIN32)
+    set(BOOST_ROOT "$ENV{USERPROFILE}/anaconda3/envs/interlock/Library/include")
+else ()
+    set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
+endif()
+
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 find_package(Boost COMPONENTS system filesystem REQUIRED)
@@ -56,6 +62,7 @@ if(USE_PYTHON_PLUGIN)
     add_subdirectory(pybind11)
 endif()
 
+set(ext_lib_dir ${Boost_LIBRARY_DIR} PARENT_SCOPE)
 
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}

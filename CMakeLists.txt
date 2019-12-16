@@ -52,6 +52,8 @@ file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.h)
 
+link_directories(${ext_lib_dir})
+
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})
@@ -77,7 +79,6 @@ if(USE_PYTHON_PLUGIN)
     pybind11_add_module(pyTopo MODULE ${TpPythonFiles})
     target_link_libraries(pyTopo PUBLIC TpCorelib)
 endif()
-
 
 ##########################################
 ######                               #####
