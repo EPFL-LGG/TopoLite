@@ -457,7 +457,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
                 string path = geomDataFolder + "/" + crossMeshNode.attribute("path").as_string();
                 std::cout << "Read File...\t:" << path << std::endl;
                 if (!data.strucCreator->LoadSurface(path.c_str())) return false;
-                data.strucCreator->CreateStructure(true, false, data.interactMatrix, true);
+                data.strucCreator->CreateStructure(true, data.interactMatrix, true);
             }
         }
         else
@@ -469,7 +469,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
                 string path = geomDataFolder + "/" + surfaceMesh.attribute("path").as_string();
                 std::cout << "Read File...\t:" << path << std::endl;
                 if (!data.strucCreator->LoadSurface(path.c_str())) return false;
-                data.strucCreator->CreateStructure(true, true, data.interactMatrix, true);
+                data.strucCreator->CreateStructure(true, data.interactMatrix, true);
             }
         }
 
@@ -694,7 +694,7 @@ void XMLIO::XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_
                         }
                     }
 
-                    data.strucCreator->CreateStructure(false, false, data.interactMatrix, false);
+                    data.strucCreator->CreateStructure(false, data.interactMatrix, false);
                 }
             }
         }

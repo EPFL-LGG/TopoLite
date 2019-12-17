@@ -233,13 +233,7 @@ void refresh(XMLData* data)
     if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
         double tmpMat[16];
         getInteractMatrix(data, tmpMat);
-        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree)
-        {
-            data->strucCreator->CreateStructure(true, true, tmpMat, false);
-        }
-        else{
-            data->strucCreator->CreateStructure(true, false, tmpMat, false);
-        }
+        data->strucCreator->CreateStructure(true, tmpMat, false);
     }
     return;
 }
@@ -249,11 +243,7 @@ void preview(XMLData* data)
     if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
         double tmpMat[16];
         getInteractMatrix(data, tmpMat);
-        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
-            data->strucCreator->CreateStructure(true, true, tmpMat, true);
-        } else {
-            data->strucCreator->CreateStructure(true, false, tmpMat, true);
-        }
+        data->strucCreator->CreateStructure(true, tmpMat, true);
     }
     return;
 }
@@ -438,6 +428,36 @@ void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg){
 
 
 //Set Parameter
+void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary){
+    if(polylines == NULL || data == NULL) return;
+    pPolyMesh surface = make_shared<PolyMesh>(data->varList);
+
+    shared_ptr<StrucCreator> strucCreator = data->strucCreator;
+    if(strucCreator){
+        vector<bool> atBoundary;
+        //build surface
+        for(int id = 0; id < polylines->n_polyline; id++){
+            int sta = polylines->sta_ends[id * 2];
+            int end = polylines->sta_ends[id * 2 + 1];
+            shared_ptr<_Polygon> polygon = make_shared<_Polygon>();
+            for(int kd = sta; kd <= end; kd++){
+                Vector3f pt;
+                for(int ld = 0; ld < 3; ld++){
+                    pt[ld] = polylines->points[kd * 3 + ld];
+                }
+                polygon->push_back(pt);
+            }
+            surface->polyList.push_back(polygon);
+            if(haveBoundary) atBoundary.push_back(polylines->atBoundary[id]);
+        }
+        surface->removeDuplicatedVertices();
+
+        strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
+        strucCreator->crossMeshCreator->LoadReferenceSurface(surface, atBoundary);
+    }
+}
+
+
 void setParaDouble(const char *name, double value, XMLData* data){
     if(data && data->varList)
         data->varList->set(name,  (float)value);

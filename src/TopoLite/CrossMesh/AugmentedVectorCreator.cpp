@@ -159,13 +159,19 @@ void AugmentedVectorCreator::UpdateMeshTiltNormals(pCrossMesh crossMesh, float t
 
 bool AugmentedVectorCreator::UpdateMeshTiltRange(shared_ptr<CrossMesh> crossMesh)
 {
+    if(crossMesh == nullptr)
+        return false;
+
 	int m = crossMesh->crossList.size();
 	float big_zero_eps = getVarList()->get<float>("big_zero_eps");
 	for(int id = 0; id < m; id++)
 	{
 		shared_ptr<Cross> cross = crossMesh->crossList[id];
-		for(int jd = 0; jd < cross->neighbors.size(); jd++){
+		if(cross == nullptr) continue;
+		for(int jd = 0; jd < cross->oriPoints.size(); jd++){
 			shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
+			if(oriPt == nullptr) continue;
+			
 			Vector3f t = oriPt->rotation_base; t /= len(t);
 			Vector3f e = oriPt->rotation_axis; e /= len(e);
 			Vector3f y = oriPt->rotation_base CROSS oriPt->rotation_axis; y /= len(y);

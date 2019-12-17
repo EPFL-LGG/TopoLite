@@ -87,8 +87,11 @@ void BaseMeshCreator::ComputeBaseMesh(double inverTextureMat[16],
 	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 }
 
-void BaseMeshCreator::ComputeBaseMesh( pPolyMesh referenceMesh,
-                        pCrossMesh &crossMesh){
+void BaseMeshCreator::ComputeBaseMesh( pPolyMesh referenceMesh, pCrossMesh &crossMesh){
+
+
+    if(referenceMesh == nullptr)
+        return;
 
     // 1) Initial the cross mesh
     crossMesh.reset();

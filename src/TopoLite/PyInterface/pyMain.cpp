@@ -25,8 +25,8 @@ PYBIND11_MODULE(pyTopo, m)
 
     py::class_<PyTopoCreator>(m, "PyTopoCreator")
             .def(py::init<const std::string &>())
-            .def("getStruc", &PyTopoCreator::getStruc)
-            .def("getParamList", &PyTopoCreator::getParamList)
+            //.def("getStruc", &PyTopoCreator::getStruc)
+            //.def("getParamList", &PyTopoCreator::getParamList)
             .def("numParts", &PyTopoCreator::numParts);
 
     py::class_<PyPolyMesh>(m, "PyPolyMesh")

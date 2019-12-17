@@ -29,6 +29,15 @@ TEST_CASE("Class XMLIO")
         }
 
         REQUIRE(Reader.XMLReader(debugxml_filepath.string(), data) == 1);
+        REQUIRE(data.strucCreator->struc->partList.size() == 103);
+
+        pCross cross = data.strucCreator->crossMeshCreator->crossMesh->crossList[0];
+
+        REQUIRE(data.varList->get<bool>("texturedModel"));
+        REQUIRE(cross->oriPoints[0]->rotation_angle == 20);
+        REQUIRE(cross->oriPoints[1]->rotation_angle == -20);
+        REQUIRE(cross->oriPoints[2]->rotation_angle == 20);
+
         Reader.XMLWriter(debugxml_filepath.string(), data);
     }
 }

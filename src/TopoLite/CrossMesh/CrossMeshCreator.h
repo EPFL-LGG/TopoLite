@@ -70,6 +70,8 @@ public:
 	 */
 	bool LoadReferenceSurface(const char *objFileName);
 
+	bool LoadReferenceSurface(pPolyMesh surface, vector<bool> &atBoundary);
+
 	/*!
 	 * \brief: main function to create base CrossMesh
 	 * \param texturedModel: True if the geometry of cross mesh is unknown. False if the polymesh just need to be assigned the tilt angle
@@ -78,11 +80,7 @@ public:
 	 * \param patternRadius: how many polygons the pattern has (the size the of the pattern)
 	 * \param interactMatrix: User interaction of the pattern (scale, rotate, translate)
 	 */
-    bool CreateCrossMesh(   bool texturedModel,
-	                        float tiltAngle,
-	                        int patternID,
-	                        int patternRadius,
-	                        bool previewMode,
+    bool CreateCrossMesh(   bool previewMode,
 	                        double interactMatrix[]);
 
 public:

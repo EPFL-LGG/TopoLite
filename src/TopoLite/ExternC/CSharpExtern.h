@@ -11,7 +11,8 @@
 #include "Interlocking/ContactGraph.h"
 #include "IO/XMLIO.h"
 #define MAXIMUM_MESHSIZE 4096
-
+#define MAXIMUM_POLYLINE_POINTS  10000
+#define MAXIMUM_POLYLINE_FACE  1000
 struct CMesh{
     float points[MAXIMUM_MESHSIZE];
     int faces[MAXIMUM_MESHSIZE];
@@ -23,6 +24,15 @@ struct ContactGraphData{
     vector<pPolyMesh> meshes;
     vector<bool> atBoundary;
     shared_ptr<ContactGraph> graph;
+};
+
+struct CPolyLines
+{
+    float points[MAXIMUM_POLYLINE_POINTS];
+    int sta_ends[MAXIMUM_POLYLINE_FACE];
+    int atBoundary[MAXIMUM_POLYLINE_FACE];
+    int n_polyline;
+    int n_points;
 };
 
 //IO
@@ -132,6 +142,9 @@ void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg);
 
 
 //Set Para
+CSharp_LIBRARY_C_FUNCTION
+void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary);
+
 CSharp_LIBRARY_C_FUNCTION
 void setParaDouble(const char *name, double value, XMLData* data);
 

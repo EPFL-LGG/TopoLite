@@ -51,7 +51,6 @@ public:
 
 	bool LoadSurface(const char* objFileName);
     int CreateStructure(bool createCrossMesh,
-                        bool textureMode,
                         double interactMatrix[],
                         bool previewMode);
     int UpdateStructureGeometry(bool previewMode);
