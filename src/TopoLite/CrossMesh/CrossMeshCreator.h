@@ -70,7 +70,11 @@ public:
 	 */
 	bool LoadReferenceSurface(const char *objFileName);
 
-	bool LoadReferenceSurface(pPolyMesh surface, vector<bool> &atBoundary);
+	void setReferenceSurface(pPolyMesh surface);
+
+	void setPatternMesh(pPolyMesh surface);
+
+	bool setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary);
 
 	/*!
 	 * \brief: main function to create base CrossMesh

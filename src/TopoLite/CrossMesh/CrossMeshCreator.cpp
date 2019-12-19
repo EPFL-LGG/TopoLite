@@ -128,19 +128,53 @@ bool CrossMeshCreator::LoadReferenceSurface(const char *objFileName)
 	}
 }
 
-bool CrossMeshCreator::LoadReferenceSurface(pPolyMesh surface, vector<bool> &atBoundary){
+void CrossMeshCreator::setReferenceSurface(pPolyMesh surface){
+
+    if(surface == nullptr) return;;
+
+    if(!surface->texturedModel)
+    {
+        MeshConverter converter(getVarList());
+        referenceSurface.reset();
+        converter.generateTexture(surface.get(), referenceSurface);
+        if(referenceSurface == nullptr) return;
+        getVarList()->set("texturedModel", true);
+    }
+
+    ComputeTextureNormalizeMatrix();
+    CreateQuadTree();
+    CreateAABBTree();
+}
+
+void CrossMeshCreator::setPatternMesh(pPolyMesh surface)
+{
+    if(surface == nullptr) return;
+
+    pattern2D.reset();
+    BaseMeshCreator baseMeshCreator(getVarList());
+    baseMeshCreator.PolyMesh2CrossMesh(surface, pattern2D);
+
+    return;
+}
+
+bool CrossMeshCreator::setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary)
+{
     referenceSurface.reset();
     referenceSurface = make_shared<PolyMesh>(*surface);
     getVarList()->set("texturedModel", false);
     referenceSurface->ComputeBBox();
 
     BaseMeshCreator baseMeshCreator(getVarList());
-    baseMeshCreator.ComputeBaseMesh(referenceSurface, crossMesh);
+    baseMeshCreator.PolyMesh2CrossMesh(referenceSurface, crossMesh);
 
-    if(crossMesh->crossList.size() == atBoundary.size()){
+    if(crossMesh->crossList.size() == atBoundary.size())
+    {
         for(pCross cross: crossMesh->crossList){
             cross->atBoundary = atBoundary[cross->crossID];
         }
+    }
+    else{
+        baseMeshCreator.ComputePracticalBoundary(crossMesh);
     }
 
     float   tiltAngle       = getVarList()->get<float>("tiltAngle");
@@ -191,7 +225,7 @@ bool CrossMeshCreator::CreateCrossMesh( bool previewMode,
 
         sta = clock();
         BaseMeshCreator baseMeshCreator(quadTree, referenceSurface, pattern2D, getVarList());
-        baseMeshCreator.ComputeBaseMesh(inverTextureMat, baseMesh2D, crossMesh);
+        baseMeshCreator.Pattern2CrossMesh(inverTextureMat, baseMesh2D, crossMesh);
         std::cout << "--Remesh Para:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
         sta = clock();
@@ -208,7 +242,9 @@ bool CrossMeshCreator::CreateCrossMesh( bool previewMode,
     else
     {
         BaseMeshCreator baseMeshCreator(getVarList());
-        baseMeshCreator.ComputeBaseMesh(referenceSurface, crossMesh);
+        baseMeshCreator.PolyMesh2CrossMesh(referenceSurface, crossMesh);
+
+        baseMeshCreator.ComputePracticalBoundary(crossMesh);
 
         AugmentedVectorCreator vectorCreator(getVarList());
         vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);

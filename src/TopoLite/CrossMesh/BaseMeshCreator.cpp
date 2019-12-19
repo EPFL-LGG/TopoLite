@@ -55,9 +55,9 @@ BaseMeshCreator::~BaseMeshCreator()
 //                               Compute Lifted 3D Mesh 
 //**************************************************************************************//
 
-void BaseMeshCreator::ComputeBaseMesh(double inverTextureMat[16],
-								  shared_ptr<PolyMesh>& baseMesh2D,
-								  shared_ptr<CrossMesh>& crossMesh)
+void BaseMeshCreator::Pattern2CrossMesh(double *inverTextureMat,
+                                        shared_ptr<PolyMesh> &baseMesh2D,
+                                        shared_ptr<CrossMesh> &crossMesh)
 {
 	tbb::tick_count sta = tbb::tick_count::now();
 	crossMesh.reset();
@@ -87,29 +87,25 @@ void BaseMeshCreator::ComputeBaseMesh(double inverTextureMat[16],
 	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 }
 
-void BaseMeshCreator::ComputeBaseMesh( pPolyMesh referenceMesh, pCrossMesh &crossMesh){
+void BaseMeshCreator::PolyMesh2CrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh){
 
 
-    if(referenceMesh == nullptr)
+    if(polyMesh == nullptr)
         return;
 
     // 1) Initial the cross mesh
     crossMesh.reset();
     crossMesh = make_shared<CrossMesh>(getVarList());
-    InitCrossMesh(referenceMesh, crossMesh);
+    InitCrossMesh(polyMesh, crossMesh);
 
     // 2. Build half-edge mesh of the polygonal mesh
     pHEdgeMesh hedgeMesh = make_shared<HEdgeMesh>();
-    hedgeMesh->InitHEdgeMesh(referenceMesh);
+    hedgeMesh->InitHEdgeMesh(polyMesh);
     hedgeMesh->BuildHalfEdgeMesh();
 
     // 3. Compute neighbors for the cross mesh
     ComputeCrossNeighbors(hedgeMesh, crossMesh);
     hedgeMesh.reset();
-
-    // 4. Compute the practical Boundary
-    ComputePracticalBoundary(crossMesh);
-
 }
 
 void BaseMeshCreator::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)

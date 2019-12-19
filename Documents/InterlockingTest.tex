@@ -1,0 +1,118 @@
+% XeLaTeX can use any Mac OS X font. See the setromanfont command below.
+% Input to XeLaTeX is full Unicode, so Unicode characters can be typed directly into the source.
+
+% The next lines tell TeXShop to typeset with xelatex, and to open and save the source with Unicode encoding.
+
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+
+\title{Interlocking Test}
+\author{Ziqi Wang}
+%\date{}                                           % Activate to display a given date or no date
+
+\begin{document}
+\frame{\titlepage}
+
+% For many users, the previous commands will be enough.
+% If you want to directly input Unicode, add an Input Menu or Keyboard to the menu bar 
+% using the International Panel in System Preferences.
+% Unicode must be typeset using a font containing the appropriate characters.
+% Remove the comment signs below for examples.
+
+% \newfontfamily{\A}{Geeza Pro}
+% \newfontfamily{\H}[Scale=0.9]{Lucida Grande}
+% \newfontfamily{\J}[Scale=0.85]{Osaka}
+
+% Here are some multilingual Unicode fonts: this is Arabic text: {\A السلام عليكم}, this is Hebrew: {\H שלום}, 
+% and here's some Japanese: {\J 今日は}.
+
+\begin{frame}
+\frametitle{Interlocking Test}
+The original interlocking test can be formulated as:\par
+\begin{equation*}
+\texttt{Interlocking}  \iff  \{x | Ax \geq 0\} = \{\mathbf{0}\} 
+\end{equation*}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Linear Programming}
+Thanks to Samara, we reformulate the feasibility problem into a linear programming.
+\begin{equation}
+\begin{aligned}
+\min_{t, x}& -\sum_{i=1}^{m} t_i \\
+\texttt{s.t.} \hspace{0.5cm} & Ax = t \\
+& t \geq 0
+\end{aligned}
+\label{eq:lp}
+\end{equation}\par
+The structure is not interlocking \texttt{iff} the optimal value of Eq~\ref{eq:lp} is non zero. \pause \par
+\vspace{1cm}\textbf{The challenge here is how to solve this optimization.}
+\end{frame}
+
+\begin{frame}
+\frametitle{Interior Point Method}
+A simple idea would be using the \textbf{interior point method}. However, the interior point method needs a strictly feasible point of Eq~\ref{eq:lp}, which leads to the "chicken and egg" problem. If this strictly feasible point is found in advance, we already can confirm the structure to be non-interlocking without starting the optimization.
+\end{frame}
+
+\begin{frame}
+\frametitle{Big-M method}
+When M tends to be infinity, the solution of right optimization is a strictly feasible point of the left optimization. Meanwhile, the right optimization has a nature strictly feasible point:\\ \centering $\lambda = 1, x = 0, t = t_0$.
+\begin{columns}
+	\begin{column}{0.5\textwidth}
+		\begin{equation*}
+		\begin{aligned}
+		\min_{t, x}& -\sum_{i=1}^{m} t_i \\
+		\texttt{s.t.} \hspace{0.5cm} & Ax = t \\
+		& t \geq 0
+		\end{aligned}
+		\end{equation*}
+	\end{column}
+	\begin{column}{0.5\textwidth}
+		\begin{equation*}
+		\begin{aligned}
+		\min_{t, x,\lambda}& -\sum_{i=1}^{m} t_i + \lambda M \\
+		\texttt{s.t.} \hspace{0.5cm} & Ax + \lambda t_0 = t \\
+		& t, \lambda  \geq 0 \\
+		& t_0 = (1, \cdots, 1)^T
+		\end{aligned}
+		\label{eq:lp}
+		\end{equation*}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{A New Interlocking Test}
+Further, we find a link between interlocking property and the big-M method. If let $t_{\texttt{sol}}(M)$ be the optimal point of the big-M method with respect to a given $M$, we have:
+\begin{equation*}
+\texttt{Interlocking} \iff \lim_{M\to\infty}t_{\texttt{sol}}(M) = 0
+\end{equation*}
+\end{frame}
+
+\begin{frame}
+\frametitle{Affine Scaling}
+For a general linear programming:
+\begin{equation*}
+\begin{aligned}
+\min_{x} & \hspace{0.1cm} c^Tx \\
+\texttt{s.t.} \hspace{0.5cm} & Ax = 0 \\
+& x \geq 0
+\end{aligned}
+\end{equation*}
+The affine scaling iteration is:
+\begin{enumerate}[(I)]
+\item<0-> Suppose $x^0$ is a strictly feasible point.
+\item<1-> Let ${X_k}$ be the \textbf{diagonal matrix} with $x^k$ on its diagonal.
+\item<2-> Let the dual variable $y^k = (AX_k^2A^T)^{-1}AX_k^2c$
+\item<3-> The reduce cost $r^k = c - A^Ty^k$
+\item<4-> The solution is found if $\mathbf{1}^TX_kr^k < \epsilon$.
+\item<5-> Otherwise, Update $x^{k+1} = x^{k} - \beta \frac{X_k^2r^k}{\lVert X_kr^k \lVert}
+\end{enumerate}
+
+\end{frame}
+
+\end{document}  

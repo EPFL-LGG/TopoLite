@@ -14,8 +14,9 @@ endif()
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem REQUIRED)
 
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+message(${Boost_LIBRARY_DIR_RELEASE})
 #Cpp Subprocess
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
