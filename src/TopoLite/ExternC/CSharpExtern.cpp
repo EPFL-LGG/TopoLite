@@ -36,8 +36,6 @@ void getInteractMatrix(XMLData* data, double *interactMat)
 
 
 //interface implementation
-
-
 //IO
 XMLData* readXML(const char *xmlstr)
 {
@@ -63,6 +61,16 @@ XMLData* initStructure(){
     data->interact_delta.scale = 1;
 
     return data;
+}
+
+ContactGraphData* initContactGraph(){
+    ContactGraphData *graphData = new ContactGraphData();
+
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+    InitVarLite(varList.get());
+    graphData->graph = make_shared<ContactGraph>(varList);
+
+    return graphData;
 }
 
 PolyMeshRhino *initPartMeshPtr(int partID, XMLData *data){
@@ -162,37 +170,33 @@ PolyLineRhino *initTextureMeshPtr(XMLData *data){
     return NULL;
 }
 
-PolyMeshRhino *initContact(XMLData *data){
+PolyMeshRhino *initContactMesh(ContactGraphData *data){
     PolyMeshRhino *mesh = NULL;
-    if(data && data->strucCreator && data->strucCreator->struc)
+    if(data)
     {
-        shared_ptr<Struc> struc = data->strucCreator->struc;
-        shared_ptr<ContactGraph> graph = make_shared<ContactGraph>(data->varList);
-
-        vector<shared_ptr<PolyMesh>> meshes;
-        vector<bool> atBoundary;
-
-        for(int partID = 0; partID < struc->partList.size(); partID++){
-            pPart part = struc->partList[partID];
-            meshes.push_back(part->polyMesh);
-            atBoundary.push_back(part->atBoundary);
-        }
-        graph->constructFromPolyMeshes(meshes, atBoundary);
-
-        pPolyMesh contactMesh;
-        graph->getContactMesh(contactMesh);
-        if(contactMesh){
-            MeshConverter converter(data->varList);
-            mesh = new PolyMeshRhino();
-            converter.Convert2EigenMesh(contactMesh.get(), mesh);
-            return mesh;
-        }
+        data->graph->constructFromPolyMeshes(data->meshes, data->atBoundary);
+        data->graph->finalize();
+        shared_ptr<PolyMesh> contact_mesh;
+        data->graph->getContactMesh(contact_mesh);
+        MeshConverter converter(data->graph->getVarList());
+        mesh = new PolyMeshRhino();
+        converter.Convert2EigenMesh(contact_mesh.get(), mesh);
+        return mesh;
     }
     return NULL;
 }
 
-
 int deleteStructure(XMLData* data){
+    if(data){
+        delete data;
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+int deleteContactGraph(ContactGraphData* data){
     if(data){
         delete data;
         return 1;
@@ -229,13 +233,7 @@ void refresh(XMLData* data)
     if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
         double tmpMat[16];
         getInteractMatrix(data, tmpMat);
-        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree)
-        {
-            data->strucCreator->CreateStructure(true, true, tmpMat, false);
-        }
-        else{
-            data->strucCreator->CreateStructure(true, false, tmpMat, false);
-        }
+        data->strucCreator->CreateStructure(true, tmpMat, false);
     }
     return;
 }
@@ -245,16 +243,39 @@ void preview(XMLData* data)
     if (data && data->strucCreator && data->strucCreator->crossMeshCreator) {
         double tmpMat[16];
         getInteractMatrix(data, tmpMat);
-        if (data->strucCreator->crossMeshCreator->aabbTree && data->strucCreator->crossMeshCreator->quadTree) {
-            data->strucCreator->CreateStructure(true, true, tmpMat, true);
-        } else {
-            data->strucCreator->CreateStructure(true, false, tmpMat, true);
-        }
+        data->strucCreator->CreateStructure(true, tmpMat, true);
     }
     return;
 }
 
+void addMeshesToContactGraph(ContactGraphData *data, CMesh *cmesh, bool brdy)
+{
+    if(cmesh == NULL) return;
+    if(data == NULL) return;
 
+    vector<Vector3i> F(cmesh->n_faces);
+    vector<Vector3f> V(cmesh->n_vertices);
+
+    for(int id = 0; id < cmesh->n_vertices; id++){
+        V.at(id)[0] = cmesh->points[id * 3];
+        V.at(id)[1] = cmesh->points[id * 3 + 1];
+        V.at(id)[2] = cmesh->points[id * 3 + 2];
+    }
+
+    for(int id = 0; id < cmesh->n_faces; id++){
+        F.at(id)[0] = cmesh->faces[id * 3];
+        F.at(id)[1] = cmesh->faces[id * 3 + 1];
+        F.at(id)[2] = cmesh->faces[id * 3 + 2];
+    }
+
+    MeshConverter converter(data->graph->getVarList());
+    pPolyMesh mesh;
+    converter.Convert2PolyMesh(V, F, mesh);
+    data->meshes.push_back(mesh);
+    data->atBoundary.push_back(brdy);
+
+    return;
+}
 
 //Get Info
 int partNumber(XMLData* data){
@@ -460,7 +481,6 @@ void setPattern(CPolyLines *polylines, XMLData* data){
         }
         surface->removeDuplicatedVertices();
 
-
         strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
         strucCreator->crossMeshCreator->setPatternMesh(surface);
     }
@@ -469,6 +489,7 @@ void setPattern(CPolyLines *polylines, XMLData* data){
 void setReferenceSurface(CMesh *cmesh, XMLData* data){
 
     if(cmesh == NULL || data == NULL) return;
+    if(polylines == NULL || data == NULL) return;
     pPolyMesh surface = make_shared<PolyMesh>(data->varList);
 
     shared_ptr<StrucCreator> strucCreator = data->strucCreator;
@@ -494,6 +515,22 @@ void setReferenceSurface(CMesh *cmesh, XMLData* data){
         pPolyMesh mesh;
         converter.Convert2PolyMesh(V, F, mesh);
 
+        for(int id = 0; id < polylines->n_polyline; id++){
+            int sta = polylines->sta_ends[id * 2];
+            int end = polylines->sta_ends[id * 2 + 1];
+            shared_ptr<_Polygon> polygon = make_shared<_Polygon>();
+            for(int kd = sta; kd <= end; kd++){
+                Vector3f pt;
+                for(int ld = 0; ld < 3; ld++){
+                    pt[ld] = polylines->points[kd * 3 + ld];
+                }
+                polygon->push_back(pt);
+            }
+            surface->polyList.push_back(polygon);
+        }
+        surface->removeDuplicatedVertices();
+
+
         strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
         strucCreator->crossMeshCreator->setPatternMesh(surface);
     }
@@ -502,6 +539,12 @@ void setReferenceSurface(CMesh *cmesh, XMLData* data){
 void setParaDouble(const char *name, double value, XMLData* data){
     if(data && data->varList)
         data->varList->set(name,  (float)value);
+    return;
+}
+
+void setParaInt(const char *name, int value, XMLData* data){
+    if(data && data->varList)
+        data->varList->set(name,  (int)value);
     return;
 }
 

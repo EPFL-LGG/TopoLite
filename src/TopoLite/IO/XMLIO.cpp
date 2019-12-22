@@ -251,7 +251,7 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
                     shared_ptr<_Polygon> poly = make_shared<_Polygon>(*((_Polygon *)crossMesh->crossList[id].get()));
                     polyMesh->polyList.push_back(poly);
                 }
-                polyMesh->UpdateVertices();
+                polyMesh->removeDuplicatedVertices();
                 part->polyMesh = polyMesh;
                 polyMesh->TranslateMesh(Vector3f(0, -data.varList->get<float>("ground_height"), 0));
                 part->WriteOBJWireFrameModel(surface_wire_path.c_str());
@@ -430,7 +430,8 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
 {
 
     //load xmlfile
-    xmldoc.load_file(xmlFileName.c_str());
+    if(!xmldoc.load_file(xmlFileName.c_str()))
+        return false;
     pugi::xml_node xml_root = xmldoc.child("Documents");
 
     if (xml_root)
@@ -456,7 +457,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
                 string path = geomDataFolder + "/" + crossMeshNode.attribute("path").as_string();
                 std::cout << "Read File...\t:" << path << std::endl;
                 if (!data.strucCreator->LoadSurface(path.c_str())) return false;
-                data.strucCreator->CreateStructure(true, false, data.interactMatrix, true);
+                data.strucCreator->CreateStructure(true, data.interactMatrix, true);
             }
         }
         else
@@ -468,7 +469,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
                 string path = geomDataFolder + "/" + surfaceMesh.attribute("path").as_string();
                 std::cout << "Read File...\t:" << path << std::endl;
                 if (!data.strucCreator->LoadSurface(path.c_str())) return false;
-                data.strucCreator->CreateStructure(true, true, data.interactMatrix, true);
+                data.strucCreator->CreateStructure(true, data.interactMatrix, true);
             }
         }
 
@@ -693,7 +694,7 @@ void XMLIO::XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_
                         }
                     }
 
-                    data.strucCreator->CreateStructure(false, false, data.interactMatrix, false);
+                    data.strucCreator->CreateStructure(false, data.interactMatrix, false);
                 }
             }
         }

@@ -3,7 +3,7 @@ project(TopoLite)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 11)
-
+set(Boost_NO_BOOST_CMAKE 1)
 
 #########################################
 #####                               #####
@@ -23,8 +23,11 @@ option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
 
 #3rd party library
-set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
-#set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/MacBin)
+if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
+    #set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
+    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/MacBin)
+endif()
+
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 
 #########################################
@@ -48,6 +51,8 @@ file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.h
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.h)
+
+link_directories(${ext_lib_dir})
 
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
@@ -75,7 +80,6 @@ if(USE_PYTHON_PLUGIN)
     target_link_libraries(pyTopo PUBLIC TpCorelib)
 endif()
 
-
 ##########################################
 ######                               #####
 ######        Catch2    Test         #####
@@ -83,7 +87,6 @@ endif()
 ##########################################
 
 if(USE_UNIT_TEST)
-
     set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
                             ${CMAKE_CURRENT_SOURCE_DIR}/ext/Catch2/contrib)
     add_subdirectory(ext/Catch2)

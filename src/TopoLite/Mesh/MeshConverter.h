@@ -77,7 +77,7 @@ public:
 
     void Convert2PolyMesh(const Eigen::MatrixXd &V, const Eigen::MatrixXi &F, pPolyMesh &out);
 
-	void Convert2PolyMesh(pPolyMesh polyMesh);
+	void Convert2PolyMesh(pPolyMesh polyMesh, double eps = 1e-4);
 
 public:
     // Convert to EigenMesh

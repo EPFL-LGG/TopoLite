@@ -3,13 +3,20 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 #EIGEN
 set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
+
 #set(EIGEN3_INCLUDE_DIR /usr/local/include/eigen3)
 
-#Boost
+if (WIN32)
+    set(BOOST_ROOT "$ENV{USERPROFILE}/anaconda3/envs/interlock/Library/include")
+else ()
+    set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
+endif()
+
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem REQUIRED)
 
+find_package(Boost COMPONENTS system filesystem REQUIRED)
+message(${Boost_LIBRARY_DIR_RELEASE})
 #Cpp Subprocess
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
@@ -31,9 +38,12 @@ include(libigl)
 #ShapeOp
 set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
+
+if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
 set_target_properties(ShapeOp  PROPERTIES
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release")
+endif()
 
 #TBB
 set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
@@ -47,24 +57,13 @@ set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 
 #Pybind11
 if(USE_PYTHON_PLUGIN)
-    #Boost
-    if (WIN32)
-        set(BOOST_ROOT "$ENV{USERPROFILE}/anaconda3/envs/interlock/Library/include")
-    else ()
-        set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
-    endif()
-
     #Pybind11
     set(PYBIND11_CPP_STANDARD -std=c++11)
     set(PYBIND11_PYTHON_VERSION 3.7)
-    if (WIN32)
-        set(PYTHON_EXECUTABLE "$ENV{USERPROFILE}/anaconda3/envs/interlock/python.exe")
-    else ()
-        set(PYTHON_EXECUTABLE "$ENV{HOME}/anaconda3/envs/interlock/bin/python3.7")
-    endif()
     add_subdirectory(pybind11)
 endif()
 
+set(ext_lib_dir ${Boost_LIBRARY_DIR} PARENT_SCOPE)
 
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}

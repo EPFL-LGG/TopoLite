@@ -78,12 +78,12 @@ public:
 	 * \note: it requires polyMesh with texture.
 	 */
 
-	void ComputeBaseMesh(double inverTextureMat[16],
-						 shared_ptr<PolyMesh>& baseMesh2D,
-						 shared_ptr<CrossMesh>& crossMesh);
+	void Pattern2CrossMesh(double *inverTextureMat,
+                           shared_ptr<PolyMesh> &baseMesh2D,
+                           shared_ptr<CrossMesh> &crossMesh);
 
 
-    void ComputeBaseMesh(   pPolyMesh polyMesh,
+    void PolyMesh2CrossMesh(pPolyMesh polyMesh,
                             pCrossMesh &crossMesh);
 
     void InitCrossMesh(     pPolyMesh polyMesh,

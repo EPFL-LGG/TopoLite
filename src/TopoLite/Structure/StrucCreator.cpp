@@ -92,17 +92,13 @@ bool StrucCreator::LoadSurface(const char * objFileName)
 	return true;
 }
 
-int StrucCreator::CreateStructure(bool createCrossMesh,
-								  bool textureMode,
-								  double interactMatrix[],
-								  bool previewMode)
+int StrucCreator::CreateStructure(  bool createCrossMesh,
+                                    double interactMatrix[],
+								    bool previewMode)
 {
 
-	float   tiltAngle       = getVarList()->get<float>("tiltAngle");
-	float   patternID       = getVarList()->get<int>("patternID");
-	float   patternRadius   = getVarList()->get<int>("patternRadius");
-	float   cutUpper        = getVarList()->get<float>("cutUpper");
-	float   cutLower        = getVarList()->get<float>("cutLower");
+    float   cutUpper        = getVarList()->get<float>("cutUpper");
+    float   cutLower        = getVarList()->get<float>("cutLower");
     bool    lockAngle       = getVarList()->get<bool>("lockTiltAngle");
 
 	tbb::tick_count sta = tbb::tick_count::now();
@@ -112,10 +108,10 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 
 	////////////////////////////////////////////////////////////////
 	// 1. Create a cross mesh from a polygonal mesh
-	if ( createCrossMesh && !lockAngle)
-	{
-		crossMeshCreator->CreateCrossMesh(textureMode, tiltAngle, patternID, patternRadius, previewMode, interactMatrix);
+	if(createCrossMesh){
+        crossMeshCreator->CreateCrossMesh(previewMode, interactMatrix);
 	}
+
 	pCrossMesh crossMesh = crossMeshCreator->crossMesh;
 	if(crossMesh == nullptr) return 0;
 	std::cout << "Compute Cross Mesh:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
@@ -154,7 +150,7 @@ int StrucCreator::CreateStructure(bool createCrossMesh,
 			part->ComputePartGeometry( true, Vector2f(cutUpper, cutLower), previewMode);
 			if( !previewMode )
 			{
-				part->polyMesh->UpdateVertices();
+                part->polyMesh->removeDuplicatedVertices();
 				part->Compute3DTextPosition();
 			}
 		}
@@ -215,7 +211,7 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 
 		if( !previewMode )
 		{
-			part->polyMesh->UpdateVertices();
+            part->polyMesh->removeDuplicatedVertices();
 			part->Compute3DTextPosition();
 		}
 	}

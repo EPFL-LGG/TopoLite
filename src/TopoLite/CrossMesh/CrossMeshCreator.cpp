@@ -128,18 +128,79 @@ bool CrossMeshCreator::LoadReferenceSurface(const char *objFileName)
 	}
 }
 
-bool CrossMeshCreator::CreateCrossMesh( bool texturedModel,
-                                        float tiltAngle,
-                                        int patternID,
-                                        int patternRadius,
-                                        bool previewMode,
+void CrossMeshCreator::setReferenceSurface(pPolyMesh surface){
+
+    if(surface == nullptr) return;;
+
+    if(!surface->texturedModel)
+    {
+        MeshConverter converter(getVarList());
+        referenceSurface.reset();
+        converter.generateTexture(surface.get(), referenceSurface);
+        if(referenceSurface == nullptr) return;
+        getVarList()->set("texturedModel", true);
+    }
+
+    ComputeTextureNormalizeMatrix();
+    CreateQuadTree();
+    CreateAABBTree();
+}
+
+void CrossMeshCreator::setPatternMesh(pPolyMesh surface)
+{
+    if(surface == nullptr) return;
+
+    pattern2D.reset();
+    BaseMeshCreator baseMeshCreator(getVarList());
+    baseMeshCreator.PolyMesh2CrossMesh(surface, pattern2D);
+
+    return;
+}
+
+bool CrossMeshCreator::setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary)
+{
+    referenceSurface.reset();
+    referenceSurface = make_shared<PolyMesh>(*surface);
+    getVarList()->set("texturedModel", false);
+    referenceSurface->ComputeBBox();
+
+    BaseMeshCreator baseMeshCreator(getVarList());
+    baseMeshCreator.PolyMesh2CrossMesh(referenceSurface, crossMesh);
+
+    if(crossMesh->crossList.size() == atBoundary.size())
+    {
+        for(pCross cross: crossMesh->crossList){
+            cross->atBoundary = atBoundary[cross->crossID];
+        }
+    }
+    else{
+        baseMeshCreator.ComputePracticalBoundary(crossMesh);
+    }
+
+    float   tiltAngle       = getVarList()->get<float>("tiltAngle");
+    AugmentedVectorCreator vectorCreator(getVarList());
+    vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
+
+    return  true;
+}
+
+bool CrossMeshCreator::CreateCrossMesh( bool previewMode,
                                         double interactMatrix[])
 {
+    float   tiltAngle       = getVarList()->get<float>("tiltAngle");
+    float   patternID       = getVarList()->get<int>("patternID");
+    float   patternRadius   = getVarList()->get<int>("patternRadius");
+    bool    texturedModel   = getVarList()->get<int>("texturedModel");
+
     //clear CrossMesh
     if (crossMesh != nullptr) crossMesh.reset();
 
     if ( texturedModel )
     {
+        if(referenceSurface == nullptr) return false;
+        if(quadTree == nullptr) return false;
+        if(aabbTree == nullptr) return false;
+
         clock_t sta;
 
         if( default_patternID != patternID ||
@@ -164,7 +225,7 @@ bool CrossMeshCreator::CreateCrossMesh( bool texturedModel,
 
         sta = clock();
         BaseMeshCreator baseMeshCreator(quadTree, referenceSurface, pattern2D, getVarList());
-        baseMeshCreator.ComputeBaseMesh(inverTextureMat, baseMesh2D, crossMesh);
+        baseMeshCreator.Pattern2CrossMesh(inverTextureMat, baseMesh2D, crossMesh);
         std::cout << "--Remesh Para:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
         sta = clock();
@@ -181,12 +242,15 @@ bool CrossMeshCreator::CreateCrossMesh( bool texturedModel,
     else
     {
         BaseMeshCreator baseMeshCreator(getVarList());
-        baseMeshCreator.ComputeBaseMesh(referenceSurface, crossMesh);
+        baseMeshCreator.PolyMesh2CrossMesh(referenceSurface, crossMesh);
+
+        baseMeshCreator.ComputePracticalBoundary(crossMesh);
 
         AugmentedVectorCreator vectorCreator(getVarList());
         vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
     }
 
+    //compute the tilt range
     if(!previewMode && crossMesh)
     {
         AugmentedVectorCreator vectorCreator(getVarList());
