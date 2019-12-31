@@ -10,29 +10,26 @@
 #include "Mesh/MeshConverter.h"
 #include "Interlocking/ContactGraph.h"
 #include "IO/XMLIO.h"
-#define MAXIMUM_MESHSIZE 100000
-#define MAXIMUM_POLYLINE_POINTS  100000
-#define MAXIMUM_POLYLINE_FACE  100000
 struct CMesh{
-    float points[MAXIMUM_MESHSIZE];
-    int faces[MAXIMUM_MESHSIZE];
+    float* points;
+    int* faces;
     int n_vertices;
     int n_faces;
+};
+
+struct CPolyLines
+{
+    float* points;
+    int* sta_ends;
+    int* atBoundary;
+    int n_polyline;
+    int n_points;
 };
 
 struct ContactGraphData{
     vector<pPolyMesh> meshes;
     vector<bool> atBoundary;
     shared_ptr<ContactGraph> graph;
-};
-
-struct CPolyLines
-{
-    float points[MAXIMUM_POLYLINE_POINTS];
-    int sta_ends[MAXIMUM_POLYLINE_FACE];
-    int atBoundary[MAXIMUM_POLYLINE_FACE];
-    int n_polyline;
-    int n_points;
 };
 
 //IO
