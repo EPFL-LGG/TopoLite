@@ -9,10 +9,10 @@ set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 if (WIN32)
     set(BOOST_ROOT "$ENV{USERPROFILE}/anaconda3/envs/interlock/Library/include")
 else ()
+    set(Boost_USE_STATIC_LIBS ON)
     set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
 endif()
 
-set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 
 find_package(Boost COMPONENTS system filesystem REQUIRED)
