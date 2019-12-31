@@ -57,7 +57,7 @@ link_directories(${ext_lib_dir})
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})
-
+        
 target_include_directories(TpCorelib PUBLIC SYSTEM
         ${ext_include}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -95,6 +95,10 @@ if(USE_UNIT_TEST)
 
     file(GLOB testTopoFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/*.cpp)
     add_executable(testTopo ${testTopoFiles})
+    #add_executable(testTopo
+            #${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/StrucCreator.cpp
+            #${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/testMain.cpp)
+
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)
     target_link_libraries(testTopo PUBLIC TpCorelib)
     ParseAndAddCatchTests(testTopo)

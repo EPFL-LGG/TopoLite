@@ -91,6 +91,7 @@ void MeshConverter::generateTexture(const PolyMesh *polyMesh, shared_ptr<PolyMes
         out->polyList[id]->vers[1].texCoord = out->texCoordList[F(id, 1)];
         out->polyList[id]->vers[2].texCoord = out->texCoordList[F(id, 2)];
     }
+    out->texturedModel = true;
 
     return;
 }

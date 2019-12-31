@@ -10,9 +10,9 @@
 #include "Mesh/MeshConverter.h"
 #include "Interlocking/ContactGraph.h"
 #include "IO/XMLIO.h"
-#define MAXIMUM_MESHSIZE 4096
-#define MAXIMUM_POLYLINE_POINTS  10000
-#define MAXIMUM_POLYLINE_FACE  1000
+#define MAXIMUM_MESHSIZE 100000
+#define MAXIMUM_POLYLINE_POINTS  100000
+#define MAXIMUM_POLYLINE_FACE  100000
 struct CMesh{
     float points[MAXIMUM_MESHSIZE];
     int faces[MAXIMUM_MESHSIZE];
@@ -144,6 +144,12 @@ void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg);
 //Set Para
 CSharp_LIBRARY_C_FUNCTION
 void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary);
+
+CSharp_LIBRARY_C_FUNCTION
+void setPattern(CPolyLines *polylines, XMLData* data);
+
+CSharp_LIBRARY_C_FUNCTION
+void setReferenceSurface(CMesh *cmesh, XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
 void setParaDouble(const char *name, double value, XMLData* data);

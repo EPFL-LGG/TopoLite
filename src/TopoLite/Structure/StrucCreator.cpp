@@ -85,11 +85,7 @@ bool StrucCreator::LoadSurface(const char * objFileName)
 {
 	ClearStruc();
 	crossMeshCreator = make_shared<CrossMeshCreator>(getVarList());
-	if(!crossMeshCreator->LoadReferenceSurface(objFileName))
-	{
-		return false;
-	}
-	return true;
+	return crossMeshCreator->loadSurface(objFileName);
 }
 
 int StrucCreator::CreateStructure(  bool createCrossMesh,
@@ -101,19 +97,25 @@ int StrucCreator::CreateStructure(  bool createCrossMesh,
     float   cutLower        = getVarList()->get<float>("cutLower");
     bool    lockAngle       = getVarList()->get<bool>("lockTiltAngle");
 
+    std::cout<< "CreateStructure" << std::endl;
 	tbb::tick_count sta = tbb::tick_count::now();
 	if (crossMeshCreator == nullptr) return 0;
-
 	struc.reset();
 
 	////////////////////////////////////////////////////////////////
 	// 1. Create a cross mesh from a polygonal mesh
-	if(createCrossMesh){
+	if(createCrossMesh)
+	{
         crossMeshCreator->CreateCrossMesh(previewMode, interactMatrix);
+	}
+
+	if(previewMode == false){
+	    crossMeshCreator->UpdateTiltRange();
 	}
 
 	pCrossMesh crossMesh = crossMeshCreator->crossMesh;
 	if(crossMesh == nullptr) return 0;
+
 	std::cout << "Compute Cross Mesh:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 
 	////////////////////////////////////////////////////////////////

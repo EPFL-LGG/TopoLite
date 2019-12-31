@@ -156,7 +156,8 @@ PolyLineRhino *initTextureMeshPtr(XMLData *data){
     {
         shared_ptr<CrossMeshCreator> crossMeshCreator = data->strucCreator->crossMeshCreator;
         shared_ptr<PolyMesh> referenceMesh = crossMeshCreator->referenceSurface;
-        if(referenceMesh->texturedModel) {
+        if(referenceMesh->texturedModel)
+        {
             shared_ptr<PolyMesh> textureMesh = referenceMesh->getTextureMesh();
             MeshConverter converter(data->varList);
             lines = new PolyLineRhino();
@@ -225,7 +226,6 @@ int deletePolyLineRhino(PolyLineRhino *lines){
         return 0;
     }
 }
-
 
 //Create Geometry
 void refresh(XMLData* data)
@@ -369,7 +369,6 @@ float ComputeGroundHeight(XMLData* data)
     return 0;
 }
 
-
 //Copy Data
 void copyVertexI(PolyMeshRhino *mesh, int vID, float *point){
     if(mesh && vID >= 0 && vID < mesh->vertices.size()){
@@ -426,7 +425,6 @@ void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg){
     return;
 }
 
-
 //Set Parameter
 void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary){
     if(polylines == NULL || data == NULL) return;
@@ -457,40 +455,52 @@ void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary){
     }
 }
 
-void setPattern(CPolyLines *polylines, XMLData* data){
+void setPattern(CPolyLines *polylines, XMLData* data)
+{
 
     if(polylines == NULL || data == NULL) return;
-    pPolyMesh surface = make_shared<PolyMesh>(data->varList);
+
+    pPolyMesh pattern_surface = make_shared<PolyMesh>(data->varList);
 
     shared_ptr<StrucCreator> strucCreator = data->strucCreator;
     if(strucCreator){
 
-        //build surface
-        for(int id = 0; id < polylines->n_polyline; id++){
+        //build pattern
+        for(int id = 0; id < polylines->n_polyline; id++)
+        {
             int sta = polylines->sta_ends[id * 2];
             int end = polylines->sta_ends[id * 2 + 1];
             shared_ptr<_Polygon> polygon = make_shared<_Polygon>();
-            for(int kd = sta; kd <= end; kd++){
-                Vector3f pt;
+            for(int kd = sta; kd <= end; kd++)
+            {
+                Vector3f pt(0, 0, 0);
                 for(int ld = 0; ld < 3; ld++){
                     pt[ld] = polylines->points[kd * 3 + ld];
                 }
+                if(std::abs(pt[2]) > 1e-4){
+                    std::cout << pt << std::endl;
+                }
                 polygon->push_back(pt);
             }
-            surface->polyList.push_back(polygon);
+            pattern_surface->polyList.push_back(polygon);
         }
-        surface->removeDuplicatedVertices();
 
-        strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
-        strucCreator->crossMeshCreator->setPatternMesh(surface);
+        //becase setPatternMesh Function will do this as well
+        //we don't need to do it twice
+        //pattern_surface->removeDuplicatedVertices();
+
+        if(strucCreator->crossMeshCreator == nullptr){
+            strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
+        }
+        strucCreator->crossMeshCreator->setPatternMesh(pattern_surface);
     }
 }
 
-void setReferenceSurface(CMesh *cmesh, XMLData* data){
-
+void setReferenceSurface(CMesh *cmesh, XMLData* data)
+{
     if(cmesh == NULL || data == NULL) return;
-    if(polylines == NULL || data == NULL) return;
-    pPolyMesh surface = make_shared<PolyMesh>(data->varList);
+
+    pPolyMesh reference_surface = make_shared<PolyMesh>(data->varList);
 
     shared_ptr<StrucCreator> strucCreator = data->strucCreator;
     if(strucCreator){
@@ -512,27 +522,14 @@ void setReferenceSurface(CMesh *cmesh, XMLData* data){
         }
 
         MeshConverter converter(data->varList);
-        pPolyMesh mesh;
-        converter.Convert2PolyMesh(V, F, mesh);
+        pPolyMesh reference_mesh;
+        converter.InitPolyMesh(V, F, reference_mesh);
+        reference_mesh->removeDuplicatedVertices();
 
-        for(int id = 0; id < polylines->n_polyline; id++){
-            int sta = polylines->sta_ends[id * 2];
-            int end = polylines->sta_ends[id * 2 + 1];
-            shared_ptr<_Polygon> polygon = make_shared<_Polygon>();
-            for(int kd = sta; kd <= end; kd++){
-                Vector3f pt;
-                for(int ld = 0; ld < 3; ld++){
-                    pt[ld] = polylines->points[kd * 3 + ld];
-                }
-                polygon->push_back(pt);
-            }
-            surface->polyList.push_back(polygon);
+        if(strucCreator->crossMeshCreator == nullptr) {
+            strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
         }
-        surface->removeDuplicatedVertices();
-
-
-        strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
-        strucCreator->crossMeshCreator->setPatternMesh(surface);
+        strucCreator->crossMeshCreator->setReferenceSurface(reference_mesh);
     }
 }
 

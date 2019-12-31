@@ -68,11 +68,11 @@ public:
 	 * \param objFileName: .obj file path
 	 * \param texturedModel: True if use the texture
 	 */
-	bool LoadReferenceSurface(const char *objFileName);
+	bool loadSurface(const char *objFileName);
 
-	void setReferenceSurface(pPolyMesh surface);
+	bool setReferenceSurface(pPolyMesh surface);
 
-	void setPatternMesh(pPolyMesh surface);
+    bool setPatternMesh(pPolyMesh surface);
 
 	bool setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary);
 
@@ -86,6 +86,8 @@ public:
 	 */
     bool CreateCrossMesh(   bool previewMode,
 	                        double interactMatrix[]);
+
+    void UpdateTiltRange();
 
 public:
 

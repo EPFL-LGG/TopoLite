@@ -69,11 +69,12 @@ void BaseMeshCreator::Pattern2CrossMesh(double *inverTextureMat,
 
 	ComputeInsideCross(inverTextureMat, baseMesh2D, crossMesh);
 
-	if(getVarList()->get<bool>("smooth_bdry")){
-		ComputeBoundaryCross(inverTextureMat, baseMesh2D, crossMesh);
+	if(getVarList()->get<bool>("smooth_bdry"))
+	{
+        ComputeBoundaryCross(inverTextureMat, baseMesh2D, crossMesh);
 		//remove dangling
 		RemoveDanglingCross(crossMesh);
-	}
+    }
 
     if(baseMesh2D){
         baseMesh2D->setVarList(getVarList());
@@ -136,6 +137,7 @@ void BaseMeshCreator::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)
 void BaseMeshCreator::RemoveDanglingCross(shared_ptr<CrossMesh> crossMesh)
 {
 	if(crossMesh == nullptr) return;
+	if(crossMesh->crossList.size() < 3) return;
 	for(auto it = crossMesh->crossList.begin(); it != crossMesh->crossList.end();)
 	{
 		shared_ptr<Cross> cross = *it;
@@ -250,11 +252,12 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 {
 
     float minimumCrossArea = getVarList()->get<float>("minCrossArea");
-
 	//get all the half_inside pattern2D
+
 	vector<int> half_inside_pattern2D;
 	for(int id = 0; id < pattern2D.lock()->crossList.size(); id++)
 	{
+	    if(pattern2D.lock()->crossList[id] == nullptr) continue;
 		int cross2ID = pattern2D.lock()->crossList[id]->crossID;
 		if(map_cross2D_3D[cross2ID] != -1) continue;
 		shared_ptr<Cross> cross2D = pattern2D.lock()->crossList[id];
@@ -271,12 +274,16 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 	}
 
 	//for each cut the polygon by the mesh boundary
-	//here only compute the vertex postion of the cut conner
-	std::unordered_map<int, vector<int>> patter2D_cut_conner3D, patter2D_cut_conner2D;
+	//here only compute the vertex position of the cut conner
+
+
+    std::unordered_map<int, vector<int>> patter2D_cut_conner3D, patter2D_cut_conner2D;
 	for(int id = 0; id < half_inside_pattern2D.size(); id++)
 	{
+
 		int cross2ID = half_inside_pattern2D[id];
 		shared_ptr<Cross> cross2D = pattern2D.lock()->crossList[cross2ID];
+		if(cross2D == nullptr) continue;
 
 		vector<int> cut_conner3D, cut_conner2D;
 		for(int jd = 0; jd < cross2D->verIDs.size(); jd++)
@@ -287,7 +294,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			{
 				shared_ptr<Cross> ncross2D = cross2D->neighbors[jd].lock();
 
-				//check whether neighbor has compute
+				//check whether neighbor has computed
 				if(ncross2D != nullptr)
 				{
 					auto find3D = patter2D_cut_conner3D.find(ncross2D->crossID);
@@ -314,7 +321,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 				}
 
 				Vector3f pos2D, pos3D;
-				if(ComputeBoundaryVertex(inverTextureMat, sta2D, end2D, pos2D, pos3D))
+                if(ComputeBoundaryVertex(inverTextureMat, sta2D, end2D, pos2D, pos3D))
 				{
 					cut_conner3D.push_back(crossMesh->vertexList.size());
 					crossMesh->vertexList.push_back(pos3D);
@@ -334,9 +341,10 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 		}
 		patter2D_cut_conner3D[cross2ID] = cut_conner3D;
 		patter2D_cut_conner2D[cross2ID] = cut_conner2D;
-	}
 
-	//compute the cut cross mesh
+    }
+
+    //compute the cut cross mesh
 	std::unordered_map<int, vector<weak_ptr<Cross>>> pattern2D_edge_cross3D;
 	std::unordered_map<int, vector<int>> pattern2D_edge_cross3D_edgeIDs;
 	for(int id = 0; id < half_inside_pattern2D.size(); id++)
@@ -357,7 +365,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			if(ver3ID == -1) continue;
 			if(vertex_visited[jd] == true) continue;
 
-			//go into anti-clock
+			//iterate anti-clockwise
 			int kd = jd;
 			while(ver3ID != -1)
 			{
@@ -373,7 +381,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			cross->atBoundary = false;
 			cross->crossID = crossMesh->crossList.size();
 
-			//go into clock
+			//iterate clockwise
 			//(1) present kd has conner or not?
 			int startID, endID;
 			int v3ID = patter2D_cut_conner3D[cross2ID][kd];
@@ -408,7 +416,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 				ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
 			}
 
-			//(3) presnet kd - 1 has a conner or not
+			//(3) kd - 1 has a conner or not
 			kd = (kd - 1 + size) % size;
 			v3ID = patter2D_cut_conner3D[cross2ID][kd];
 			v2ID = patter2D_cut_conner2D[cross2ID][kd];
@@ -449,7 +457,6 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 		pattern2D_edge_cross3D_edgeIDs[cross2ID] = edge_cross3D_edgeIDs;
 	}
 
-	//add neighbor
 	for(int id = 0; id < half_inside_pattern2D.size(); id++)
 	{
 		int cross2ID = half_inside_pattern2D[id];
@@ -569,7 +576,6 @@ bool BaseMeshCreator::ComputeBoundaryVertex(double *inverTextureMat, Vector3f st
 
 	pos3D = init_pos3D;
 	pos2D = sta2D;
-
 	while(len(sta2D - end2D) > 1e-4)
 	{
 		Vector3f mid = (sta2D + end2D) * 0.5f;
@@ -595,9 +601,8 @@ bool BaseMeshCreator::ComputeBoundaryVertex(double *inverTextureMat, Vector3f st
 	}
 }
 
-void BaseMeshCreator::ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh crossMesh) {
-    if (crossMesh->crossList.size() < 2) return;
-
+void BaseMeshCreator::ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh crossMesh)
+{
     vector<pHFace> faceList = hedgeMesh->GetFaceList();
 
     // Find neighboring cross based on the half-edge graph

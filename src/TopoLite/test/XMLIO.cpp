@@ -3,6 +3,7 @@
 //
 
 #include "IO/XMLIO.h"
+#include "CrossMesh/CrossMeshCreator.h"
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 
@@ -11,7 +12,6 @@
 
 TEST_CASE("Class XMLIO")
 {
-
     SECTION("Read XML")
     {
         XMLIO Reader;
