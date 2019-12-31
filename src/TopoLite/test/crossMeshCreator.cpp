@@ -27,7 +27,7 @@ TEST_CASE("Read CrossMesh")
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     InitVarLite(varList.get());
     shared_ptr<CrossMeshCreator> crossMeshCreator = make_shared<CrossMeshCreator>(varList);
-    REQUIRE(crossMeshCreator->loadSurface(debugobj_filepath.c_str()));
+    REQUIRE(crossMeshCreator->loadSurface(debugobj_filepath.string().c_str()));
     REQUIRE(crossMeshCreator->crossMesh == nullptr);
 
     SECTION("create cross mesh by using default pattern")

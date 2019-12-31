@@ -52,8 +52,6 @@ file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.cpp
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.h)
 
-link_directories(${ext_lib_dir})
-
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})

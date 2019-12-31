@@ -30,7 +30,7 @@ TEST_CASE()
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     InitVarLite(varList.get());
     shared_ptr<StrucCreator> strucCreator = make_shared<StrucCreator>(varList);
-    REQUIRE(strucCreator->LoadSurface(debugobj_filepath.c_str()));
+    REQUIRE(strucCreator->LoadSurface(debugobj_filepath.string().c_str()));
     REQUIRE(strucCreator->crossMeshCreator != nullptr);
 
     SECTION("create 2 parts from 2 quads pattern"){

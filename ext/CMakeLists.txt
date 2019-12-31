@@ -7,16 +7,17 @@ set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 #set(EIGEN3_INCLUDE_DIR /usr/local/include/eigen3)
 
 if (WIN32)
-    set(BOOST_ROOT "$ENV{USERPROFILE}/anaconda3/envs/interlock/Library/include")
+    #the boost in anaconda has some bugs
+    #instead we use https://sourceforge.net/projects/boost/files/boost-binaries/
+    set(BOOST_ROOT "C:/local/boost_1_66_0")
 else ()
-    set(Boost_USE_STATIC_LIBS ON)
     set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
 endif()
 
+set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
-
 find_package(Boost COMPONENTS system filesystem REQUIRED)
-message(${Boost_LIBRARY_DIR_RELEASE})
+
 #Cpp Subprocess
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
@@ -58,12 +59,14 @@ set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 #Pybind11
 if(USE_PYTHON_PLUGIN)
     #Pybind11
+    if(WIN32)
+        set(PYTHON_EXECUTABLE $ENV{USERPROFILE}/anaconda3/python.exe)
+    endif()
     set(PYBIND11_CPP_STANDARD -std=c++11)
     set(PYBIND11_PYTHON_VERSION 3.7)
     add_subdirectory(pybind11)
 endif()
 
-set(ext_lib_dir ${Boost_LIBRARY_DIR} PARENT_SCOPE)
 
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}
