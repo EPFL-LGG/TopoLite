@@ -278,6 +278,19 @@ void InterlockingSolver::computeRotationalInterlockingMatrixDense(Eigen::MatrixX
     return;
 }
 
+
+void InterlockingSolver::computeRotationalInterlockingMatrixSparse(EigenSpMat &spatMat)
+{
+    vector<EigenTriple> tris;
+    Eigen::Vector2i size;
+
+    computeRotationalInterlockingMatrix(tris, size);
+    spatMat = EigenSpMat(size[0], size[1]);
+    spatMat.setFromTriplets(tris.begin(), tris.end());
+}
+
+
+
 void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool withFriction) {
     if (!withFriction)
     {
@@ -376,5 +389,4 @@ double InterlockingSolver::computeEquilibriumMatrixConditonalNumber()
     }
 
 }
-
 

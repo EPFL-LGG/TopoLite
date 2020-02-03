@@ -4,7 +4,7 @@
 
 #ifndef TOPOLITE_INTERLOCKINGSOLVER_H
 #define TOPOLITE_INTERLOCKINGSOLVER_H
-
+#include "Eigen/Sparse"
 #include <Eigen/SparseCore>
 #include <Eigen/Dense>
 #include "ContactGraph.h"
@@ -15,7 +15,7 @@ using std::map;
 using std::vector;
 using std::shared_ptr;
 
-using EigenSpMat = Eigen::SparseMatrix<double>;
+using EigenSpMat = Eigen::SparseMatrix<double, Eigen::ColMajor>;
 using EigenTriple = Eigen::Triplet<double>;
 using stdvec_Vector3d = std::vector<Eigen::Vector3d,Eigen::aligned_allocator<Eigen::Vector3d>>;
 
@@ -82,6 +82,8 @@ public:
     void computeRotationalInterlockingMatrixDense(Eigen::MatrixXd &mat);
 
     void computeTranslationalInterlockingMatrixDense(Eigen::MatrixXd &mat);
+
+    void computeRotationalInterlockingMatrixSparse(EigenSpMat &mat);
 
 public:
 
