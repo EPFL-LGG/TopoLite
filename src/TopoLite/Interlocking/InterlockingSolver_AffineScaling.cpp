@@ -91,8 +91,8 @@ bool InterlockingSolver_AffineScaling::isRotationalInterlocking(shared_ptr<Inter
         beta = 0.9;
 
         std::cout << "(" <<  k << ") " << c.dot(xs[k + 1]) << std::endl;
-        VectorXd Vec = xs.back().segment(0, n) - xs.back().segment(n, n);
-        std::cout << "Motion: " << Vec.norm() << ",\tError: " << (mat  * Vec).norm() << std::endl;
+        //VectorXd Vec = xs.back().segment(0, n) - xs.back().segment(n, n);
+        //std::cout << "Motion: " << Vec.norm() << ",\tError: " << (mat  * Vec).norm() << std::endl;
 
         if (c.dot(xs[k + 1]) < -1e4)
         {
