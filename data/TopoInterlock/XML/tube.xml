@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<Documents>
+	<GUISettings>
+		<patternID value="4" />
+		<tiltAngle value="15" />
+		<cutUpper value="0.0199999996" />
+		<cutLower value="0.0199999996" />
+		<patternRadius value="15" />
+		<minCrossArea value="0.00100000005" />
+		<minBoundaryEdge value="0.0299999993" />
+		<textureScaleFactor value="1" />
+		<slopSample value="10" />
+		<Unit value="100" />
+		<mult_move_scale value="1" />
+		<smooth_bdry value="1" />
+		<ground_touch_bdry value="1" />
+		<faceface_contact value="1" />
+		<edgeedge_contact value="1" />
+		<only_cut_bdry value="0" />
+		<texturedModel value="0" />
+		<penetration_check value="0" />
+		<small_zero_eps value="1.00000001e-07" />
+		<big_zero_eps value="9.99999975e-06" />
+		<clipper_scale value="100000000" />
+		<tilt_face_angle_min value="0" />
+		<tilt_face_angle_max value="0" />
+		<ShapeOp_Settings>
+			<shapeop_meshFit value="1" />
+			<shapeop_regularity value="1" />
+			<shapeop_planarity value="1" />
+			<shapeop_bending value="0" />
+			<shapeop_boundary value="0" />
+			<shapeop_iterator value="0" />
+		</ShapeOp_Settings>
+		<Para_Mitsuba>
+			<output_mitsuba value="0" />
+			<wireframe_thickness value="0.00100000005" />
+			<wireframe_circle_vertex_num value="16" />
+			<mitsuba_PartYRotation value="50" />
+			<mitsuba_CameraRotation value="30" />
+			<mitsuba_CameraDistance value="4" />
+			<mitsuba_width value="768" />
+			<mitsuba_height value="576" />
+			<mitsuba_sample value="128" />
+			<mitsuba_SunTime value="12" />
+			<mitsuba_SunStrength value="5" />
+		</Para_Mitsuba>
+		<Para_ContactGraph>
+			<mosek_intpntCoTolRelGap value="9.99999996e-13" />
+			<mosek_intpntCoTolInfeas value="9.99999996e-13" />
+			<mosek_interlocking_eps value="1.00000001e-07" />
+			<mosek_rbe_eps value="1.00000001e-07" />
+			<mosek_rbe_friction_coeff value="0" />
+			<mosek_rbeForce_upperBound value="10000000" />
+			<slope_binarySearch_eps value="0.100000001" />
+			<slope_bound_eps value="0.100000001" />
+			<slope_num_init_sample value="4" />
+			<kmeans_iteration value="100" />
+			<GravityX value="0" />
+			<GravityY value="-1" />
+			<GravityZ value="0" />
+		</Para_ContactGraph>
+		<Para_CrossMesh>
+			<crossmesh_quadTree_leafNodeSize value="0.00999999978" />
+		</Para_CrossMesh>
+		<Para_Opt>
+			<opt_compression_weight value="0.00999999978" />
+			<opt_tension_weight value="10000" />
+			<opt_activeset_eps value="9.99999975e-05" />
+			<opt_gravity_scale_factor value="100" />
+			<opt_knitro_opttol value="1.00000001e-07" />
+			<opt_iterations_times value="200" />
+			<opt_tiltAngle_width value="30" />
+			<opt_mod value="0" />
+			<opt_init_levelset value="0.00100000005" />
+			<opt_radius_scale_factor value="0.200000003" />
+			<opt_rs_factor_lower_bound value="0.00999999978" />
+			<opt_poly_size value="5" />
+			<opt_edge_sample value="10" />
+			<opt_tot_time value="0" />
+		</Para_Opt>
+		<Para_Assembly>
+			<showAssembly value="0" />
+			<assembling_layer value="1" />
+			<assembling_Kth_part value="-1" />
+			<assembling_vec_length value="0.200000003" />
+		</Para_Assembly>
+		<Para_Support>
+			<showSupport value="0" />
+			<ground_height value="-0.930800557" />
+			<support_thickness value="0.100000001" />
+			<support_layer value="-1" />
+			<support_smallest_area value="0.00999999978" />
+		</Para_Support>
+		<pickPartIDs></pickPartIDs>
+		<Interact_Matrix>1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000</Interact_Matrix>
+		<Boundary_PartIDs>84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107</Boundary_PartIDs>
+		<Camera>
+			<worldAxesMat>0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,140.000000,0.000000,0.000000,0.000000,-0.000000,0.000000,0.000000,0.000000,0.000000,0.000000</worldAxesMat>
+			<worldMatrix>0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,224.000000,0.000000</worldMatrix>
+		</Camera>
+	</GUISettings>
+	<PartGeoData>
+		<CrossData path="tube_data/CrossMesh.xml" />
+	</PartGeoData>
+	<Output>
+		<Structure path="tube_data/tube_Surface.obj" />
+		<CrossMesh path="tube_data/tube_CrossMesh.obj" />
+		<PartGeometry>tube_data/PartGeometry/Part_13.obj
+tube_data/PartGeometry/Part_07.obj
+tube_data/PartGeometry/Part_06.obj
+tube_data/PartGeometry/Part_12.obj
+tube_data/PartGeometry/Part_04.obj
+tube_data/PartGeometry/Part_10.obj
+tube_data/PartGeometry/Part_38.obj
+tube_data/PartGeometry/Part_39.obj
+tube_data/PartGeometry/Part_11.obj
+tube_data/PartGeometry/Part_05.obj
+tube_data/PartGeometry/Boundary.obj
+tube_data/PartGeometry/Part_29.obj
+tube_data/PartGeometry/Part_01.obj
+tube_data/PartGeometry/Part_15.obj
+tube_data/PartGeometry/Part_14.obj
+tube_data/PartGeometry/Part_00.obj
+tube_data/PartGeometry/Part_28.obj
+tube_data/PartGeometry/Part_16.obj
+tube_data/PartGeometry/Part_02.obj
+tube_data/PartGeometry/Part_03.obj
+tube_data/PartGeometry/Part_17.obj
+tube_data/PartGeometry/Part_70.obj
+tube_data/PartGeometry/Part_64.obj
+tube_data/PartGeometry/Part_58.obj
+tube_data/PartGeometry/Part_59.obj
+tube_data/PartGeometry/Part_65.obj
+tube_data/PartGeometry/Part_71.obj
+tube_data/PartGeometry/Part_67.obj
+tube_data/PartGeometry/Part_73.obj
+tube_data/PartGeometry/Part_72.obj
+tube_data/PartGeometry/Part_66.obj
+tube_data/PartGeometry/Part_62.obj
+tube_data/PartGeometry/Part_76.obj
+tube_data/PartGeometry/Part_77.obj
+tube_data/PartGeometry/Part_63.obj
+tube_data/PartGeometry/Part_49.obj
+tube_data/PartGeometry/Part_75.obj
+tube_data/PartGeometry/Part_61.obj
+tube_data/PartGeometry/Part_60.obj
+tube_data/PartGeometry/Part_74.obj
+tube_data/PartGeometry/Part_48.obj
+tube_data/PartGeometry/Part_51.obj
+tube_data/PartGeometry/Part_45.obj
+tube_data/PartGeometry/Part_79.obj
+tube_data/PartGeometry/Part_78.obj
+tube_data/PartGeometry/Part_44.obj
+tube_data/PartGeometry/Part_50.obj
+tube_data/PartGeometry/Part_46.obj
+tube_data/PartGeometry/Part_52.obj
+tube_data/PartGeometry/Part_53.obj
+tube_data/PartGeometry/Part_47.obj
+tube_data/PartGeometry/Part_80.obj
+tube_data/PartGeometry/Part_43.obj
+tube_data/PartGeometry/Part_57.obj
+tube_data/PartGeometry/Part_56.obj
+tube_data/PartGeometry/Part_42.obj
+tube_data/PartGeometry/Part_81.obj
+tube_data/PartGeometry/Part_83.obj
+tube_data/PartGeometry/Part_68.obj
+tube_data/PartGeometry/Part_54.obj
+tube_data/PartGeometry/Part_40.obj
+tube_data/PartGeometry/Part_41.obj
+tube_data/PartGeometry/Part_55.obj
+tube_data/PartGeometry/Part_69.obj
+tube_data/PartGeometry/Part_82.obj
+tube_data/PartGeometry/Part_32.obj
+tube_data/PartGeometry/Part_26.obj
+tube_data/PartGeometry/Part_27.obj
+tube_data/PartGeometry/Part_33.obj
+tube_data/PartGeometry/Part_25.obj
+tube_data/PartGeometry/Part_31.obj
+tube_data/PartGeometry/Part_19.obj
+tube_data/PartGeometry/Part_18.obj
+tube_data/PartGeometry/Part_30.obj
+tube_data/PartGeometry/Part_24.obj
+tube_data/PartGeometry/Part_08.obj
+tube_data/PartGeometry/Part_20.obj
+tube_data/PartGeometry/Part_34.obj
+tube_data/PartGeometry/Part_35.obj
+tube_data/PartGeometry/Part_21.obj
+tube_data/PartGeometry/Part_09.obj
+tube_data/PartGeometry/Part_37.obj
+tube_data/PartGeometry/Part_23.obj
+tube_data/PartGeometry/Part_22.obj
+tube_data/PartGeometry/Part_36.obj
+</PartGeometry>
+	</Output>
+</Documents>

@@ -110,7 +110,7 @@ int StrucCreator::CreateStructure(  bool createCrossMesh,
 	}
 
 	if(previewMode == false){
-	    crossMeshCreator->UpdateTiltRange();
+	    if(crossMeshCreator->UpdateTiltRange() == false) return 0;
 	}
 
 	pCrossMesh crossMesh = crossMeshCreator->crossMesh;

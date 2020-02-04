@@ -1,0 +1,367 @@
+<?xml version="1.0"?>
+<Documents>
+	<GUISettings>
+		<patternID value="4" />
+		<tiltAngle value="50" />
+		<cutUpper value="0.0299999993" />
+		<cutLower value="0.0299999993" />
+		<patternRadius value="15" />
+		<minCrossArea value="0.00100000005" />
+		<minBoundaryEdge value="0.0299999993" />
+		<textureScaleFactor value="1" />
+		<slopSample value="10" />
+		<Unit value="100" />
+		<mult_move_scale value="1" />
+		<smooth_bdry value="1" />
+		<ground_touch_bdry value="1" />
+		<faceface_contact value="1" />
+		<edgeedge_contact value="1" />
+		<only_cut_bdry value="0" />
+		<texturedModel value="0" />
+		<penetration_check value="0" />
+		<small_zero_eps value="1.00000001e-07" />
+		<big_zero_eps value="9.99999975e-06" />
+		<clipper_scale value="100000000" />
+		<tilt_face_angle_min value="0" />
+		<tilt_face_angle_max value="0" />
+		<ShapeOp_Settings>
+			<shapeop_meshFit value="1" />
+			<shapeop_regularity value="1" />
+			<shapeop_planarity value="1" />
+			<shapeop_bending value="0" />
+			<shapeop_boundary value="0" />
+			<shapeop_iterator value="0" />
+		</ShapeOp_Settings>
+		<Para_Mitsuba>
+			<output_mitsuba value="0" />
+			<wireframe_thickness value="0.00100000005" />
+			<wireframe_circle_vertex_num value="16" />
+			<mitsuba_PartYRotation value="50" />
+			<mitsuba_CameraRotation value="30" />
+			<mitsuba_CameraDistance value="4" />
+			<mitsuba_width value="768" />
+			<mitsuba_height value="576" />
+			<mitsuba_sample value="128" />
+			<mitsuba_SunTime value="12" />
+			<mitsuba_SunStrength value="5" />
+		</Para_Mitsuba>
+		<Para_ContactGraph>
+			<mosek_intpntCoTolRelGap value="9.99999996e-13" />
+			<mosek_intpntCoTolInfeas value="9.99999996e-13" />
+			<mosek_interlocking_eps value="1.00000001e-07" />
+			<mosek_rbe_eps value="1.00000001e-07" />
+			<mosek_rbe_friction_coeff value="0" />
+			<mosek_rbeForce_upperBound value="10000000" />
+			<slope_binarySearch_eps value="0.100000001" />
+			<slope_bound_eps value="0.100000001" />
+			<slope_num_init_sample value="4" />
+			<kmeans_iteration value="100" />
+			<GravityX value="0" />
+			<GravityY value="-1" />
+			<GravityZ value="0" />
+		</Para_ContactGraph>
+		<Para_CrossMesh>
+			<crossmesh_quadTree_leafNodeSize value="0.00999999978" />
+		</Para_CrossMesh>
+		<Para_Opt>
+			<opt_compression_weight value="0.00999999978" />
+			<opt_tension_weight value="10000" />
+			<opt_activeset_eps value="9.99999975e-05" />
+			<opt_gravity_scale_factor value="100" />
+			<opt_knitro_opttol value="1.00000001e-07" />
+			<opt_iterations_times value="200" />
+			<opt_tiltAngle_width value="30" />
+			<opt_mod value="0" />
+			<opt_init_levelset value="0.00100000005" />
+			<opt_radius_scale_factor value="0.200000003" />
+			<opt_rs_factor_lower_bound value="0.00999999978" />
+			<opt_poly_size value="5" />
+			<opt_edge_sample value="10" />
+			<opt_tot_time value="0" />
+		</Para_Opt>
+		<Para_Assembly>
+			<showAssembly value="0" />
+			<assembling_layer value="1" />
+			<assembling_Kth_part value="-1" />
+			<assembling_vec_length value="0.200000003" />
+		</Para_Assembly>
+		<Para_Support>
+			<showSupport value="0" />
+			<ground_height value="-0.383458555" />
+			<support_thickness value="0.100000001" />
+			<support_layer value="-1" />
+			<support_smallest_area value="0.00999999978" />
+		</Para_Support>
+		<pickPartIDs></pickPartIDs>
+		<Interact_Matrix>1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000,0.000000,0.000000,0.000000,0.000000,1.000000</Interact_Matrix>
+		<Boundary_PartIDs>11,13,14,28,48,51,62,64,66,180,185,191,202,234,249,259,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330</Boundary_PartIDs>
+		<Camera>
+			<worldAxesMat>0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,nan,0.000000,0.000000,0.000000</worldAxesMat>
+			<worldMatrix>nan,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000,0.000000</worldMatrix>
+		</Camera>
+	</GUISettings>
+	<PartGeoData>
+		<CrossData path="chips_data/CrossMesh.xml" />
+	</PartGeoData>
+	<Output>
+		<Structure path="chips_data/chips_Surface.obj" />
+		<CrossMesh path="chips_data/chips_CrossMesh.obj" />
+		<PartGeometry>chips_data/PartGeometry/Part_270.obj
+chips_data/PartGeometry/Part_264.obj
+chips_data/PartGeometry/Part_258.obj
+chips_data/PartGeometry/Part_106.obj
+chips_data/PartGeometry/Part_112.obj
+chips_data/PartGeometry/Part_07.obj
+chips_data/PartGeometry/Part_06.obj
+chips_data/PartGeometry/Part_12.obj
+chips_data/PartGeometry/Part_113.obj
+chips_data/PartGeometry/Part_107.obj
+chips_data/PartGeometry/Part_265.obj
+chips_data/PartGeometry/Part_267.obj
+chips_data/PartGeometry/Part_111.obj
+chips_data/PartGeometry/Part_105.obj
+chips_data/PartGeometry/Part_139.obj
+chips_data/PartGeometry/Part_04.obj
+chips_data/PartGeometry/Part_10.obj
+chips_data/PartGeometry/Part_38.obj
+chips_data/PartGeometry/Part_39.obj
+chips_data/PartGeometry/Part_05.obj
+chips_data/PartGeometry/Part_138.obj
+chips_data/PartGeometry/Part_104.obj
+chips_data/PartGeometry/Part_110.obj
+chips_data/PartGeometry/Part_266.obj
+chips_data/PartGeometry/Part_262.obj
+chips_data/PartGeometry/Boundary.obj
+chips_data/PartGeometry/Part_128.obj
+chips_data/PartGeometry/Part_114.obj
+chips_data/PartGeometry/Part_100.obj
+chips_data/PartGeometry/Part_29.obj
+chips_data/PartGeometry/Part_01.obj
+chips_data/PartGeometry/Part_15.obj
+chips_data/PartGeometry/Part_00.obj
+chips_data/PartGeometry/Part_101.obj
+chips_data/PartGeometry/Part_115.obj
+chips_data/PartGeometry/Part_129.obj
+chips_data/PartGeometry/Part_263.obj
+chips_data/PartGeometry/Part_261.obj
+chips_data/PartGeometry/Part_103.obj
+chips_data/PartGeometry/Part_117.obj
+chips_data/PartGeometry/Part_16.obj
+chips_data/PartGeometry/Part_02.obj
+chips_data/PartGeometry/Part_03.obj
+chips_data/PartGeometry/Part_17.obj
+chips_data/PartGeometry/Part_116.obj
+chips_data/PartGeometry/Part_102.obj
+chips_data/PartGeometry/Part_260.obj
+chips_data/PartGeometry/Part_248.obj
+chips_data/PartGeometry/Part_213.obj
+chips_data/PartGeometry/Part_207.obj
+chips_data/PartGeometry/Part_165.obj
+chips_data/PartGeometry/Part_171.obj
+chips_data/PartGeometry/Part_159.obj
+chips_data/PartGeometry/Part_70.obj
+chips_data/PartGeometry/Part_58.obj
+chips_data/PartGeometry/Part_59.obj
+chips_data/PartGeometry/Part_65.obj
+chips_data/PartGeometry/Part_71.obj
+chips_data/PartGeometry/Part_158.obj
+chips_data/PartGeometry/Part_170.obj
+chips_data/PartGeometry/Part_164.obj
+chips_data/PartGeometry/Part_206.obj
+chips_data/PartGeometry/Part_212.obj
+chips_data/PartGeometry/Part_204.obj
+chips_data/PartGeometry/Part_210.obj
+chips_data/PartGeometry/Part_238.obj
+chips_data/PartGeometry/Part_172.obj
+chips_data/PartGeometry/Part_166.obj
+chips_data/PartGeometry/Part_98.obj
+chips_data/PartGeometry/Part_67.obj
+chips_data/PartGeometry/Part_73.obj
+chips_data/PartGeometry/Part_199.obj
+chips_data/PartGeometry/Part_198.obj
+chips_data/PartGeometry/Part_72.obj
+chips_data/PartGeometry/Part_99.obj
+chips_data/PartGeometry/Part_167.obj
+chips_data/PartGeometry/Part_173.obj
+chips_data/PartGeometry/Part_239.obj
+chips_data/PartGeometry/Part_211.obj
+chips_data/PartGeometry/Part_205.obj
+chips_data/PartGeometry/Part_229.obj
+chips_data/PartGeometry/Part_201.obj
+chips_data/PartGeometry/Part_215.obj
+chips_data/PartGeometry/Part_89.obj
+chips_data/PartGeometry/Part_177.obj
+chips_data/PartGeometry/Part_163.obj
+chips_data/PartGeometry/Part_188.obj
+chips_data/PartGeometry/Part_76.obj
+chips_data/PartGeometry/Part_77.obj
+chips_data/PartGeometry/Part_63.obj
+chips_data/PartGeometry/Part_189.obj
+chips_data/PartGeometry/Part_162.obj
+chips_data/PartGeometry/Part_176.obj
+chips_data/PartGeometry/Part_88.obj
+chips_data/PartGeometry/Part_214.obj
+chips_data/PartGeometry/Part_200.obj
+chips_data/PartGeometry/Part_228.obj
+chips_data/PartGeometry/Part_216.obj
+chips_data/PartGeometry/Part_148.obj
+chips_data/PartGeometry/Part_160.obj
+chips_data/PartGeometry/Part_174.obj
+chips_data/PartGeometry/Part_49.obj
+chips_data/PartGeometry/Part_75.obj
+chips_data/PartGeometry/Part_61.obj
+chips_data/PartGeometry/Part_60.obj
+chips_data/PartGeometry/Part_74.obj
+chips_data/PartGeometry/Part_175.obj
+chips_data/PartGeometry/Part_161.obj
+chips_data/PartGeometry/Part_149.obj
+chips_data/PartGeometry/Part_203.obj
+chips_data/PartGeometry/Part_217.obj
+chips_data/PartGeometry/Part_232.obj
+chips_data/PartGeometry/Part_226.obj
+chips_data/PartGeometry/Part_92.obj
+chips_data/PartGeometry/Part_144.obj
+chips_data/PartGeometry/Part_150.obj
+chips_data/PartGeometry/Part_86.obj
+chips_data/PartGeometry/Part_178.obj
+chips_data/PartGeometry/Part_187.obj
+chips_data/PartGeometry/Part_45.obj
+chips_data/PartGeometry/Part_193.obj
+chips_data/PartGeometry/Part_79.obj
+chips_data/PartGeometry/Part_78.obj
+chips_data/PartGeometry/Part_192.obj
+chips_data/PartGeometry/Part_44.obj
+chips_data/PartGeometry/Part_50.obj
+chips_data/PartGeometry/Part_186.obj
+chips_data/PartGeometry/Part_179.obj
+chips_data/PartGeometry/Part_87.obj
+chips_data/PartGeometry/Part_151.obj
+chips_data/PartGeometry/Part_145.obj
+chips_data/PartGeometry/Part_93.obj
+chips_data/PartGeometry/Part_227.obj
+chips_data/PartGeometry/Part_233.obj
+chips_data/PartGeometry/Part_225.obj
+chips_data/PartGeometry/Part_231.obj
+chips_data/PartGeometry/Part_219.obj
+chips_data/PartGeometry/Part_153.obj
+chips_data/PartGeometry/Part_85.obj
+chips_data/PartGeometry/Part_91.obj
+chips_data/PartGeometry/Part_147.obj
+chips_data/PartGeometry/Part_46.obj
+chips_data/PartGeometry/Part_190.obj
+chips_data/PartGeometry/Part_184.obj
+chips_data/PartGeometry/Part_52.obj
+chips_data/PartGeometry/Part_53.obj
+chips_data/PartGeometry/Part_47.obj
+chips_data/PartGeometry/Part_146.obj
+chips_data/PartGeometry/Part_90.obj
+chips_data/PartGeometry/Part_84.obj
+chips_data/PartGeometry/Part_152.obj
+chips_data/PartGeometry/Part_218.obj
+chips_data/PartGeometry/Part_230.obj
+chips_data/PartGeometry/Part_224.obj
+chips_data/PartGeometry/Part_208.obj
+chips_data/PartGeometry/Part_220.obj
+chips_data/PartGeometry/Part_156.obj
+chips_data/PartGeometry/Part_80.obj
+chips_data/PartGeometry/Part_94.obj
+chips_data/PartGeometry/Part_142.obj
+chips_data/PartGeometry/Part_43.obj
+chips_data/PartGeometry/Part_195.obj
+chips_data/PartGeometry/Part_181.obj
+chips_data/PartGeometry/Part_57.obj
+chips_data/PartGeometry/Part_56.obj
+chips_data/PartGeometry/Part_194.obj
+chips_data/PartGeometry/Part_42.obj
+chips_data/PartGeometry/Part_143.obj
+chips_data/PartGeometry/Part_95.obj
+chips_data/PartGeometry/Part_81.obj
+chips_data/PartGeometry/Part_157.obj
+chips_data/PartGeometry/Part_235.obj
+chips_data/PartGeometry/Part_221.obj
+chips_data/PartGeometry/Part_209.obj
+chips_data/PartGeometry/Part_237.obj
+chips_data/PartGeometry/Part_223.obj
+chips_data/PartGeometry/Part_169.obj
+chips_data/PartGeometry/Part_97.obj
+chips_data/PartGeometry/Part_141.obj
+chips_data/PartGeometry/Part_155.obj
+chips_data/PartGeometry/Part_83.obj
+chips_data/PartGeometry/Part_68.obj
+chips_data/PartGeometry/Part_182.obj
+chips_data/PartGeometry/Part_54.obj
+chips_data/PartGeometry/Part_40.obj
+chips_data/PartGeometry/Part_196.obj
+chips_data/PartGeometry/Part_197.obj
+chips_data/PartGeometry/Part_41.obj
+chips_data/PartGeometry/Part_55.obj
+chips_data/PartGeometry/Part_183.obj
+chips_data/PartGeometry/Part_69.obj
+chips_data/PartGeometry/Part_82.obj
+chips_data/PartGeometry/Part_154.obj
+chips_data/PartGeometry/Part_140.obj
+chips_data/PartGeometry/Part_96.obj
+chips_data/PartGeometry/Part_168.obj
+chips_data/PartGeometry/Part_222.obj
+chips_data/PartGeometry/Part_236.obj
+chips_data/PartGeometry/Part_251.obj
+chips_data/PartGeometry/Part_245.obj
+chips_data/PartGeometry/Part_127.obj
+chips_data/PartGeometry/Part_133.obj
+chips_data/PartGeometry/Part_32.obj
+chips_data/PartGeometry/Part_26.obj
+chips_data/PartGeometry/Part_27.obj
+chips_data/PartGeometry/Part_33.obj
+chips_data/PartGeometry/Part_132.obj
+chips_data/PartGeometry/Part_126.obj
+chips_data/PartGeometry/Part_244.obj
+chips_data/PartGeometry/Part_250.obj
+chips_data/PartGeometry/Part_246.obj
+chips_data/PartGeometry/Part_252.obj
+chips_data/PartGeometry/Part_130.obj
+chips_data/PartGeometry/Part_124.obj
+chips_data/PartGeometry/Part_118.obj
+chips_data/PartGeometry/Part_25.obj
+chips_data/PartGeometry/Part_31.obj
+chips_data/PartGeometry/Part_19.obj
+chips_data/PartGeometry/Part_18.obj
+chips_data/PartGeometry/Part_30.obj
+chips_data/PartGeometry/Part_24.obj
+chips_data/PartGeometry/Part_119.obj
+chips_data/PartGeometry/Part_125.obj
+chips_data/PartGeometry/Part_131.obj
+chips_data/PartGeometry/Part_253.obj
+chips_data/PartGeometry/Part_247.obj
+chips_data/PartGeometry/Part_243.obj
+chips_data/PartGeometry/Part_257.obj
+chips_data/PartGeometry/Part_109.obj
+chips_data/PartGeometry/Part_135.obj
+chips_data/PartGeometry/Part_121.obj
+chips_data/PartGeometry/Part_08.obj
+chips_data/PartGeometry/Part_20.obj
+chips_data/PartGeometry/Part_34.obj
+chips_data/PartGeometry/Part_35.obj
+chips_data/PartGeometry/Part_21.obj
+chips_data/PartGeometry/Part_09.obj
+chips_data/PartGeometry/Part_120.obj
+chips_data/PartGeometry/Part_134.obj
+chips_data/PartGeometry/Part_108.obj
+chips_data/PartGeometry/Part_256.obj
+chips_data/PartGeometry/Part_242.obj
+chips_data/PartGeometry/Part_268.obj
+chips_data/PartGeometry/Part_254.obj
+chips_data/PartGeometry/Part_240.obj
+chips_data/PartGeometry/Part_122.obj
+chips_data/PartGeometry/Part_136.obj
+chips_data/PartGeometry/Part_37.obj
+chips_data/PartGeometry/Part_23.obj
+chips_data/PartGeometry/Part_22.obj
+chips_data/PartGeometry/Part_36.obj
+chips_data/PartGeometry/Part_137.obj
+chips_data/PartGeometry/Part_123.obj
+chips_data/PartGeometry/Part_241.obj
+chips_data/PartGeometry/Part_255.obj
+chips_data/PartGeometry/Part_269.obj
+</PartGeometry>
+	</Output>
+</Documents>

@@ -55,8 +55,8 @@ bool InterlockingSolver_AffineScaling::isRotationalInterlocking(shared_ptr<Inter
 
     xs.push_back(x0);
 
-    float beta = 0.9;
-    while(k < 1000)
+    float beta = 0.5;
+    while(k < 20)
     {
         EigenSpMat X = EigenSpMat(2 * n + m + 1, 2* n + m + 1);
         for(int id = 0; id < 2 * n + m + 1; id++){
@@ -88,18 +88,18 @@ bool InterlockingSolver_AffineScaling::isRotationalInterlocking(shared_ptr<Inter
         }
 
         xs.push_back(xs[k] - beta * theta *  X2k * r / nrmXkr);
-        beta = 0.9;
+        beta = 0.5;
 
         std::cout << "(" <<  k << ") " << c.dot(xs[k + 1]) << std::endl;
         //VectorXd Vec = xs.back().segment(0, n) - xs.back().segment(n, n);
         //std::cout << "Motion: " << Vec.norm() << ",\tError: " << (mat  * Vec).norm() << std::endl;
 
-        if (c.dot(xs[k + 1]) < -1e4)
+        if (c.dot(xs[k + 1]) < -1e3)
         {
             return false;
         }
 
-        if (xs[k + 1].segment(2 * n, m).maxCoeff() < 1e-6){
+        if (xs[k + 1].segment(2 * n, m).maxCoeff() < 1e-4){
             return true;
         }
         else{

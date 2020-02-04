@@ -87,7 +87,7 @@ public:
     bool CreateCrossMesh(   bool previewMode,
 	                        double interactMatrix[]);
 
-    void UpdateTiltRange();
+    bool UpdateTiltRange();
 
 public:
 

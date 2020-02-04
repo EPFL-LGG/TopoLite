@@ -170,7 +170,12 @@ void AugmentedVectorCreator::UpdateMeshTiltNormals(pCrossMesh crossMesh, float t
         for(int jd = 0; jd < cross->oriPoints.size(); jd++)
         {
             shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
-            oriPt->update_rotation(tiltAngle);
+            if(cross->neighbors[jd].lock() != nullptr){
+                if(cross->neighbors[jd].lock()->atBoundary == false || cross->atBoundary == false){
+                    oriPt->normal = cross->RotateNormal(oriPt->rotation_base, oriPt->rotation_axis, tiltAngle * oriPt->tiltSign);
+                    oriPt->update_rotation(tiltAngle);
+                }
+            }
         }
     }
 

@@ -271,13 +271,13 @@ bool CrossMeshCreator::CreateCrossMesh( bool previewMode,
         sta = clock();
         AugmentedVectorCreator vectorCreator(getVarList());
         vectorCreator.UpdateMeshTiltNormals(crossMesh, tiltAngle);
-        std::cout << "--Remesh Own:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
+        std::cout << "--UpdateMeshTiltNormals:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
     }
 
     return crossMesh != nullptr;
 }
 
-void CrossMeshCreator::UpdateTiltRange()
+bool CrossMeshCreator::UpdateTiltRange()
 {
     //compute the tilt range
     if(crossMesh)
@@ -285,9 +285,12 @@ void CrossMeshCreator::UpdateTiltRange()
         AugmentedVectorCreator vectorCreator(getVarList());
         if(!vectorCreator.UpdateMeshTiltRange(crossMesh))
         {
-            crossMesh.reset();
+            return false;
         }
+        return true;
     }
+
+    return false;
 }
 
 //**************************************************************************************//

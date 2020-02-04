@@ -51,6 +51,14 @@ XMLData* readXML(const char *xmlstr)
     return data;
 }
 
+void writeXML(XMLData* data, const char *xmlstr){
+    if(data){
+        XMLIO writer;
+        writer.XMLWriter(xmlstr, *data);
+    }
+    return;
+}
+
 XMLData* initStructure(){
     XMLData *data = new XMLData();
 
