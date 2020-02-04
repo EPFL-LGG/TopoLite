@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <set>
 #include <tbb/tbb.h>
+#include <cmath>
 /*************************************************
 *
 *                  Basic Operation
@@ -43,7 +44,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
             plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
 
             plane.D = nrm ^ center;
-            maxD = std::max(maxD, std::abs(plane.D));
+            maxD = (std::max)(maxD, (double)std::abs(plane.D));
         }
     }
 

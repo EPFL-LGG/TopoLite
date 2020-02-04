@@ -5,6 +5,7 @@
 #include "HelpFunc.h"
 #include "TopoObject.h"
 #include "Mesh/Polygon.h"
+#include <cmath>
 
 class PolyPolyBoolean: TopoObject
 {
@@ -31,7 +32,7 @@ public:
             Ps.push_back(PA);
 
             int exponent = std::ceil(std::log10(PA.ComputeMaxRadius()));
-            scaling_factor = std::max(scaling_factor, std::pow(10, exponent) * 2);
+            scaling_factor = std::max(scaling_factor, (double)std::pow(10, exponent) * 2);
         }
 
         Vector3f x_axis, y_axis, origin;
@@ -128,8 +129,8 @@ public:
         PA.ComputeFrame(x_axis, y_axis, origin);
 
         double scaling_factor = 1;
-        scaling_factor = std::max(scaling_factor, std::pow(std::ceil(std::log10(PA.ComputeMaxRadius())), 10));
-        scaling_factor = std::max(scaling_factor, std::pow(std::ceil(std::log10(PB.ComputeMaxRadius())), 10));
+        scaling_factor = std::max(scaling_factor, (double)std::pow(std::ceil(std::log10(PA.ComputeMaxRadius())), 10));
+        scaling_factor = std::max(scaling_factor, (double)std::pow(std::ceil(std::log10(PB.ComputeMaxRadius())), 10));
         float Scale = getVarList()->get<float>("clipper_scale") / scaling_factor;
 
         vector<Vector3i> intPA = PA.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
