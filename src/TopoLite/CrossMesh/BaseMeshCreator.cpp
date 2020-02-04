@@ -550,9 +550,9 @@ bool BaseMeshCreator::ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3f ptTexCoor
 		{
 			// Compute total and partial triangle area
 			float totalArea = GetTriangleArea(texTri.v[0], texTri.v[1], texTri.v[2]);
-			float subArea0 = GetTriangleArea(ptTexCoord, texTri.v[1], texTri.v[2]);
-			float subArea1 = GetTriangleArea(texTri.v[0], ptTexCoord, texTri.v[2]);
-			float subArea2 = GetTriangleArea(texTri.v[0], texTri.v[1], ptTexCoord);
+            float subArea0 = GetTriangleArea(ptTexCoord, texTri.v[1], texTri.v[2]);
+            float subArea1 = GetTriangleArea(texTri.v[0], ptTexCoord, texTri.v[2]);
+            float subArea2 = GetTriangleArea(texTri.v[0], texTri.v[1], ptTexCoord);
 
 			ptSurfCoord = (subArea0 / totalArea)*geoTri.v[0] +
 						  (subArea1 / totalArea)*geoTri.v[1] +

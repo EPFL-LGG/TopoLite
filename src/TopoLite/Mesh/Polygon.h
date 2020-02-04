@@ -92,6 +92,7 @@ public:
 	Vector3f PlaneNormalFit();
 	float ComputeArea();
 	float ComputeAverageEdge();
+	float ComputeMaxRadius();
 
 public:
 	// Access Operations

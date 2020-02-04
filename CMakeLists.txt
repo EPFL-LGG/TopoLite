@@ -12,8 +12,8 @@ set(Boost_NO_BOOST_CMAKE 1)
 #########################################
 
 option(USE_PYTHON_PLUGIN "USE PYBIND11 PLUGIN" OFF)
-option(USE_UNIT_TEST "USE CATCH2 TEST" ON)
-option(USE_C_EXTENSION "USE_C_EXTENSION" OFF)
+option(USE_UNIT_TEST "USE CATCH2 TEST" OFF)
+option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
 #########################################
 #####                               #####
@@ -94,7 +94,7 @@ if(USE_UNIT_TEST)
     file(GLOB testTopoFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/*.cpp)
     #add_executable(testTopo ${testTopoFiles})
     add_executable(testTopo
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/interlockingSolver.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/ContactGraph.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/testMain.cpp)
 
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)

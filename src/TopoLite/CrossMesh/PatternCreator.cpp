@@ -145,7 +145,9 @@ void PatternCreator::CreateMesh_2DPattern( int patternID,
             }
         }
         polyMesh->removeDuplicatedVertices();
-        polyMesh->NormalizeMesh();
+        Vector3f trans;
+        float scale;
+        polyMesh->NormalizeMesh(trans, scale);
 
         BaseMeshCreator meshCreator(getVarList());
         crossMesh = make_shared<CrossMesh>(getVarList());
@@ -366,7 +368,9 @@ void PatternCreator::CreateMesh_2DPattern(vector<_Polygon> &root_polys, Vector3f
     }
 
     polyMesh->removeDuplicatedVertices();
-    polyMesh->NormalizeMesh();
+    Vector3f trans;
+    float scale;
+    polyMesh->NormalizeMesh(trans, scale);
 
     BaseMeshCreator meshCreator(getVarList());
     crossMesh = make_shared<CrossMesh>(getVarList());

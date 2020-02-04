@@ -44,6 +44,8 @@ XMLData* readXML(const char *xmlstr)
     reader.XMLReader(xmlstr, *data);
 
     data->interact_delta.scale = 1;
+    data->normalizedData.scale = 1;
+    data->normalizedData.trans = Vector3f(0, 0, 0);
 
     return data;
 }
@@ -59,6 +61,8 @@ XMLData* initStructure(){
     LoadIdentityMatrix(data->interactMatrix);
 
     data->interact_delta.scale = 1;
+    data->normalizedData.scale = 1;
+    data->normalizedData.trans = Vector3f(0, 0, 0);
 
     return data;
 }
@@ -79,10 +83,19 @@ PolyMeshRhino *initPartMeshPtr(int partID, XMLData *data){
         if(0 <= partID && partID < data->strucCreator->struc->partList.size())
         {
             shared_ptr<Part> part = data->strucCreator->struc->partList[partID];
-            if(part && part->polyMesh){
+            if(part && part->polyMesh)
+            {
+                pPolyMesh polyMesh = make_shared<PolyMesh>(*part->polyMesh);
+
+                if(data->varList->get<bool>("texturedModel") == false)
+                {
+                    polyMesh->ScaleMesh(1.0 / data->normalizedData.scale);
+                    polyMesh->TranslateMesh(-data->normalizedData.trans);
+                }
+
                 MeshConverter converter(data->varList);
                 mesh = new PolyMeshRhino();
-                converter.Convert2EigenMesh(part->polyMesh.get(), mesh);
+                converter.Convert2EigenMesh(polyMesh.get(), mesh);
                 return mesh;
             }
         }
@@ -98,6 +111,13 @@ PolyLineRhino *initCrossMeshPtr(XMLData *data){
         && data->strucCreator->crossMeshCreator->crossMesh)
     {
         shared_ptr<PolyMesh> crossMesh = data->strucCreator->crossMeshCreator->crossMesh->getPolyMesh();
+
+        if(data->varList->get<bool>("texturedModel") == false)
+        {
+            crossMesh->ScaleMesh(1.0 / data->normalizedData.scale);
+            crossMesh->TranslateMesh(-data->normalizedData.trans);
+        }
+
         MeshConverter converter(data->varList);
         lines = new PolyLineRhino();
         converter.Convert2PolyLines(crossMesh.get(), lines);
@@ -107,7 +127,8 @@ PolyLineRhino *initCrossMeshPtr(XMLData *data){
     return NULL;
 }
 
-PolyLineRhino *initPatternMeshPtr(XMLData *data){
+PolyLineRhino *initPatternMeshPtr(XMLData *data)
+{
     PolyLineRhino *lines = NULL;
     if(data
        && data->strucCreator
@@ -126,7 +147,8 @@ PolyLineRhino *initPatternMeshPtr(XMLData *data){
     return NULL;
 }
 
-PolyLineRhino *initBaseMesh2DPtr(XMLData *data){
+PolyLineRhino *initBaseMesh2DPtr(XMLData *data)
+{
     PolyLineRhino *lines = NULL;
     if(data
        && data->strucCreator
@@ -171,7 +193,8 @@ PolyLineRhino *initTextureMeshPtr(XMLData *data){
     return NULL;
 }
 
-PolyMeshRhino *initContactMesh(ContactGraphData *data){
+PolyMeshRhino *initContactMesh(ContactGraphData *data)
+{
     PolyMeshRhino *mesh = NULL;
     if(data)
     {
@@ -363,7 +386,8 @@ float ComputeGroundHeight(XMLData* data)
 {
     if(data && data->strucCreator && data->strucCreator->struc)
     {
-        return data->strucCreator->struc->ComputeLowestY();
+        if(data->varList->get<bool>("texturedModel"))
+            return data->strucCreator->struc->ComputeLowestY();
     }
 
     return 0;
@@ -426,7 +450,8 @@ void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg){
 }
 
 //Set Parameter
-void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary){
+void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary)
+{
     if(polylines == NULL || data == NULL) return;
     pPolyMesh surface = make_shared<PolyMesh>(data->varList);
 
@@ -449,6 +474,7 @@ void setCrossMesh(CPolyLines *polylines, XMLData* data, bool haveBoundary){
             if(haveBoundary) atBoundary.push_back(polylines->atBoundary[id]);
         }
         surface->removeDuplicatedVertices();
+        surface->NormalizeMesh(data->normalizedData.trans, data->normalizedData.scale);
 
         strucCreator->crossMeshCreator = make_shared<CrossMeshCreator>(data->varList);
         strucCreator->crossMeshCreator->setCrossMesh(surface, atBoundary);

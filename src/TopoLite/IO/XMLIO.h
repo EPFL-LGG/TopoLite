@@ -34,12 +34,18 @@ struct InteractData{
     double scale;
 };
 
+struct InputMeshNormalizeData{
+    Vector3f trans;
+    float scale;
+};
+
 struct XMLData{
     shared_ptr<InputVarList> varList;
     shared_ptr<StrucCreator> strucCreator;
     vector<int> pickPartIDs;
     double interactMatrix[16];
     InteractData interact_delta;
+    InputMeshNormalizeData normalizedData;
 };
 
 class XMLIO

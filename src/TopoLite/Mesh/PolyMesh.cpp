@@ -140,12 +140,12 @@ Box PolyMesh::ComputeTextureBBox()
 	return texBBox;
 }
 
-void PolyMesh::NormalizeMesh()
+void PolyMesh::NormalizeMesh(Vector3f &trans, float &scale)
 {
 	ComputeBBox();
 
-	float scale = 2.0f / _MAX(bbox.size.x, _MAX(bbox.size.y, bbox.size.z));
-	Vector3f trans = -bbox.cenPt;
+	scale = 2.0f / _MAX(bbox.size.x, _MAX(bbox.size.y, bbox.size.z));
+	trans = -bbox.cenPt;
 
 	for (int i = 0; i < vertexList.size(); ++i)
 	{
@@ -363,6 +363,24 @@ void PolyMesh::TranslateMesh(Vector3f move)
     }
 }
 
+void PolyMesh::ScaleMesh(float scale)
+{
+    for (int i = 0; i < vertexList.size(); ++i) {
+        Vector3f &ver = vertexList[i];
+        ver*= scale;
+    }
+
+    for (int i = 0; i < polyList.size(); ++i)
+    {
+        pPolygon poly = polyList[i];
+        for (int j = 0; j < poly->vers.size(); ++j)
+        {
+            Vector3f &ver = poly->vers[j].pos;
+            ver *= scale;
+        }
+    }
+}
+
 
 //**************************************************************************************//
 //                                   Read Save OBJ File
@@ -415,7 +433,9 @@ bool PolyMesh::ReadOBJModel(
 	    else{
             texturedModel = textureModel_ = true;
 	    }
-	    if(normalized) NormalizeMesh();
+        Vector3f trans;
+	    float scale;
+	    if(normalized) NormalizeMesh(trans, scale);
         removeDuplicatedVertices();
 		return true;
 	}

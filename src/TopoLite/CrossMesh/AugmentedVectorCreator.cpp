@@ -42,7 +42,7 @@ void AugmentedVectorCreator::CreateAugmentedVector(float tiltAngle, pCrossMesh &
 	if(crossMesh)
 	{
 	    InitMeshTiltNormals(crossMesh);
-        UpdateMeshTiltNormals(crossMesh, tiltAngle);
+        InitMeshTiltNormalsResolveConflicts(crossMesh, tiltAngle);
     }
 }
 
@@ -58,7 +58,7 @@ void AugmentedVectorCreator::InitMeshTiltNormals(pCrossMesh crossMesh)
 }
 
 
-void AugmentedVectorCreator::UpdateMeshTiltNormals(pCrossMesh crossMesh, float tiltAngle)
+void AugmentedVectorCreator::InitMeshTiltNormalsResolveConflicts(pCrossMesh crossMesh, float tiltAngle)
 {
 	vector<pCross> bfsQueue;
 
@@ -154,6 +154,27 @@ void AugmentedVectorCreator::UpdateMeshTiltNormals(pCrossMesh crossMesh, float t
                 crossMesh->crossList[id]->UpdateTiltNormal(tiltAngle);
         }
 	}
+}
+
+void AugmentedVectorCreator::UpdateMeshTiltNormals(pCrossMesh crossMesh, float tiltAngle)
+{
+
+    if(crossMesh == nullptr)
+        return;
+
+    int m = crossMesh->crossList.size();
+    for(int id = 0; id < m; id++)
+    {
+        shared_ptr<Cross> cross = crossMesh->crossList[id];
+        if(cross == nullptr) continue;
+        for(int jd = 0; jd < cross->oriPoints.size(); jd++)
+        {
+            shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
+            oriPt->update_rotation(tiltAngle);
+        }
+    }
+
+    return;
 }
 
 

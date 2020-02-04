@@ -82,6 +82,10 @@ public:
 
 public:
 
+    void normalize_meshes(vector<shared_ptr<PolyMesh>> &meshes);
+
+public:
+
     /*************************************************
     *                  Basic Operation
     *************************************************/

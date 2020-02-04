@@ -61,6 +61,9 @@ public:
  	* \brief Distribute the sign of each tilt angle
 	* \todo Only consider one possible distribution of sign for each edge. Other distribution may exist and can improve the structural stability
  	*/
+	void InitMeshTiltNormalsResolveConflicts(pCrossMesh crossMesh, float tiltAngle);
+
+
 	void UpdateMeshTiltNormals(pCrossMesh crossMesh, float tiltAngle);
 
 	bool UpdateMeshTiltRange(pCrossMesh crossMesh);

@@ -237,6 +237,18 @@ float _Polygon::ComputeAverageEdge()
 	return avgEdgeLen;
 }
 
+float _Polygon::ComputeMaxRadius()
+{
+    float MaxRadius = 0;
+
+    Vector3f origin = ComputeCenter();
+    for (int i = 0; i < vers.size(); i++)
+    {
+        MaxRadius = std::max(len(vers[i].pos - origin), MaxRadius);
+    }
+    return MaxRadius;
+}
+
 void _Polygon::ComputeFrame(Vector3f &x_axis, Vector3f &y_axis, Vector3f &origin)
 {
 	normal = ComputeNormal();

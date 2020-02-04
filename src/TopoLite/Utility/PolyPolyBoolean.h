@@ -23,16 +23,23 @@ public:
         if(polys.empty())return;
 
         vector<_Polygon> Ps;
+        double scaling_factor = 1;
         for(int id = 0; id < polys.size(); id++)
         {
             _Polygon PA;
             PA.SetVertices(polys[id]);
             Ps.push_back(PA);
+
+            int exponent = std::ceil(std::log10(PA.ComputeMaxRadius()));
+            scaling_factor = std::max(scaling_factor, std::pow(10, exponent) * 2);
         }
 
         Vector3f x_axis, y_axis, origin;
         Ps[0].ComputeFrame(x_axis, y_axis, origin);
-        float Scale = getVarList()->get<float>("clipper_scale");
+
+        float Scale = getVarList()->get<float>("clipper_scale") / scaling_factor;
+
+
         vector<ClipperLib::Path> clipperPaths;
 
         for(int id = 0; id < Ps.size(); id++)
@@ -119,7 +126,12 @@ public:
 
         Vector3f x_axis, y_axis, origin;
         PA.ComputeFrame(x_axis, y_axis, origin);
-        float Scale = getVarList()->get<float>("clipper_scale");
+
+        double scaling_factor = 1;
+        scaling_factor = std::max(scaling_factor, std::pow(std::ceil(std::log10(PA.ComputeMaxRadius())), 10));
+        scaling_factor = std::max(scaling_factor, std::pow(std::ceil(std::log10(PB.ComputeMaxRadius())), 10));
+        float Scale = getVarList()->get<float>("clipper_scale") / scaling_factor;
+
         vector<Vector3i> intPA = PA.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
         vector<Vector3i> intPB = PB.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
 

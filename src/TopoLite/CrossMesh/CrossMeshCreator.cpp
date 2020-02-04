@@ -184,7 +184,6 @@ bool CrossMeshCreator::setPatternMesh(pPolyMesh surface)
 bool CrossMeshCreator::setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary)
 {
     if(surface == nullptr) return false;
-
     referenceSurface.reset();
     referenceSurface = make_shared<PolyMesh>(*surface);
     getVarList()->set("texturedModel", false);
@@ -219,16 +218,18 @@ bool CrossMeshCreator::CreateCrossMesh( bool previewMode,
     float   patternRadius   = getVarList()->get<int>("patternRadius");
     bool    texturedModel   = getVarList()->get<int>("texturedModel");
 
-    //clear CrossMesh
-    if (crossMesh != nullptr) crossMesh.reset();
+    clock_t sta;
 
     if ( texturedModel )
     {
+        //clear CrossMesh
+        if (crossMesh != nullptr) crossMesh.reset();
+
         if(referenceSurface == nullptr) return false;
         if(quadTree == nullptr) return false;
         if(aabbTree == nullptr) return false;
 
-        clock_t sta;
+
 
         if( default_patternID != patternID ||
             default_patternRadius != patternRadius ||
@@ -265,6 +266,12 @@ bool CrossMeshCreator::CreateCrossMesh( bool previewMode,
         std::cout << "--Remesh Own:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
         crossMesh->SetBaseMesh2D(baseMesh2D);
+    }
+    else if(crossMesh){
+        sta = clock();
+        AugmentedVectorCreator vectorCreator(getVarList());
+        vectorCreator.UpdateMeshTiltNormals(crossMesh, tiltAngle);
+        std::cout << "--Remesh Own:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
     }
 
     return crossMesh != nullptr;

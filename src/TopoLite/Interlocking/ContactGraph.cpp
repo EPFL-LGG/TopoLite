@@ -30,6 +30,9 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
                                            double eps)
 {
 
+    //0) scale the meshes into united box
+    //normalize_meshes(meshes);
+
     //1) create contact planes
     vector<plane_contact> planes;
     std::set<plane_contact, plane_contact_compare> setPlanes;
@@ -272,6 +275,10 @@ void ContactGraph::getContactMesh(pPolyMesh &mesh)
             mesh->polyList.push_back(face);
         }
     }
+
     if(mesh)
         mesh->removeDuplicatedVertices();
+
+//    mesh->ScaleMesh(1.0 / normalized_scale);
+//    mesh->TranslateMesh(-normalized_trans);
 }

@@ -84,7 +84,7 @@ public:
 
 	void ClearMesh();
 	void Print();
-    void NormalizeMesh();
+    void NormalizeMesh(Vector3f &trans, float &scale);
 
     // Read/Save OBJ File
     bool ReadOBJModel(  const char *fileName,
@@ -110,6 +110,7 @@ public:
 
     // Transform Mesh
 	void TranslateMesh(Vector3f move);
+	void ScaleMesh(float scale);
 	void RotateMesh(Vector3f rotCenter, Vector3f rotAxis, float rotAngle);
 
 	shared_ptr<PolyMesh> getTextureMesh();
