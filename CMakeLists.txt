@@ -24,8 +24,8 @@ option(USE_C_EXTENSION "USE_C_EXTENSION" ON)
 
 #3rd party library
 if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
-    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
-    #set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/MacBin)
+    #set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
+    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/MacBin)
 endif()
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
@@ -92,10 +92,10 @@ if(USE_UNIT_TEST)
     include(ParseAndAddCatchTests)
 
     file(GLOB testTopoFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/*.cpp)
-    #add_executable(testTopo ${testTopoFiles})
-    add_executable(testTopo
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/ContactGraph.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/testMain.cpp)
+    add_executable(testTopo ${testTopoFiles})
+    #add_executable(testTopo
+            #${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/ContactGraph.cpp
+            #${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/testMain.cpp)
 
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)
     target_link_libraries(testTopo PUBLIC TpCorelib)

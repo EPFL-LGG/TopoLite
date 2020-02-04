@@ -31,7 +31,21 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
 {
 
     //0) scale the meshes into united box
-    //normalize_meshes(meshes);
+    double maxD = 1;
+    for (int id = 0; id < meshes.size(); id++) {
+        pPolyMesh poly = meshes[id];
+        if (poly == nullptr) return false;
+        for (shared_ptr<_Polygon> face : poly->polyList) {
+            //1.1) construct plane
+            plane_contact plane;
+            Vector3f nrm = face->ComputeNormal();
+            Vector3f center = face->vers[0].pos;
+            plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
+
+            plane.D = nrm ^ center;
+            maxD = std::max(maxD, std::abs(plane.D));
+        }
+    }
 
     //1) create contact planes
     vector<plane_contact> planes;
@@ -53,7 +67,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
             Vector3f center = face->vers[0].pos;
             plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
             
-            plane.D = nrm ^ center;
+            plane.D = (nrm ^ center) / maxD;
             plane.partID = id;
             plane.polygon = face;
             plane.eps = eps;

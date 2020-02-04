@@ -231,6 +231,19 @@ void MeshConverter::Convert2PolyMesh(pPolyMesh polyMesh, double eps)
     vector<plane_contact> planes;
     std::set<plane_contact, plane_contact_compare> setPlanes;
 
+    //0) scale the meshes into united box
+    double maxD = 1;
+    for (shared_ptr<_Polygon> face : polyMesh->polyList) {
+            //1.1) construct plane
+            plane_contact plane;
+            Vector3f nrm = face->ComputeNormal();
+            Vector3f center = face->vers[0].pos;
+            plane.nrm = nrm;
+
+            plane.D = nrm ^ center;
+            maxD = std::max(maxD, std::abs(plane.D));
+        }
+
     int groupID = 0;
     for (shared_ptr<_Polygon> face : polyMesh->polyList)
     {
@@ -241,7 +254,7 @@ void MeshConverter::Convert2PolyMesh(pPolyMesh polyMesh, double eps)
         Vector3f center = face->ComputeCenter();
         plane.nrm = nrm;
 
-        plane.D = nrm ^ center;
+        plane.D = (nrm ^ center) / maxD;
         plane.polygon = face;
         plane.eps = eps;
 

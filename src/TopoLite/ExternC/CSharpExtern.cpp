@@ -10,6 +10,7 @@
 #include "IO/XMLIO.h"
 #include "Structure/StrucCreator.h"
 #include "Interlocking/ContactGraph.h"
+#include "Interlocking/InterlockingSolver_AffineScaling.h"
 
 /*
  * GLOBAL VARIABLES
@@ -208,6 +209,19 @@ PolyMeshRhino *initContactMesh(ContactGraphData *data)
         return mesh;
     }
     return NULL;
+}
+
+int testInterlocking(ContactGraphData *data){
+    if(data)
+    {
+        data->graph->constructFromPolyMeshes(data->meshes, data->atBoundary);
+        data->graph->finalize();
+
+        InterlockingSolver_AffineScaling solver(data->graph, data->graph->getVarList());
+        shared_ptr<InterlockingData> interlockData;
+        return (int)solver.isRotationalInterlocking(interlockData);
+    }
+    return 0;
 }
 
 int deleteStructure(XMLData* data){

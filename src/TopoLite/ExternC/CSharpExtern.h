@@ -61,6 +61,9 @@ CSharp_LIBRARY_C_FUNCTION
 PolyMeshRhino *initContactMesh(ContactGraphData *data);
 
 CSharp_LIBRARY_C_FUNCTION
+int testInterlocking(ContactGraphData *data);
+
+CSharp_LIBRARY_C_FUNCTION
 int deleteStructure(XMLData* data);
 
 CSharp_LIBRARY_C_FUNCTION
