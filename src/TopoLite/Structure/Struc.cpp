@@ -15,7 +15,7 @@
 #include "Mesh/Cross.h"
 #include "Utility/math3D.h"
 #include "Utility/HelpDefine.h"
-#include "Utility/HelpStruct.h"
+#include "Utility/GeometricPrimitives.h"
 #include "Utility/HelpFunc.h"
 #include "Mesh/Polygon.h"
 #include "Mesh/PolyMesh.h"

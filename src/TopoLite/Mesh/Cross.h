@@ -15,7 +15,7 @@
 #define _CROSS_H
 
 #include "TopoLite/Utility/vec.h"
-#include "TopoLite/Utility/HelpStruct.h"
+#include "TopoLite/Utility/GeometricPrimitives.h"
 #include "TopoLite/Mesh/Polygon.h"
 #include "TopoLite/Utility/TopoObject.h"
 

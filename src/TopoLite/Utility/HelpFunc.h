@@ -14,9 +14,8 @@
 #ifndef _HELP_FUNC_H
 #define _HELP_FUNC_H
 
-#include "vec.h"
 #include <vector>
-#include "HelpStruct.h"
+#include "GeometricPrimitives.h"
 
 
 using namespace std;

@@ -15,20 +15,22 @@
 #ifndef _POLYGON_H
 #define _POLYGON_H
 
-#include "TopoLite/Utility/vec.h"
-#include "TopoLite/Utility/HelpStruct.h"
+#include "TopoLite/Utility/GeometricPrimitives.h"
+#include <Eigen/Dense>
 #include <vector>
 
 using namespace std;
+using Eigen::Matrix;
 using pTriangle = shared_ptr<Triangle>;
 
+template <typename Scalar>
 class _Vertex
 {
 public:
 
-	Vector3f pos;				//!< vertex's postion (X,Y,Z)
+	Matrix<Scalar, 3, 1> pos;				//!< vertex's postion (X,Y,Z)
 
-	Vector2f texCoord;			//!< vertex's texcoord (U,V) for mapping the pattern
+	Matrix<Scalar, 2, 1> texCoord;			//!< vertex's texcoord (U,V) for mapping the pattern
 
 public:
 	_Vertex()
@@ -36,12 +38,12 @@ public:
 
 	};
 
-	_Vertex(Vector3f _pos)
+	_Vertex(Matrix<Scalar, 3, 1> _pos)
 	{
 		pos   = _pos;
 	};
 
-	_Vertex(Vector3f _pos, Vector2f _texCoord)
+	_Vertex(Matrix<Scalar, 3, 1> _pos, Matrix<Scalar, 2, 1> _texCoord)
 	{
 		pos = _pos;
 
@@ -58,7 +60,7 @@ class _Polygon
 public:
 
     //storage
-	vector<_Vertex> vers;                //!< Vertices   (position, texture coordinate.)
+	vector<_Vertex<double>> vers;                //!< Vertices   (position, texture coordinate.)
 	vector<int> verIDs;                  //!< Vertex IDs (only for position)
 	vector<int> texIDs;					 //!< texture ID
 

@@ -11,7 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#include "Utility/HelpStruct.h"
+#include "Utility/GeometricPrimitives.h"
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"

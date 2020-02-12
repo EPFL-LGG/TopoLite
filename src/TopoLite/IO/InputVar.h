@@ -5,7 +5,7 @@
 #ifndef TOPOLOCKCREATOR_GLUIVAR_H
 #define TOPOLOCKCREATOR_GLUIVAR_H
 #include "string.h"
-#include "../Utility/HelpStruct.h"
+#include "TopoLite/Utility/GeometricPrimitives.h"
 #include <map>
 #include <pugixml.hpp>
 using std::string;

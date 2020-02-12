@@ -58,12 +58,12 @@ void Cross::InitTiltNormals()
 	oriPoints.clear();
 	for (int i = 0; i < vers.size(); i++)
 	{
-		Vector3f staPt = vers[i].pos;
-		Vector3f endPt = vers[(i + 1) % vers.size()].pos;
-		Vector3f midPt = 0.5f * (staPt + endPt);
+		Vector3d staPt = vers[i].pos;
+		Vector3d endPt = vers[(i + 1) % vers.size()].pos;
+		Vector3d midPt = 0.5f * (staPt + endPt);
 
-		Vector3f edgeDir = (endPt - staPt) / len(endPt - staPt);
-		Vector3f midPtDir = midPt - center;
+        Vector3d edgeDir = (endPt - staPt) / len(endPt - staPt);
+        Vector3d midPtDir = midPt - center;
 
 		// Average edge normal
 		Vector3f avgNormal;

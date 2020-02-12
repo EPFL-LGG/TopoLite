@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////
 
 #include "Utility/HelpDefine.h"
-#include "Utility/HelpStruct.h"
+#include "Utility/GeometricPrimitives.h"
 #include "Utility/HelpFunc.h"
 
 #include "CrossMesh/PatternCreator.h"

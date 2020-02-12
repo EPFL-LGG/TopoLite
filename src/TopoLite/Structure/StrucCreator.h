@@ -19,7 +19,7 @@
 #include <vector>
 #include "TopoLite/Structure/Part.h"
 #include "TopoLite/Utility/vec.h"
-#include "TopoLite/Utility/HelpStruct.h"
+#include "TopoLite/Utility/GeometricPrimitives.h"
 #include "TopoLite/Utility/TopoObject.h"
 #include "TopoLite/Structure/Struc.h"
 #include "TopoLite/CrossMesh/CrossMeshCreator.h"

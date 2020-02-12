@@ -195,7 +195,8 @@ void PatternCreator::CreateMesh_2DPattern_HexagonPattern2(int patternRadius, sha
             {5, 4, -1, 2, 1, 0}
     };
 
-    for(int id = 0; id < 4; id++){
+    for(int id = 0; id < 4; id++)
+    {
         _Polygon poly;
         for(int jd = 0; jd < 6; jd++)
         {
@@ -205,7 +206,7 @@ void PatternCreator::CreateMesh_2DPattern_HexagonPattern2(int patternRadius, sha
                 poly.vers.push_back(_Vertex(hex[pID]->vers[vID].pos));
             }
             else{
-                poly.vers.push_back(_Vertex(Vector3f(0, 0, 0)));
+                poly.vers.push_back(_Vertex(Eigen::Vector3f(0, 0, 0)));
             }
         }
         poly.ComputeCenter();

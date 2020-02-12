@@ -1,0 +1,460 @@
+///////////////////////////////////////////////////////////////
+//
+// Utility/HelpStruct.h
+//
+//   Common Structures
+//
+// by Peng SONG ( songpenghit@gmail.com )
+// 
+// 01/Aug/2018
+//
+//
+///////////////////////////////////////////////////////////////
+
+#ifndef GeometricPrimitives_H
+#define GeometricPrimitives_H
+
+#include "TopoLite/Utility/HelpDefine.h"
+
+#include <vector>
+#include <Eigen/Dense>
+#include <cmath>
+
+using Eigen::Matrix;
+using Eigen::Vector3d;
+using Eigen::Vector3f;
+
+using namespace std;
+
+// Point position w.r.t a plane
+#define POINT_PLANE_UNKWONN          -1
+#define POINT_PLANE_INTERSECT         0
+#define POINT_PLANE_POSITIVE_SIDE     1
+#define POINT_PLANE_NEGATIVE_SIDE     2
+
+// Line position w.r.t a plane
+#define LINE_PLANE_UNKWONN           -1
+#define LINE_PLANE_INTERSECT          0
+#define LINE_PLANE_POSITIVE_SIDE      1
+#define LINE_PLANE_NEGATIVE_SIDE      2
+
+// Face position w.r.t a plane
+#define FACE_PLANE_UNKWONN           -1
+#define FACE_PLANE_INTERSECT          0
+#define FACE_PLANE_POSITIVE_SIDE      1
+#define FACE_PLANE_NEGATIVE_SIDE      2
+
+////////////////////////////////////////////
+// 3D Point
+////////////////////////////////////////////
+
+// 3D Point (with normal)
+template <typename Scalar>
+struct Point
+{
+    typedef Matrix<Scalar,3, 1> Vector3;
+
+    Vector3 pos;     // Point position
+    Vector3 nor;     // Point normal
+    Vector3 color;   // Point color (if available)
+
+    Scalar curv;       // Point curvature
+	int dist;         // Distance to the object surface
+
+	Point(){
+	    pos = Vector3(0, 0, 0);
+        nor = Vector3(0, 0, 0);
+        color = Vector3(0, 0, 0);
+        curv = 0;
+        dist = 0;
+	}
+
+	Point & operator=(const Point &pt)
+	{
+		if( this == &pt )
+			return *this;
+
+		this->pos   = pt.pos;
+		this->nor   = pt.nor;
+
+		this->color = pt.color;
+		this->curv  = pt.curv;
+
+		return *this;
+	};
+};
+
+
+////////////////////////////////////////////
+// 3D Line
+////////////////////////////////////////////
+
+template <typename Scalar>
+struct Line
+{
+    typedef Matrix<Scalar,3, 1> Vector3;
+
+    Vector3 point1;
+	Vector3 point2;
+
+	Line(){
+	    point1 = Vector3(0 ,0 ,0);
+        point2 = Vector3(0 ,0 ,0);
+	}
+
+	Line(Vector3 pt1, Vector3 pt2){
+	    point1 = pt1;
+	    point2 = pt2;
+	}
+};
+
+
+////////////////////////////////////////////
+// 3D Plane
+////////////////////////////////////////////
+
+template <typename Scalar>
+struct Plane
+{
+    typedef Matrix<Scalar,3, 1> Vector3;
+
+    Vector3 point;
+	Vector3 normal;
+
+    Plane(){
+        point = Vector3(0, 0, 0);
+        normal = Vector3(0, 0, 0);
+    }
+
+	Plane & operator=(const Plane &plane);
+
+	Scalar PointPlaneDistance(Vector3 tagtPt);
+	int PointPlaneIntersect(Vector3 tagtPt);
+
+	int LinePlaneIntersect(Line<Scalar> line);
+	int LineIntersectPoint(Line<Scalar> line, Vector3 &crossPt);
+};
+
+template<typename Scalar>
+Plane<Scalar> & Plane<Scalar>::operator=(const Plane<Scalar> &plane)
+{
+    if( this == &plane ) return *this;
+
+    this->point  = plane.point;
+    this->normal = plane.normal;
+
+    this->radius = plane.radius;
+
+    return *this;
+}
+
+template<typename Scalar>
+Scalar Plane<Scalar>::PointPlaneDistance(Vector3 tagtPt)
+{
+    Vector3 tagtvec = tagtPt - point;
+
+    Scalar dotP = tagtvec.dot(normal);
+    Scalar dist = std::abs(dotP);
+
+    return dist;
+}
+
+
+template<typename Scalar>
+int Plane<Scalar>::PointPlaneIntersect(Vector3 tagtPt)
+{
+    Vector3 vec = tagtPt - point;
+    float dotP = normal.dot(vec);
+
+    if ( std::abs(dotP) < FLOAT_ERROR_SMALL)    return POINT_PLANE_INTERSECT;       // Note: may need to tune this small threshold
+    else if ( dotP >  0 )              return POINT_PLANE_POSITIVE_SIDE;
+    else if ( dotP <  0 )              return POINT_PLANE_NEGATIVE_SIDE;
+
+    return POINT_PLANE_UNKWONN;
+}
+
+template<typename Scalar>
+int Plane<Scalar>::LinePlaneIntersect(Line<Scalar> line)
+{
+    int pt1State = PointPlaneIntersect( line.point1 );
+    int pt2State = PointPlaneIntersect( line.point2 );
+
+    if ( pt1State == POINT_PLANE_POSITIVE_SIDE &&
+         pt2State == POINT_PLANE_POSITIVE_SIDE )
+        return LINE_PLANE_POSITIVE_SIDE;
+
+    else
+    if ( pt1State == POINT_PLANE_NEGATIVE_SIDE &&
+         pt2State == POINT_PLANE_NEGATIVE_SIDE )
+        return LINE_PLANE_NEGATIVE_SIDE;
+
+    else
+        return LINE_PLANE_INTERSECT;
+}
+
+template<typename Scalar>
+int Plane<Scalar>::LineIntersectPoint(Line<Scalar> line, Vector3 &crossPt)
+{
+    // Check if the line intersects the plane
+    int state = LinePlaneIntersect( line );
+    if ( state != LINE_PLANE_INTERSECT )
+    {
+        //printf("Warning: Line does not intersect with the plane. \n");
+        return state;
+    }
+
+    // Compute the intersected point between the line and the plane
+    Vector3 rayOrg = line.point1;
+    Vector3 rayDir = (line.point2-line.point1) / (line.point2-line.point1).norm();
+    Vector3 tempVec = point - rayOrg;
+    Scalar m = (normal.dot(tempVec)) / (normal.dot(rayDir));
+
+    crossPt[0] = rayOrg[0] + m * rayDir[0];
+    crossPt[1] = rayOrg[1] + m * rayDir[1];
+    crossPt[2] = rayOrg[2] + m * rayDir[2];
+
+    return state;
+}
+
+
+////////////////////////////////////////////
+// 3D Box
+////////////////////////////////////////////
+
+template <typename Scalar>
+struct Box 
+{
+    typedef Matrix<Scalar,3, 1> Vector3;
+
+public:
+    //storage
+    Vector3 minPt;
+    Vector3 maxPt;
+
+public:
+    //compute
+    Vector3 cenPt;
+    Vector3 size;
+
+public:
+	Box();
+	Box & operator=(const Box &box);
+	void PrintBox();
+
+	void GetCenter();
+	void GetSize();
+
+	void Transform(Vector3 transVec, Vector3 scale);
+
+	//if this box degenerates into a quad plane, compute its area.
+	Scalar GetQuadArea();
+};
+
+template<typename Scalar>
+Box<Scalar>::Box()
+{
+    minPt = Vector3(0, 0, 0);
+    maxPt = Vector3(0, 0, 0);
+    cenPt = Vector3(0, 0, 0);
+    size = Vector3(0, 0, 0);
+}
+
+template<typename Scalar>
+Box<Scalar> & Box<Scalar>::operator=(const Box &box)
+{
+    if( this == &box )
+        return *this;
+
+    this->minPt = box.minPt;
+    this->maxPt = box.maxPt;
+    this->cenPt = box.cenPt;
+
+    return *this;
+}
+
+template<typename Scalar>
+void Box<Scalar>::PrintBox()
+{
+    printf("Box: [%7.3f  %7.3f  %7.3f]      [%7.3f  %7.3f  %7.3f] \n", minPt.x(), minPt.y(), minPt.z(), maxPt.x(), maxPt.y(), maxPt.z());
+}
+
+template<typename Scalar>
+void Box<Scalar>::GetCenter()
+{
+    cenPt = 0.5f * ( minPt + maxPt );
+}
+
+template<typename Scalar>
+void Box<Scalar>::GetSize()
+{
+    size = maxPt - minPt;
+}
+
+template<typename Scalar>
+void Box<Scalar>::Transform(Vector3 transVec, Vector3 scale)
+{
+    minPt.x() *= scale.x();  minPt.y() *= scale.y();  minPt.z() *= scale.z();
+    maxPt.x() *= scale.x();  maxPt.y() *= scale.y();  maxPt.z() *= scale.z();
+    cenPt.x() *= scale.x();  cenPt.y() *= scale.y();  cenPt.z() *= scale.z();
+    size.x() *= scale.x();   size.y() *= scale.y();   size.z() *= scale.z();
+
+    minPt += transVec;
+    maxPt += transVec;
+    cenPt += transVec;
+}
+
+template<typename Scalar>
+Scalar Box<Scalar>::GetQuadArea()
+{
+    Vector3 dimen = maxPt - minPt;
+    Scalar quadArea = 0;
+
+    if      ( std::abs(dimen.x()) < FLOAT_ERROR_SMALL && dimen.y()  > 0 &&  dimen.z()  > 0 )
+        quadArea = dimen.y() * dimen.z();  // y-z plane quad
+    else if ( dimen.x()  > 0 && std::abs(dimen.y()) < FLOAT_ERROR_SMALL &&  dimen.z()  > 0 )
+        quadArea = dimen.x() * dimen.z();  // x-z plane quad
+    else if ( dimen.x()  > 0 && dimen.y()  > 0 &&  std::abs(dimen.z()) < FLOAT_ERROR_SMALL )
+        quadArea = dimen.x() * dimen.y();  // x-y plane quad
+    else
+        printf("Warning: The box is not degenerated into a quad. \n");
+
+    return quadArea;
+}
+
+
+////////////////////////////////////////////
+// 3D Triangle
+////////////////////////////////////////////
+
+template <typename Scalar>
+struct Triangle
+{
+    typedef Matrix<Scalar,3, 1> Vector3;
+    Vector3 v[3];
+    Vector3 normal;
+	Scalar area;            // Face area
+    Vector3 center;
+
+	int vIndices[3];       // Index of each vertex
+
+	void Init(Vector3 _v0, Vector3 _v1, Vector3 _v2);
+	Triangle & operator=(const Triangle &tri);
+	bool IsEqual(Triangle *tri);
+	void PrintTriangle();
+
+	Vector3 GetBBoxMinPt();
+	Vector3 GetBBoxMaxPt();
+
+	void ComputeCenter();
+	void ComputeArea();
+	void ComputeNormal();
+	void CorrectNormal(Vector3 tagtNormal);
+};
+
+
+////////////////////////////////////////////
+// For computing part geometry and mobility
+////////////////////////////////////////////
+
+template <typename Scalar>
+struct OrientPoint
+{
+    typedef Matrix<Scalar, 3, 1> Vector3;
+    typedef Matrix<Scalar, 2, 1> Vector2;
+    /*for geometry generation*/
+    Vector3 point;
+    Vector3 normal;
+    Vector3 rotation_axis;
+    Vector3 rotation_base;
+
+	/*for optimization*/
+	float rotation_angle;
+	int tiltSign;              // Flag that indicates the direction to tilt the normal (possible values are {-1, 1})
+    int oriptID;               //the index of the oriented point in the whole structure
+    Vector2 tilt_range;	   //the lower and upper bound of tilt angle such that the structure have valid geometry.
+    Vector2 sided_range;	   //for debug, show the side range
+public:
+
+	OrientPoint(Vector3 _point, Vector3 _normal)
+	{
+		point  = _point;
+		normal = _normal;
+		rotation_base = _normal;
+		rotation_axis = Vector3(0, 0, 0);
+		rotation_angle = 0;
+		tiltSign = TILT_SIGN_NONE;
+		oriptID = -1;
+		tilt_range[0] = 0;
+		tilt_range[1] = 180;
+	}
+
+	OrientPoint(Vector3 _point, Vector3 _normal, Vector3 _axis)
+	{
+		point  = _point;
+		normal = _normal;
+		rotation_base = _normal;
+		rotation_axis = _axis;
+		rotation_angle = 0;
+		tiltSign = TILT_SIGN_NONE;
+		oriptID = -1;
+		tilt_range[0] = 0;
+		tilt_range[1] = 180;
+	};
+
+	void update_rotation(Scalar _angle)
+	{
+		rotation_angle = _angle;
+	}
+
+	void Print()
+	{
+		printf("point: [%6.3f %6.3f %6.3f]   normal: [%6.3f %6.3f %6.3f] \n", point[0], point[1], point[2], normal[0], normal[1], normal[2]);
+		printf("rotation_axis: [%6.3f %6.3f %6.3f]   rotation_angle: [%6.3f] \n", rotation_axis[0], rotation_axis[1], rotation_axis[2], rotation_angle);
+	};
+};
+
+template <typename Scalar>
+struct HypVertex
+{
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+public:
+	int verID;
+	Vector3 point;
+
+	//int planeIDs[3];
+	int edgeID;         // For part mobility
+	bool isValid;
+};
+
+template <typename Scalar>
+struct HypEdge
+{
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+public:
+	int edgeID;
+	Vector3 point;
+	Vector3 normal;
+
+	int planeIDs[2];
+};
+
+template <typename Scalar>
+struct HypPlane
+{
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+public:
+	int planeID;
+	Vector3 point;
+	Vector3 normal;
+
+public:
+	double getD(){return normal.dot(point);}
+
+	Scalar radius;             // For rendering a finite plane in 3D
+};
+
+
+#endif

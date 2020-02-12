@@ -15,8 +15,7 @@
 #ifndef _POLY_MESH_H
 #define _POLY_MESH_H
 
-#include "TopoLite/Utility/vec.h"
-#include "TopoLite/Utility/HelpStruct.h"
+#include "TopoLite/Utility/GeometricPrimitives.h"
 #include "TopoLite/Utility/TopoObject.h"
 #include "Polygon.h"
 

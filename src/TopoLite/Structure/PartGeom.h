@@ -22,7 +22,7 @@
 #include "TopoLite/Mesh/PolyMesh.h"
 
 #include "TopoLite/Utility/vec.h"
-#include "TopoLite/Utility/HelpStruct.h"
+#include "TopoLite/Utility/GeometricPrimitives.h"
 #include "TopoLite/Utility/ConvexHull2D.h"
 #include "TopoLite/Utility/TopoObject.h"
 
