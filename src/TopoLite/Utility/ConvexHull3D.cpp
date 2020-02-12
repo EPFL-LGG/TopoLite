@@ -4,6 +4,7 @@
 #include "QuickHull.hpp"
 #include "vec.h"
 #include <Eigen/Dense>
+
 void computeQuickHull(std::vector<Vector3f> &pointList, std::vector<Vector3f> &ver, std::vector<Vector3i> &tri)
 {
     quickhull::QuickHull<float> qh;
@@ -36,7 +37,7 @@ void computeQuickHull(std::vector<Vector3f> &pointList, std::vector<Vector3f> &v
     return;
 }
 
-void computeQuickHull(std::vector<Vector3f> &pointList, Eigen::MatrixXd &V, Eigen::MatrixXi &F)
+void computeQuickHullMatrix(std::vector<Vector3f> &pointList, Eigen::MatrixXd &V, Eigen::MatrixXi &F)
 {
     std::vector<Vector3f> ver;
     std::vector<Vector3i> tri;
