@@ -20,6 +20,7 @@
 #include "TopoLite/Mesh/Cross.h"
 #include "TopoLite/Mesh/Polygon.h"
 #include "TopoLite/Mesh/PolyMesh.h"
+#include "Utility/ConvexHull3D.h"
 
 #include "TopoLite/Utility/vec.h"
 #include "TopoLite/Utility/HelpStruct.h"

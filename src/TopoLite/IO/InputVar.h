@@ -8,6 +8,7 @@
 #include "../Utility/HelpStruct.h"
 #include <map>
 #include <pugixml.hpp>
+#include <memory>
 using std::string;
 
 #if USE_OPENGL_DRAW

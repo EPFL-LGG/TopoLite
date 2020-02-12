@@ -16,6 +16,7 @@
 
 #include "../Utility/vec.h"
 #include <vector>
+#include <memory>
 
 using namespace std;
 

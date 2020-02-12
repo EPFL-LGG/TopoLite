@@ -18,6 +18,8 @@
 #include "TopoLite/Utility/vec.h"
 #include "TopoLite/Utility/HelpStruct.h"
 #include <vector>
+#include <memory>
+#include <string.h>
 
 using namespace std;
 using pTriangle = shared_ptr<Triangle>;
