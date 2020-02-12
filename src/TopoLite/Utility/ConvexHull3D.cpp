@@ -33,8 +33,6 @@ void computeQuickHull(std::vector<Vector3f> &pointList, std::vector<Vector3f> &v
         float c = vertex_buff[id].z;
         ver.push_back(Vector3f(a, b, c));
     }
-
-    return;
 }
 
 void computeQuickHullMatrix(std::vector<Vector3f> &pointList, Eigen::MatrixXd &V, Eigen::MatrixXi &F)
@@ -51,5 +49,4 @@ void computeQuickHullMatrix(std::vector<Vector3f> &pointList, Eigen::MatrixXd &V
     for(int id = 0; id < tri.size(); id++){
         F.row(id) = Eigen::RowVector3i(tri[id].x, tri[id].y, tri[id].z);
     }
-    return;
 }
