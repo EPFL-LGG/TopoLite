@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
-message(BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS})
 project(pugixml VERSION 1.9)
 
-option(BUILD_SHARED_LIBS "Build shared instead of static library" OFF)
+option(BUILD_SHARED_LIBS "Build shared instead of static library" ON)
 option(BUILD_TESTS "Build tests" OFF)
 option(USE_VERSIONED_LIBDIR "Use a private subdirectory to install the headers and libs" OFF)
 option(USE_POSTFIX "Use separate postfix for each configuration to make sure you can install multiple build outputs" OFF)
