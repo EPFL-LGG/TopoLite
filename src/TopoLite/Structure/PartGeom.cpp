@@ -17,7 +17,7 @@
 #include "Utility/HelpDefine.h"
 #include "Utility/HelpFunc.h"
 #include "Utility/math3D.h"
-#include "Utility/ConvexHull3D.cpp"
+
 #include "Mesh/HEdgeMesh.h"
 #include "Mesh/PolyMesh.h"
 #include "Mesh/MeshConverter.h"
