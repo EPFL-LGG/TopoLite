@@ -11,15 +11,40 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#include "vec.h"
+#ifndef CONVEXHULL2D_H
+#define CONVEXHULL2D_H
+
+#include <Eigen/Dense>
 #include <vector>
 
-using namespace std;
+using Eigen::Matrix;
 
-// Chain Hull Algorithm
-vector<Vector3f> convex_hull(vector<Vector3f> P);
-double cross(const Vector3f &O, const Vector3f &A, const Vector3f &B);
+template<typename Scalar>
+class ConvexHull2D{
 
-// Sort Points Based on X - and Y - coordinate
-vector<int> BubbleSort(vector<Vector3f> &Array, bool isAscend);
-bool IS_LESS(Vector3f a, Vector3f b);
+public:
+    typedef Matrix<Scalar, 3, 1> Vector3;
+    typedef std::vector<Matrix<Scalar, 3, 1>> ListVector3;
+
+    ConvexHull2D(){
+
+    }
+
+public:
+
+    // Chain Hull Algorithm
+    void convex_hull(const ListVector3 &in, ListVector3 &out);
+
+private:
+
+    Scalar cross(const Vector3 &O, const Vector3 &A, const Vector3 &B);
+
+    // Sort Points Based on X - and Y - coordinate
+    void SortXY(ListVector3 &Array);
+
+    bool IS_LESS(Vector3 a, Vector3 b);
+};
+
+#include "ConvexHull2D.cpp"
+
+#endif

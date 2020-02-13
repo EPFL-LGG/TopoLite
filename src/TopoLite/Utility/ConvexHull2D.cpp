@@ -11,9 +11,7 @@
 //
 ///////////////////////////////////////////////////////////////
 
-
-#include "ConvexHull2D.h"
-
+#include <algorithm>
 
 //**************************************************************************************//
 //                              Compute 2D Convex Hull
@@ -27,42 +25,49 @@
 // 2) Returns a list of points on the convex hull in counter-clockwise order,
 //    where the last point in the returned list is the same as the first one.
 
-vector<Vector3f> convex_hull(vector<Vector3f> P)
+template<typename Scalar>
+void ConvexHull2D<Scalar>::convex_hull(const ListVector3 &in, ListVector3 &out)
 {
-	int n = P.size(), k = 0;
-	if (n == 1) return P;
-	vector<Vector3f> H(2 * n);
+    out.clear();
+	int n = in.size(), k = 0;
+	if (n == 1){
+	    return;
+	}
+
+	out.clear();
+	out.resize(2 * n);
 
 	// Sort points lexicographically
-	BubbleSort(P, true);
+	ListVector3 _in = in;
+	SortXY(_in);
 
 	// Build lower hull
 	for (int i = 0; i < n; ++i) {
-		while (k >= 2 && cross(H[k - 2], H[k - 1], P[i]) <= 0) k--;
-		H[k++] = P[i];
+		while (k >= 2 && cross(out[k - 2], out[k - 1], _in[i]) <= 0) k--;
+		out[k++] = _in[i];
 	}
 
 	// Build upper hull
 	for (int i = n - 2, t = k + 1; i >= 0; i--) {
-		while (k >= t && cross(H[k - 2], H[k - 1], P[i]) <= 0) k--;
-		H[k++] = P[i];
+		while (k >= t && cross(out[k - 2], out[k - 1], _in[i]) <= 0) k--;
+		out[k++] = _in[i];
 	}
 
-	H.resize(k - 1);
+	out.resize(k - 1);
 
-	reverse(H.begin(), H.end());
-
-	return H;
+	reverse(out.begin(), out.end());
 }
+
+
 
 // 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
 // Returns a positive value, if OAB makes a counter-clockwise turn,
 // negative for clockwise turn, and zero if the points are collinear.
-double cross(const Vector3f &O, const Vector3f &A, const Vector3f &B)
+template<typename Scalar>
+Scalar ConvexHull2D<Scalar>::cross(const Vector3 &O, const Vector3 &A, const Vector3 &B)
 {
-	return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+	return (A.x() - O.x()) * (B.y() - O.y()) - (A.y() - O.y()) * (B.x() - O.x());
 }
-
 
 
 
@@ -70,50 +75,13 @@ double cross(const Vector3f &O, const Vector3f &A, const Vector3f &B)
 //                       Sort Points Based on X- and Y-coordinate
 //**************************************************************************************//
 
-vector<int> BubbleSort(vector<Vector3f> &Array, bool isAscend)
+template<typename Scalar>
+void ConvexHull2D<Scalar>::SortXY(ListVector3 &Array)
 {
-	vector<int> Indices;
-	for (int i = 0; i < Array.size(); i++)
-		Indices.push_back(i);
-
-	//printf("Before Sorting: ");
-	//for (int i=0; i<Array.size(); i++)
-	//	printf(" %d: %.2f ", Indices[i], Array[i]);
-	//printf("\n");
-
-	int i, j, flag = 1; // Set flag to 1 to start first pass
-	float tempValue;    // Holding variable
-	int tempIndex;      // Holding variable index 
-	int num = Array.size();
-	for (i = 1; (i <= num) && flag; i++)
-	{
-		flag = 0;
-		for (j = 0; j < (num - 1); j++)
-		{
-			if ((isAscend == true && IS_LESS(Array[j+1], Array[j]) == true ) ||
-				(isAscend == false && IS_LESS(Array[j + 1], Array[j]) == false))
-			{
-				swap(Array[j], Array[j+1]);
-				swap(Indices[j], Indices[j+1]);
-
-				flag = 1;
-			}
-		}
-	}
-
-	//printf("After Sorting:  ");
-	//for (int i=0; i<Array.size(); i++)
-	//	printf(" %d: %.2f ", Indices[i], Array[i]);
-	//printf("\n");
-
-	return Indices;
-}
-
-
-bool IS_LESS(Vector3f a, Vector3f b)
-{
-	if (a.x < b.x || (a.x == b.x && a.y < b.y))
-		return true;
-	else
-		return false;
+	std::sort(Array.begin(), Array.end(), [=](const Vector3 &a, const Vector3 &b){
+        if (a.x() < b.x() || (a.x() == b.x() && a.y() < b.y()))
+            return true;
+        else
+            return false;
+	});
 }

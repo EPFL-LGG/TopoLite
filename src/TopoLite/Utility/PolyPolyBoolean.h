@@ -4,9 +4,9 @@
 #include <clipper.hpp>
 #include "HelpFunc.h"
 #include "TopoObject.h"
-#include "Mesh/Polygon.h"
 #include <cmath>
 
+template<typename Scalar>
 class PolyPolyBoolean: TopoObject
 {
 public:
@@ -15,10 +15,7 @@ public:
     }
     
 public:
-    void ComputePolygonsUnion(
-            vector<vector<Vector3f>> &polys,
-            vector<vector<Vector3f>> &polysUnion
-            )
+    void ComputePolygonsUnion(vector<vector<Vector3f>> &polys, vector<vector<Vector3f>> &polysUnion)
     {
         polysUnion.clear();
         if(polys.empty())return;

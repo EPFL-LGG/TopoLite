@@ -164,7 +164,7 @@ template<typename Scalar>
 int Plane<Scalar>::PointPlaneIntersect(Vector3 tagtPt)
 {
     Vector3 vec = tagtPt - point;
-    float dotP = normal.dot(vec);
+    Scalar dotP = normal.dot(vec);
 
     if ( std::abs(dotP) < FLOAT_ERROR_SMALL)    return POINT_PLANE_INTERSECT;       // Note: may need to tune this small threshold
     else if ( dotP >  0 )              return POINT_PLANE_POSITIVE_SIDE;
@@ -339,7 +339,7 @@ struct Triangle
 
 	void Init(Vector3 _v0, Vector3 _v1, Vector3 _v2);
 	Triangle & operator=(const Triangle &tri);
-	bool IsEqual(Triangle *tri);
+	bool IsEqual(const Triangle<Scalar> &tri);
 	void PrintTriangle();
 
 	Vector3 GetBBoxMinPt();
@@ -351,6 +351,133 @@ struct Triangle
 	void CorrectNormal(Vector3 tagtNormal);
 };
 
+template<typename Scalar>
+void Triangle<Scalar>::Init(Vector3 _v0, Vector3 _v1, Vector3 _v2)
+{
+    v[0] = _v0;
+    v[1] = _v1;
+    v[2] = _v2;
+
+    ComputeCenter();
+    ComputeArea();
+    ComputeNormal();
+}
+
+template<typename Scalar>
+Triangle<Scalar> & Triangle<Scalar>::operator=(const Triangle &tri)
+{
+    if( this == &tri )
+        return *this;
+
+    for (int i=0; i<3; i++)
+    {
+        this->v[i] = tri.v[i];
+        this->vIndices[i] = tri.vIndices[i];
+    }
+
+    this->normal = tri.normal;
+    this->center = tri.center;
+    this->area   = tri.area;
+
+    return *this;
+}
+
+template<typename Scalar>
+bool Triangle<Scalar>::IsEqual(const Triangle<Scalar> &tri)
+{
+    if( this->v[0] == tri.v[0] &&
+        this->v[1] == tri.v[1] &&
+        this->v[2] == tri.v[2] )
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+template<typename Scalar>
+void Triangle<Scalar>::PrintTriangle()
+{
+    printf("v0: [%.12f %.12f %.12f] \n", v[0].x(), v[0].y(), v[0].z());
+    printf("v1: [%.12f %.12f %.12f] \n", v[1].x(), v[1].y(), v[1].z());
+    printf("v2: [%.12f %.12f %.12f] \n", v[2].x(), v[2].y(), v[2].z());
+    printf("\n");
+}
+
+template<typename Scalar>
+Matrix<Scalar, 3, 1> Triangle<Scalar>::GetBBoxMinPt()
+{
+    Vector3 bboxMinPt;
+
+    bboxMinPt.x() = _MIN(v[0].x(), _MIN(v[1].x(), v[2].x()));
+    bboxMinPt.y() = _MIN(v[0].y(), _MIN(v[1].y(), v[2].y()));
+    bboxMinPt.z() = _MIN(v[0].z(), _MIN(v[1].z(), v[2].z()));
+
+    return bboxMinPt;
+}
+template<typename Scalar>
+Matrix<Scalar, 3, 1> Triangle<Scalar>::GetBBoxMaxPt()
+{
+    Vector3 bboxMaxPt;
+
+    bboxMaxPt.x() = _MAX(v[0].x(), _MAX(v[1].x(), v[2].x()));
+    bboxMaxPt.y() = _MAX(v[0].y(), _MAX(v[1].y(), v[2].y()));
+    bboxMaxPt.z() = _MAX(v[0].z(), _MAX(v[1].z(), v[2].z()));
+
+    return bboxMaxPt;
+}
+
+template<typename Scalar>
+void Triangle<Scalar>::ComputeCenter()
+{
+    center = (v[0] + v[1] + v[2]) / 3.0;
+}
+
+template<typename Scalar>
+void Triangle<Scalar>::ComputeArea()
+{
+    Vector3 normal  = (v[1] - v[0]).cross(v[2] - v[0]);
+    area  = 0.5f * normal.norm();
+}
+
+template<typename Scalar>
+void Triangle<Scalar>::ComputeNormal()
+{
+    Vector3 tempNor = (v[1] - v[0]).cross(v[2] - v[0]);  // Assume the vertices are saved in counter-clockwise
+    Scalar tempNorLen = tempNor.norm();
+
+    if ( tempNorLen > FLOAT_ERROR_SMALL )
+        normal = tempNor / tempNorLen;
+    else
+        normal = Vector3(1,0,0);     // Note: this default vector also can be others
+}
+
+template<typename Scalar>
+void Triangle<Scalar>::CorrectNormal(Vector3 tagtNormal)
+{
+    // Compute initial normal
+    ComputeNormal();
+
+    // Rearrange vertex order if needed
+    Scalar dotp = normal.dot(tagtNormal);
+    if ( dotp < 0 )
+    {
+        Vector3 triVers[3];
+        for (int i=0; i<3; i++)
+        {
+            triVers[i] = v[i];
+        }
+
+        v[0] = triVers[0];
+        v[1] = triVers[2];
+        v[2] = triVers[1];
+    }
+
+    // Recompute the normal
+    ComputeNormal();
+}
 
 ////////////////////////////////////////////
 // For computing part geometry and mobility
@@ -361,6 +488,7 @@ struct OrientPoint
 {
     typedef Matrix<Scalar, 3, 1> Vector3;
     typedef Matrix<Scalar, 2, 1> Vector2;
+
     /*for geometry generation*/
     Vector3 point;
     Vector3 normal;
@@ -368,10 +496,10 @@ struct OrientPoint
     Vector3 rotation_base;
 
 	/*for optimization*/
-	float rotation_angle;
+	Scalar rotation_angle;
 	int tiltSign;              // Flag that indicates the direction to tilt the normal (possible values are {-1, 1})
     int oriptID;               //the index of the oriented point in the whole structure
-    Vector2 tilt_range;	   //the lower and upper bound of tilt angle such that the structure have valid geometry.
+    Vector2 tilt_range;	       //the lower and upper bound of tilt angle such that the structure have valid geometry.
     Vector2 sided_range;	   //for debug, show the side range
 public:
 

@@ -149,8 +149,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
 file(GLOB TpCoreFiles
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/GeometricPrimitives.h
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/GeometricPrimitives.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/math3D.cpp)
 
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
@@ -172,7 +171,7 @@ include(ParseAndAddCatchTests)
 
 add_executable(testTopo
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/Test_Main.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/Utility/Test_GeometricPrimitives.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/Utility/Test_ConvexHull2D.cpp)
 
 target_link_libraries(testTopo PUBLIC Catch2::Catch2)
 target_link_libraries(testTopo PUBLIC TpCorelib)

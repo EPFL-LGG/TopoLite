@@ -1,4 +1,5 @@
 #include <catch2/catch.hpp>
+#include <iostream>
 #include "Utility/GeometricPrimitives.h"
 using Eigen::Vector3d;
 TEST_CASE("GeometricPrimitives Point"){
@@ -65,7 +66,7 @@ TEST_CASE("GeometricPrimitives Plane")
         Vector3d intersec(0, 0, 0);
         REQUIRE(plane.LineIntersectPoint(line, intersec) == LINE_PLANE_INTERSECT);
         REQUIRE(intersec[0] == 0);
-        REQUIRE(std::abs(intersec[1] + 1.0/3) < FLOAT_ERROR_SMALL);
+        REQUIRE(intersec[1] ==  Approx(-1.0/3));
     }
 }
 
@@ -105,4 +106,54 @@ TEST_CASE("Box"){
         box.maxPt = Vector3d(1, 1, 0.9e-7);
         REQUIRE(box.GetQuadArea() == 1);
     }
+}
+
+TEST_CASE("Triangle"){
+    Triangle<double> tri;
+
+    tri.Init(Vector3d(1, 0, 0), Vector3d(0, 1, 0), Vector3d(0, 0, 1));
+
+    SECTION("IsEqual"){
+        REQUIRE(tri.IsEqual(tri) == true);
+    }
+
+    SECTION("PrintTriangle"){
+        tri.PrintTriangle();
+    }
+
+    SECTION("GetBBoxMinPt"){
+        Vector3d bbox = tri.GetBBoxMinPt();
+        CHECK(bbox.x() == 0);
+        CHECK(bbox.y() == 0);
+        CHECK(bbox.z() == 0);
+    }
+
+    SECTION("GetBBoxMaxPt"){
+        Vector3d bbox = tri.GetBBoxMaxPt();
+        CHECK(bbox.x() == 1);
+        CHECK(bbox.y() == 1);
+        CHECK(bbox.z() == 1);
+    }
+
+    SECTION("ComputeCenter"){
+        CHECK(tri.center.x() == Approx(1.0 / 3));
+        CHECK(tri.center.y() == Approx(1.0 / 3));
+        CHECK(tri.center.z() == Approx(1.0 / 3));
+    }
+
+    SECTION("ComputeArea"){
+        CHECK(tri.area == Approx(sqrt(3) / 2));
+    }
+
+    SECTION("ComputeNormal"){
+        CHECK((tri.normal - Vector3d(1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3))).norm() == Approx(0));
+    }
+
+    SECTION("CorrectNormal"){
+        tri.CorrectNormal(Vector3d(-1, -1, -1));
+        CHECK((tri.v[0] - Vector3d(1, 0, 0)).norm() == Approx(0));
+        CHECK((tri.v[1] - Vector3d(0, 0, 1)).norm() == Approx(0));
+        CHECK((tri.v[2] - Vector3d(0, 1, 0)).norm() == Approx(0));
+    }
+
 }
