@@ -908,7 +908,7 @@ Happy Christmas!
   functions is simply ``handle()``. It can also be invoked explicitly via
   ``handle::operator<X>()``, where ``X`` is an optional return value policy.
 
-* Print more informative error messages when ``make_tuple()`` or ``cast()``
+* print more informative error messages when ``make_tuple()`` or ``cast()``
   fail. `#262 <https://github.com/pybind/pybind11/pull/262>`_.
 
 * Creation of holder types for classes deriving from

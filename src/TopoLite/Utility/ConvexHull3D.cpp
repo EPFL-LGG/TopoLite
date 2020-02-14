@@ -5,7 +5,7 @@
 using Eigen::Vector3i;
 
 template<typename Scalar>
-void ConvexHull3D<Scalar>::computeQuickHull(ListVector3 &pointList, ListVector3 &ver, ListVector3i &tri)
+void ConvexHull3D<Scalar>::compute(ListVector3 &pointList, ListVector3 &ver, ListVector3i &tri)
 {
     quickhull::QuickHull<Scalar> qh;
     std::vector<quickhull::Vector3<Scalar>> pointCloud;
@@ -39,7 +39,7 @@ void ConvexHull3D<Scalar>::computeQuickHull(ListVector3 &pointList, ListVector3 
 }
 
 template<typename Scalar>
-void ConvexHull3D<Scalar>::computeQuickHull(ListVector3 &pointList, Matrix<Scalar, Dynamic, Dynamic> &V, Matrix<int, Dynamic, Dynamic> &F)
+void ConvexHull3D<Scalar>::compute(ListVector3 &pointList, Matrix<Scalar, Dynamic, Dynamic> &V, Matrix<int, Dynamic, Dynamic> &F)
 {
     ListVector3 ver;
     ListVector3i tri;

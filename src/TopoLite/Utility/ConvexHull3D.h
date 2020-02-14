@@ -18,8 +18,8 @@ public:
     typedef std::vector<Matrix<int, 3, 1>> ListVector3i;
 
 public:
-    void computeQuickHull(ListVector3 &pointList, ListVector3 &ver, ListVector3i &tri);
-    void computeQuickHull(ListVector3 &pointList, Matrix<Scalar, Dynamic, Dynamic> &V, Matrix<int, Dynamic, Dynamic> &F);
+    void compute(ListVector3 &pointList, ListVector3 &ver, ListVector3i &tri);
+    void compute(ListVector3 &pointList, Matrix<Scalar, Dynamic, Dynamic> &V, Matrix<int, Dynamic, Dynamic> &F);
 
 };
 

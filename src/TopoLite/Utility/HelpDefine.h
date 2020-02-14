@@ -28,6 +28,9 @@
 ///////////////////////////////////////////////////////////////////////
 //  General Definition
 
+// List
+#define ELEMENT_OUT_LIST            -1
+
 // File and buffer
 #define FILE_NAME_LENGTH            1024
 #define BUFFER_LENGTH               256

@@ -170,9 +170,11 @@ add_subdirectory(ext/Catch2)
 include(CTest)
 include(ParseAndAddCatchTests)
 
-add_executable(testTopo
-        test/Test_Main.cpp
-        test/Utility/Test_PolyPolyBoolean.cpp)
+file(GLOB testTopoFiles test/Mesh/*.cpp)
+
+set(testTopoFiles ${testTopoFiles} test/Test_Main.cpp)
+
+add_executable(testTopo ${testTopoFiles})
 
 target_link_libraries(testTopo PUBLIC Catch2::Catch2)
 target_link_libraries(testTopo PUBLIC TpCorelib)

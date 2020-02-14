@@ -45,7 +45,7 @@ ifdef BUILDING_PHASE
 
     # Do not use -Werror because it is too strict for the early offload compiler.
     # Need to set anything because WARNING_AS_ERROR_KEY should not be empty.
-    # Treat #2426 as a warning. Print errors only.
+    # Treat #2426 as a warning. print errors only.
     tbb_strict=0
     WARNING_AS_ERROR_KEY = Warning as error
     WARNING_KEY = -diag-warning 2426 -w0

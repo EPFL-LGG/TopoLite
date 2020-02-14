@@ -33,16 +33,14 @@ public:
 public:
 
     // Chain Hull Algorithm
-    void convex_hull(const ListVector3 &in, ListVector3 &out);
+    void compute(const ListVector3 &in, ListVector3 &out);
 
 private:
 
     Scalar cross(const Vector3 &O, const Vector3 &A, const Vector3 &B);
 
     // Sort Points Based on X - and Y - coordinate
-    void SortXY(ListVector3 &Array);
-
-    bool IS_LESS(Vector3 a, Vector3 b);
+    void sortXY(ListVector3 &Array);
 };
 
 #include "ConvexHull2D.cpp"

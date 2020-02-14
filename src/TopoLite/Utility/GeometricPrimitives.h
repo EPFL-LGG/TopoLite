@@ -84,6 +84,42 @@ struct Point
 	};
 };
 
+////////////////////////////////////////////
+// 3D Vertex
+////////////////////////////////////////////
+
+template <typename Scalar>
+class _Vertex
+{
+public:
+    typedef Matrix<Scalar, 3, 1> Vector3;
+    typedef Matrix<Scalar, 2 ,1> Vector2;
+
+public:
+
+    Vector3 pos;				//!< vertex's postion (X,Y,Z)
+
+    Vector2 texCoord;			//!< vertex's texcoord (U,V) for mapping the pattern
+
+public:
+    _Vertex()
+    {
+
+    };
+
+    _Vertex(const Vector3 &_pos)
+    {
+        pos   = _pos;
+    };
+
+    _Vertex(const Vector3& _pos, const Vector2& _texCoord)
+    {
+        pos = _pos;
+
+        texCoord = _texCoord;
+    };
+};
+
 
 ////////////////////////////////////////////
 // 3D Line

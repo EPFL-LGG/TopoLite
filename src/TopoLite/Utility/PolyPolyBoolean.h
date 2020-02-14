@@ -22,11 +22,11 @@ public:
     }
     
 public:
-    void ComputePolygonsUnion(PolysVector3 &polys, PolysVector3 &polysUnion);
+    void computePolygonsUnion(PolysVector3 &polys, PolysVector3 &polysUnion);
 
-    void ComputePolygonsIntersection(const PolyVector3 &polyA, const PolyVector3 &polyB, PolyVector3 &polyIntsec);
+    void computePolygonsIntersection(const PolyVector3 &polyA, const PolyVector3 &polyB, PolyVector3 &polyIntsec);
 
-    void ComputePolygonsIntersection(const PolyVector3 &polyA, const PolyVector3 &polyB, PolysVector3 &polyIntsec);
+    void computePolygonsIntersection(const PolyVector3 &polyA, const PolyVector3 &polyB, PolysVector3 &polyIntsec);
 
 public:
 
@@ -48,7 +48,7 @@ public:
 };
 
 template<typename Scalar>
-void PolyPolyBoolean<Scalar>::ComputePolygonsUnion(PolyPolyBoolean::PolysVector3 &polys,
+void PolyPolyBoolean<Scalar>::computePolygonsUnion(PolyPolyBoolean::PolysVector3 &polys,
                                                    PolyPolyBoolean::PolysVector3 &polysUnion) {
     polysUnion.clear();
     if(polys.empty())return;
@@ -92,11 +92,11 @@ void PolyPolyBoolean<Scalar>::ComputePolygonsUnion(PolyPolyBoolean::PolysVector3
 }
 
 template<typename Scalar>
-void PolyPolyBoolean<Scalar>::ComputePolygonsIntersection(const PolyPolyBoolean::PolyVector3 &polyA,
+void PolyPolyBoolean<Scalar>::computePolygonsIntersection(const PolyPolyBoolean::PolyVector3 &polyA,
                                                           const PolyPolyBoolean::PolyVector3 &polyB,
                                                           PolyPolyBoolean::PolyVector3 &polyIntsec) {
     PolysVector3 polylists;
-    ComputePolygonsIntersection(polyA, polyB, polylists);
+    computePolygonsIntersection(polyA, polyB, polylists);
     if(!polylists.empty()){
         polyIntsec = polylists[0];
     }
@@ -114,7 +114,7 @@ void PolyPolyBoolean<Scalar>::printPolygon(const PolyPolyBoolean::PolyVector3 &p
 }
 
 template<typename Scalar>
-void PolyPolyBoolean<Scalar>::ComputePolygonsIntersection(const PolyPolyBoolean::PolyVector3 &polyA,
+void PolyPolyBoolean<Scalar>::computePolygonsIntersection(const PolyPolyBoolean::PolyVector3 &polyA,
                                                           const PolyPolyBoolean::PolyVector3 &polyB,
                                                           PolyPolyBoolean::PolysVector3 &polyIntsec) {
     polyIntsec.clear();
@@ -140,6 +140,7 @@ void PolyPolyBoolean<Scalar>::ComputePolygonsIntersection(const PolyPolyBoolean:
     solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
     ClipperLib::ClipperOffset offset;
     offset.AddPaths(path_int, ClipperLib::jtSquare, ClipperLib::etClosedPolygon);
+    offset.Execute(path_int, -10);
     ClipperLib::SimplifyPolygons(path_int);
     if (path_int.empty())
         return;

@@ -7,54 +7,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-
-using Eigen::Vector3d;
-
-bool compareListVector3(const std::vector<Eigen::Vector3d> &A, const std::vector<Eigen::Vector3d> &B)
-{
-
-    if(A.size() != B.size()) return false;
-
-    for(int id = 0; id < A.size(); id++)
-    {
-        int jd = 0;
-        for(; jd < B.size(); jd++){
-            if(Approx(0) == (A[id] - B[jd]).norm()){
-                break;
-            }
-        }
-
-        if(jd == B.size())
-            return false;
-    }
-    return true;
-
-}
-
-void string2ListVector3(std::string data, std::vector<Eigen::Vector3d> &pts)
-{
-
-    std::stringstream iss(data);
-    double number;
-    int index = 0;
-    while(iss >> number){
-
-        if(index % 2 == 0){
-            pts.push_back(Eigen::Vector3d(0, 0, 0));
-        }
-
-        pts.back()[index % 2] = number;
-        index += 1;
-    }
-
-    return;
-}
-
-void printListVector3(std::vector<Eigen::Vector3d> &list){
-    for(Eigen::Vector3d pt : list){
-        std::cout << pt.transpose() << std::endl;
-    }
-}
+#include "ListVector3.h"
 
 TEST_CASE(){
 
@@ -113,13 +66,13 @@ TEST_CASE(){
     //convert to ListVector3
 
     ConvexHull2D<double>::ListVector3 pts,resPts;
-    string2ListVector3(data, pts);
-    string2ListVector3(result, resPts);
+    convertString2ToListVector3(data, pts);
+    convertString2ToListVector3(result, resPts);
 
     ConvexHull2D<double> convexhull3d;
 
     ConvexHull2D<double>::ListVector3 outPts;
-    convexhull2d.convex_hull(pts, outPts);
+    convexhull2d.compute(pts, outPts);
 
     REQUIRE(compareListVector3(outPts, resPts) == true);
 }

@@ -68,7 +68,7 @@ TEST_CASE("Class PolyPolyBoolean")
         polys.push_back(C);
 
         vector<vector<Vector3d>> polyUnions;
-        polyBoolean.ComputePolygonsUnion(polys, polyUnions);
+        polyBoolean.computePolygonsUnion(polys, polyUnions);
 
 
         REQUIRE(polyUnions.size() == 1);
@@ -90,7 +90,7 @@ TEST_CASE("Class PolyPolyBoolean")
         }
 
         vector<vector<Vector3d>> polyIntersec;
-        polyBoolean.ComputePolygonsIntersection(PA, PB, polyIntersec);
+        polyBoolean.computePolygonsIntersection(PA, PB, polyIntersec);
 
         REQUIRE(polyIntersec.size() == 2);
         REQUIRE(polyIntersec[0].size() == 4);
@@ -113,7 +113,7 @@ TEST_CASE("Class PolyPolyBoolean")
         B.push_back(Vector3d(1.5, 1.5, 0));
 
         vector<Vector3d> polyIntersec;
-        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+        polyBoolean.computePolygonsIntersection(A, B, polyIntersec);
 
         REQUIRE(polyIntersec.size() == 3);
     }
@@ -134,7 +134,7 @@ TEST_CASE("Class PolyPolyBoolean")
         B.push_back(Vector3d(1.5, 1.5, 0));
 
         vector<Vector3d> polyIntersec;
-        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+        polyBoolean.computePolygonsIntersection(A, B, polyIntersec);
 
         REQUIRE(polyIntersec.size() == 4);
     }
@@ -155,7 +155,7 @@ TEST_CASE("Class PolyPolyBoolean")
         B.push_back(Vector3d(1.5, 1.5, 0));
 
         vector<Vector3d> polyIntersec;
-        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+        polyBoolean.computePolygonsIntersection(A, B, polyIntersec);
 
         REQUIRE(polyIntersec.size() == 3);
     }
@@ -176,7 +176,7 @@ TEST_CASE("Class PolyPolyBoolean")
         B.push_back(Vector3d(1.5, 1.5, 0));
 
         vector<Vector3d> polyIntersec;
-        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+        polyBoolean.computePolygonsIntersection(A, B, polyIntersec);
 
         REQUIRE(polyIntersec.size() == 4);
     }
@@ -198,7 +198,7 @@ TEST_CASE("Class PolyPolyBoolean")
         Scale_ListVector3d(B);
 
         vector<Vector3d> polyIntersec;
-        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+        polyBoolean.computePolygonsIntersection(A, B, polyIntersec);
 
         REQUIRE(polyIntersec.size() == 4);
     }

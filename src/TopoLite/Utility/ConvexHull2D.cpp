@@ -26,7 +26,7 @@
 //    where the last point in the returned list is the same as the first one.
 
 template<typename Scalar>
-void ConvexHull2D<Scalar>::convex_hull(const ListVector3 &in, ListVector3 &out)
+void ConvexHull2D<Scalar>::compute(const ListVector3 &in, ListVector3 &out)
 {
     out.clear();
 	int n = in.size(), k = 0;
@@ -39,7 +39,7 @@ void ConvexHull2D<Scalar>::convex_hull(const ListVector3 &in, ListVector3 &out)
 
 	// Sort points lexicographically
 	ListVector3 _in = in;
-	SortXY(_in);
+	sortXY(_in);
 
 	// Build lower hull
 	for (int i = 0; i < n; ++i) {
@@ -76,7 +76,7 @@ Scalar ConvexHull2D<Scalar>::cross(const Vector3 &O, const Vector3 &A, const Vec
 //**************************************************************************************//
 
 template<typename Scalar>
-void ConvexHull2D<Scalar>::SortXY(ListVector3 &Array)
+void ConvexHull2D<Scalar>::sortXY(ListVector3 &Array)
 {
 	std::sort(Array.begin(), Array.end(), [=](const Vector3 &a, const Vector3 &b){
         if (a.x() < b.x() || (a.x() == b.x() && a.y() < b.y()))

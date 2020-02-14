@@ -13,25 +13,27 @@
 
 #include "Utility/GeometricPrimitives.h"
 #include "Utility/HelpDefine.h"
-#include "Utility/HelpFunc.h"
-#include "Utility/math3D.h"
 #include "Polygon.h"
 
 //**************************************************************************************//
 //                                    Initialization
 //**************************************************************************************//
 
-_Polygon::_Polygon()
+template <typename Scalar>
+_Polygon<Scalar>::_Polygon()
 {
-	normal = Vector3f(0, 0, 0);
+	normal = Vector3(0, 0, 0);
+	dist = polyType = 0;
 }
 
-_Polygon::~_Polygon()
+template <typename Scalar>
+_Polygon<Scalar>::~_Polygon()
 {
-
+    clear();
 }
 
-_Polygon & _Polygon::operator=(const _Polygon &poly)
+template <typename Scalar>
+_Polygon<Scalar> & _Polygon<Scalar>::operator=(const _Polygon<Scalar> &poly)
 {
 	if( this == &poly )
 		return *this;
@@ -48,7 +50,8 @@ _Polygon & _Polygon::operator=(const _Polygon &poly)
 	return *this;
 }
 
-_Polygon::_Polygon(const _Polygon &poly)
+template <typename Scalar>
+_Polygon<Scalar>::_Polygon(const _Polygon<Scalar> &poly)
 {
     this->vers   = poly.vers;
     this->normal = poly.normal;
@@ -59,48 +62,66 @@ _Polygon::_Polygon(const _Polygon &poly)
     this->dist = poly.dist;
 }
 
-bool _Polygon::IsEqual(_Polygon *poly)
+template <typename Scalar>
+bool _Polygon<Scalar>::checkEquality(const _Polygon &poly)
 {
-	if (this->vers.size() != poly->vers.size())
+	if (this->size() != poly.size())
 		return false;
 
-	// TODO: may need to add more strict conditions (e.g., equal vertex positions)
-	float dist = len(this->center - poly->center);
-	if (dist > FLOAT_ERROR_LARGE)
-		return false;
+	const _Polygon<Scalar> &A = *this;
+	const _Polygon<Scalar> &B = poly;
 
-	return true;
+	int id;
+    for(id = 0; id < A.size(); id++)
+    {
+        if((A[id] - B[0]).norm() < FLOAT_ERROR_SMALL){
+            break;
+        }
+    }
+    if(id == A.size()) return false;
+
+    for(int jd = 0; jd < A.size(); jd++){
+        if((A[(id + jd) % A.size()] - B[jd]).norm() > FLOAT_ERROR_SMALL){
+            return false;
+        }
+    }
+
+    return true;
 }
 
-void _Polygon::Print()
+template <typename Scalar>
+void _Polygon<Scalar>::print()
 {
 	printf("verNum: %lu \n", vers.size());
 	for (int i = 0; i < vers.size(); i++)
 	{
-		printf("(%6.3f, %6.3f, %6.3f) \n", vers[i].pos.x, vers[i].pos.y, vers[i].pos.z);
+		printf("(%6.3f, %6.3f, %6.3f) \n", vers[i].pos.x(), vers[i].pos.y(), vers[i].pos.z());
 	}
 	printf("\n");
 }
 
-void _Polygon::SetVertices(vector<Vector3f> _vers)
+template <typename Scalar>
+void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
 {
 	vers.clear();
 	for (int i = 0; i < _vers.size(); i++)
 	{
-		vers.push_back( _Vertex(_vers[i]) );
+		vers.push_back( _Vertex<Scalar>(_vers[i]) );
 	}
 }
 
-size_t _Polygon::push_back(Vector3f pt)
+template <typename Scalar>
+size_t _Polygon<Scalar>::push_back(Vector3 pt)
 {
-    vers.push_back(_Vertex(pt));
+    vers.push_back(_Vertex<Scalar>(pt));
     return vers.size();
 }
 
-void _Polygon::ReverseVertices()
+template <typename Scalar>
+void _Polygon<Scalar>::reverseVertices()
 {
     // Reverse vertices
-    vector<_Vertex> newVers;
+    vector<_Vertex<Scalar>> newVers;
     for (int i = vers.size() - 1; i >= 0; i--)
     {
         newVers.push_back(vers[i]);
@@ -109,7 +130,7 @@ void _Polygon::ReverseVertices()
     vers = newVers;
 
     // Reverse normal
-    normal = -1.0f * normal;
+    normal = -normal;
 }
 
 
@@ -117,61 +138,66 @@ void _Polygon::ReverseVertices()
 //                                    Compute Properties
 //**************************************************************************************//
 
-Vector3f _Polygon::ComputeCenter()
+template <typename Scalar>
+Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeCenter()
 {
-	center = Vector3f(0,0,0);
-	for (int i=0; i<vers.size(); i++)
+	center = Vector3(0, 0, 0);
+	for (int i= 0; i < vers.size(); i++)
 	{
 		center += vers[i].pos;
 	}
 
-	center = center / float(vers.size());
+	center = center / vers.size();
 
 	return center;
 }
 
 
-Vector3f _Polygon::ComputeNormal()
+template <typename Scalar>
+Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeNormal()
 {
-	ComputeCenter();
+	computeCenter();
 
-	 Vector3f tempNor(0, 0, 0);
-	for(int id = 0; id < vers.size() - 1; id++){
-	    tempNor += (vers[id].pos - center) CROSS (vers[id + 1].pos - center);
+	Vector3 tempNor(0, 0, 0);
+	for(int id = 0; id < vers.size() - 1; id++)
+	{
+	    tempNor += (vers[id].pos - center).cross(vers[id + 1].pos - center);
 	}
-	if(len(tempNor) < FLOAT_ERROR_LARGE)
-	    return Vector3f(0, 0, 0);
 
-	tempNor = tempNor / len(tempNor);
+	if(tempNor.norm() < FLOAT_ERROR_LARGE)
+	    return Vector3(0, 0, 0);
 
-
-	PlaneNormalFit();
-	if((normal DOT tempNor) < 0) normal *= -1;
+	tempNor.normalize();
+	
+	computeFitedPlaneNormal();
+	
+	if(normal.dot(tempNor) < 0) normal *= -1;
 
 	return normal;
 }
 
 //see https://www.ilikebigbits.com/2015_03_04_plane_from_points.html
-Vector3f _Polygon::PlaneNormalFit()
+template <typename Scalar>
+Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal()
 {
 	if(vers.size() < 3)
 	{
-		return Vector3f(0, 0, 0);
+		return Vector3(0, 0, 0);
 	}
 
-	Vector3f centroid = ComputeCenter();
+	Vector3 centroid = computeCenter();
 
 	double xx, xy, xz, yy, yz, zz;
 	xx = xy = xz = yy = yz = zz = 0;
-	for(_Vertex ver: vers)
+	for(_Vertex<Scalar> ver: vers)
 	{
-		Vector3f r = ver.pos - centroid;
-		xx += r.x * r.x;
-		xy += r.x * r.y;
-		xz += r.x * r.z;
-		yy += r.y * r.y;
-		yz += r.y * r.z;
-		zz += r.z * r.z;
+		Vector3 r = ver.pos - centroid;
+		xx += r.x() * r.x();
+		xy += r.x() * r.y();
+		xz += r.x() * r.z();
+		yy += r.y() * r.y();
+		yz += r.y() * r.z();
+		zz += r.z() * r.z();
 	}
 
 	double det_x = yy*zz - yz*yz;
@@ -180,68 +206,69 @@ Vector3f _Polygon::PlaneNormalFit()
 
 	double maxDet = std::max(det_x, std::max(det_y, det_z));
 	if(maxDet <= 0){
-		return Vector3f(0, 0, 0);
+		return Vector3(0, 0, 0);
 	}
 
 	if(maxDet == det_x)
 	{
-		normal = Vector3f(det_x, xz*yz - xy*zz, xy*yz - xz*yy);
+		normal = Vector3(det_x, xz*yz - xy*zz, xy*yz - xz*yy);
 	}
 	else if(maxDet == det_y)
 	{
-		normal = Vector3f(xz*yz - xy*zz, det_y, xy*xz - yz*xx);
+		normal = Vector3(xz*yz - xy*zz, det_y, xy*xz - yz*xx);
 	}
 	else {
-		normal = Vector3f(xy*yz - xz*yy, xy*xz - yz*xx, det_z);
+		normal = Vector3(xy*yz - xz*yy, xy*xz - yz*xx, det_z);
 	};
-	normal /= len(normal);
-	return normal;
+
+	return normal.normalized();
 }
 
-float _Polygon::ComputeArea()
+template <typename Scalar>
+Scalar _Polygon<Scalar>::computeArea()
 {
-	if ( normal == Vector3f(0,0,0) )
-		ComputeNormal();
+	if ( normal == Vector3(0,0,0))
+	    computeNormal();
 
-	float signedArea = 0;
-	for (int i=0; i<vers.size(); i++)
+	Scalar signedArea = 0;
+	for (int i = 0; i < vers.size(); i++)
 	{
-		Vector3f crossVec;
+		Vector3 crossVec;
 
-		if ( i < vers.size()-1 )    crossVec = vers[i].pos CROSS vers[i+1].pos;
-		else                        crossVec = vers[i].pos CROSS vers[0].pos;
+		if ( i < vers.size()-1 )    crossVec = vers[i].pos.cross(vers[i + 1].pos);
+		else                        crossVec = vers[i].pos.cross(vers[0].pos);
 
-		signedArea += 0.5f * (normal DOT crossVec);
+		signedArea += 0.5f * (normal.dot(crossVec));
 	}
 
-	float area = fabs( signedArea );
-
-	return area;
+	return std::abs( signedArea );
 }
 
-float _Polygon::ComputeAverageEdge()
+template <typename Scalar>
+Scalar _Polygon<Scalar>::computeAverageEdge()
 {
-	float avgEdgeLen = 0;
+	Scalar avgEdgeLen = 0;
 
 	for (int i = 0; i < vers.size(); i++)
 	{
-		Vector3f currVer = vers[i].pos;
-		Vector3f nextVer = vers[(i + 1) % vers.size()].pos;
+		Vector3 currVer = vers[i].pos;
+		Vector3 nextVer = vers[(i + 1) % vers.size()].pos;
 		float edgeLen = len(nextVer - currVer);
 
 		avgEdgeLen += edgeLen;
 	}
 
-	avgEdgeLen /= (float)vers.size();
+	avgEdgeLen /= vers.size();
 
 	return avgEdgeLen;
 }
 
-float _Polygon::ComputeMaxRadius()
+template <typename Scalar>
+Scalar _Polygon<Scalar>::computeMaxRadius()
 {
-    float MaxRadius = 0;
+    Scalar MaxRadius = 0;
 
-    Vector3f origin = ComputeCenter();
+    Vector3 origin = computeCenter();
     for (int i = 0; i < vers.size(); i++)
     {
         MaxRadius = std::max(len(vers[i].pos - origin), MaxRadius);
@@ -249,16 +276,19 @@ float _Polygon::ComputeMaxRadius()
     return MaxRadius;
 }
 
-void _Polygon::ComputeFrame(Vector3f &x_axis, Vector3f &y_axis, Vector3f &origin)
+template <typename Scalar>
+void _Polygon<Scalar>::computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &origin)
 {
-	normal = ComputeNormal();
-	center = ComputeCenter();
-	x_axis = normal CROSS Vector3f(1, 0, 0);
+	normal = computeNormal();
+    origin = computeCenter();
+
+	x_axis = normal.cross(Vector3(1, 0, 0));
 	if(len(x_axis) < FLOAT_ERROR_LARGE)
-	    x_axis = normal CROSS Vector3f(0, 1, 0);
-	x_axis /= len(x_axis);
-	y_axis = normal CROSS x_axis; y_axis /= len(y_axis);
-	origin = center;
+	    x_axis = normal.cross(Vector3(0, 1, 0));
+	x_axis.normalize();
+
+	y_axis = normal.cross(x_axis);
+	y_axis.normalize();
 }
 
 
@@ -266,29 +296,34 @@ void _Polygon::ComputeFrame(Vector3f &x_axis, Vector3f &y_axis, Vector3f &origin
 //                                  Polygon Operations
 //**************************************************************************************//
 
-void _Polygon::SetDistance(int _dist)
+template <typename Scalar>
+void _Polygon<Scalar>::SetDistance(int _dist)
 {
 	dist = _dist;
 }
 
-int _Polygon::GetDistance()
+template <typename Scalar>
+int _Polygon<Scalar>::GetDistance()
 {
 	return dist;
 }
 
-void _Polygon::SetPolyType(float _polyType)
+template <typename Scalar>
+void _Polygon<Scalar>::SetPolyType(float _polyType)
 {
 	polyType = _polyType;
 }
 
-int _Polygon::GetPolyType()
+template <typename Scalar>
+int _Polygon<Scalar>::GetPolyType()
 {
 	return polyType;
 }
 
-vector<Vector3f> _Polygon::GetVertices()
+template <typename Scalar>
+vector<Matrix<Scalar, 3, 1>> _Polygon<Scalar>::GetVertices()
 {
-	vector<Vector3f> vertices;
+	vector<Vector3> vertices;
 
 	for (int i = 0; i < vers.size(); i++)
 	{
@@ -298,9 +333,9 @@ vector<Vector3f> _Polygon::GetVertices()
 	return vertices;
 }
 
-
-vector<Vector2f> _Polygon::GetVerticesTex() {
-	vector<Vector2f> vertices;
+template <typename Scalar>
+vector<Matrix<Scalar, 2, 1>> _Polygon<Scalar>::GetVerticesTex() {
+	vector<Vector2> vertices;
 
 	for (int i = 0; i < vers.size(); i++)
 	{
@@ -313,15 +348,16 @@ vector<Vector2f> _Polygon::GetVerticesTex() {
 //                                  Polygon Operations
 //**************************************************************************************//
 
-void _Polygon::Convert2Triangles(vector<pTriangle> &tris)
+template <typename Scalar>
+void _Polygon<Scalar>::Convert2Triangles(vector<pTriangle> &tris)
 {
     if(vers.size() < 3)
         return;
 
-    center = ComputeCenter();
+    center = computeCenter();
     for (int i = 0; i < (int)(vers.size()); i++)
 	{
-		pTriangle tri = make_shared<Triangle>();
+		pTriangle tri = make_shared<Triangle<Scalar>>();
 		tri->v[0] = center;
 		tri->v[1] = vers[i].pos;
 		tri->v[2] = vers[(i + 1)%vers.size()].pos;
@@ -331,7 +367,8 @@ void _Polygon::Convert2Triangles(vector<pTriangle> &tris)
     return;
 }
 
-int _Polygon::GetVertexIndexInList(Vector3f tagtVerPos)
+template <typename Scalar>
+int _Polygon<Scalar>::GetVertexIndexInList(Vector3 tagtVerPos)
 {
 	for (int i = 0; i < vers.size(); i++)
 	{
@@ -354,7 +391,8 @@ int _Polygon::GetVertexIndexInList(Vector3f tagtVerPos)
 //                                  Polygon Transforms
 //**************************************************************************************//
 
-void _Polygon::Translate(Vector3f transVec)
+template <typename Scalar>
+void _Polygon<Scalar>::Translate(Vector3 transVec)
 {
 	for (int i = 0; i < vers.size(); i++)
 	{
@@ -364,13 +402,14 @@ void _Polygon::Translate(Vector3f transVec)
 	center += transVec;
 }
 
-vector<Vector3f> _Polygon::ProjectPolygonTo2D(double projMat[])
+template <typename Scalar>
+vector<Matrix<Scalar, 3, 1>> _Polygon<Scalar>::ProjectPolygonTo2D(double projMat[])
 {
-	vector<Vector3f> poly2D;
+	vector<Vector3> poly2D;
 
 	for (int i = 0; i < vers.size(); i++)
 	{
-		Vector3f ver2D;
+		Vector3 ver2D;
 		MultiplyPoint( vers[i].pos, projMat, ver2D);
 
 		poly2D.push_back( ver2D );
@@ -379,44 +418,45 @@ vector<Vector3f> _Polygon::ProjectPolygonTo2D(double projMat[])
 	return poly2D;
 }
 
-vector<Vector3i> _Polygon::ProjectToNormalPlane(Vector3f x_axis, Vector3f y_axis, Vector3f origin, float Scale) {
-	vector<Vector3i> pts;
-	for(int id = 0; id < vers.size(); id++)
-	{
-		Vector3f pos = vers[id].pos;
-		int x = (int)(((pos - origin) DOT x_axis) * Scale);
-		int y = (int)(((pos - origin) DOT y_axis) * Scale);
-		int z = 0;
-		pts.push_back(Vector3i(x, y, z));
-	}
-
-	return pts;
-}
-
-
-void _Polygon::ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[])
-{
-	if ( vers.size() < 3 )
-		return;
-
-	Vector3f origin = ComputeCenter();
-
-	Vector3f zAxis = ComputeNormal();
-	Vector3f xAxis = vers[1].pos - vers[0].pos;
-	xAxis = xAxis / len(xAxis);
-	Vector3f yAxis = zAxis CROSS xAxis;
-
-	double mat[16];
-	identityd(mat);
-	mat[0] = xAxis.x;     mat[1] = xAxis.y;     mat[2] = xAxis.z;
-	mat[4] = yAxis.x;     mat[5] = yAxis.y;     mat[6] = yAxis.z;
-	mat[8] = zAxis.x;     mat[9] = zAxis.y;     mat[10] = zAxis.z;
-	mat[12] = origin.x;   mat[13] = origin.y;   mat[14] = origin.z;
-
-	memcpy(invsProjMat, mat, sizeof(double)*16);
-
-	memcpy(projMat, mat, sizeof(double)*16);
-	if (invert4by4(projMat) == 0)  printf("Inverse Matrix Error \n");
-}
+//template <typename Scalar>
+//vector<Eigen::Vector3i> _Polygon<Scalar>::ProjectToNormalPlane(Vector3 x_axis, Vector3 y_axis, Vector3 origin, float Scale)
+//{
+//	vector<Vector3i> pts;
+//	for(int id = 0; id < vers.size(); id++)
+//	{
+//		Vector3 pos = vers[id].pos;
+//		int x = (int)((pos - origin).dot(x_axis) * Scale);
+//		int y = (int)((pos - origin).dot(y_axis) * Scale);
+//		int z = 0;
+//		pts.push_back(Vector3i(x, y, z));
+//	}
+//	return pts;
+//}
+//
+//template <typename Scalar>
+//void _Polygon<Scalar>::ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[])
+//{
+//	if ( vers.size() < 3 )
+//		return;
+//
+//	Vector3 origin = ComputeCenter();
+//
+//	Vector3 zAxis = ComputeNormal();
+//	Vector3 xAxis = vers[1].pos - vers[0].pos;
+//	xAxis = xAxis / len(xAxis);
+//	Vector3 yAxis = zAxis.cross(xAxis);
+//
+//	double mat[16];
+//	identityd(mat);
+//	mat[0] = xAxis.x;     mat[1] = xAxis.y;     mat[2] = xAxis.z;
+//	mat[4] = yAxis.x;     mat[5] = yAxis.y;     mat[6] = yAxis.z;
+//	mat[8] = zAxis.x;     mat[9] = zAxis.y;     mat[10] = zAxis.z;
+//	mat[12] = origin.x;   mat[13] = origin.y;   mat[14] = origin.z;
+//
+//	memcpy(invsProjMat, mat, sizeof(double)*16);
+//
+//	memcpy(projMat, mat, sizeof(double)*16);
+// 	if (invert4by4(projMat) == 0)  printf("Inverse Matrix Error \n");
+//}
 
 //
