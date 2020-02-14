@@ -5,6 +5,13 @@
 #include <catch2/catch.hpp>
 using Eigen::Vector3d;
 
+void Scale_ListVector3d(vector<Vector3d>& poly, double Scale = 10000){
+    for(Vector3d &pt : poly){
+        pt *= Scale;
+    }
+    return;
+}
+
 TEST_CASE("Class PolyPolyBoolean")
 {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
@@ -167,6 +174,28 @@ TEST_CASE("Class PolyPolyBoolean")
         B.push_back(Vector3d(0.4, 0.5, 0));
         B.push_back(Vector3d(1.5, 0.5, 0));
         B.push_back(Vector3d(1.5, 1.5, 0));
+
+        vector<Vector3d> polyIntersec;
+        polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);
+
+        REQUIRE(polyIntersec.size() == 4);
+    }
+
+    SECTION("Scaling Error"){
+        vector<Vector3d> A;
+        A.push_back(Vector3d(0, 0, 0));
+        A.push_back(Vector3d(1, 0, 0));
+        A.push_back(Vector3d(1, 0.8, 0));
+        A.push_back(Vector3d(1, 1, 0));
+        A.push_back(Vector3d(0.8, 1, 0));
+        A.push_back(Vector3d(0, 1, 0));
+        Scale_ListVector3d(A);
+
+        vector<Vector3d> B;
+        B.push_back(Vector3d(0.4, 0.5, 0));
+        B.push_back(Vector3d(1.5, 0.5, 0));
+        B.push_back(Vector3d(1.5, 1.5, 0));
+        Scale_ListVector3d(B);
 
         vector<Vector3d> polyIntersec;
         polyBoolean.ComputePolygonsIntersection(A, B, polyIntersec);

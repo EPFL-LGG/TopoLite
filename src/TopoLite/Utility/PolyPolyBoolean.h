@@ -36,11 +36,13 @@ public:
 
     void computeFrame(const PolyVector3 &poly, Vector3 &xaxis, Vector3 &yaxis, Vector3 &origin);
 
+    Scalar computeScale(const PolysVector3 &poly, Vector3 &xaxis, Vector3 &yaxis, Vector3 &origin);
+
     Vector3 computeNormal(const PolyVector3 &poly);
 
     Vector3 computeCenter(const PolyVector3 &poly);
 
-    ClipperLib::Path projectToNormalPlane(const PolyVector3 &poly, Vector3 xaxis, Vector3 yaxis, Vector3 origin, Scalar scale);
+    ClipperLib::Path projectToNormalPlane(const PolyVector3 &poly, Vector3 xaxis, Vector3 yaxis, Vector3 origin, Scalar Scale);
 
     PolyVector3 projectTo3D(const ClipperLib::Path &path, Vector3 xaxis, Vector3 yaxis, Vector3 origin, Scalar scale);
 };
@@ -54,7 +56,7 @@ void PolyPolyBoolean<Scalar>::ComputePolygonsUnion(PolyPolyBoolean::PolysVector3
     Vector3 x_axis, y_axis, origin;
     computeFrame(polys[0], x_axis, y_axis, origin);
 
-    Scalar Scale = getVarList()->template get<float>("clipper_scale");
+    Scalar Scale = computeScale(polys, x_axis, y_axis, origin);
 
     vector<ClipperLib::Path> clipperPaths;
 
@@ -120,7 +122,11 @@ void PolyPolyBoolean<Scalar>::ComputePolygonsIntersection(const PolyPolyBoolean:
     Vector3 x_axis, y_axis, origin;
     computeFrame(polyA, x_axis, y_axis, origin);
 
-    Scalar Scale = getVarList()->template get<float>("clipper_scale");
+    PolysVector3 polys;
+    polys.push_back(polyA);
+    polys.push_back(polyB);
+
+    Scalar Scale = computeScale(polys, x_axis, y_axis, origin);
 
     ClipperLib::Path pathA, pathB;
     pathA = projectToNormalPlane(polyA, x_axis, y_axis, origin, Scale);
@@ -134,7 +140,6 @@ void PolyPolyBoolean<Scalar>::ComputePolygonsIntersection(const PolyPolyBoolean:
     solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
     ClipperLib::ClipperOffset offset;
     offset.AddPaths(path_int, ClipperLib::jtSquare, ClipperLib::etClosedPolygon);
-    offset.Execute(path_int, -100);
     ClipperLib::SimplifyPolygons(path_int);
     if (path_int.empty())
         return;
@@ -280,6 +285,28 @@ PolyPolyBoolean<Scalar>::projectTo3D(const ClipperLib::Path &path,
     }
 
     return poly;
+}
+
+template<typename Scalar>
+Scalar PolyPolyBoolean<Scalar>::computeScale(const PolyPolyBoolean::PolysVector3 &polys, PolyPolyBoolean::Vector3 &xaxis,
+                                           PolyPolyBoolean::Vector3 &yaxis, PolyPolyBoolean::Vector3 &origin){
+
+    Scalar Scale = 1;
+    int maxdigit = 0;
+    for(PolyVector3 poly:polys)
+    {
+        for(int id = 0; id < poly.size(); id++)
+        {
+            Vector3 pos = poly[id];
+            Scalar x = std::abs((pos - origin).dot(xaxis));
+            Scalar y = std::abs((pos - origin).dot(yaxis));
+            int digit = std::floor(std::max(std::log10(x) + 1, std::log10(y) + 1));
+            maxdigit = std::max(digit, maxdigit);
+        }
+    }
+
+    Scale = std::max(Scale, std::pow(10, std::max(0, 8 - maxdigit)));
+    return Scale;
 }
 
 
