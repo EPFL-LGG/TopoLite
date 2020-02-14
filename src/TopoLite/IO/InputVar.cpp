@@ -2,7 +2,7 @@
 // Created by ziqwang on 10.03.19.
 //
 #include "InputVar.h"
-
+#include "Utility/HelpDefine.h"
 void InitVar(InputVarList *varList)
 {
     varList->clear();

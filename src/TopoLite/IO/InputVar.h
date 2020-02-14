@@ -4,16 +4,19 @@
 
 #ifndef TOPOLOCKCREATOR_GLUIVAR_H
 #define TOPOLOCKCREATOR_GLUIVAR_H
-#include "string.h"
-#include "TopoLite/Utility/GeometricPrimitives.h"
+#include <string>
 #include <map>
 #include <pugixml.hpp>
+#include <vector>
+#include <Eigen/Dense>
+#include <memory>
+#include <iostream>
 using std::string;
-
-#if USE_OPENGL_DRAW
-    #include "glui.h"
-    extern GLUI *glui;
-#endif
+using std::vector;
+using Eigen::Vector2f;
+using std::shared_ptr;
+using std::make_shared;
+using std::map;
 
 enum gluiVarValueType{
     GLUI_VAR_VALUE_NONE,
@@ -43,10 +46,6 @@ public:
         var_control_type = GLUI_VAR_CONTROL_NONE;
         var_value_type = GLUI_VAR_VALUE_NONE;
         visible = true;
-#if USE_OPENGL_DRAW
-        aligned_settings = GLUI_ALIGN_LEFT;
-        gluiID = -1;
-#endif
     }
 
     InputVar& operator<<(string name){

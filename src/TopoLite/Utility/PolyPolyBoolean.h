@@ -2,242 +2,285 @@
 #define POLYPLOYINTERSEC_H
 
 #include <clipper.hpp>
-#include "HelpFunc.h"
-#include "TopoObject.h"
 #include <cmath>
+#include <Eigen/Dense>
 
+#include "TopoObject.h"
+#include "HelpDefine.h"
+using Eigen::Matrix;
 template<typename Scalar>
 class PolyPolyBoolean: TopoObject
 {
+
+    typedef Matrix<Scalar, 3 ,1> Vector3;
+    typedef vector<Vector3> PolyVector3;
+    typedef vector<vector<Vector3>> PolysVector3;
+
 public:
     PolyPolyBoolean(shared_ptr<InputVarList> varList) : TopoObject(varList){
 
     }
     
 public:
-    void ComputePolygonsUnion(vector<vector<Vector3f>> &polys, vector<vector<Vector3f>> &polysUnion)
-    {
-        polysUnion.clear();
-        if(polys.empty())return;
+    void ComputePolygonsUnion(PolysVector3 &polys, PolysVector3 &polysUnion);
 
-        vector<_Polygon> Ps;
-        double scaling_factor = 1;
-        for(int id = 0; id < polys.size(); id++)
-        {
-            _Polygon PA;
-            PA.SetVertices(polys[id]);
-            Ps.push_back(PA);
+    void ComputePolygonsIntersection(const PolyVector3 &polyA, const PolyVector3 &polyB, PolyVector3 &polyIntsec);
 
-            int exponent = std::ceil(std::log10(PA.ComputeMaxRadius()));
-            scaling_factor = std::max(scaling_factor, (double)std::pow(10, exponent) * 2);
-        }
+    void ComputePolygonsIntersection(const PolyVector3 &polyA, const PolyVector3 &polyB, PolysVector3 &polyIntsec);
 
-        Vector3f x_axis, y_axis, origin;
-        Ps[0].ComputeFrame(x_axis, y_axis, origin);
+public:
 
-        float Scale = getVarList()->get<float>("clipper_scale") / scaling_factor;
+    void printPolygon(const PolyVector3& poly);
 
+    void cleanPath(PolyVector3 &polyIntsec);
 
-        vector<ClipperLib::Path> clipperPaths;
+    void computeFrame(const PolyVector3 &poly, Vector3 &xaxis, Vector3 &yaxis, Vector3 &origin);
 
-        for(int id = 0; id < Ps.size(); id++)
-        {
-            vector<Vector3i> intPA = Ps[id].ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
-            Ps[id].ComputeNormal();
-            ClipperLib::Path pathA;
-            for (int jd = 0; jd < intPA.size(); jd++)
-            {
-                int x = intPA[jd].x;
-                int y = intPA[jd].y;
-                pathA.push_back(ClipperLib::IntPoint(x, y));
-            }
+    Vector3 computeNormal(const PolyVector3 &poly);
 
-            if(pathA.empty()) continue;
+    Vector3 computeCenter(const PolyVector3 &poly);
 
-            ClipperLib::ClipperOffset offsetter;
-            offsetter.AddPath(pathA, ClipperLib::jtSquare, ClipperLib::etClosedPolygon);
-            ClipperLib::Paths off_sol;
-            offsetter.Execute(off_sol, 10.0);
-            TopoASSERT(off_sol.empty() == false);
-            if(!off_sol.empty())
-                clipperPaths.push_back(off_sol[0]);
-        }
+    ClipperLib::Path projectToNormalPlane(const PolyVector3 &poly, Vector3 xaxis, Vector3 yaxis, Vector3 origin, Scalar scale);
 
-        ClipperLib::Clipper solver;
-        solver.AddPaths(clipperPaths, ClipperLib::ptSubject, true);
-        ClipperLib::Paths path_union;
-        solver.Execute(ClipperLib::ctUnion, path_union, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
-
-        if (path_union.empty())
-            return;
-
-        for(ClipperLib::Path path : path_union)
-        {
-            vector<Vector3f> polyUnion;
-            for (ClipperLib::IntPoint pt : path)
-            {
-                float x = pt.X / Scale;
-                float y = pt.Y / Scale;
-                Vector3f pos = x_axis * x + y_axis * y + origin;
-                polyUnion.push_back(pos);
-            }
-            cleanPath(polyUnion);
-            polysUnion.push_back(polyUnion);
-        }
-
-        return;
-    }
-
-    void ComputePolygonsIntersection(
-            const vector<Vector3f> &polyA,
-            const vector<Vector3f> &polyB,
-            vector<Vector3f> &polyIntsec)
-    {
-        vector<vector<Vector3f>> polylists;
-        ComputePolygonsIntersection(polyA, polyB, polylists);
-        if(!polylists.empty()){
-            polyIntsec = polylists[0];
-        }
-
-        return;
-    }
-
-    void printPolygon(vector<Vector3f> poly){
-        std::cout << "{";
-        for (int id = 0; id < poly.size(); id++) {
-            std::cout << "{" << poly[id].x << ", " << poly[id].y << "}, ";
-        }
-        std::cout << "}\n";
-    }
-
-    void ComputePolygonsIntersection(
-        const vector<Vector3f> &polyA,
-        const vector<Vector3f> &polyB,
-        vector<vector<Vector3f>> &polyIntsec)
-    {
-        polyIntsec.clear();
-
-        _Polygon PA;
-        PA.SetVertices(polyA);
-        _Polygon PB;
-        PB.SetVertices(polyB);
-
-        Vector3f x_axis, y_axis, origin;
-        PA.ComputeFrame(x_axis, y_axis, origin);
-
-        double scaling_factor = 1;
-        scaling_factor = std::max(scaling_factor, (double)std::pow(std::ceil(std::log10(PA.ComputeMaxRadius())), 10));
-        scaling_factor = std::max(scaling_factor, (double)std::pow(std::ceil(std::log10(PB.ComputeMaxRadius())), 10));
-        float Scale = getVarList()->get<float>("clipper_scale") / scaling_factor;
-
-        vector<Vector3i> intPA = PA.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
-        vector<Vector3i> intPB = PB.ProjectToNormalPlane(x_axis, y_axis, origin, Scale);
-
-        ClipperLib::Path pathA, pathB;
-
-        for (int id = 0; id < intPA.size(); id++)
-        {
-            int x = intPA[id].x;
-            int y = intPA[id].y;
-            pathA.push_back(ClipperLib::IntPoint(x, y));
-        }
-
-        for (int id = 0; id < intPB.size(); id++) {
-            int x = intPB[id].x;
-            int y = intPB[id].y;
-            pathB.push_back(ClipperLib::IntPoint(x, y));
-        }
-
-        ClipperLib::Clipper solver;
-        solver.AddPath(pathA, ClipperLib::ptSubject, true);
-        solver.AddPath(pathB, ClipperLib::ptClip, true);
-        ClipperLib::Paths path_int;
-        solver.StrictlySimple(true);
-        solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
-        ClipperLib::ClipperOffset offset;
-        offset.AddPaths(path_int, ClipperLib::jtSquare, ClipperLib::etClosedPolygon);
-        offset.Execute(path_int, -100);
-        ClipperLib::SimplifyPolygons(path_int);
-        if (path_int.empty())
-            return;
-
-        for(int id = 0; id < path_int.size(); id++)
-        {
-            vector<Vector3f> polylist;
-            for (ClipperLib::IntPoint pt : path_int[id])
-            {
-                float x = pt.X / Scale;
-                float y = pt.Y / Scale;
-                Vector3f pos = x_axis * x + y_axis * y + origin;
-                polylist.push_back(pos);
-            }
-            cleanPath(polylist);
-            polyIntsec.push_back(polylist);
-        }
-
-        return;
-    }
-
-    void cleanPath(vector<Vector3f> &polyIntsec)
-    {
-        vector<Vector3f> polySimplest;
-        bool doAgain = true;
-        float big_zero_eps = FLOAT_ERROR_LARGE;
-
-
-        int N = polyIntsec.size();
-        //remove duplicate points first
-        for (int id = 0; id < polyIntsec.size(); id++) {
-
-            Vector3f ppt = polyIntsec[(id - 1 + N) % N];
-            Vector3f pt = polyIntsec[id];
-            Vector3f npt = polyIntsec[(id + 1) % N];
-            Vector3f tA = ppt - pt;
-            Vector3f tB = npt - pt;
-            if (len(tA) < big_zero_eps)
-            {
-                doAgain = true;
-                continue;
-            }
-            else {
-                polySimplest.push_back(pt);
-            }
-        }
-
-        //remove points in a same line
-        polyIntsec = polySimplest;
-        polySimplest.clear();
-        N = polyIntsec.size();
-        for(int id = 0; id < polyIntsec.size(); id++){
-            Vector3f ppt = polyIntsec[(id - 1 + N) % N];
-            Vector3f pt = polyIntsec[id];
-            Vector3f npt = polyIntsec[(id + 1) % N];
-            Vector3f tA = ppt - pt;
-            Vector3f tB = npt - pt;
-            double cross_product = len(tA CROSS tB) / len(tA) / len(tB);
-            if (cross_product > big_zero_eps) {
-                polySimplest.push_back(pt);
-            }
-        }
-        polyIntsec = polySimplest;
-    }
-
-    void ProjectPolygonTo3D(const vector<Vector3f> &poly, double *projMat, vector<Vector3f> &poly3D)
-    {
-        poly3D.clear();
-
-        for (int i = 0; i < poly.size(); i++)
-        {
-            Vector3f ver3D;
-            MultiplyPoint(poly[i], projMat, ver3D);
-            poly3D.push_back(ver3D);
-        }
-
-        return;
-    }
+    PolyVector3 projectTo3D(const ClipperLib::Path &path, Vector3 xaxis, Vector3 yaxis, Vector3 origin, Scalar scale);
 };
 
+template<typename Scalar>
+void PolyPolyBoolean<Scalar>::ComputePolygonsUnion(PolyPolyBoolean::PolysVector3 &polys,
+                                                   PolyPolyBoolean::PolysVector3 &polysUnion) {
+    polysUnion.clear();
+    if(polys.empty())return;
 
+    Vector3 x_axis, y_axis, origin;
+    computeFrame(polys[0], x_axis, y_axis, origin);
+
+    Scalar Scale = getVarList()->template get<float>("clipper_scale");
+
+    vector<ClipperLib::Path> clipperPaths;
+
+    for(int id = 0; id < polys.size(); id++)
+    {
+        ClipperLib::Path path;
+        path = projectToNormalPlane(polys[id], x_axis, y_axis, origin, Scale);
+
+        ClipperLib::ClipperOffset offsetter;
+        offsetter.AddPath(path, ClipperLib::jtSquare, ClipperLib::etClosedPolygon);
+        ClipperLib::Paths off_sol;
+        offsetter.Execute(off_sol, 10.0);
+        TopoASSERT(off_sol.empty() == false);
+        if(!off_sol.empty()) clipperPaths.push_back(off_sol[0]);
+    }
+
+    ClipperLib::Clipper solver;
+    solver.AddPaths(clipperPaths, ClipperLib::ptSubject, true);
+    ClipperLib::Paths path_union;
+    solver.Execute(ClipperLib::ctUnion, path_union, ClipperLib::pftNonZero, ClipperLib::pftNonZero);
+
+    if (path_union.empty())
+        return;
+
+    for(ClipperLib::Path path : path_union)
+    {
+        PolyVector3 polyUnion = projectTo3D(path, x_axis, y_axis, origin, Scale);
+        cleanPath(polyUnion);
+        polysUnion.push_back(polyUnion);
+    }
+
+    return;
+}
+
+template<typename Scalar>
+void PolyPolyBoolean<Scalar>::ComputePolygonsIntersection(const PolyPolyBoolean::PolyVector3 &polyA,
+                                                          const PolyPolyBoolean::PolyVector3 &polyB,
+                                                          PolyPolyBoolean::PolyVector3 &polyIntsec) {
+    PolysVector3 polylists;
+    ComputePolygonsIntersection(polyA, polyB, polylists);
+    if(!polylists.empty()){
+        polyIntsec = polylists[0];
+    }
+
+    return;
+}
+
+template<typename Scalar>
+void PolyPolyBoolean<Scalar>::printPolygon(const PolyPolyBoolean::PolyVector3 &poly) {
+    std::cout << "{";
+    for (int id = 0; id < poly.size(); id++) {
+        std::cout << "{" << poly[id].x << ", " << poly[id].y << "}, ";
+    }
+    std::cout << "}\n";
+}
+
+template<typename Scalar>
+void PolyPolyBoolean<Scalar>::ComputePolygonsIntersection(const PolyPolyBoolean::PolyVector3 &polyA,
+                                                          const PolyPolyBoolean::PolyVector3 &polyB,
+                                                          PolyPolyBoolean::PolysVector3 &polyIntsec) {
+    polyIntsec.clear();
+
+    Vector3 x_axis, y_axis, origin;
+    computeFrame(polyA, x_axis, y_axis, origin);
+
+    Scalar Scale = getVarList()->template get<float>("clipper_scale");
+
+    ClipperLib::Path pathA, pathB;
+    pathA = projectToNormalPlane(polyA, x_axis, y_axis, origin, Scale);
+    pathB = projectToNormalPlane(polyB, x_axis, y_axis, origin, Scale);
+
+    ClipperLib::Clipper solver;
+    solver.AddPath(pathA, ClipperLib::ptSubject, true);
+    solver.AddPath(pathB, ClipperLib::ptClip, true);
+    ClipperLib::Paths path_int;
+    solver.StrictlySimple(true);
+    solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
+    ClipperLib::ClipperOffset offset;
+    offset.AddPaths(path_int, ClipperLib::jtSquare, ClipperLib::etClosedPolygon);
+    offset.Execute(path_int, -100);
+    ClipperLib::SimplifyPolygons(path_int);
+    if (path_int.empty())
+        return;
+
+    for(int id = 0; id < path_int.size(); id++)
+    {
+        PolyVector3 polylist = projectTo3D(path_int[id], x_axis, y_axis, origin, Scale);
+        cleanPath(polylist);
+        polyIntsec.push_back(polylist);
+    }
+
+    return;
+}
+
+template<typename Scalar>
+void PolyPolyBoolean<Scalar>::cleanPath(PolyPolyBoolean::PolyVector3 &polyIntsec)
+{
+    PolyVector3 polySimplest;
+    bool doAgain = true;
+    float big_zero_eps = FLOAT_ERROR_LARGE;
+
+
+    int N = polyIntsec.size();
+    //remove duplicate points first
+    for (int id = 0; id < polyIntsec.size(); id++) {
+
+        Vector3 ppt = polyIntsec[(id - 1 + N) % N];
+        Vector3 pt = polyIntsec[id];
+        Vector3 npt = polyIntsec[(id + 1) % N];
+        Vector3 tA = ppt - pt;
+        Vector3 tB = npt - pt;
+        if (tA.norm() < big_zero_eps)
+        {
+            doAgain = true;
+            continue;
+        }
+        else {
+            polySimplest.push_back(pt);
+        }
+    }
+
+    //remove points in a same line
+    polyIntsec = polySimplest;
+    polySimplest.clear();
+    N = polyIntsec.size();
+    for(int id = 0; id < polyIntsec.size(); id++){
+        Vector3 ppt = polyIntsec[(id - 1 + N) % N];
+        Vector3 pt = polyIntsec[id];
+        Vector3 npt = polyIntsec[(id + 1) % N];
+        Vector3 tA = ppt - pt;
+        Vector3 tB = npt - pt;
+        double cross_product = (tA.cross(tB)).norm() / tA.norm() / tB.norm();
+        if (cross_product > big_zero_eps) {
+            polySimplest.push_back(pt);
+        }
+    }
+    polyIntsec = polySimplest;
+}
+
+template<typename Scalar>
+void PolyPolyBoolean<Scalar>::computeFrame(const PolyPolyBoolean::PolyVector3 &poly, PolyPolyBoolean::Vector3 &xaxis,
+                                           PolyPolyBoolean::Vector3 &yaxis, PolyPolyBoolean::Vector3 &origin) {
+    Vector3 normal = computeNormal(poly);
+    Vector3 center = computeCenter(poly);
+
+    xaxis = normal.cross(Vector3(1, 0, 0));
+    if(xaxis.norm() < FLOAT_ERROR_LARGE)
+        xaxis = normal.cross(Vector3(0, 1, 0));
+    xaxis.normalize();
+
+    yaxis = normal.cross(xaxis);
+    yaxis.normalize();
+
+    origin = center;
+
+    return;
+}
+
+template<typename Scalar>
+Matrix<Scalar, 3, 1> PolyPolyBoolean<Scalar>::computeNormal(const PolyPolyBoolean::PolyVector3 &poly)
+{
+    Vector3 normal(0, 0 ,0), center(0, 0, 0);
+    center = computeCenter(poly);
+
+    for(int id = 0; id < poly.size() - 1; id++){
+        normal += (poly[id] - center).cross(poly[id + 1] - center);
+    }
+    if(normal.norm() < FLOAT_ERROR_LARGE)
+        return Vector3(0, 0, 0);
+
+    return normal.normalized();
+}
+
+template<typename Scalar>
+Matrix<Scalar, 3, 1> PolyPolyBoolean<Scalar>::computeCenter(const PolyPolyBoolean::PolyVector3 &poly) {
+    Vector3 center(0, 0, 0);
+
+    for(int id = 0; id < poly.size() - 1; id++){
+        center += poly[id];
+    }
+    if(!poly.empty())
+        center /= poly.size();
+    else
+        center = Vector3(0, 0, 0);
+
+    return center;
+}
+
+template<typename Scalar>
+ClipperLib::Path
+PolyPolyBoolean<Scalar>::projectToNormalPlane(  const PolyPolyBoolean::PolyVector3 &poly,
+                                                PolyPolyBoolean::Vector3 xaxis,
+                                                PolyPolyBoolean::Vector3 yaxis,
+                                                PolyPolyBoolean::Vector3 origin,
+                                                Scalar Scale) {
+    ClipperLib::Path path;
+    for(int id = 0; id < poly.size(); id++)
+    {
+        Vector3 pos = poly[id];
+        int x = (int)((pos - origin).dot(xaxis) * Scale);
+        int y = (int)((pos - origin).dot(yaxis) * Scale);
+        path.push_back(ClipperLib::IntPoint(x, y));
+    }
+
+    return path;
+}
+
+template<typename Scalar>
+vector<Matrix<Scalar, 3, 1>>
+PolyPolyBoolean<Scalar>::projectTo3D(const ClipperLib::Path &path,
+                                     PolyPolyBoolean::Vector3 xaxis,
+                                     PolyPolyBoolean::Vector3 yaxis,
+                                     PolyPolyBoolean::Vector3 origin,
+                                     Scalar Scale) {
+
+    PolyVector3 poly;
+    for(int id = 0; id < path.size(); id++)
+    {
+        float x = path[id].X / Scale;
+        float y = path[id].Y / Scale;
+        Vector3 pos = xaxis * x + yaxis * y + origin;
+        poly.push_back(pos);
+    }
+
+    return poly;
+}
 
 
 #endif
