@@ -83,6 +83,32 @@ public:
 
     Vector3 operator [](int index) const{return vers.at(index).pos;}
 
+    vector<Vector3> getVertices()
+    {
+        vector<Vector3> vertices;
+        for (int i = 0; i < vers.size(); i++)
+            vertices.push_back( vers[i].pos );
+        return vertices;
+    }
+
+    vector<Vector2> getVerticesTex()
+    {
+        vector<Vector2> vertices;
+        for (int i = 0; i < vers.size(); i++)
+        {
+            vertices.push_back( vers[i].texCoord );
+        }
+        return vertices;
+    }
+
+    void setDistance(int _dist){dist = _dist;}
+
+    int getDistance(){return dist;}
+
+    void setPolyType(float _polyType){polyType = _polyType;}
+
+    int getPolyType(){return polyType;}
+
 public:
 
     // Compute Properties
@@ -99,25 +125,26 @@ public:
     Scalar computeMaxRadius();
 
     void computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &origin);
+
 public:
 
-	// Access Operations
-	void SetDistance(int _dist);
-	int GetDistance();
-	void SetPolyType(float _polyType);
-	int GetPolyType();
-	vector<Vector3> GetVertices();
-	vector<Vector2> GetVerticesTex();
+    // Polygon Operations
+    
+	void convertToTriangles(vector<pTriangle> &tris);
 
-	// Polygon Operations
-	void Convert2Triangles(vector<pTriangle> &out);
-	int GetVertexIndexInList(Vector3 tagtVerPos);
+	int getPtVerID(Vector3 point);
+
+public:
 
 	// Transforms
-	void Translate(Vector3 transVec);
-	vector<Vector3> ProjectPolygonTo2D(double projMat[]);
-	void ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[]);
-	vector<Vector3i> ProjectToNormalPlane(Vector3 x_axis, Vector3 y_axis, Vector3 origin, float Scale);
+	
+	void executeTranslation(Vector3 transVec);
+
+//	vector<Vector3> ProjectPolygonTo2D(double projMat[]);
+//
+//	void ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[]);
+//
+//	vector<Vector3i> ProjectToNormalPlane(Vector3 x_axis, Vector3 y_axis, Vector3 origin, float Scale);
 };
 
 #include "Polygon.cpp"

@@ -233,12 +233,9 @@ Scalar _Polygon<Scalar>::computeArea()
 	Scalar signedArea = 0;
 	for (int i = 0; i < vers.size(); i++)
 	{
-		Vector3 crossVec;
-
-		if ( i < vers.size()-1 )    crossVec = vers[i].pos.cross(vers[i + 1].pos);
-		else                        crossVec = vers[i].pos.cross(vers[0].pos);
-
-		signedArea += 0.5f * (normal.dot(crossVec));
+        Vector3 currVer = vers[i].pos;
+        Vector3 nextVer = vers[(i + 1) % vers.size()].pos;
+		signedArea += 0.5 * (normal.dot(currVer.cross(nextVer)));
 	}
 
 	return std::abs( signedArea );
@@ -253,9 +250,7 @@ Scalar _Polygon<Scalar>::computeAverageEdge()
 	{
 		Vector3 currVer = vers[i].pos;
 		Vector3 nextVer = vers[(i + 1) % vers.size()].pos;
-		float edgeLen = len(nextVer - currVer);
-
-		avgEdgeLen += edgeLen;
+        avgEdgeLen += (nextVer - currVer).norm();
 	}
 
 	avgEdgeLen /= vers.size();
@@ -271,7 +266,7 @@ Scalar _Polygon<Scalar>::computeMaxRadius()
     Vector3 origin = computeCenter();
     for (int i = 0; i < vers.size(); i++)
     {
-        MaxRadius = std::max(len(vers[i].pos - origin), MaxRadius);
+        MaxRadius = std::max((vers[i].pos - origin).norm(), MaxRadius);
     }
     return MaxRadius;
 }
@@ -283,7 +278,7 @@ void _Polygon<Scalar>::computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &o
     origin = computeCenter();
 
 	x_axis = normal.cross(Vector3(1, 0, 0));
-	if(len(x_axis) < FLOAT_ERROR_LARGE)
+	if(x_axis.norm() < FLOAT_ERROR_LARGE)
 	    x_axis = normal.cross(Vector3(0, 1, 0));
 	x_axis.normalize();
 
@@ -297,59 +292,7 @@ void _Polygon<Scalar>::computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &o
 //**************************************************************************************//
 
 template <typename Scalar>
-void _Polygon<Scalar>::SetDistance(int _dist)
-{
-	dist = _dist;
-}
-
-template <typename Scalar>
-int _Polygon<Scalar>::GetDistance()
-{
-	return dist;
-}
-
-template <typename Scalar>
-void _Polygon<Scalar>::SetPolyType(float _polyType)
-{
-	polyType = _polyType;
-}
-
-template <typename Scalar>
-int _Polygon<Scalar>::GetPolyType()
-{
-	return polyType;
-}
-
-template <typename Scalar>
-vector<Matrix<Scalar, 3, 1>> _Polygon<Scalar>::GetVertices()
-{
-	vector<Vector3> vertices;
-
-	for (int i = 0; i < vers.size(); i++)
-	{
-		vertices.push_back( vers[i].pos );
-	}
-
-	return vertices;
-}
-
-template <typename Scalar>
-vector<Matrix<Scalar, 2, 1>> _Polygon<Scalar>::GetVerticesTex() {
-	vector<Vector2> vertices;
-
-	for (int i = 0; i < vers.size(); i++)
-	{
-		vertices.push_back( vers[i].texCoord );
-	}
-	return vertices;
-}
-
-//**************************************************************************************//
-//                                  Polygon Operations
-//**************************************************************************************//
-
-template <typename Scalar>
-void _Polygon<Scalar>::Convert2Triangles(vector<pTriangle> &tris)
+void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris)
 {
     if(vers.size() < 3)
         return;
@@ -368,11 +311,11 @@ void _Polygon<Scalar>::Convert2Triangles(vector<pTriangle> &tris)
 }
 
 template <typename Scalar>
-int _Polygon<Scalar>::GetVertexIndexInList(Vector3 tagtVerPos)
+int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point)
 {
 	for (int i = 0; i < vers.size(); i++)
 	{
-		float dist = len(tagtVerPos - vers[i].pos);
+		Scalar dist = (point - vers[i].pos).norm();
 
 		// Note: this threshold depends on the scale of elements
 		if (dist < FLOAT_ERROR_LARGE)
@@ -392,7 +335,7 @@ int _Polygon<Scalar>::GetVertexIndexInList(Vector3 tagtVerPos)
 //**************************************************************************************//
 
 template <typename Scalar>
-void _Polygon<Scalar>::Translate(Vector3 transVec)
+void _Polygon<Scalar>::executeTranslation(Vector3 transVec)
 {
 	for (int i = 0; i < vers.size(); i++)
 	{
@@ -402,21 +345,21 @@ void _Polygon<Scalar>::Translate(Vector3 transVec)
 	center += transVec;
 }
 
-template <typename Scalar>
-vector<Matrix<Scalar, 3, 1>> _Polygon<Scalar>::ProjectPolygonTo2D(double projMat[])
-{
-	vector<Vector3> poly2D;
-
-	for (int i = 0; i < vers.size(); i++)
-	{
-		Vector3 ver2D;
-		MultiplyPoint( vers[i].pos, projMat, ver2D);
-
-		poly2D.push_back( ver2D );
-	}
-
-	return poly2D;
-}
+//template <typename Scalar>
+//vector<Matrix<Scalar, 3, 1>> _Polygon<Scalar>::ProjectPolygonTo2D(double projMat[])
+//{
+//	vector<Vector3> poly2D;
+//
+//	for (int i = 0; i < vers.size(); i++)
+//	{
+//		Vector3 ver2D;
+//		MultiplyPoint( vers[i].pos, projMat, ver2D);
+//
+//		poly2D.push_back( ver2D );
+//	}
+//
+//	return poly2D;
+//}
 
 //template <typename Scalar>
 //vector<Eigen::Vector3i> _Polygon<Scalar>::ProjectToNormalPlane(Vector3 x_axis, Vector3 y_axis, Vector3 origin, float Scale)
