@@ -170,7 +170,7 @@ add_subdirectory(ext/Catch2)
 include(CTest)
 include(ParseAndAddCatchTests)
 
-file(GLOB testTopoFiles test/Mesh/*.cpp)
+file(GLOB testTopoFiles test/Mesh/Test_Cross.cpp)
 
 set(testTopoFiles ${testTopoFiles} test/Test_Main.cpp)
 

@@ -58,9 +58,12 @@ public:
 public:
 
     Cross(const Cross &Cross);
+
     Cross(std::shared_ptr<InputVarList> var);
-	~Cross();
-	void Print();
+
+    ~Cross();
+
+	virtual void print();
 
 public:
     //edge tilt normal
@@ -68,7 +71,7 @@ public:
 	/*!
 	 * \brief Compute Initial Tilt Normal, the rotation angle is 0.
 	 */
-	void InitTiltNormals();
+	void initTiltNormals();
 
 	/*!
 	 * \brief: Initially update all oriPoints in this cross \n

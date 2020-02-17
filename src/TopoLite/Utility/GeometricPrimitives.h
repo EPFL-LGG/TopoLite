@@ -164,11 +164,11 @@ struct Plane
 
 	Plane & operator=(const Plane &plane);
 
-	Scalar PointPlaneDistance(Vector3 tagtPt);
-	int PointPlaneIntersect(Vector3 tagtPt);
+	Scalar computePtPtDistance(Vector3 tagtPt);
+	int computePtPlnIntersec(Vector3 tagtPt);
 
-	int LinePlaneIntersect(Line<Scalar> line);
-	int LineIntersectPoint(Line<Scalar> line, Vector3 &crossPt);
+	int checkLnPlnIntersec(Line<Scalar> line);
+	int computeLnLnIntersec(Line<Scalar> line, Vector3 &crossPt);
 };
 
 template<typename Scalar>
@@ -185,7 +185,7 @@ Plane<Scalar> & Plane<Scalar>::operator=(const Plane<Scalar> &plane)
 }
 
 template<typename Scalar>
-Scalar Plane<Scalar>::PointPlaneDistance(Vector3 tagtPt)
+Scalar Plane<Scalar>::computePtPtDistance(Vector3 tagtPt)
 {
     Vector3 tagtvec = tagtPt - point;
 
@@ -197,7 +197,7 @@ Scalar Plane<Scalar>::PointPlaneDistance(Vector3 tagtPt)
 
 
 template<typename Scalar>
-int Plane<Scalar>::PointPlaneIntersect(Vector3 tagtPt)
+int Plane<Scalar>::computePtPlnIntersec(Vector3 tagtPt)
 {
     Vector3 vec = tagtPt - point;
     Scalar dotP = normal.dot(vec);
@@ -210,10 +210,10 @@ int Plane<Scalar>::PointPlaneIntersect(Vector3 tagtPt)
 }
 
 template<typename Scalar>
-int Plane<Scalar>::LinePlaneIntersect(Line<Scalar> line)
+int Plane<Scalar>::checkLnPlnIntersec(Line<Scalar> line)
 {
-    int pt1State = PointPlaneIntersect( line.point1 );
-    int pt2State = PointPlaneIntersect( line.point2 );
+    int pt1State = computePtPlnIntersec(line.point1);
+    int pt2State = computePtPlnIntersec(line.point2);
 
     if ( pt1State == POINT_PLANE_POSITIVE_SIDE &&
          pt2State == POINT_PLANE_POSITIVE_SIDE )
@@ -229,10 +229,10 @@ int Plane<Scalar>::LinePlaneIntersect(Line<Scalar> line)
 }
 
 template<typename Scalar>
-int Plane<Scalar>::LineIntersectPoint(Line<Scalar> line, Vector3 &crossPt)
+int Plane<Scalar>::computeLnLnIntersec(Line<Scalar> line, Vector3 &crossPt)
 {
     // Check if the line intersects the plane
-    int state = LinePlaneIntersect( line );
+    int state = checkLnPlnIntersec( line );
     if ( state != LINE_PLANE_INTERSECT )
     {
         //printf("Warning: Line does not intersect with the plane. \n");
@@ -275,15 +275,15 @@ public:
 public:
 	Box();
 	Box & operator=(const Box &box);
-	void PrintBox();
+	void print();
 
-	void GetCenter();
-	void GetSize();
+	void computeCenter();
+	void computeSize();
 
-	void Transform(Vector3 transVec, Vector3 scale);
+	void executeTransform(Vector3 transVec, Vector3 scale);
 
 	//if this box degenerates into a quad plane, compute its area.
-	Scalar GetQuadArea();
+	Scalar computeQuadArea();
 };
 
 template<typename Scalar>
@@ -309,25 +309,25 @@ Box<Scalar> & Box<Scalar>::operator=(const Box &box)
 }
 
 template<typename Scalar>
-void Box<Scalar>::PrintBox()
+void Box<Scalar>::print()
 {
     printf("Box: [%7.3f  %7.3f  %7.3f]      [%7.3f  %7.3f  %7.3f] \n", minPt.x(), minPt.y(), minPt.z(), maxPt.x(), maxPt.y(), maxPt.z());
 }
 
 template<typename Scalar>
-void Box<Scalar>::GetCenter()
+void Box<Scalar>::computeCenter()
 {
     cenPt = 0.5f * ( minPt + maxPt );
 }
 
 template<typename Scalar>
-void Box<Scalar>::GetSize()
+void Box<Scalar>::computeSize()
 {
     size = maxPt - minPt;
 }
 
 template<typename Scalar>
-void Box<Scalar>::Transform(Vector3 transVec, Vector3 scale)
+void Box<Scalar>::executeTransform(Vector3 transVec, Vector3 scale)
 {
     minPt.x() *= scale.x();  minPt.y() *= scale.y();  minPt.z() *= scale.z();
     maxPt.x() *= scale.x();  maxPt.y() *= scale.y();  maxPt.z() *= scale.z();
@@ -340,7 +340,7 @@ void Box<Scalar>::Transform(Vector3 transVec, Vector3 scale)
 }
 
 template<typename Scalar>
-Scalar Box<Scalar>::GetQuadArea()
+Scalar Box<Scalar>::computeQuadArea()
 {
     Vector3 dimen = maxPt - minPt;
     Scalar quadArea = 0;
@@ -365,38 +365,54 @@ Scalar Box<Scalar>::GetQuadArea()
 template <typename Scalar>
 struct Triangle
 {
+public:
     typedef Matrix<Scalar,3, 1> Vector3;
+
+public:
+
     Vector3 v[3];
+
     Vector3 normal;
-	Scalar area;            // Face area
-    Vector3 center;
+
+    Scalar area;            // Face area
+
+	Vector3 center;
 
 	int vIndices[3];       // Index of each vertex
 
-	void Init(Vector3 _v0, Vector3 _v1, Vector3 _v2);
+public:
+
+	void init(Vector3 _v0, Vector3 _v1, Vector3 _v2);
+
 	Triangle & operator=(const Triangle &tri);
-	bool IsEqual(const Triangle<Scalar> &tri);
-	void PrintTriangle();
 
-	Vector3 GetBBoxMinPt();
-	Vector3 GetBBoxMaxPt();
+	bool checkEqual(const Triangle<Scalar> &tri);
 
-	void ComputeCenter();
-	void ComputeArea();
-	void ComputeNormal();
-	void CorrectNormal(Vector3 tagtNormal);
+	void print();
+
+	Vector3 computeBBoxMinPt();
+
+	Vector3 computeBBoxMaxPt();
+
+	void computeCenter();
+
+	void computeArea();
+
+	void computeNormal();
+
+	void correctNormal(Vector3 tagtNormal);
 };
 
 template<typename Scalar>
-void Triangle<Scalar>::Init(Vector3 _v0, Vector3 _v1, Vector3 _v2)
+void Triangle<Scalar>::init(Vector3 _v0, Vector3 _v1, Vector3 _v2)
 {
     v[0] = _v0;
     v[1] = _v1;
     v[2] = _v2;
 
-    ComputeCenter();
-    ComputeArea();
-    ComputeNormal();
+    computeCenter();
+    computeArea();
+    computeNormal();
 }
 
 template<typename Scalar>
@@ -419,7 +435,7 @@ Triangle<Scalar> & Triangle<Scalar>::operator=(const Triangle &tri)
 }
 
 template<typename Scalar>
-bool Triangle<Scalar>::IsEqual(const Triangle<Scalar> &tri)
+bool Triangle<Scalar>::checkEqual(const Triangle<Scalar> &tri)
 {
     if( this->v[0] == tri.v[0] &&
         this->v[1] == tri.v[1] &&
@@ -434,7 +450,7 @@ bool Triangle<Scalar>::IsEqual(const Triangle<Scalar> &tri)
 }
 
 template<typename Scalar>
-void Triangle<Scalar>::PrintTriangle()
+void Triangle<Scalar>::print()
 {
     printf("v0: [%.12f %.12f %.12f] \n", v[0].x(), v[0].y(), v[0].z());
     printf("v1: [%.12f %.12f %.12f] \n", v[1].x(), v[1].y(), v[1].z());
@@ -443,7 +459,7 @@ void Triangle<Scalar>::PrintTriangle()
 }
 
 template<typename Scalar>
-Matrix<Scalar, 3, 1> Triangle<Scalar>::GetBBoxMinPt()
+Matrix<Scalar, 3, 1> Triangle<Scalar>::computeBBoxMinPt()
 {
     Vector3 bboxMinPt;
 
@@ -454,7 +470,7 @@ Matrix<Scalar, 3, 1> Triangle<Scalar>::GetBBoxMinPt()
     return bboxMinPt;
 }
 template<typename Scalar>
-Matrix<Scalar, 3, 1> Triangle<Scalar>::GetBBoxMaxPt()
+Matrix<Scalar, 3, 1> Triangle<Scalar>::computeBBoxMaxPt()
 {
     Vector3 bboxMaxPt;
 
@@ -466,20 +482,20 @@ Matrix<Scalar, 3, 1> Triangle<Scalar>::GetBBoxMaxPt()
 }
 
 template<typename Scalar>
-void Triangle<Scalar>::ComputeCenter()
+void Triangle<Scalar>::computeCenter()
 {
     center = (v[0] + v[1] + v[2]) / 3.0;
 }
 
 template<typename Scalar>
-void Triangle<Scalar>::ComputeArea()
+void Triangle<Scalar>::computeArea()
 {
     Vector3 normal  = (v[1] - v[0]).cross(v[2] - v[0]);
     area  = 0.5f * normal.norm();
 }
 
 template<typename Scalar>
-void Triangle<Scalar>::ComputeNormal()
+void Triangle<Scalar>::computeNormal()
 {
     Vector3 tempNor = (v[1] - v[0]).cross(v[2] - v[0]);  // Assume the vertices are saved in counter-clockwise
     Scalar tempNorLen = tempNor.norm();
@@ -491,10 +507,10 @@ void Triangle<Scalar>::ComputeNormal()
 }
 
 template<typename Scalar>
-void Triangle<Scalar>::CorrectNormal(Vector3 tagtNormal)
+void Triangle<Scalar>::correctNormal(Vector3 tagtNormal)
 {
     // Compute initial normal
-    ComputeNormal();
+    computeNormal();
 
     // Rearrange vertex order if needed
     Scalar dotp = normal.dot(tagtNormal);
@@ -512,7 +528,7 @@ void Triangle<Scalar>::CorrectNormal(Vector3 tagtNormal)
     }
 
     // Recompute the normal
-    ComputeNormal();
+    computeNormal();
 }
 
 ////////////////////////////////////////////
@@ -565,12 +581,12 @@ public:
 		tilt_range[1] = 180;
 	};
 
-	void update_rotation(Scalar _angle)
+	void updateRotation(Scalar _angle)
 	{
 		rotation_angle = _angle;
 	}
 
-	void Print()
+	void print()
 	{
 		printf("point: [%6.3f %6.3f %6.3f]   normal: [%6.3f %6.3f %6.3f] \n", point[0], point[1], point[2], normal[0], normal[1], normal[2]);
 		printf("rotation_axis: [%6.3f %6.3f %6.3f]   rotation_angle: [%6.3f] \n", rotation_axis[0], rotation_axis[1], rotation_axis[2], rotation_angle);

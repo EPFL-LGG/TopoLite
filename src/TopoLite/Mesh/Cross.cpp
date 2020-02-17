@@ -43,12 +43,12 @@ Cross<Scalar>::Cross(const Cross &_cross) : _Polygon<Scalar>(_cross), TopoObject
 }
 
 template <typename Scalar>
-void Cross<Scalar>::Print()
+void Cross<Scalar>::print()
 {
 	printf("oriPoints num: %lu \n", oriPoints.size());
 	for (int i = 0; i < oriPoints.size(); i++)
 	{
-        oriPoints[i]->Print();
+        oriPoints[i]->print();
 	}
 	printf("\n");
 }
@@ -58,7 +58,7 @@ void Cross<Scalar>::Print()
 //**************************************************************************************//
 
 template <typename Scalar>
-void Cross<Scalar>::InitTiltNormals()
+void Cross<Scalar>::initTiltNormals()
 {
 	oriPoints.clear();
 

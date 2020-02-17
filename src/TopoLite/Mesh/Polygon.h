@@ -67,7 +67,7 @@ public:
 
     //Mimic the vector class
 
-    void print();
+    virtual void print();
 
     void clear(){
         vers.clear();

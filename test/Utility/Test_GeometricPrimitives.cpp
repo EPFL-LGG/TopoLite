@@ -28,43 +28,43 @@ TEST_CASE("GeometricPrimitives Plane")
     plane.normal = Vector3d(1, 0 ,0);
 
     Vector3d vec;
-    SECTION("PointPlaneDistance"){
+    SECTION("computePtPtDistance"){
         vec = Vector3d(1, 0 ,0);
-        REQUIRE(plane.PointPlaneDistance(vec) == 1);
+        REQUIRE(plane.computePtPtDistance(vec) == 1);
         vec = Vector3d(-1, 0 ,0);
-        REQUIRE(plane.PointPlaneDistance(vec) == 1);
+        REQUIRE(plane.computePtPtDistance(vec) == 1);
     }
 
-    SECTION("PointPlaneIntersect"){
+    SECTION("computePtPlnIntersec"){
         vec = Vector3d(1.1e-7, 0 ,0);
-        REQUIRE(plane.PointPlaneIntersect(vec) == POINT_PLANE_POSITIVE_SIDE);
+        REQUIRE(plane.computePtPlnIntersec(vec) == POINT_PLANE_POSITIVE_SIDE);
         vec = Vector3d(-1.1e-7, 0 ,0);
-        REQUIRE(plane.PointPlaneIntersect(vec) == POINT_PLANE_NEGATIVE_SIDE);
+        REQUIRE(plane.computePtPlnIntersec(vec) == POINT_PLANE_NEGATIVE_SIDE);
         vec = Vector3d(0.9e-7, 0 ,0);
-        REQUIRE(plane.PointPlaneIntersect(vec) == POINT_PLANE_INTERSECT);
+        REQUIRE(plane.computePtPlnIntersec(vec) == POINT_PLANE_INTERSECT);
         vec = Vector3d(-0.9e-7, 0 ,0);
-        REQUIRE(plane.PointPlaneIntersect(vec) == POINT_PLANE_INTERSECT);
+        REQUIRE(plane.computePtPlnIntersec(vec) == POINT_PLANE_INTERSECT);
     }
 
-    SECTION("LinePlaneIntersect"){
+    SECTION("checkLnPlnIntersec"){
         Vector3d pt1(1, 0, 0);
         Vector3d pt2(-2, -1, 0);
         Line<double> line (pt1, pt2);
-        REQUIRE(plane.LinePlaneIntersect(line) == LINE_PLANE_INTERSECT);
+        REQUIRE(plane.checkLnPlnIntersec(line) == LINE_PLANE_INTERSECT);
 
         pt2 = Vector3d(2, -1, 0);
         line = Line<double>(pt1, pt2);
-        REQUIRE(plane.LinePlaneIntersect(line) == LINE_PLANE_POSITIVE_SIDE);
+        REQUIRE(plane.checkLnPlnIntersec(line) == LINE_PLANE_POSITIVE_SIDE);
     }
 
-    SECTION("LineIntersectPoint")
+    SECTION("computeLnLnIntersec")
     {
         Vector3d pt1(1, 0, 0);
         Vector3d pt2(-2, -1, 0);
         Line<double> line (pt1, pt2);
 
         Vector3d intersec(0, 0, 0);
-        REQUIRE(plane.LineIntersectPoint(line, intersec) == LINE_PLANE_INTERSECT);
+        REQUIRE(plane.computeLnLnIntersec(line, intersec) == LINE_PLANE_INTERSECT);
         REQUIRE(intersec[0] == 0);
         REQUIRE(intersec[1] ==  Approx(-1.0/3));
     }
@@ -74,83 +74,83 @@ TEST_CASE("Box"){
     Box<double> box;
     box.minPt = Vector3d(0, 0, 0);
     box.maxPt = Vector3d(1, 1, 1);
-    box.GetCenter();
-    box.GetSize();
-    SECTION("PrintBox"){
-        box.PrintBox();
+    box.computeCenter();
+    box.computeSize();
+    SECTION("print"){
+        box.print();
     }
 
-    SECTION("GetCenter"){
+    SECTION("computeCenter"){
         REQUIRE(box.cenPt.x() == 0.5);
         REQUIRE(box.cenPt.y() == 0.5);
         REQUIRE(box.cenPt.z() == 0.5);
     }
 
-    SECTION("GetSize"){
+    SECTION("computeSize"){
         REQUIRE(box.size.x() == 1);
         REQUIRE(box.size.y() == 1);
         REQUIRE(box.size.z() == 1);
     }
 
-    SECTION("Transform"){
-        box.Transform(Vector3d(1, 1.5, 2.5), Vector3d(2, 3, 4));
+    SECTION("executeTransform"){
+        box.executeTransform(Vector3d(1, 1.5, 2.5), Vector3d(2, 3, 4));
         REQUIRE(box.cenPt.x() == 2);
         REQUIRE(box.cenPt.y() == 3);
         REQUIRE(box.cenPt.z() == 4.5);
     }
 
-    SECTION("GetQuadArea"){
+    SECTION("computeQuadArea"){
         box.maxPt = Vector3d(1, 1, 1.1e-7);
-        REQUIRE(box.GetQuadArea() == 0);
+        REQUIRE(box.computeQuadArea() == 0);
 
         box.maxPt = Vector3d(1, 1, 0.9e-7);
-        REQUIRE(box.GetQuadArea() == 1);
+        REQUIRE(box.computeQuadArea() == 1);
     }
 }
 
 TEST_CASE("Triangle"){
     Triangle<double> tri;
 
-    tri.Init(Vector3d(1, 0, 0), Vector3d(0, 1, 0), Vector3d(0, 0, 1));
+    tri.init(Vector3d(1, 0, 0), Vector3d(0, 1, 0), Vector3d(0, 0, 1));
 
-    SECTION("IsEqual"){
-        REQUIRE(tri.IsEqual(tri) == true);
+    SECTION("checkEqual"){
+        REQUIRE(tri.checkEqual(tri) == true);
     }
 
-    SECTION("PrintTriangle"){
-        tri.PrintTriangle();
+    SECTION("print"){
+        tri.print();
     }
 
-    SECTION("GetBBoxMinPt"){
-        Vector3d bbox = tri.GetBBoxMinPt();
+    SECTION("computeBBoxMinPt"){
+        Vector3d bbox = tri.computeBBoxMinPt();
         CHECK(bbox.x() == 0);
         CHECK(bbox.y() == 0);
         CHECK(bbox.z() == 0);
     }
 
-    SECTION("GetBBoxMaxPt"){
-        Vector3d bbox = tri.GetBBoxMaxPt();
+    SECTION("computeBBoxMaxPt"){
+        Vector3d bbox = tri.computeBBoxMaxPt();
         CHECK(bbox.x() == 1);
         CHECK(bbox.y() == 1);
         CHECK(bbox.z() == 1);
     }
 
-    SECTION("ComputeCenter"){
+    SECTION("computeCenter"){
         CHECK(tri.center.x() == Approx(1.0 / 3));
         CHECK(tri.center.y() == Approx(1.0 / 3));
         CHECK(tri.center.z() == Approx(1.0 / 3));
     }
 
-    SECTION("ComputeArea"){
+    SECTION("computeArea"){
         CHECK(tri.area == Approx(sqrt(3) / 2));
     }
 
-    SECTION("ComputeNormal"){
+    SECTION("computeNormal"){
         CHECK((tri.normal - Vector3d(1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3))).norm() == Approx(0));
     }
 
-    SECTION("CorrectNormal"){
-        tri.CorrectNormal(Vector3d(-1, -1, -1));
+    SECTION("correctNormal"){
+        tri.correctNormal(Vector3d(-1, -1, -1));
         CHECK((tri.v[0] - Vector3d(1, 0, 0)).norm() == Approx(0));
         CHECK((tri.v[1] - Vector3d(0, 0, 1)).norm() == Approx(0));
         CHECK((tri.v[2] - Vector3d(0, 1, 0)).norm() == Approx(0));
