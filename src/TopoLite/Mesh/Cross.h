@@ -14,10 +14,10 @@
 #ifndef _CROSS_H
 #define _CROSS_H
 
-#include "TopoLite/Utility/vec.h"
 #include "TopoLite/Utility/GeometricPrimitives.h"
-#include "TopoLite/Mesh/Polygon.h"
 #include "TopoLite/Utility/TopoObject.h"
+
+#include "Polygon.h"
 
 #include <vector>
 #include <memory>
@@ -28,11 +28,17 @@ using std::weak_ptr;
 using std::shared_ptr;
 using std::make_shared;
 
-class Cross;
-using pCross = shared_ptr<Cross>;
-
-class Cross: public _Polygon, public TopoObject
+template<typename Scalar>
+class Cross: public _Polygon<Scalar>, public TopoObject
 {
+public:
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+
+    typedef Matrix<Scalar, 3 ,1> Vector3;
+
 public:
     //storage
 
@@ -40,9 +46,9 @@ public:
 
 	bool atBoundary;									//!< At Boundary or not
 
-	vector<weak_ptr<Cross>> neighbors;                  //!< Neighbors of the cross
+	vector<wpCross> neighbors;                  //!< Neighbors of the cross
 
-	vector<shared_ptr<OrientPoint>> oriPoints;            //!< A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
+	vector<shared_ptr<OrientPoint<Scalar>>> oriPoints;            //!< A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
 
 public:
     //temporary variables
@@ -86,7 +92,7 @@ public:
 	 * \param[in] rotAngle rotation angle
 	 * \return vector after rotation
 	 */
-    Vector3f RotateNormal(Vector3f normal, Vector3f rotAxis, float rotAngle);
+    Vector3 RotateNormal(Vector3 normal, Vector3 rotAxis, Scalar rotAngle);
 
 public:
     //neighbor
@@ -104,5 +110,7 @@ public:
 
 	int GetPrevEdgeID(int edgeID);
 };
+
+#include "Cross.cpp"
 
 #endif
