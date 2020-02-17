@@ -14,3 +14,11 @@ Release
 
 data\origin_data\PartGeometry\*.*
 data\origin_data\Simulation\*.*
+
+# Latex specific compilation files
+Documents/*.nav
+Documents/*.snm
+Documents/*.toc
+Documents/*.aux
+Documents/*.log
+Documents/*.dvi
