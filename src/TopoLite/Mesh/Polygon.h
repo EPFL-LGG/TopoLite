@@ -81,7 +81,13 @@ public:
 
     size_t size() const{return vers.size();}
 
-    Vector3 operator [](int index) const{return vers.at(index).pos;}
+    Vector3 operator [](int index) const{
+        if(vers.empty()) return Vector3(0, 0, 0);
+        else{
+            int rID = index % size();
+            return vers.at(rID).pos;
+        }
+    }
 
     vector<Vector3> getVertices()
     {

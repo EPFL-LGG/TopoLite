@@ -60,8 +60,13 @@ void Cross<Scalar>::print()
 template <typename Scalar>
 void Cross<Scalar>::initTiltNormals()
 {
-	oriPoints.clear();
 
+    //1) recompute normal and center for safety reason
+    oriPoints.clear();
+    _Polygon<Scalar>::computeNormal();
+    _Polygon<Scalar>::computeCenter();
+
+    //2)
 	const vector<_Vertex<Scalar>> &vers= _Polygon<Scalar>::vers;
 	const Vector3 &center = _Polygon<Scalar>::center;
     const Vector3 &normal = _Polygon<Scalar>::normal;
@@ -77,7 +82,7 @@ void Cross<Scalar>::initTiltNormals()
         Vector3 midPtDir = midPt - center;
 
 		// Average edge normal
-		Vector3f avgNormal;
+		Vector3 avgNormal;
 		if( neighbors.size() > 0 )
 		{
 			if ( neighbors[i].lock() != nullptr)    avgNormal = (normal + neighbors[i].lock()->normal) / 2.0f;
@@ -89,15 +94,12 @@ void Cross<Scalar>::initTiltNormals()
 		}
 
 		// Initial tilt normal (perpendicular to edge and edge normal; pointing outward)
-		Vector3f tiltNormal = edgeDir.cross(avgNormal);
+		Vector3 tiltNormal = edgeDir.cross(avgNormal).normalized();
 
-		float dotP = midPtDir.dot(tiltNormal);
-		if (dotP < 0 )
+		if (midPtDir.dot(tiltNormal) < 0 )
 		{
 			tiltNormal = -tiltNormal;
 		}
-
-		tiltNormal.normalize();
 
 		// Push back orientPoint
 		shared_ptr<OrientPoint<Scalar>> oriPoint =  make_shared<OrientPoint<Scalar>>(midPt, tiltNormal, edgeDir);
@@ -106,7 +108,7 @@ void Cross<Scalar>::initTiltNormals()
 }
 
 template <typename Scalar>
-void Cross<Scalar>::UpdateTiltNormal_Root(float tiltAngle)
+void Cross<Scalar>::updateTiltNormalsRoot(float tiltAngle)
 {
     const vector<_Vertex<Scalar>> &vers= _Polygon<Scalar>::vers;
     const Vector3 &center = _Polygon<Scalar>::center;
@@ -123,13 +125,12 @@ void Cross<Scalar>::UpdateTiltNormal_Root(float tiltAngle)
 		else               oriPoints[i]->tiltSign = TILT_SIGN_NEGATIVE;
 
 		float rotAngle = oriPoints[i]->tiltSign * tiltAngle;
-		oriPoints[i]->normal = RotateNormal(oriPoints[i]->rotation_base, edgeDir, rotAngle);
 		oriPoints[i]->update_rotation(rotAngle);
 	}
 }
 
 template <typename Scalar>
-void Cross<Scalar>::UpdateTiltNormal(float tiltAngle)
+void Cross<Scalar>::updateTiltNormals(float tiltAngle)
 {
 	//////////////////////////////////////////////////////////////////////
 	// 1. Update tilt normals for the edges shared with visited neighbors
@@ -234,19 +235,6 @@ void Cross<Scalar>::UpdateTiltNormal(float tiltAngle)
 		currEdgeID = nextEdgeID;
 	}
 }
-
-template <typename Scalar>
-Matrix<Scalar, 3 ,1> Cross<Scalar>::RotateNormal(Vector3 normal, Vector3 rotAxis, Scalar rotAngle)
-{
-    rotAngle = rotAngle / 180 * M_PI;
-    Eigen::Matrix<Scalar, 3, 3> mat, ux;
-    ux <<   0, -rotAxis.z(), rotAxis.y(),
-            rotAxis.z(), 0, -rotAxis.x(),
-            -rotAxis.y(), rotAxis.x(), 0;
-    mat = Eigen::Matrix3f::Identity() * std::cos(rotAngle) + ux * std::sin(rotAngle);
-    return mat * normal;
-}
-
 
 //**************************************************************************************//
 //                                 Compute Neighbor

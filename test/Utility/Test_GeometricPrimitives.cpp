@@ -157,3 +157,14 @@ TEST_CASE("Triangle"){
     }
 
 }
+
+TEST_CASE("OrientPoint")
+{
+    OrientPoint<double> oriPt(Vector3d(0, 0, 0), Vector3d(1, 0, 0), Vector3d(0, 1, 0));
+    oriPt.print();
+    oriPt.tiltSign = 1;
+    oriPt.updateAngle(10.0);
+    REQUIRE(oriPt.normal[0] == Approx(std::cos(10.0 * M_PI / 180)));
+    REQUIRE(oriPt.normal[1] == 0);
+    REQUIRE(oriPt.normal[2] == Approx(std::sin(-10.0 * M_PI / 180)));
+}

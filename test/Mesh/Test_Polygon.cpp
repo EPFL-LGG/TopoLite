@@ -39,32 +39,32 @@ TEST_CASE("Polygon")
     SECTION("the polygon has a simple input")
     {
         poly.push_back(Vector3d(0, 0, 0));
-        poly.push_back(Vector3d(1, 0, 0));
-        poly.push_back(Vector3d(1, 1, 0));
-        poly.push_back(Vector3d(0, 1, 0));
+        poly.push_back(Vector3d(2, 0, 0));
+        poly.push_back(Vector3d(2, 2, 0));
+        poly.push_back(Vector3d(0, 2, 0));
 
         SECTION("reverseVertices"){
             poly.reverseVertices();
 
             REQUIRE(poly.vers.size() == 4);
-            REQUIRE((poly.vers[1].pos - Vector3d(1, 1, 0)).norm() == Approx(0));
+            REQUIRE((poly.vers[1].pos - Vector3d(2, 2, 0)).norm() == Approx(0));
         }
 
         SECTION("checkEquality"){
             _Polygon<double> pB;
             pB.push_back(Vector3d(0, 0, 0));
-            pB.push_back(Vector3d(1, 0, 0));
-            pB.push_back(Vector3d(1, 1, 0));
-            pB.push_back(Vector3d(0, 1, 0));
+            pB.push_back(Vector3d(2, 0, 0));
+            pB.push_back(Vector3d(2, 2, 0));
+            pB.push_back(Vector3d(0, 2, 0));
             pB.reverseVertices();
 
             REQUIRE(poly.checkEquality(pB) == false);
 
             pB.clear();
-            pB.push_back(Vector3d(1, 1, 0));
-            pB.push_back(Vector3d(0, 1, 0));
+            pB.push_back(Vector3d(2, 2, 0));
+            pB.push_back(Vector3d(0, 2, 0));
             pB.push_back(Vector3d(0, 0, 0));
-            pB.push_back(Vector3d(1, 0, 0));
+            pB.push_back(Vector3d(2, 0, 0));
 
             REQUIRE(poly.checkEquality(pB) == true);
         }
@@ -74,27 +74,31 @@ TEST_CASE("Polygon")
         }
 
         SECTION("computeCenter"){
-            REQUIRE((poly.computeCenter() - Vector3d(0.5, 0.5, 0)).norm() < FLOAT_ERROR_SMALL);
+            REQUIRE((poly.computeCenter() - Vector3d(1, 1, 0)).norm()  == Approx(0.0));
         }
 
         SECTION("computeNormal"){
-            REQUIRE((poly.computeNormal() - Vector3d(0, 0, 1)).norm() < FLOAT_ERROR_SMALL);
+            REQUIRE((poly.computeNormal() - Vector3d(0, 0, 1)).norm()  == Approx(0.0));
+            REQUIRE((poly.normal - Vector3d(0, 0, 1)).norm() == Approx(0.0));
+            poly.reverseVertices();
+            poly.computeNormal();
+            REQUIRE((poly.normal - Vector3d(0, 0, -1)).norm() == Approx(0.0));
         }
 
         SECTION("computeFitedPlaneNormal"){
-            REQUIRE((poly.computeFitedPlaneNormal() - Vector3d(0, 0, 1)).norm() < FLOAT_ERROR_SMALL);
+            REQUIRE((poly.computeFitedPlaneNormal() - Vector3d(0, 0, 1)).norm()  == Approx(0.0));
         }
 
         SECTION("computeArea"){
-            REQUIRE(poly.computeArea() == Approx(1.0));
+            REQUIRE(poly.computeArea() == Approx(4.0));
         }
 
         SECTION("computeAverageEdge"){
-            REQUIRE(poly.computeAverageEdge() == Approx(1.0));
+            REQUIRE(poly.computeAverageEdge() == Approx(2.0));
         }
 
         SECTION("computeMaxRadius"){
-            REQUIRE(poly.computeMaxRadius() == Approx(sqrt(2)/2.0));
+            REQUIRE(poly.computeMaxRadius() == Approx(sqrt(2)));
         }
 
         SECTION("computeFrame")
@@ -112,15 +116,20 @@ TEST_CASE("Polygon")
         }
 
         SECTION("getPtVerID"){
-            REQUIRE(poly.getPtVerID(Vector3d(1, 1, 0)) == 2);
+            REQUIRE(poly.getPtVerID(Vector3d(2, 2, 0)) == 2);
         }
 
         SECTION("executeTranslation"){
             poly.executeTranslation(Vector3d(1, 1, 1));
-            REQUIRE((poly[1] - Vector3d(2, 1, 1)).norm() == Approx(0.0));
+            REQUIRE((poly[1] - Vector3d(3, 1, 1)).norm() == Approx(0.0));
         }
 
-
+        SECTION("operation []"){
+            //support circular index
+            REQUIRE((poly[-1] - Vector3d(0, 2, 0)).norm() == Approx(0.0));
+            REQUIRE((poly[1] - Vector3d(2, 0, 0)).norm() == Approx(0.0));
+            REQUIRE((poly[4] - Vector3d(0, 0, 0)).norm() == Approx(0.0));
+        }
     }
 }
 

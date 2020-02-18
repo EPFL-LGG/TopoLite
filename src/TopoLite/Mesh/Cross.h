@@ -39,6 +39,7 @@ public:
 
     typedef Matrix<Scalar, 3 ,1> Vector3;
 
+
 public:
     //storage
 
@@ -65,6 +66,15 @@ public:
 
 	virtual void print();
 
+    shared_ptr<OrientPoint<Scalar>> ori(int index)
+    {
+        if(oriPoints.empty()) return nullptr;
+        else{
+            int rID = index % oriPoints.size();
+            return oriPoints.at(rID);
+        }
+    }
+
 public:
     //edge tilt normal
 
@@ -78,7 +88,7 @@ public:
 	 * 1) alternatively update the sign by following the order as oriPoints \n
 	 * 2) the sign of first orient point is positive \n
 	 */
-	void UpdateTiltNormal_Root(float tiltAngle);
+	void updateTiltNormalsRoot(float tiltAngle);
 
 	/*!
 	 * \brief: Update oriPoints in this cross \n
@@ -86,16 +96,7 @@ public:
 	 * 2) The sign of some orient point could be changed in order to resolve conflict \n
 	 * 3) In odd polygon, neighboring orient point could have same sign
 	 */
-	void UpdateTiltNormal(float tiltAngle);
-
-	/*!
-	 * \brief: Compute vector rotation
-	 * \param[in] normal based vector
-	 * \param[in] rotAxis rotation axis
-	 * \param[in] rotAngle rotation angle
-	 * \return vector after rotation
-	 */
-    Vector3 RotateNormal(Vector3 normal, Vector3 rotAxis, Scalar rotAngle);
+	void updateTiltNormals(float tiltAngle);
 
 public:
     //neighbor

@@ -581,9 +581,29 @@ public:
 		tilt_range[1] = 180;
 	};
 
-	void updateRotation(Scalar _angle)
+    /*!
+    * \brief: Compute vector rotation
+    * \param[in] normal based vector
+    * \param[in] rotAxis rotation axis
+    * \param[in] rotAngle rotation angle
+    * \return vector after rotation
+    */
+    Vector3 rotateVecAroundAxis(Vector3 normal, Vector3 rotAxis, Scalar rotAngle)
+    {
+        rotAngle = rotAngle / 180 * M_PI;
+        Eigen::Matrix<Scalar, 3, 3> mat, ux;
+        ux <<   0, -rotAxis.z(), rotAxis.y(),
+                rotAxis.z(), 0, -rotAxis.x(),
+                -rotAxis.y(), rotAxis.x(), 0;
+        mat = Eigen::Matrix<Scalar, 3, 3>::Identity() * std::cos(rotAngle) + ux * std::sin(rotAngle);
+        return mat * normal;
+    }
+
+
+    void updateAngle(Scalar _angle)
 	{
 		rotation_angle = _angle;
+        normal = rotateVecAroundAxis(rotation_base, rotation_axis, rotation_angle * tiltSign);
 	}
 
 	void print()

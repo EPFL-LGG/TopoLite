@@ -157,7 +157,6 @@ template <typename Scalar>
 Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeNormal()
 {
 	computeCenter();
-
 	Vector3 tempNor(0, 0, 0);
 	for(int id = 0; id < vers.size() - 1; id++)
 	{
@@ -167,12 +166,10 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeNormal()
 	if(tempNor.norm() < FLOAT_ERROR_LARGE)
 	    return Vector3(0, 0, 0);
 
-	tempNor.normalize();
-	
+	//normal already normalized
 	computeFitedPlaneNormal();
 	
 	if(normal.dot(tempNor) < 0) normal *= -1;
-
 	return normal;
 }
 
@@ -221,7 +218,8 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal()
 		normal = Vector3(xy*yz - xz*yy, xy*xz - yz*xx, det_z);
 	};
 
-	return normal.normalized();
+	normal.normalize();
+	return normal;
 }
 
 template <typename Scalar>
