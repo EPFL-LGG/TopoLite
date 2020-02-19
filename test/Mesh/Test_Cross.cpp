@@ -23,11 +23,21 @@ TEST_CASE("Cross")
             cross.push_back(pt);
         }
 
+
+        //initTiltNormal
         cross.initTiltNormals();
         for(int id = 0; id < N; id++){
             Vector3d mid = (cross[id] + cross[id + 1]) / 2;
             REQUIRE(Approx(mid.cross(cross.ori(id)->normal).norm()).margin(1e-10) == 0.0);
         }
-        
+
+        //updateTiltNormalsRoot
+        cross.updateTiltNormalsRoot(-30);
+        for(int id = 0; id < N; id++){
+            REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 30.0);
+            REQUIRE(cross.ori(id)->tiltSign == (id % 2 == 0?1 :-1));
+        }
+        REQUIRE(Approx((cross.ori(0)->normal - Vector3d(3.0/4, sqrt(3)/4, -1.0 / 2)).norm()).margin(1e-10) == 0.0);
+
     }
 }

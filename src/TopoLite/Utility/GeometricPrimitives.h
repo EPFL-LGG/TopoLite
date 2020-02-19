@@ -548,7 +548,7 @@ struct OrientPoint
     Vector3 rotation_base;
 
 	/*for optimization*/
-	Scalar rotation_angle;
+	Scalar rotation_angle;     //always possitive
 	int tiltSign;              // Flag that indicates the direction to tilt the normal (possible values are {-1, 1})
     int oriptID;               //the index of the oriented point in the whole structure
     Vector2 tilt_range;	       //the lower and upper bound of tilt angle such that the structure have valid geometry.
@@ -600,9 +600,10 @@ public:
     }
 
 
+    //will convert the angle to be positive
     void updateAngle(Scalar _angle)
 	{
-		rotation_angle = _angle;
+		rotation_angle = std::abs(_angle);
         normal = rotateVecAroundAxis(rotation_base, rotation_axis, rotation_angle * tiltSign);
 	}
 

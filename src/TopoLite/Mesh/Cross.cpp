@@ -116,16 +116,16 @@ void Cross<Scalar>::updateTiltNormalsRoot(float tiltAngle)
 
 	for (int i = 0; i < oriPoints.size(); i++)
 	{
-		Vector3f staPt = vers[i].pos;
-		Vector3f endPt = vers[(i + 1) % vers.size()].pos;
-		Vector3f edgeDir = (endPt - staPt).normalized();
+		Vector3 staPt = vers[i].pos;
+		Vector3 endPt = vers[(i + 1) % vers.size()].pos;
+		Vector3 edgeDir = (endPt - staPt).normalized();
 
 		// Upper tilt normal
 		if (i % 2 == 0)    oriPoints[i]->tiltSign = TILT_SIGN_POSITIVE;  // Initialize the sign
 		else               oriPoints[i]->tiltSign = TILT_SIGN_NEGATIVE;
 
 		float rotAngle = oriPoints[i]->tiltSign * tiltAngle;
-		oriPoints[i]->update_rotation(rotAngle);
+		oriPoints[i]->updateAngle(rotAngle);
 	}
 }
 
