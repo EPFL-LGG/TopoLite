@@ -25,10 +25,16 @@ template<typename Scalar>
 class PolyMesh : public TopoObject
 {
 public:
+
     using pPolygon = shared_ptr<_Polygon<Scalar>> ;
+
     using pTriangle = shared_ptr<Triangle<Scalar>> ;
+
     typedef Matrix<Scalar, 3, 1> Vector3;
+
     typedef Matrix<Scalar, 2, 1> Vector2;
+
+    typedef shared_ptr<_Vertex<Scalar>> pVertex;
 
 public:
 
@@ -68,20 +74,28 @@ public:
 
     //Storage
 	vector<pPolygon> polyList;           // Faces of polygonal mesh
+
     bool texturedModel;                  // Whether this mesh has texture
 
 public:
 
 	//Computed
-	vector<_Vertex<Scalar>> vertexList;
+    vector<pVertex> vertexList;          // Vertex of polygonal mesh
+
 	Box<Scalar> bbox;                    // Bounding box of polygonal mesh
+
+    Box<Scalar> texBBox;                 // Bounding box of polygonal mesh's texture
+
 	Vector3 centroid;                    // Centroid of polygonal mesh
-    Scalar volume;                       // Volume if the mesh is closed
+
+	Scalar volume;                       // Volume if the mesh is closed
+
 	Vector3 lowestPt;                    // lowest point in terms of y coordinate
 
 public:
     
     PolyMesh(std::shared_ptr<InputVarList> var) : TopoObject(var){}
+
     PolyMesh(const PolyMesh &_mesh);
 
 	~PolyMesh();
@@ -94,6 +108,10 @@ public:
 
     void normalize(Vector3 &trans, Scalar &scale);
 
+    void setPolyLists(vector<pPolygon> _polyList);
+
+    shared_ptr<PolyMesh<Scalar>> getTextureMesh();
+
 public:
 
     //Read OBJ File
@@ -102,37 +120,46 @@ public:
     //Save OBJ File
     void writeOBJModel(const char *objFileName, bool triangulate = false);
 
-    void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
-
-    shared_ptr<PolyMesh<Scalar>> getTextureMesh();
-
 public:
 
-	// Mesh Operations	
-	void computeBBox();
-	Box<Scalar> computeTextureBBox();
+    //Storage memeber computation
 
-	// Volume and Centroid
+	void computeBBox();
+
+    void computeTextureBBox();
+
 	void computeCentroid();
-	Scalar computeVolume();
+
+    void computeVolume();
 
 	void computeLowestPt();
+
+	void computeVertexList();
+
+    void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
+
+private:
+
+    Scalar computeVolume(vector<pTriangle> triList);
+
+    Vector3 computeCentroid(vector<pTriangle> triList);
+
     Vector3 computeExtremeVertex(Vector3 rayDir);
 
 public:
 
     // Transform Mesh
-	void translateMesh(Vector3 move);
+    void translateMesh(Vector3 move);
 
-	void scaleMesh(Scalar scale);
+    void scaleMesh(Scalar scale);
 
-	void rotateMesh(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle);
+    void rotateMesh(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle);
 
-private:
+public:
 
-    Scalar ComputeVolume(vector<pTriangle> triList);
+    //convert
 
-    Vector3 computeCentroid(vector<pTriangle> triList);
+    void convertToTriMesh(vector<pTriangle> &triList);
 
 };
 

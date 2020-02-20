@@ -44,17 +44,82 @@ TEST_CASE("Cross")
     }
 
     SECTION("Four Quad"){
-        vector<Cross<double>> crossLists;
+        vector<shared_ptr<Cross<double>>> crossLists;
 
         int dXY[4][2] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
+        int verIDs[4][4] = {{0, 1, 2, 3},
+                            {1, 4, 5, 2},
+                            {2, 5, 6, 7},
+                            {3, 2, 7, 8}};
+
         for(int id = 0; id < 4; id++)
         {
-            Cross<double> cross(varList);
-            cross.push_back(Vector3d(0 + dXY[id][0], 0 + dXY[id][1], 0));
-            cross.push_back(Vector3d(1 + dXY[id][0], 0 + dXY[id][1], 0));
-            cross.push_back(Vector3d(1 + dXY[id][0], 1 + dXY[id][1], 0));
-            cross.push_back(Vector3d(0 + dXY[id][0], 1 + dXY[id][1], 0));
+            shared_ptr<Cross<double>> cross = make_shared<Cross<double>>(Cross<double>(varList));
+            cross->push_back(Vector3d(0 + dXY[id][0], 0 + dXY[id][1], 0));
+            cross->push_back(Vector3d(1 + dXY[id][0], 0 + dXY[id][1], 0));
+            cross->push_back(Vector3d(1 + dXY[id][0], 1 + dXY[id][1], 0));
+            cross->push_back(Vector3d(0 + dXY[id][0], 1 + dXY[id][1], 0));
+
+            cross->vers[0]->verID = verIDs[id][0];
+            cross->vers[1]->verID = verIDs[id][1];
+            cross->vers[2]->verID = verIDs[id][2];
+            cross->vers[3]->verID = verIDs[id][3];
+
             crossLists.push_back(cross);
+            cross->crossID = id;
+            cross->neighbors.resize(4);
+        }
+        crossLists[0]->neighbors[1] = crossLists[1];
+        crossLists[0]->neighbors[2] = crossLists[3];
+        crossLists[1]->neighbors[3] = crossLists[0];
+        crossLists[1]->neighbors[2] = crossLists[2];
+        crossLists[2]->neighbors[0] = crossLists[1];
+        crossLists[2]->neighbors[3] = crossLists[3];
+        crossLists[3]->neighbors[1] = crossLists[2];
+        crossLists[3]->neighbors[0] = crossLists[0];
+
+        SECTION("getEdgeIDOfGivenCross")
+        {
+            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[2].get()) == NONE_ELEMENT);
+            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[1].get()) == 1);
+            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[3].get()) == 2);
+            REQUIRE(crossLists[1]->getEdgeIDOfGivenCross(crossLists[0].get()) == 3);
+            REQUIRE(crossLists[1]->getEdgeIDOfGivenCross(crossLists[2].get()) == 2);
+            REQUIRE(crossLists[2]->getEdgeIDOfGivenCross(crossLists[1].get()) == 0);
+            REQUIRE(crossLists[2]->getEdgeIDOfGivenCross(crossLists[3].get()) == 3);
+            REQUIRE(crossLists[3]->getEdgeIDOfGivenCross(crossLists[2].get()) == 1);
+            REQUIRE(crossLists[3]->getEdgeIDOfGivenCross(crossLists[0].get()) == 0);
+        }
+
+        SECTION("getEdgeIDOfGivenVertexID"){
+            REQUIRE(crossLists[1]->getEdgeIDOfGivenVertexID(4) == 1);
+        }
+
+        SECTION("getPrevEdgeID"){
+            REQUIRE(crossLists[1]->getPrevEdgeID(0) == 3);
+        }
+
+        SECTION("getCrossIDSharedWithCross"){
+            vector<int> shared_crossIDs;
+            REQUIRE(crossLists[0]->getCrossIDsSharedWithCross(crossLists[1].get(), shared_crossIDs) == NONE_ELEMENT);
+            REQUIRE(crossLists[0]->getCrossIDsSharedWithCross(crossLists[2].get(), shared_crossIDs) == 2);
+            REQUIRE(shared_crossIDs[0] == 1);
+            REQUIRE(shared_crossIDs[1] == 3);
+        }
+
+        SECTION("getEdgeIDSharedWithCross"){
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[1].get()) == 1);
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[2].get()) == NONE_ELEMENT);
+        }
+
+        crossLists[0]->atBoundary = true;
+        crossLists[1]->atBoundary = true;
+        crossLists[2]->atBoundary = true;
+        crossLists[3]->atBoundary = false;
+        SECTION("checkNeighborAtBoundary"){
+            REQUIRE(crossLists[0]->checkNeighborAtBoundary(0) == true);
+            REQUIRE(crossLists[0]->checkNeighborAtBoundary(1) == true);
+            REQUIRE(crossLists[0]->checkNeighborAtBoundary(2) == false);
         }
     }
 }

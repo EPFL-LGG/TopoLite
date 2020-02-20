@@ -39,6 +39,7 @@ public:
 
     typedef Matrix<Scalar, 3 ,1> Vector3;
 
+    typedef shared_ptr<_Vertex<Scalar>> pVertex;
 
 public:
     //storage
@@ -113,7 +114,7 @@ public:
 
 	int getEdgeIDOfGivenVertexID(int vertexID);
 
-	int getCrossIDSharedWithCross(const Cross<Scalar>* ncross);
+	int getCrossIDsSharedWithCross(const Cross<Scalar>* ncross, vector<int> &shared_crossIDs);
 
 	int getEdgeIDSharedWithCross(const Cross<Scalar>* ncross);
 

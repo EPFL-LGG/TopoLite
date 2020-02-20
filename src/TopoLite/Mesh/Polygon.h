@@ -40,8 +40,6 @@ public:
 
     //storage
 	vector<pVertex> vers;        //!< Vertices   (position, texture coordinate.)
-	vector<int> verIDs;                  //!< Vertex IDs (only for position)
-	vector<int> texIDs;					 //!< texture ID
 
     //computed
 	Vector3 normal;                     //!< Normal vector
@@ -70,10 +68,9 @@ public:
 
     virtual void print();
 
-    void clear(){
+    void clear()
+    {
         vers.clear();
-        verIDs.clear();
-        texIDs.clear();
         normal = center = Vector3(0, 0, 0);
         dist = polyType = 0;
     }
@@ -86,7 +83,7 @@ public:
         if(vers.empty()) return Vector3(0, 0, 0);
         else{
             int rID = index % size();
-            return vers.at(rID).pos;
+            return vers.at(rID)->pos;
         }
     }
 
@@ -94,7 +91,7 @@ public:
     {
         vector<Vector3> vertices;
         for (int i = 0; i < vers.size(); i++)
-            vertices.push_back( vers[i].pos );
+            vertices.push_back( vers[i]->pos );
         return vertices;
     }
 

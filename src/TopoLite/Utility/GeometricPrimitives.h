@@ -103,24 +103,23 @@ public:
 
     int verID;
 
-    int texID;
-
 public:
     _Vertex()
     {
-
+        verID = -1;
     };
 
     _Vertex(const Vector3 &_pos)
     {
         pos   = _pos;
+        verID = -1;
     };
 
     _Vertex(const Vector3& _pos, const Vector2& _texCoord)
     {
         pos = _pos;
-
         texCoord = _texCoord;
+        verID = -1;
     };
 };
 

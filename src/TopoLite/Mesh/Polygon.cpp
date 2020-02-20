@@ -56,8 +56,6 @@ _Polygon<Scalar>::_Polygon(const _Polygon<Scalar> &poly)
     this->vers   = poly.vers;
     this->normal = poly.normal;
     this->center = poly.center;
-    this->verIDs = poly.verIDs;
-    this->texIDs = poly.texIDs;
     this->polyType = poly.polyType;
     this->dist = poly.dist;
 }
@@ -95,7 +93,7 @@ void _Polygon<Scalar>::print()
 	printf("verNum: %lu \n", vers.size());
 	for (int i = 0; i < vers.size(); i++)
 	{
-		printf("(%6.3f, %6.3f, %6.3f) \n", vers[i].pos.x(), vers[i].pos.y(), vers[i].pos.z());
+		printf("(%6.3f, %6.3f, %6.3f) \n", vers[i]->pos.x(), vers[i]->pos.y(), vers[i]->pos.z());
 	}
 	printf("\n");
 }
@@ -114,7 +112,8 @@ void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
 template <typename Scalar>
 size_t _Polygon<Scalar>::push_back(Vector3 pt)
 {
-    vers.push_back(_Vertex<Scalar>(pt));
+    pVertex vertex = make_shared<_Vertex<Scalar>>(pt);
+    vers.push_back(vertex);
     return vers.size();
 }
 
@@ -122,10 +121,11 @@ template <typename Scalar>
 void _Polygon<Scalar>::reverseVertices()
 {
     // Reverse vertices
-    vector<_Vertex<Scalar>> newVers;
+    vector<pVertex> newVers;
     for (int i = vers.size() - 1; i >= 0; i--)
     {
-        newVers.push_back(vers[i]);
+        pVertex vertex = make_shared<_Vertex<Scalar>>(*vers[i]);
+        newVers.push_back(vertex);
     }
 
     vers = newVers;
@@ -145,7 +145,7 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeCenter()
 	center = Vector3(0, 0, 0);
 	for (int i= 0; i < vers.size(); i++)
 	{
-		center += vers[i].pos;
+		center += vers[i]->pos;
 	}
 
 	center = center / vers.size();
@@ -161,7 +161,7 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeNormal()
 	Vector3 tempNor(0, 0, 0);
 	for(int id = 0; id < vers.size() - 1; id++)
 	{
-	    tempNor += (vers[id].pos - center).cross(vers[id + 1].pos - center);
+	    tempNor += (vers[id]->pos - center).cross(vers[id + 1]->pos - center);
 	}
 
 	if(tempNor.norm() < FLOAT_ERROR_LARGE)
@@ -187,9 +187,9 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal()
 
 	double xx, xy, xz, yy, yz, zz;
 	xx = xy = xz = yy = yz = zz = 0;
-	for(_Vertex<Scalar> ver: vers)
+	for(pVertex ver: vers)
 	{
-		Vector3 r = ver.pos - centroid;
+		Vector3 r = ver->pos - centroid;
 		xx += r.x() * r.x();
 		xy += r.x() * r.y();
 		xz += r.x() * r.z();
@@ -232,8 +232,8 @@ Scalar _Polygon<Scalar>::computeArea()
 	Scalar signedArea = 0;
 	for (int i = 0; i < vers.size(); i++)
 	{
-        Vector3 currVer = vers[i].pos;
-        Vector3 nextVer = vers[(i + 1) % vers.size()].pos;
+        Vector3 currVer = vers[i]->pos;
+        Vector3 nextVer = vers[(i + 1) % vers.size()]->pos;
 		signedArea += 0.5 * (normal.dot(currVer.cross(nextVer)));
 	}
 
@@ -247,8 +247,8 @@ Scalar _Polygon<Scalar>::computeAverageEdge()
 
 	for (int i = 0; i < vers.size(); i++)
 	{
-		Vector3 currVer = vers[i].pos;
-		Vector3 nextVer = vers[(i + 1) % vers.size()].pos;
+		Vector3 currVer = vers[i]->pos;
+		Vector3 nextVer = vers[(i + 1) % vers.size()]->pos;
         avgEdgeLen += (nextVer - currVer).norm();
 	}
 
@@ -265,7 +265,7 @@ Scalar _Polygon<Scalar>::computeMaxRadius()
     Vector3 origin = computeCenter();
     for (int i = 0; i < vers.size(); i++)
     {
-        MaxRadius = std::max((vers[i].pos - origin).norm(), MaxRadius);
+        MaxRadius = std::max((vers[i]->pos - origin).norm(), MaxRadius);
     }
     return MaxRadius;
 }
@@ -301,8 +301,8 @@ void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris)
 	{
 		pTriangle tri = make_shared<Triangle<Scalar>>();
 		tri->v[0] = center;
-		tri->v[1] = vers[i].pos;
-		tri->v[2] = vers[(i + 1)%vers.size()].pos;
+		tri->v[1] = vers[i]->pos;
+		tri->v[2] = vers[(i + 1)%vers.size()]->pos;
 		tris.push_back(tri);
 	}
 
@@ -314,7 +314,7 @@ int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point)
 {
 	for (int i = 0; i < vers.size(); i++)
 	{
-		Scalar dist = (point - vers[i].pos).norm();
+		Scalar dist = (point - vers[i]->pos).norm();
 
 		// Note: this threshold depends on the scale of elements
 		if (dist < FLOAT_ERROR_LARGE)
@@ -338,7 +338,7 @@ void _Polygon<Scalar>::executeTranslation(Vector3 transVec)
 {
 	for (int i = 0; i < vers.size(); i++)
 	{
-		vers[i].pos += transVec;
+		vers[i]->pos += transVec;
 	}
 
 	center += transVec;
@@ -352,7 +352,7 @@ void _Polygon<Scalar>::executeTranslation(Vector3 transVec)
 //	for (int i = 0; i < vers.size(); i++)
 //	{
 //		Vector3 ver2D;
-//		MultiplyPoint( vers[i].pos, projMat, ver2D);
+//		MultiplyPoint( vers[i]->pos, projMat, ver2D);
 //
 //		poly2D.push_back( ver2D );
 //	}
@@ -366,7 +366,7 @@ void _Polygon<Scalar>::executeTranslation(Vector3 transVec)
 //	vector<Vector3i> pts;
 //	for(int id = 0; id < vers.size(); id++)
 //	{
-//		Vector3 pos = vers[id].pos;
+//		Vector3 pos = vers[id]->pos;
 //		int x = (int)((pos - origin).dot(x_axis) * Scale);
 //		int y = (int)((pos - origin).dot(y_axis) * Scale);
 //		int z = 0;
@@ -384,7 +384,7 @@ void _Polygon<Scalar>::executeTranslation(Vector3 transVec)
 //	Vector3 origin = ComputeCenter();
 //
 //	Vector3 zAxis = ComputeNormal();
-//	Vector3 xAxis = vers[1].pos - vers[0].pos;
+//	Vector3 xAxis = vers[1]->pos - vers[0]->pos;
 //	xAxis = xAxis / len(xAxis);
 //	Vector3 yAxis = zAxis.cross(xAxis);
 //
