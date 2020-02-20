@@ -11,11 +11,11 @@ TEST_CASE("Cross")
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
     InitVarLite(varList.get());
-    Cross<double> cross(varList);
-
-    cross.print();
 
     SECTION("Hexagon"){
+        Cross<double> cross(varList);
+
+
         double radius = 1.0;
         int N = 6;
         for(int id = 0; id < N; id++){
@@ -39,5 +39,22 @@ TEST_CASE("Cross")
         }
         REQUIRE(Approx((cross.ori(0)->normal - Vector3d(3.0/4, sqrt(3)/4, -1.0 / 2)).norm()).margin(1e-10) == 0.0);
 
+        //updateTiltNormals
+        cross.updateTiltNormals(30);
+    }
+
+    SECTION("Four Quad"){
+        vector<Cross<double>> crossLists;
+
+        int dXY[4][2] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
+        for(int id = 0; id < 4; id++)
+        {
+            Cross<double> cross(varList);
+            cross.push_back(Vector3d(0 + dXY[id][0], 0 + dXY[id][1], 0));
+            cross.push_back(Vector3d(1 + dXY[id][0], 0 + dXY[id][1], 0));
+            cross.push_back(Vector3d(1 + dXY[id][0], 1 + dXY[id][1], 0));
+            cross.push_back(Vector3d(0 + dXY[id][0], 1 + dXY[id][1], 0));
+            crossLists.push_back(cross);
+        }
     }
 }

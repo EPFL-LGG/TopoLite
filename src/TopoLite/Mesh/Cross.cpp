@@ -33,13 +33,25 @@ Cross<Scalar>::~Cross()
 template <typename Scalar>
 Cross<Scalar>::Cross(const Cross &_cross) : _Polygon<Scalar>(_cross), TopoObject(_cross)
 {
+    //copy data
     crossID = _cross.crossID;
     atBoundary = _cross.atBoundary;
+    isVisited = _cross.isVisited;
+
     for(int id = 0; id < _cross.oriPoints.size(); id++)
     {
-        shared_ptr<OrientPoint<Scalar>> oript = make_shared<OrientPoint>(*_cross.oriPoints[id]);
+        shared_ptr<OrientPoint<Scalar>> oript = make_shared<OrientPoint<Scalar>>(*_cross.oriPoints[id]);
         oriPoints.push_back(oript);
     }
+
+    //copy neighbors
+    //theorically we should not copy the neighbor,
+    //because it is not recommanded to copy pointer
+    //but for practical reason, we should copy it.
+    //just don't forgot to update the neighbor pointer list
+    //once the old neighbor pointers are not more valid
+
+    neighbors = _cross.neighbors;
 }
 
 template <typename Scalar>
@@ -132,106 +144,74 @@ void Cross<Scalar>::updateTiltNormalsRoot(float tiltAngle)
 template <typename Scalar>
 void Cross<Scalar>::updateTiltNormals(float tiltAngle)
 {
-	//////////////////////////////////////////////////////////////////////
-	// 1. Update tilt normals for the edges shared with visited neighbors
-
     const vector<_Vertex<Scalar>> &vers= _Polygon<Scalar>::vers;
     const Vector3 &center = _Polygon<Scalar>::center;
     const Vector3 &normal = _Polygon<Scalar>::normal;
+	bool boundary_not_tilt = getVarList()->template get<bool>("ground_touch_bdry");
 
-	int startEdgeID = -1;
-	bool ground_touch_bdry = getVarList()->template get<bool>("ground_touch_bdry");
-
-	for (int i = 0; i < oriPoints.size(); i++)
-	{
-		pCross neighbor = neighbors[i].lock();
-
-		if (neighbor == nullptr) continue;
-
-		Vector3f staPt = vers[i].pos;
-		Vector3f endPt = vers[(i + 1) % vers.size()].pos;
-		Vector3f edgeDir = (endPt - staPt).normalized();
-
-		if(neighbor->isVisited == true)
-		{
-			int neiborEdgeID = neighbor->GetNeighborEdgeID(crossID);
-			if (neiborEdgeID == NONE_ELEMENT)
-			{
-				printf("Warning: neiborEdgeID should be -1. \n");
-				continue;
-			}
-
-			//tilt normal
-			oriPoints[i]->tiltSign = -1 * neighbor->oriPoints[neiborEdgeID]->tiltSign; // Reverse the sign
-			if(atBoundary && neighbor->atBoundary && ground_touch_bdry)
-			{
-				float rotAngle = 0;
-				oriPoints[i]->normal =
-				        RotateNormal(oriPoints[i]->rotation_base, edgeDir, rotAngle);
-				oriPoints[i]->update_rotation(rotAngle);
-			}
-			else{
-				float rotAngle = oriPoints[i]->tiltSign * tiltAngle;
-				oriPoints[i]->normal = RotateNormal(oriPoints[i]->rotation_base, edgeDir, rotAngle);
-				oriPoints[i]->update_rotation(rotAngle);
-			}
-
-			startEdgeID = i;
-		}
+	//1) Clear all signs
+	for(int id = 0; id < oriPoints.size(); id++){
+	    ori(id)->tiltSign = TILT_SIGN_NONE;
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// 2. Update tilt normals for the remaining edges
-
-	int currEdgeID = startEdgeID;
-	while (true)
+    int startEdgeID = -1;
+    int num_edges_assigned = 0;
+	//2) If neighbor has a sign, reverse it
+	for (int i = 0; i < oriPoints.size(); i++)
 	{
-		// Check if all edges have been updated
-		bool isAllAsigned = true;
-		for (int i = 0; i < oriPoints.size(); i++)
-		{
-			if (oriPoints[i]->tiltSign == TILT_SIGN_NONE)
-			{
-				isAllAsigned = false;
-				break;
-			}
-		}
 
-		if (isAllAsigned)
-			break;
+	    //1) check neighbor exist and has been visited
+	    if(neighbors.size() <= i) break;
+		pCross neighbor = neighbors[i].lock();
+		if (neighbor == nullptr) continue;
+		if(neighbor->isVisited == false) continue;
 
+        //2)reverse the tilt sign of its neighbor
+        int neiborEdgeID = neighbor->getEdgeIDOfGivenCross(this);
+        TopoASSERT(neiborEdgeID != NONE_ELEMENT);
+        if(neiborEdgeID == NONE_ELEMENT) continue;
+
+        //3)reverse the tilt sign of its neighbor
+        oriPoints[i]->tiltSign = (-1) * neighbor->oriPoints[neiborEdgeID]->tiltSign; // Reverse the sign
+        if(atBoundary && neighbor->atBoundary && boundary_not_tilt)
+        {
+            oriPoints[i]->updateAngle(0);
+        }
+        else{
+            oriPoints[i]->updateAngle(tiltAngle);
+        }
+        num_edges_assigned ++;
+        startEdgeID = i;
+	}
+
+
+	//3) Update tilt normals for the remaining edges
+	int currEdgeID = startEdgeID;
+	while (num_edges_assigned < oriPoints.size())
+	{
 		// Process edges that have not been updated
 		int nextEdgeID = (currEdgeID + 1) % oriPoints.size();
 
-		bool neighbor_at_boundary = false;
-		if(neighbors[nextEdgeID].lock() == nullptr)  neighbor_at_boundary = true;
-		else if(neighbors[nextEdgeID].lock()->atBoundary) neighbor_at_boundary = true;
-
 		if (oriPoints[nextEdgeID]->tiltSign == TILT_SIGN_NONE)
 		{
-				Vector3f staPt = vers[nextEdgeID].pos;
-				Vector3f endPt = vers[(nextEdgeID + 1) % vers.size()].pos;
-				Vector3f edgeDir = (endPt - staPt).normalized();
+            // Reverse the sign
+		    if(currEdgeID != -1){
+                oriPoints[nextEdgeID]->tiltSign = -1 * oriPoints[currEdgeID]->tiltSign;
+            }
+			else{
+			    //force it to be positive
+			    oriPoints[nextEdgeID]->tiltSign = TILT_SIGN_POSITIVE;
+            }
 
-				// Upper tilt normal
-				if(currEdgeID != -1)
-					oriPoints[nextEdgeID]->tiltSign = -1 * oriPoints[currEdgeID]->tiltSign; // Reverse the sign
-				else
-					oriPoints[nextEdgeID]->tiltSign = TILT_SIGN_POSITIVE;
+            if(atBoundary && checkNeighborAtBoundary(nextEdgeID) && boundary_not_tilt){
+                oriPoints[nextEdgeID]->updateAngle(0);
+            }
+            else{
+                oriPoints[nextEdgeID]->updateAngle(tiltAngle);
+            }
 
-				if (!neighbor_at_boundary || !atBoundary || !ground_touch_bdry)
-				{
-					float rotAngle = oriPoints[nextEdgeID]->tiltSign * tiltAngle;
-					oriPoints[nextEdgeID]->normal = RotateNormal(oriPoints[nextEdgeID]->rotation_base, edgeDir, rotAngle);
-					oriPoints[nextEdgeID]->update_rotation(rotAngle);
-				}
-				else{
-					float rotAngle = 0;
-					oriPoints[nextEdgeID]->normal = RotateNormal(oriPoints[nextEdgeID]->rotation_base, edgeDir, rotAngle);
-					oriPoints[nextEdgeID]->update_rotation(rotAngle);
-				}
+            num_edges_assigned++;
 		}
-
 		currEdgeID = nextEdgeID;
 	}
 }
@@ -241,14 +221,16 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle)
 //**************************************************************************************//
 
 template <typename Scalar>
-int Cross<Scalar>::GetNeighborEdgeID(int currCrossID)
+int Cross<Scalar>::getEdgeIDOfGivenCross(const Cross<Scalar>* ncross)
 {
+    if(ncross == nullptr) return NONE_ELEMENT;
+
 	for (int i = 0; i < neighbors.size(); i++)
 	{
 		if (neighbors[i].lock() == nullptr)
 			continue;
 
-		if (neighbors[i].lock()->crossID == currCrossID)
+		if (neighbors[i].lock()->crossID == ncross->crossID)
 			return i;
 	}
 
@@ -256,7 +238,7 @@ int Cross<Scalar>::GetNeighborEdgeID(int currCrossID)
 }
 
 template <typename Scalar>
-int Cross<Scalar>::GetVertexEdgeID(int vertexID)
+int Cross<Scalar>::getEdgeIDOfGivenVertexID(int vertexID)
 {
     const vector<_Vertex<Scalar>> &verIDs= _Polygon<Scalar>::verIDs;
     for (int i = 0; i < verIDs.size(); i++)
@@ -269,21 +251,23 @@ int Cross<Scalar>::GetVertexEdgeID(int vertexID)
 }
 
 template <typename Scalar>
-int Cross<Scalar>::GetPrevEdgeID(int edgeID){
+int Cross<Scalar>::getPrevEdgeID(int edgeID){
     const vector<_Vertex<Scalar>> &verIDs= _Polygon<Scalar>::verIDs;
     return (edgeID - 1 + verIDs.size()) % verIDs.size();
 }
 
 template <typename Scalar>
-int Cross<Scalar>::GetSharedCross(weak_ptr<Cross> ncross)
+int Cross<Scalar>::getCrossIDSharedWithCross(const Cross<Scalar>* ncross)
 {
+    if(ncross == nullptr) return NONE_ELEMENT;
+
 	vector<int> neigbor_crossID;
 	for(int id = 0; id < neighbors.size(); id++){
-		if(neighbors[id].lock()) neigbor_crossID.push_back(neighbors[id].lock()->crossID);
+		if(neighbors[id]) neigbor_crossID.push_back(neighbors[id].lock()->crossID);
 	}
 
-	for(int id = 0; id < ncross.lock()->neighbors.size(); id++){
-		if(ncross.lock()->neighbors[id].lock()) neigbor_crossID.push_back(ncross.lock()->neighbors[id].lock()->crossID);
+	for(int id = 0; id < ncross->neighbors.size(); id++){
+		if(ncross->neighbors[id].lock()) neigbor_crossID.push_back(ncross->neighbors[id].lock()->crossID);
 	}
 
 	std::sort(neigbor_crossID.begin(), neigbor_crossID.end());
@@ -293,17 +277,20 @@ int Cross<Scalar>::GetSharedCross(weak_ptr<Cross> ncross)
 			return neigbor_crossID[id];
 	}
 
-	return -1;
+	return NONE_ELEMENT;
 }
 
 template <typename Scalar>
-int Cross<Scalar>::GetShareEdge(weak_ptr<Cross> ncross)
+int Cross<Scalar>::getEdgeIDSharedWithCross(const Cross<Scalar>* ncross)
 {
+    if(ncross == nullptr) return NONE_ELEMENT;
+
+
     const vector<_Vertex<Scalar>> &verIDs= _Polygon<Scalar>::verIDs;
 
     map<int, bool> neighborVertex;
-    for(int id = 0; id < ncross.lock()->verIDs.size(); id++){
-        neighborVertex[ncross.lock()->verIDs[id]] = true;
+    for(int id = 0; id < ncross->verIDs.size(); id++){
+        neighborVertex[ncross->verIDs[id]] = true;
     }
 
     for(int id = 0; id < verIDs.size(); id++){
@@ -313,5 +300,16 @@ int Cross<Scalar>::GetShareEdge(weak_ptr<Cross> ncross)
             return id;
         }
     }
-    return -1;
+    return NONE_ELEMENT;
+}
+
+template<typename Scalar>
+bool Cross<Scalar>::checkNeighborAtBoundary(int nID)
+{
+    //neighbor is not existed
+    if(nID >= neighbors.size() || nID < 0) return true;
+    if(neighbors.at(nID).lock() == nullptr) return true;
+
+    //neighbor is existed
+    return neighbors.at(nID).lock()->atBoundary;
 }

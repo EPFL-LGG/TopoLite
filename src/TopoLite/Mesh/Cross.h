@@ -47,9 +47,9 @@ public:
 
 	bool atBoundary;									//!< At Boundary or not
 
-	vector<wpCross> neighbors;                  //!< Neighbors of the cross
+	vector<wpCross> neighbors;                          //!< Neighbors of the cross
 
-	vector<shared_ptr<OrientPoint<Scalar>>> oriPoints;            //!< A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
+	vector<shared_ptr<OrientPoint<Scalar>>> oriPoints;  //!< A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
 
 public:
     //temporary variables
@@ -73,6 +73,11 @@ public:
             int rID = index % oriPoints.size();
             return oriPoints.at(rID);
         }
+    }
+
+    pCross nei(int index){
+        if(index < 0 || index >= neighbors.size()) return nullptr;
+        return neighbors[index].lock();
     }
 
 public:
@@ -104,15 +109,17 @@ public:
     /*!
      * \brief: found the EdgeID (order in oriPoints) which correspond crossID is currCrossID
      */
-	int GetNeighborEdgeID(int currCrossID);
+	int getEdgeIDOfGivenCross(const Cross<Scalar>* ncross);
 
-	int GetVertexEdgeID(int vertexID);
+	int getEdgeIDOfGivenVertexID(int vertexID);
 
-	int GetSharedCross(weak_ptr<Cross> ncross);
+	int getCrossIDSharedWithCross(const Cross<Scalar>* ncross);
 
-	int GetShareEdge(weak_ptr<Cross> ncross);
+	int getEdgeIDSharedWithCross(const Cross<Scalar>* ncross);
 
-	int GetPrevEdgeID(int edgeID);
+	int getPrevEdgeID(int edgeID);
+
+    bool checkNeighborAtBoundary(int nID);
 };
 
 #include "Cross.cpp"
