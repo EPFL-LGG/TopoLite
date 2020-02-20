@@ -106,7 +106,8 @@ void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
 	vers.clear();
 	for (int i = 0; i < _vers.size(); i++)
 	{
-		vers.push_back( _Vertex<Scalar>(_vers[i]) );
+	    pVertex vertex = make_shared<_Vertex<Scalar>>(_vers[i]);
+		vers.push_back(vertex);
 	}
 }
 

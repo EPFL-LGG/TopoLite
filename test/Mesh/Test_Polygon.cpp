@@ -23,7 +23,7 @@ TEST_CASE("Polygon")
 
         poly.setVertices(pts);
         REQUIRE(poly.vers.size() == 4);
-        REQUIRE((poly.vers[1].pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+        REQUIRE((poly.vers[1]->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
     }
 
     SECTION("push_back"){
@@ -33,7 +33,7 @@ TEST_CASE("Polygon")
         poly.push_back(Vector3d(0, 1, 0));
 
         REQUIRE(poly.vers.size() == 4);
-        REQUIRE((poly.vers[1].pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+        REQUIRE((poly.vers[1]->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
     }
 
     SECTION("the polygon has a simple input")
@@ -47,7 +47,7 @@ TEST_CASE("Polygon")
             poly.reverseVertices();
 
             REQUIRE(poly.vers.size() == 4);
-            REQUIRE((poly.vers[1].pos - Vector3d(2, 2, 0)).norm() == Approx(0));
+            REQUIRE((poly.vers[1]->pos - Vector3d(2, 2, 0)).norm() == Approx(0));
         }
 
         SECTION("checkEquality"){

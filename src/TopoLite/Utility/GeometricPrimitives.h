@@ -101,6 +101,10 @@ public:
 
     Vector2 texCoord;			//!< vertex's texcoord (U,V) for mapping the pattern
 
+    int verID;
+
+    int texID;
+
 public:
     _Vertex()
     {

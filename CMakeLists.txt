@@ -171,7 +171,7 @@ include(CTest)
 include(ParseAndAddCatchTests)
 
 #file(GLOB testTopoFiles test/Utility/Test_GeometricPrimitives.cpp)
-file(GLOB testTopoFiles test/Mesh/Test_Cross.cpp)
+file(GLOB testTopoFiles test/Mesh/Test_Polygon.cpp)
 
 set(testTopoFiles ${testTopoFiles} test/Test_Main.cpp)
 

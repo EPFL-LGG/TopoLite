@@ -34,11 +34,12 @@ public:
     typedef Matrix<Scalar, 2, 1> Vector2;
     typedef Matrix<int, 3, 1> Vector3i;
     typedef shared_ptr<Triangle<Scalar>> pTriangle;
+    typedef shared_ptr<_Vertex<Scalar>> pVertex;
 
 public:
 
     //storage
-	vector<_Vertex<Scalar>> vers;        //!< Vertices   (position, texture coordinate.)
+	vector<pVertex> vers;        //!< Vertices   (position, texture coordinate.)
 	vector<int> verIDs;                  //!< Vertex IDs (only for position)
 	vector<int> texIDs;					 //!< texture ID
 
