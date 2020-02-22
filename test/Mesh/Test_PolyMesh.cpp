@@ -9,7 +9,6 @@ TEST_CASE("PolyMesh")
 {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     InitVarLite(varList.get());
-
     PolyMesh<double> polyMesh(varList);
 
     SECTION("Four Quad with index as input") {
@@ -54,6 +53,73 @@ TEST_CASE("PolyMesh")
 
         REQUIRE(polyMesh.volume == Approx(0.0));
 
-        REQUIRE((polyMesh.lowestPt - Vector3d(0, 0, 0)).norm() == Approx(0.0));
+        REQUIRE((polyMesh.lowestPt - Vector3d(0.5, 0, 0)).norm() == Approx(0.0));
+    }
+
+    SECTION("Cube"){
+        vector<shared_ptr<_Polygon<double>> > polyLists;
+
+        int XYZ[8][3] = {{0, 0, 0}, {1, 0, 0}, {1, 1, 0}, {0, 1, 0},
+                         {0, 0, 1}, {1, 0, 1}, {1, 1, 1}, {0, 1, 1}};
+
+        int face[6][4] = {{0, 3, 2, 1},
+                          {6, 5, 1, 2},
+                          {2, 3, 7, 6},
+                          {0, 4, 7, 3},
+                          {0, 1, 5, 4},
+                          {4, 5, 6, 7}};
+
+        for(int id = 0;id < 6; id++)
+        {
+            shared_ptr<_Polygon< double>> poly = make_shared<_Polygon < double>> (_Polygon<double>());
+            for(int jd = 0; jd < 4; jd++)
+            {
+                Vector3d pt(XYZ[face[id][jd]][0], XYZ[face[id][jd]][1], XYZ[face[id][jd]][2]);
+                poly->push_back(pt);
+            }
+            polyLists.push_back(poly);
+        }
+
+        polyMesh.setPolyLists(polyLists);
+        REQUIRE((polyMesh.centroid - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
+        REQUIRE(polyMesh.volume == Approx(1).margin(1e-6));
+        REQUIRE(polyMesh.vertexList.size() == 24);
+
+        polyMesh.removeDuplicatedVertices();
+        REQUIRE(polyMesh.vertexList.size() == 8);
+
+        polyMesh.computeCentroid();
+        REQUIRE((polyMesh.centroid - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
+
+        polyMesh.computeVolume();
+        REQUIRE(polyMesh.volume == Approx(1).margin(1e-6));
+
+    }
+
+
+
+    SECTION("read polyhedron"){
+        bool texturedModel;
+        polyMesh.readOBJModel("../data/Mesh/primitives/Icosphere.obj", texturedModel, true);
+        REQUIRE(texturedModel == true);
+
+        polyMesh.rotateMesh(Vector3d(0, 0, 0), Vector3d(0, 0, 1), 10);
+        polyMesh.translateMesh(Vector3d(1, 1, 1));
+        polyMesh.scaleMesh(Vector3d(2, 2, 2));
+
+        polyMesh.getTextureMesh()->writeOBJModel("../data/Mesh/primitives/Icosphere2.obj", false);
+
+        SECTION("Test copy and construct function")
+        {
+            PolyMesh<double> newmesh = polyMesh;
+            REQUIRE(newmesh.vertexList[0]->pos == polyMesh.vertexList[0]->pos);
+            REQUIRE(newmesh.vertexList[0] != polyMesh.vertexList[0]);
+
+            REQUIRE(newmesh.texList[0]->texCoord == polyMesh.texList[0]->texCoord);
+            REQUIRE(newmesh.texList[0] != polyMesh.texList[0]);
+
+            REQUIRE(newmesh.polyList[0] != polyMesh.polyList[0]);
+            REQUIRE((newmesh.polyList[0]->normal() - polyMesh.polyList[0]->normal()).norm() == Approx(0.0));
+        }
     }
 }

@@ -22,8 +22,9 @@
 template <typename Scalar>
 _Polygon<Scalar>::_Polygon()
 {
-	normal = Vector3(0, 0, 0);
-	dist = polyType = 0;
+	normal_ = center_ = Vector3(0, 0, 0);
+	dist_ = polyType_ = 0;
+	compute_data_dirty = false;
 }
 
 template <typename Scalar>
@@ -33,35 +34,107 @@ _Polygon<Scalar>::~_Polygon()
 }
 
 template <typename Scalar>
-_Polygon<Scalar> & _Polygon<Scalar>::operator=(const _Polygon<Scalar> &poly)
-{
-	if( this == &poly )
-		return *this;
-
-	this->vers   = poly.vers;
-	this->normal = poly.normal;
-	this->center = poly.center;
-	this->verIDs = poly.verIDs;
-	this->texIDs = poly.texIDs;
-	this->polyType = poly.polyType;
-	this->dist = poly.dist;
-	//this->area   = poly.area;
-
-	return *this;
-}
-
-template <typename Scalar>
 _Polygon<Scalar>::_Polygon(const _Polygon<Scalar> &poly)
 {
-    this->vers   = poly.vers;
-    this->normal = poly.normal;
-    this->center = poly.center;
+
+    vers_.clear();
+    for(pVertex vertex: poly.vers_){
+        vers_.push_back(make_shared<VPoint<Scalar>>(*vertex));
+    }
+
+    texs_.clear();
+    for(pVTex tex: poly.texs_){
+        texs_.push_back(make_shared<VTex<Scalar>>(*tex));
+    }
+
+    update();
+
     this->polyType = poly.polyType;
     this->dist = poly.dist;
 }
 
+//**************************************************************************************//
+//                                    modify operation
+//**************************************************************************************//
+
+//1) will affect computed data
 template <typename Scalar>
-bool _Polygon<Scalar>::checkEquality(const _Polygon &poly)
+void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
+{
+    dirty();
+    
+    vers_.clear();
+    for (int i = 0; i < _vers.size(); i++)
+    {
+        pVertex vertex = make_shared<VPoint<Scalar>>(_vers[i]);
+        vers_.push_back(vertex);
+    }
+}
+
+template <typename Scalar>
+size_t _Polygon<Scalar>::push_back(Vector3 pt)
+{
+    dirty();
+
+    pVertex vertex = make_shared<VPoint<Scalar>>(pt);
+    vers_.push_back(vertex);
+    return vers_.size();
+}
+
+template <typename Scalar>
+size_t _Polygon<Scalar>::push_back(Vector3 pt, Vector2 tex)
+{
+    dirty();
+
+    pVertex vertex = make_shared<VPoint<Scalar>>(pt);
+    vers_.push_back(vertex);
+
+    pVTex ptex = make_shared<VTex<Scalar>>(tex);
+    texs_.push_back(ptex);
+
+    return vers_.size();
+}
+
+//2) will not affect computed data
+
+template <typename Scalar>
+void _Polygon<Scalar>::reverseVertices()
+{
+    // Reverse vertices
+    vector<pVertex> newVers;
+    for (int i = (int)(vers_.size()) - 1; i >= 0; i--)
+    {
+        pVertex vertex = make_shared<VPoint<Scalar>>(*vers_[i]);
+        newVers.push_back(vertex);
+    }
+
+    vers_ = newVers;
+
+    // Reverse normal (no need recompute the normal)
+    normal_ = -normal_;
+}
+
+template <typename Scalar>
+void _Polygon<Scalar>::translatePolygon(Vector3 transVec)
+{
+    for (int i = 0; i < vers_.size(); i++)
+    {
+        vers_[i]->pos += transVec;
+    }
+
+    //no need to recompute normal and center
+    center_ += transVec;
+}
+
+
+/***********************************************
+ *                                             *
+ *             read only      operation        *
+ *                                             *
+ ***********************************************/
+
+template <typename Scalar>
+bool _Polygon<Scalar>::checkEquality(const _Polygon &poly) const
 {
 	if (this->size() != poly.size())
 		return false;
@@ -72,14 +145,16 @@ bool _Polygon<Scalar>::checkEquality(const _Polygon &poly)
 	int id;
     for(id = 0; id < A.size(); id++)
     {
-        if((A[id] - B[0]).norm() < FLOAT_ERROR_SMALL){
+        if((A.vers_[id]->pos - B.vers_[0]->pos).norm() < FLOAT_ERROR_SMALL){
             break;
         }
     }
     if(id == A.size()) return false;
 
-    for(int jd = 0; jd < A.size(); jd++){
-        if((A[(id + jd) % A.size()] - B[jd]).norm() > FLOAT_ERROR_SMALL){
+    for(int jd = 0; jd < A.size(); jd++)
+    {
+        int Aij = (id + jd) % A.size();
+        if((A.vers_[Aij]->pos - B.vers_[jd]->pos).norm() > FLOAT_ERROR_SMALL){
             return false;
         }
     }
@@ -88,108 +163,63 @@ bool _Polygon<Scalar>::checkEquality(const _Polygon &poly)
 }
 
 template <typename Scalar>
-void _Polygon<Scalar>::print()
+void _Polygon<Scalar>::print() const
 {
-	printf("verNum: %lu \n", vers.size());
-	for (int i = 0; i < vers.size(); i++)
+	printf("verNum: %lu \n", vers_.size());
+	for (int i = 0; i < vers_.size(); i++)
 	{
-		printf("(%6.3f, %6.3f, %6.3f) \n", vers[i]->pos.x(), vers[i]->pos.y(), vers[i]->pos.z());
+		printf("(%6.3f, %6.3f, %6.3f) \n", vers_[i]->pos.x(), vers_[i]->pos.y(), vers_[i]->pos.z());
 	}
 	printf("\n");
 }
 
 template <typename Scalar>
-void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
+Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeCenter() const
 {
-	vers.clear();
-	for (int i = 0; i < _vers.size(); i++)
+    Vector3d _center = Vector3d(0, 0, 0);
+	for (int i= 0; i < vers_.size(); i++)
 	{
-	    pVertex vertex = make_shared<_Vertex<Scalar>>(_vers[i]);
-		vers.push_back(vertex);
+        _center += vers_[i]->pos;
 	}
+    _center = _center / vers_.size();
+	return _center;
 }
 
 template <typename Scalar>
-size_t _Polygon<Scalar>::push_back(Vector3 pt)
+Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeNormal() const
 {
-    pVertex vertex = make_shared<_Vertex<Scalar>>(pt);
-    vers.push_back(vertex);
-    return vers.size();
-}
-
-template <typename Scalar>
-void _Polygon<Scalar>::reverseVertices()
-{
-    // Reverse vertices
-    vector<pVertex> newVers;
-    for (int i = vers.size() - 1; i >= 0; i--)
-    {
-        pVertex vertex = make_shared<_Vertex<Scalar>>(*vers[i]);
-        newVers.push_back(vertex);
-    }
-
-    vers = newVers;
-
-    // Reverse normal
-    normal = -normal;
-}
-
-
-//**************************************************************************************//
-//                                    Compute Properties
-//**************************************************************************************//
-
-template <typename Scalar>
-Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeCenter()
-{
-	center = Vector3(0, 0, 0);
-	for (int i= 0; i < vers.size(); i++)
-	{
-		center += vers[i]->pos;
-	}
-
-	center = center / vers.size();
-
-	return center;
-}
-
-
-template <typename Scalar>
-Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeNormal()
-{
-	computeCenter();
+	Vector3 _center = computeCenter();
 	Vector3 tempNor(0, 0, 0);
-	for(int id = 0; id < vers.size() - 1; id++)
+	for(int id = 0; id < (int)(vers_.size()) - 1; id++)
 	{
-	    tempNor += (vers[id]->pos - center).cross(vers[id + 1]->pos - center);
+	    tempNor += (vers_[id]->pos - _center).cross(vers_[id + 1]->pos - _center);
 	}
 
 	if(tempNor.norm() < FLOAT_ERROR_LARGE)
 	    return Vector3(0, 0, 0);
 
 	//normal already normalized
-	computeFitedPlaneNormal();
-	
-	if(normal.dot(tempNor) < 0) normal *= -1;
-	return normal;
+	Vector3 _normal = computeFitedPlaneNormal();
+	if(_normal.dot(tempNor) < 0) _normal *= -1;
+	return _normal;
 }
 
 //see https://www.ilikebigbits.com/2015_03_04_plane_from_points.html
 template <typename Scalar>
-Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal()
+Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal() const
 {
-	if(vers.size() < 3)
+	if(vers_.size() < 3)
 	{
 		return Vector3(0, 0, 0);
 	}
 
-	Vector3 centroid = computeCenter();
+	Vector3 _center = computeCenter();
 
 	double xx, xy, xz, yy, yz, zz;
 	xx = xy = xz = yy = yz = zz = 0;
-	for(pVertex ver: vers)
+	for(pVertex ver: vers_)
 	{
-		Vector3 r = ver->pos - centroid;
+		Vector3 r = ver->pos - _center;
 		xx += r.x() * r.x();
 		xy += r.x() * r.y();
 		xz += r.x() * r.z();
@@ -207,102 +237,96 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal()
 		return Vector3(0, 0, 0);
 	}
 
+	Vector3d _normal;
 	if(maxDet == det_x)
 	{
-		normal = Vector3(det_x, xz*yz - xy*zz, xy*yz - xz*yy);
+        _normal = Vector3(det_x, xz*yz - xy*zz, xy*yz - xz*yy);
 	}
 	else if(maxDet == det_y)
 	{
-		normal = Vector3(xz*yz - xy*zz, det_y, xy*xz - yz*xx);
+        _normal = Vector3(xz*yz - xy*zz, det_y, xy*xz - yz*xx);
 	}
 	else {
-		normal = Vector3(xy*yz - xz*yy, xy*xz - yz*xx, det_z);
-	};
+        _normal = Vector3(xy*yz - xz*yy, xy*xz - yz*xx, det_z);
+	}
 
-	normal.normalize();
-	return normal;
+	return _normal.normalized();
 }
 
 template <typename Scalar>
-Scalar _Polygon<Scalar>::computeArea()
+Scalar _Polygon<Scalar>::computeArea() const
 {
-	if ( normal == Vector3(0,0,0))
-	    computeNormal();
+    Vector3 _normal = computeNormal();
 
 	Scalar signedArea = 0;
-	for (int i = 0; i < vers.size(); i++)
+	for (int i = 0; i < vers_.size(); i++)
 	{
-        Vector3 currVer = vers[i]->pos;
-        Vector3 nextVer = vers[(i + 1) % vers.size()]->pos;
-		signedArea += 0.5 * (normal.dot(currVer.cross(nextVer)));
+        Vector3 currVer = vers_[i]->pos;
+        Vector3 nextVer = vers_[(i + 1) % vers_.size()]->pos;
+		signedArea += 0.5 * (_normal.dot(currVer.cross(nextVer)));
 	}
 
 	return std::abs( signedArea );
 }
 
 template <typename Scalar>
-Scalar _Polygon<Scalar>::computeAverageEdge()
+Scalar _Polygon<Scalar>::computeAverageEdge() const
 {
 	Scalar avgEdgeLen = 0;
 
-	for (int i = 0; i < vers.size(); i++)
+	for (int i = 0; i < vers_.size(); i++)
 	{
-		Vector3 currVer = vers[i]->pos;
-		Vector3 nextVer = vers[(i + 1) % vers.size()]->pos;
+		Vector3 currVer = vers_[i]->pos;
+		Vector3 nextVer = vers_[(i + 1) % vers_.size()]->pos;
         avgEdgeLen += (nextVer - currVer).norm();
 	}
 
-	avgEdgeLen /= vers.size();
+	avgEdgeLen /= vers_.size();
 
 	return avgEdgeLen;
 }
 
 template <typename Scalar>
-Scalar _Polygon<Scalar>::computeMaxRadius()
+Scalar _Polygon<Scalar>::computeMaxRadius() const
 {
     Scalar MaxRadius = 0;
 
     Vector3 origin = computeCenter();
-    for (int i = 0; i < vers.size(); i++)
+    for (int i = 0; i < vers_.size(); i++)
     {
-        MaxRadius = std::max((vers[i]->pos - origin).norm(), MaxRadius);
+        MaxRadius = std::max((vers_[i]->pos - origin).norm(), MaxRadius);
     }
     return MaxRadius;
 }
 
 template <typename Scalar>
-void _Polygon<Scalar>::computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &origin)
+void _Polygon<Scalar>::computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &origin) const
 {
-	normal = computeNormal();
+	Vector3 _normal = computeNormal();
     origin = computeCenter();
 
-	x_axis = normal.cross(Vector3(1, 0, 0));
+	x_axis = _normal.cross(Vector3(1, 0, 0));
 	if(x_axis.norm() < FLOAT_ERROR_LARGE)
-	    x_axis = normal.cross(Vector3(0, 1, 0));
+	    x_axis = _normal.cross(Vector3(0, 1, 0));
 	x_axis.normalize();
 
-	y_axis = normal.cross(x_axis);
+	y_axis = _normal.cross(x_axis);
 	y_axis.normalize();
 }
 
-
-//**************************************************************************************//
-//                                  Polygon Operations
-//**************************************************************************************//
-
 template <typename Scalar>
-void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris)
+void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris) const
 {
-    if(vers.size() < 3)
+    if(vers_.size() < 3)
         return;
 
-    center = computeCenter();
-    for (int i = 0; i < (int)(vers.size()); i++)
+    Vector3 _center = computeCenter();
+    for (int i = 0; i < vers_.size(); i++)
 	{
 		pTriangle tri = make_shared<Triangle<Scalar>>();
-		tri->v[0] = center;
-		tri->v[1] = vers[i]->pos;
-		tri->v[2] = vers[(i + 1)%vers.size()]->pos;
+		tri->v[0] = _center;
+		tri->v[1] = vers_[i]->pos;
+		tri->v[2] = vers_[(i + 1)%vers_.size()]->pos;
 		tris.push_back(tri);
 	}
 
@@ -310,11 +334,11 @@ void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris)
 }
 
 template <typename Scalar>
-int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point)
+int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point) const
 {
-	for (int i = 0; i < vers.size(); i++)
+	for (int i = 0; i < vers_.size(); i++)
 	{
-		Scalar dist = (point - vers[i]->pos).norm();
+		Scalar dist = (point - vers_[i]->pos).norm();
 
 		// Note: this threshold depends on the scale of elements
 		if (dist < FLOAT_ERROR_LARGE)
@@ -325,80 +349,3 @@ int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point)
 
 	return ELEMENT_OUT_LIST;
 }
-
-
-
-
-//**************************************************************************************//
-//                                  Polygon Transforms
-//**************************************************************************************//
-
-template <typename Scalar>
-void _Polygon<Scalar>::executeTranslation(Vector3 transVec)
-{
-	for (int i = 0; i < vers.size(); i++)
-	{
-		vers[i]->pos += transVec;
-	}
-
-	center += transVec;
-}
-
-//template <typename Scalar>
-//vector<Matrix<Scalar, 3, 1>> _Polygon<Scalar>::ProjectPolygonTo2D(double projMat[])
-//{
-//	vector<Vector3> poly2D;
-//
-//	for (int i = 0; i < vers.size(); i++)
-//	{
-//		Vector3 ver2D;
-//		MultiplyPoint( vers[i]->pos, projMat, ver2D);
-//
-//		poly2D.push_back( ver2D );
-//	}
-//
-//	return poly2D;
-//}
-
-//template <typename Scalar>
-//vector<Eigen::Vector3i> _Polygon<Scalar>::ProjectToNormalPlane(Vector3 x_axis, Vector3 y_axis, Vector3 origin, float Scale)
-//{
-//	vector<Vector3i> pts;
-//	for(int id = 0; id < vers.size(); id++)
-//	{
-//		Vector3 pos = vers[id]->pos;
-//		int x = (int)((pos - origin).dot(x_axis) * Scale);
-//		int y = (int)((pos - origin).dot(y_axis) * Scale);
-//		int z = 0;
-//		pts.push_back(Vector3i(x, y, z));
-//	}
-//	return pts;
-//}
-//
-//template <typename Scalar>
-//void _Polygon<Scalar>::ComputeProjectMatrixTo2D(double projMat[], double invsProjMat[])
-//{
-//	if ( vers.size() < 3 )
-//		return;
-//
-//	Vector3 origin = ComputeCenter();
-//
-//	Vector3 zAxis = ComputeNormal();
-//	Vector3 xAxis = vers[1]->pos - vers[0]->pos;
-//	xAxis = xAxis / len(xAxis);
-//	Vector3 yAxis = zAxis.cross(xAxis);
-//
-//	double mat[16];
-//	identityd(mat);
-//	mat[0] = xAxis.x;     mat[1] = xAxis.y;     mat[2] = xAxis.z;
-//	mat[4] = yAxis.x;     mat[5] = yAxis.y;     mat[6] = yAxis.z;
-//	mat[8] = zAxis.x;     mat[9] = zAxis.y;     mat[10] = zAxis.z;
-//	mat[12] = origin.x;   mat[13] = origin.y;   mat[14] = origin.z;
-//
-//	memcpy(invsProjMat, mat, sizeof(double)*16);
-//
-//	memcpy(projMat, mat, sizeof(double)*16);
-// 	if (invert4by4(projMat) == 0)  printf("Inverse Matrix Error \n");
-//}
-
-//

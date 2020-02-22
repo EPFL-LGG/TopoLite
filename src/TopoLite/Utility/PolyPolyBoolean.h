@@ -225,9 +225,10 @@ Matrix<Scalar, 3, 1> PolyPolyBoolean<Scalar>::computeNormal(const PolyPolyBoolea
     Vector3 normal(0, 0 ,0), center(0, 0, 0);
     center = computeCenter(poly);
 
-    for(int id = 0; id < poly.size() - 1; id++){
+    for(int id = 0; id < (int)(poly.size()) - 1; id++){
         normal += (poly[id] - center).cross(poly[id + 1] - center);
     }
+
     if(normal.norm() < FLOAT_ERROR_LARGE)
         return Vector3(0, 0, 0);
 
@@ -235,10 +236,12 @@ Matrix<Scalar, 3, 1> PolyPolyBoolean<Scalar>::computeNormal(const PolyPolyBoolea
 }
 
 template<typename Scalar>
-Matrix<Scalar, 3, 1> PolyPolyBoolean<Scalar>::computeCenter(const PolyPolyBoolean::PolyVector3 &poly) {
+Matrix<Scalar, 3, 1> PolyPolyBoolean<Scalar>::computeCenter(const PolyPolyBoolean::PolyVector3 &poly)
+{
     Vector3 center(0, 0, 0);
 
-    for(int id = 0; id < poly.size() - 1; id++){
+    for(int id = 0; id < poly.size(); id++)
+    {
         center += poly[id];
     }
     if(!poly.empty())

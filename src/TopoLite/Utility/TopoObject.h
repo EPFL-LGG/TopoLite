@@ -25,7 +25,7 @@ public:
 
 public:
 
-    shared_ptr<InputVarList> getVarList(){
+    shared_ptr<InputVarList> getVarList() const{
         TopoASSERT(varList != nullptr);
         return varList;
     }

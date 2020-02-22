@@ -39,7 +39,7 @@ public:
 
     typedef Matrix<Scalar, 3 ,1> Vector3;
 
-    typedef shared_ptr<_Vertex<Scalar>> pVertex;
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
 
 public:
     //storage

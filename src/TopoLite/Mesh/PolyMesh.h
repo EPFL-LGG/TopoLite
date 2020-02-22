@@ -34,20 +34,23 @@ public:
 
     typedef Matrix<Scalar, 2, 1> Vector2;
 
-    typedef shared_ptr<_Vertex<Scalar>> pVertex;
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
+
+    typedef shared_ptr<VTex<Scalar>> pVTex;
 
 public:
 
-    struct duplicate_vertex
+    struct sort_vertex
     {
         Vector3 pos;
         int vID;
         double eps;
+        shared_ptr<VPoint<Scalar>> ptr;
     };
 
-    struct duplicate_vertex_compare
+    struct sort_vertex_compare
     {
-        bool operator()(const duplicate_vertex& A, const duplicate_vertex& B) const
+        bool operator()(const sort_vertex& A, const sort_vertex& B) const
         {
             double eps = A.eps / 2;
 
@@ -80,7 +83,9 @@ public:
 public:
 
 	//Computed
-    vector<pVertex> vertexList;          // Vertex of polygonal mesh
+    vector<pVertex> vertexList;          // Vertex Position of polygonal mesh
+
+    vector<pVTex> texList;               // Tex Coordinate
 
 	Box<Scalar> bbox;                    // Bounding box of polygonal mesh
 
@@ -100,67 +105,76 @@ public:
 
 	~PolyMesh();
 
+
+/***********************************************
+ *             modify mesh operation           *
+ ***********************************************/
+
 public:
 
-	void clear();
-
-	void print();
+    void clear();
 
     void normalize(Vector3 &trans, Scalar &scale);
 
     void setPolyLists(vector<pPolygon> _polyList);
 
-    shared_ptr<PolyMesh<Scalar>> getTextureMesh();
-
-public:
-
-    //Read OBJ File
+    // Read OBJ File
     bool readOBJModel(  const char *fileName, bool &textureModel_, bool normalized);
 
-    //Save OBJ File
-    void writeOBJModel(const char *objFileName, bool triangulate = false);
-
-public:
-
-    //Storage memeber computation
-
-	void computeBBox();
-
-    void computeTextureBBox();
-
-	void computeCentroid();
-
-    void computeVolume();
-
-	void computeLowestPt();
-
-	void computeVertexList();
-
     void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
-
-private:
-
-    Scalar computeVolume(vector<pTriangle> triList);
-
-    Vector3 computeCentroid(vector<pTriangle> triList);
-
-    Vector3 computeExtremeVertex(Vector3 rayDir);
-
-public:
 
     // Transform Mesh
     void translateMesh(Vector3 move);
 
-    void scaleMesh(Scalar scale);
+    void scaleMesh(Vector3 scale);
 
     void rotateMesh(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle);
 
+    // Auxiliary Data Computation
+    void computeBBox();
+
+    void computeTextureBBox();
+
+    void computeCentroid();
+
+    void computeVolume();
+
+    void computeLowestPt();
+
+    void computeVertexList();
+
+    void computeTexList();
+
 public:
+/***********************************************
+ *             read only mesh operation        *
+ ***********************************************/
 
-    //convert
+	void print() const;
 
-    void convertToTriMesh(vector<pTriangle> &triList);
+    vector<Vector3> getVertices() const{
+        vector<Vector3> pointLists;
+        for(pVertex vertex: vertexList){
+            pointLists.push_back(vertex.pos);
+        }
+        return pointLists;
+    }
 
+    shared_ptr<PolyMesh<Scalar>> getTextureMesh() const;
+
+    //Save OBJ File
+    void writeOBJModel(const char *objFileName, bool triangulate = false) const;
+
+    //convert to triangle mesh
+    void convertToTriMesh(vector<pTriangle> &triList) const;
+
+private:
+
+    Scalar computeVolume(vector<pTriangle> triList) const;
+
+    Vector3 computeCentroid(vector<pTriangle> triList) const;
+
+    Vector3 computeExtremeVertex(Vector3 rayDir) const;
 };
 
 #include "PolyMesh.cpp"

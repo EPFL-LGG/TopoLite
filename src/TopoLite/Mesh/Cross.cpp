@@ -22,12 +22,14 @@ template <typename Scalar>
 Cross<Scalar>::Cross(std::shared_ptr<InputVarList> var) : TopoObject(var)
 {
 	isVisited = false;
+	crossID = -1;
 }
 
 template <typename Scalar>
 Cross<Scalar>::~Cross()
 {
 	oriPoints.clear();
+	crossID = -1;
 }
 
 template <typename Scalar>

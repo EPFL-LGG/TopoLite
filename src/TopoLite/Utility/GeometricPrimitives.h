@@ -89,37 +89,55 @@ struct Point
 ////////////////////////////////////////////
 
 template <typename Scalar>
-class _Vertex
+class VPoint
 {
 public:
+
     typedef Matrix<Scalar, 3, 1> Vector3;
-    typedef Matrix<Scalar, 2 ,1> Vector2;
 
 public:
 
     Vector3 pos;				//!< vertex's postion (X,Y,Z)
 
-    Vector2 texCoord;			//!< vertex's texcoord (U,V) for mapping the pattern
-
     int verID;
 
 public:
-    _Vertex()
+    VPoint()
     {
         verID = -1;
     };
 
-    _Vertex(const Vector3 &_pos)
+    VPoint(const Vector3 &_pos)
     {
         pos   = _pos;
         verID = -1;
     };
+};
 
-    _Vertex(const Vector3& _pos, const Vector2& _texCoord)
+
+template <typename Scalar>
+class VTex
+{
+public:
+
+    typedef Matrix<Scalar, 2 ,1> Vector2;
+
+public:
+
+    Vector2 texCoord;				//!< vertex's postion (X,Y,Z)
+
+    int texID;
+
+public:
+    VTex()
     {
-        pos = _pos;
+        texID = -1;
+    };
+
+    VTex(const Vector2& _texCoord)
+    {
         texCoord = _texCoord;
-        verID = -1;
+        texID = -1;
     };
 };
 
@@ -591,7 +609,7 @@ public:
     * \param[in] rotAngle rotation angle
     * \return vector after rotation
     */
-    Vector3 rotateVecAroundAxis(Vector3 normal, Vector3 rotAxis, Scalar rotAngle)
+    static Vector3 rotateVecAroundAxis(Vector3 normal, Vector3 rotAxis, Scalar rotAngle)
     {
         rotAngle = rotAngle / 180 * M_PI;
         Eigen::Matrix<Scalar, 3, 3> mat, ux;

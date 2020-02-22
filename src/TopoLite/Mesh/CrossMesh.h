@@ -15,62 +15,73 @@
 #ifndef _CROSS_MESH_H
 #define _CROSS_MESH_H
 
-#include "TopoLite/Utility/vec.h"
-#include "TopoLite/Utility/TopoObject.h"
-
 #include "TopoLite/Mesh/PolyMesh.h"
-
 #include "Cross.h"
 
 
 
-#include <vector>
-
-using namespace std;
-using pCross = shared_ptr<Cross>;
-using wpCross = weak_ptr<Cross>;
-
-class CrossMesh : public TopoObject
+template<typename Scalar>
+class CrossMesh : private PolyMesh<Scalar>
 {
 
 public:
 
-	vector<pCross> crossList;                // Cross list of the mesh
+    using pCross = shared_ptr<Cross<Scalar>>;
 
-	vector<Vector3f> vertexList;						// all vertices point of cross
+    using wpCross = weak_ptr<Cross<Scalar>>;
+
+    using pPolygon = shared_ptr<_Polygon<Scalar>> ;
+
+    using pTriangle = shared_ptr<Triangle<Scalar>> ;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef Matrix<Scalar, 2, 1> Vector2;
+
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
+
+    typedef shared_ptr<VTex<Scalar>> pVTex;
+
+public:
+
+	vector<pCross> crossList;                   // Cross list of the mesh
 
 	vector<vector<wpCross>> vertexCrossList; 	// all cross around a vertex
 
 public:
 
-	//int boundary_vertexList_index;						//seperate the boundary vertices which will not optimize in the shapeop function
-
-	shared_ptr<PolyMesh> baseMesh2D;
+	shared_ptr<PolyMesh<Scalar>> baseMesh2D;            //
 
 public:
 
     CrossMesh(std::shared_ptr<InputVarList> var);
+
     CrossMesh(const CrossMesh &_cross);
+
+    CrossMesh(const PolyMesh<Scalar> &polyMesh);
+
     ~CrossMesh();
 
-    bool checkCoherency();
-    void Print();
-	void SetBaseMesh2D(shared_ptr<PolyMesh> _baseMesh2D);
-    vector<Vector3f> GetAllVertices();
+public:
+
+    void setPolyMesh(const PolyMesh<Scalar> &polyMesh);
+
+    void setBaseMesh2D(shared_ptr<PolyMesh<Scalar>> _baseMesh2D);
+
+    void print();
 
 public:
 
-	void UpdateCrossFromVertexList();
-	void UpdateCrossVertexIndex();
+    using PolyMesh<Scalar>::getVertices;
+
+public:
+
 	void updateCrossID();
-    float averageCrossSize();
-    void TranslateMesh(Vector3f mv);
-    shared_ptr<PolyMesh> getPolyMesh();
 
-public:
-	// Save OBJ file
-	void WriteOBJModel(const char *objFileName);
+    Scalar computeAverageCrossSize();
 };
+
+#include "CrossMesh.cpp"
 
 #endif
 

@@ -13,27 +13,25 @@
 
 
 #include "Utility/HelpDefine.h"
-#include "Utility/HelpFunc.h"
-#include "Cross.h"
-#include "CrossMesh.h"
-#include "Mesh/PolyMesh.h"
-#include "IO/InputVar.h"
-
-#include <igl/remove_duplicate_vertices.h>
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
-CrossMesh::CrossMesh(std::shared_ptr<InputVarList> var) : TopoObject(var)
+
+template<typename Scalar>
+CrossMesh<Scalar>::CrossMesh(std::shared_ptr<InputVarList> var) : TopoObject(var)
 {
-	baseMesh2D = NULL;
+	baseMesh2D = nullptr;
 }
 
-CrossMesh::~CrossMesh()
+template<typename Scalar>
+CrossMesh<Scalar>::~CrossMesh()
 {
+
 }
 
-CrossMesh::CrossMesh(const CrossMesh &_cross)
+template<typename Scalar>
+CrossMesh<Scalar>::CrossMesh(const CrossMesh &_cross)
 {
     if(_cross.baseMesh2D) baseMesh2D = make_shared<PolyMesh>(*_cross.baseMesh2D);
     vertexList = _cross.vertexList;
@@ -68,15 +66,8 @@ CrossMesh::CrossMesh(const CrossMesh &_cross)
     UpdateCrossVertexIndex();
 }
 
-bool CrossMesh::checkCoherency()
-{
-    for(pCross cross: crossList){
-        TopoASSERT(cross->getVarList() != getVarList());
-    }
-    return true;
-}
-
-void CrossMesh::Print()
+template<typename Scalar>
+void CrossMesh<Scalar>::Print()
 {
 	printf("cross num: %lu \n", crossList.size());
 
@@ -86,7 +77,8 @@ void CrossMesh::Print()
 	}
 }
 
-void CrossMesh::SetBaseMesh2D(shared_ptr<PolyMesh> _baseMesh2D)
+template<typename Scalar>
+void CrossMesh<Scalar>::SetBaseMesh2D(shared_ptr<PolyMesh> _baseMesh2D)
 {
 	baseMesh2D = _baseMesh2D;
 }
@@ -115,7 +107,8 @@ vector<Vector3f> CrossMesh::GetAllVertices()
 //                                   Update Vertices
 //**************************************************************************************//
 
-void CrossMesh::UpdateCrossFromVertexList()
+template<typename Scalar>
+void CrossMesh<Scalar>::UpdateCrossFromVertexList()
 {
     for (int i = 0; i < crossList.size(); i++)
     {
@@ -132,7 +125,8 @@ void CrossMesh::UpdateCrossFromVertexList()
     return;
 }
 
-void CrossMesh::UpdateCrossVertexIndex()
+template<typename Scalar>
+void CrossMesh<Scalar>::UpdateCrossVertexIndex()
 {
     vertexList.clear();
 
@@ -190,18 +184,21 @@ void CrossMesh::UpdateCrossVertexIndex()
     return;
 }
 
-float CrossMesh::averageCrossSize() {
+template<typename Scalar>
+Scalar CrossMesh<Scalar>::averageCrossSize() {
     return 0;
 }
 
-void CrossMesh::updateCrossID() {
+template<typename Scalar>
+void CrossMesh<Scalar>::updateCrossID() {
     for(int id = 0; id < crossList.size(); id++){
         if(crossList[id])
             crossList[id]->crossID = id;
     }
 }
 
-void CrossMesh::TranslateMesh(Vector3f mv) {
+template<typename Scalar>
+void CrossMesh<Scalar>::TranslateMesh(Vector3f mv) {
     for(int id = 0; id < vertexList.size(); id++){
         vertexList[id] += mv;
     }
@@ -229,7 +226,8 @@ shared_ptr<PolyMesh> CrossMesh::getPolyMesh()
 //                                   Save OBJ File
 //**************************************************************************************//
 
-void CrossMesh::WriteOBJModel(const char *objFileName)
+template<typename Scalar>
+void CrossMesh<Scalar>::WriteOBJModel(const char *objFileName)
 {
 	FILE *fp;
 	if ((fp = fopen(objFileName, "w+")) == NULL)

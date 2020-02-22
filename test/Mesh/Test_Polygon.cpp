@@ -12,7 +12,7 @@ TEST_CASE("Polygon")
 {
     _Polygon<double> poly;
 
-    REQUIRE(poly.vers.empty());
+    REQUIRE(poly.size() == 0);
 
     SECTION("setVertices"){
         PolyVector3d pts;
@@ -22,8 +22,24 @@ TEST_CASE("Polygon")
         pts.push_back(Vector3d(0, 1, 0));
 
         poly.setVertices(pts);
-        REQUIRE(poly.vers.size() == 4);
-        REQUIRE((poly.vers[1]->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+        REQUIRE(poly.size() == 4);
+        REQUIRE((poly.vers(1)->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+    }
+
+    SECTION("deep copy"){
+        PolyVector3d pts;
+        pts.push_back(Vector3d(0, 0, 0));
+        pts.push_back(Vector3d(1, 0, 0));
+        pts.push_back(Vector3d(1, 1, 0));
+        pts.push_back(Vector3d(0, 1, 0));
+
+        poly.setVertices(pts);
+
+        _Polygon<double> newpoly;
+        newpoly = poly;
+        poly.clear();
+
+        REQUIRE((newpoly.vers(1)->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
     }
 
     SECTION("push_back"){
@@ -32,8 +48,8 @@ TEST_CASE("Polygon")
         poly.push_back(Vector3d(1, 1, 0));
         poly.push_back(Vector3d(0, 1, 0));
 
-        REQUIRE(poly.vers.size() == 4);
-        REQUIRE((poly.vers[1]->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+        REQUIRE(poly.size() == 4);
+        REQUIRE((poly.vers(1)->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
     }
 
     SECTION("the polygon has a simple input")
@@ -46,8 +62,8 @@ TEST_CASE("Polygon")
         SECTION("reverseVertices"){
             poly.reverseVertices();
 
-            REQUIRE(poly.vers.size() == 4);
-            REQUIRE((poly.vers[1]->pos - Vector3d(2, 2, 0)).norm() == Approx(0));
+            REQUIRE(poly.size() == 4);
+            REQUIRE((poly.vers(1)->pos - Vector3d(2, 2, 0)).norm() == Approx(0));
         }
 
         SECTION("checkEquality"){
@@ -78,11 +94,9 @@ TEST_CASE("Polygon")
         }
 
         SECTION("computeNormal"){
-            REQUIRE((poly.computeNormal() - Vector3d(0, 0, 1)).norm()  == Approx(0.0));
-            REQUIRE((poly.normal - Vector3d(0, 0, 1)).norm() == Approx(0.0));
+            REQUIRE((poly.normal() - Vector3d(0, 0, 1)).norm() == Approx(0.0));
             poly.reverseVertices();
-            poly.computeNormal();
-            REQUIRE((poly.normal - Vector3d(0, 0, -1)).norm() == Approx(0.0));
+            REQUIRE((poly.normal() - Vector3d(0, 0, -1)).norm() == Approx(0.0));
         }
 
         SECTION("computeFitedPlaneNormal"){
@@ -120,15 +134,15 @@ TEST_CASE("Polygon")
         }
 
         SECTION("executeTranslation"){
-            poly.executeTranslation(Vector3d(1, 1, 1));
-            REQUIRE((poly[1] - Vector3d(3, 1, 1)).norm() == Approx(0.0));
+            poly.translatePolygon(Vector3d(1, 1, 1));
+            REQUIRE((poly.vers(1)->pos - Vector3d(3, 1, 1)).norm() == Approx(0.0));
         }
 
-        SECTION("operation []"){
+        SECTION("vers()"){
             //support circular index
-            REQUIRE((poly[-1] - Vector3d(0, 2, 0)).norm() == Approx(0.0));
-            REQUIRE((poly[1] - Vector3d(2, 0, 0)).norm() == Approx(0.0));
-            REQUIRE((poly[4] - Vector3d(0, 0, 0)).norm() == Approx(0.0));
+            REQUIRE((poly.vers(-1)->pos - Vector3d(0, 2, 0)).norm() == Approx(0.0));
+            REQUIRE((poly.vers(1)->pos - Vector3d(2, 0, 0)).norm() == Approx(0.0));
+            REQUIRE((poly.vers(4)->pos - Vector3d(0, 0, 0)).norm() == Approx(0.0));
         }
     }
 }

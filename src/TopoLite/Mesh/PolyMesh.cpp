@@ -18,6 +18,8 @@
 #include "igl/readOBJ.h"
 #include "igl/lscm.h"
 #include "Polygon.h"
+#include "PolyMesh.h"
+
 
 #include <set>
 
@@ -70,6 +72,8 @@ void PolyMesh<Scalar>::setPolyLists(vector<pPolygon> _polyList)
 
     computeLowestPt();
 
+    computeVolume();
+
     computeBBox();
 
     return;
@@ -93,36 +97,40 @@ PolyMesh<Scalar>::PolyMesh(const PolyMesh &_mesh): TopoObject(_mesh)
 
     computeVertexList();
 
+    computeTexList();
+
     computeCentroid();
 
     computeLowestPt();
+
+    computeVolume();
 
     computeBBox();
     return;
 }
 
 template<typename Scalar>
-void PolyMesh<Scalar>::print()
+void PolyMesh<Scalar>::print() const
 {
-	printf("vertex num: %lu \n", vertexList.size());
-	for (int i = 0; i < vertexList.size(); i++)
-	{
-		Vector3 ver = vertexList[i]->pos;
-		printf("%9.6f  %9.6f  %9.6f \n", ver.x(), ver.y(), ver.z());
-	}
-	printf("\n");
+    printf("vertex num: %lu \n", vertexList.size());
+    for (int i = 0; i < vertexList.size(); i++)
+    {
+        Vector3 ver = vertexList[i]->pos;
+        printf("%9.6f  %9.6f  %9.6f \n", ver.x(), ver.y(), ver.z());
+    }
+    printf("\n");
 
-	printf("polygon num: %lu \n", polyList.size());
-	for (int i = 0; i < polyList.size(); i++)
-	{
-		pPolygon poly = polyList[i];
-		for(int j=0; j < poly->vers.size(); j++)
-		{
-			printf("%d ", poly->vers[j]->verID);
-		}
-		printf("\n");
-	}
-	printf("\n");
+    printf("polygon num: %lu \n", polyList.size());
+    for (int i = 0; i < polyList.size(); i++)
+    {
+        pPolygon poly = polyList[i];
+        for(int j=0; j < poly->vers.size(); j++)
+        {
+            printf("%d ", poly->vers[j]->verID);
+        }
+        printf("\n");
+    }
+    printf("\n");
 }
 
 template<typename Scalar>
@@ -130,23 +138,17 @@ void PolyMesh<Scalar>::normalize(Vector3 &trans, Scalar &scale)
 {
     computeBBox();
 
-    scale = 2.0f / _MAX(bbox.size.x, _MAX(bbox.size.y, bbox.size.z));
+    scale = 2.0 / std::max(bbox.size.x(), std::max(bbox.size.y(), bbox.size.z()));
     trans = -bbox.cenPt;
 
     for (int i = 0; i < vertexList.size(); ++i)
     {
-        Vector3 origVer = vertexList[i];
-        vertexList[i] = (origVer+trans) * scale;
+        Vector3 origVer = vertexList[i]->pos;
+        vertexList[i]->pos = (origVer + trans) * scale;
     }
 
-    for (int i = 0; i < polyList.size(); i++)
-    {
-        for (int j = 0; j < polyList[i]->vers.size(); ++j)
-        {
-            Vector3 origVer = polyList[i]->vers[j].pos;
-
-            polyList[i]->vers[j].pos = (origVer + trans) * scale;
-        }
+    for (pPolygon poly: polyList){
+        poly->update();
     }
 }
 
@@ -210,10 +212,10 @@ void PolyMesh<Scalar>::computeVolume()
 {
     // Convert into triangular mesh
     vector<pTriangle> triList;
-    convert2TriMesh(triList);
+    convertToTriMesh(triList);
 
     // Compute volume of the triangular mesh
-    volume = ComputeVolume(triList);
+    volume = computeVolume(triList);
 
     // Release the memory
     triList.clear();
@@ -223,7 +225,7 @@ void PolyMesh<Scalar>::computeVolume()
 // Compute model volume following Dr Robert Nurnberg's method at:
 // http://wwwf.imperial.ac.uk/~rn/centroid.pdf
 template<typename Scalar>
-Scalar PolyMesh<Scalar>::computeVolume(vector<pTriangle> triList)
+Scalar PolyMesh<Scalar>::computeVolume(vector<pTriangle> triList) const
 {
     Scalar volume = 0;
 
@@ -262,7 +264,7 @@ void PolyMesh<Scalar>::computeCentroid()
 // Compute model centroid following Dr Robert Nurnberg's method at:
 // http://wwwf.imperial.ac.uk/~rn/centroid.pdf
 template<typename Scalar>
-Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeCentroid(vector<pTriangle> triList)
+Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeCentroid(vector<pTriangle> triList) const
 {
     Vector3 centroid = Vector3(0, 0, 0);
 
@@ -310,7 +312,7 @@ void PolyMesh<Scalar>::computeLowestPt()
 }
 
 template<typename Scalar>
-Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeExtremeVertex(Vector3 rayDir)
+Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeExtremeVertex(Vector3 rayDir) const
 {
     Vector3 extremVer(0, 0, 0);
 
@@ -320,7 +322,7 @@ Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeExtremeVertex(Vector3 rayDir)
     {
         pPolygon poly = polyList[i];
         poly->computeCenter();
-        pointList.push_back(poly->center);
+        pointList.push_back(poly->center());
     }
 
     //Push back edge middle points
@@ -402,8 +404,49 @@ void PolyMesh<Scalar>::computeVertexList()
             }
         }
     }
+}
 
+template<typename Scalar>
+void PolyMesh<Scalar>::computeTexList()
+{
+    texList.clear();
 
+    //1) check whether the vertices of all polygons already have vertex index
+    bool hasTexID = true;
+    int numTex = 0;
+    for(pPolygon poly: polyList)
+    {
+        for(pVTex tex : poly->texs)
+        {
+            if(tex->texID == -1){
+                hasTexID = false;
+                break;
+            }
+            else{
+                numTex = std::max(numTex, tex->texID + 1);
+            }
+        }
+    }
+
+    if(hasTexID){
+        //2.1) if vertices have vertex index
+        texList.resize(numTex);
+        for(pPolygon poly: polyList) {
+            for (pVTex tex : poly->texs) {
+                texList[tex->texID] = tex;
+            }
+        }
+    }
+    else{
+        //2.2) if vertices do not have vertex index
+        for(pPolygon poly: polyList) {
+            for (pVTex tex : poly->texs)
+            {
+                tex->texID = texList.size();
+                texList.push_back(tex);
+            }
+        }
+    }
 }
 
 
@@ -416,21 +459,8 @@ void PolyMesh<Scalar>::rotateMesh(Vector3 rotCenter, Vector3 rotAxis, Scalar rot
 {
 	for (int i = 0; i < vertexList.size(); ++i)
 	{
-		Vector3 &ver = vertexList[i];
-
-		ver = RotateVector(rotCenter, rotAxis, rotAngle, ver);
-	}
-
-	for (int i = 0; i < polyList.size(); ++i)
-	{
-		pPolygon poly = polyList[i];
-
-		for (int j = 0; j < poly->vers.size(); ++j)
-		{
-			Vector3 &ver = poly->vers[j].pos;
-
-			ver = RotateVector(rotCenter, rotAxis, rotAngle, ver);
-		}
+		pVertex ver = vertexList[i];
+		ver->pos = OrientPoint<Scalar>::rotateVecAroundAxis(rotCenter, rotAxis, rotAngle);
 	}
 }
 
@@ -438,37 +468,19 @@ template<typename Scalar>
 void PolyMesh<Scalar>::translateMesh(Vector3 move)
 {
     for (int i = 0; i < vertexList.size(); ++i) {
-        Vector3 &ver = vertexList[i];
-        ver+= move;
-    }
-
-    for (int i = 0; i < polyList.size(); ++i)
-    {
-        pPolygon poly = polyList[i];
-        for (int j = 0; j < poly->vers.size(); ++j)
-        {
-            Vector3 &ver = poly->vers[j].pos;
-            ver += move;
-        }
+        pVertex ver = vertexList[i];
+        ver->pos += move;
     }
 }
 
 template<typename Scalar>
-void PolyMesh<Scalar>::scaleMesh(Scalar scale)
+void PolyMesh<Scalar>::scaleMesh(Vector3 scale)
 {
     for (int i = 0; i < vertexList.size(); ++i) {
-        Vector3 &ver = vertexList[i];
-        ver*= scale;
-    }
-
-    for (int i = 0; i < polyList.size(); ++i)
-    {
-        pPolygon poly = polyList[i];
-        for (int j = 0; j < poly->vers.size(); ++j)
-        {
-            Vector3 &ver = poly->vers[j].pos;
-            ver *= scale;
-        }
+        pVertex ver = vertexList[i];
+        ver->pos[0] *= scale[0];
+        ver->pos[1] *= scale[1];
+        ver->pos[2] *= scale[2];
     }
 }
 
@@ -486,36 +498,38 @@ bool PolyMesh<Scalar>::readOBJModel(
 	vector<vector<double>> V, TC, CN;
 	vector<vector<int>> F, FTC, FN;
 
+	clear();
+
 	if(igl::readOBJ(fileName, V, TC, CN, F, FTC, FN))
 	{
 	    clear();
 
-        for(int id = 0; id < V.size(); id++)
-        {
-            vertexList.push_back(Vector3(V[id][0], V[id][1], V[id][2]));
-//            if(!TC.empty()) texCoordList.push_back(Vector2(TC[id][0], TC[id][1]));
+        for(int id = 0; id < V.size(); id++) {
+            {
+                shared_ptr<VPoint<Scalar>> ver = make_shared<VPoint<Scalar>>();
+                ver->pos = Vector3(V[id][0], V[id][1], V[id][2]);
+                ver->verID = id;
+                vertexList.push_back(ver);
+            }
         }
+
+        for(int id = 0; id < TC.size(); id++)
+        {
+                shared_ptr<VTex<Scalar>> vtex = make_shared<VTex<Scalar>>();
+                vtex->texCoord = Vector2(TC[id][0], TC[id][1]);
+                vtex->texID = id;
+                texList.push_back(vtex);
+        }
+
         for(int id = 0; id < F.size(); id++)
         {
 			shared_ptr<_Polygon<Scalar>> poly = make_shared<_Polygon<Scalar>>();
-            poly->verIDs.resize(F[id].size());
-            poly->vers.resize(F[id].size());
-
             for(int jd = 0; jd < F[id].size(); jd++)
 			{
-				poly->verIDs[jd] = F[id][jd];
-				poly->vers[jd].pos = vertexList[F[id][jd]];
+				poly->vers.push_back(vertexList[F[id][jd]]);
+				poly->texs.push_back(texList[FTC[id][jd]]);
 			}
-
-            if(!TC.empty()){
-                poly->texIDs.resize(F[id].size());
-
-				for(int jd = 0; jd < F[id].size(); jd++)
-				{
-					poly->texIDs[jd] = FTC[id][jd];
-//					poly->vers[jd].texCoord = texCoordList[FTC[id][jd]];
-				}
-            }
+            poly->update();
             polyList.push_back(poly);
         }
 
@@ -525,9 +539,10 @@ bool PolyMesh<Scalar>::readOBJModel(
 	    else{
             texturedModel = textureModel_ = true;
 	    }
+
         Vector3 trans;
 	    Scalar scale;
-	    if(normalized) NormalizeMesh(trans, scale);
+	    if(normalized) normalize(trans, scale);
         removeDuplicatedVertices();
 		return true;
 	}
@@ -537,22 +552,28 @@ bool PolyMesh<Scalar>::readOBJModel(
 }
 
 template<typename Scalar>
-shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh()
+shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh() const
 {
     shared_ptr<PolyMesh> polymesh = make_shared<PolyMesh>(getVarList());
-    for (int i = 0; i < polyList.size(); i++) {
+    for (int i = 0; i < polyList.size(); i++)
+    {
         pPolygon poly = make_shared<_Polygon<Scalar>>(*polyList[i]);
-        for(int j = 0; j < poly->vers.size(); j++){
-            poly->vers[j].pos = Vector3(poly->vers[j].texCoord[0], poly->vers[j].texCoord[1], 0);
+        for(int j = 0; j < poly->texs.size(); j++)
+        {
+            if(poly->texs[j] != nullptr){
+                poly->vers[j]->pos = Vector3(poly->texs[j]->texCoord.x(), poly->texs[j]->texCoord.y(), 0);
+            }
         }
+        poly->texs.clear();
         polymesh->polyList.push_back(poly);
     }
 
     return polymesh;
 }
 
+
 template<typename Scalar>
-void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate)
+void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) const
 {
 	FILE *fp;
 	if ((fp = fopen(objFileName, "w+")) == NULL)
@@ -563,29 +584,28 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate)
 	else
 	{
 		///////////////////////////////////////////////////////////////////
-		// 1. Compute vertices and vertexIDs in case they are missing
-
-        removeDuplicatedVertices();
+		// 1. Check whether vertexList and texList exists
+		if(vertexList.empty() || texList.empty()) return;
 
 		///////////////////////////////////////////////////////////////////
 		// 2. Write the vertex info of the mesh
 
-		//fprintf(fp, "# Wavefront OBJ generated by Peng SONG \n\n");
+		fprintf(fp, "# Wavefront OBJ generated by Ziqi & Peng SONG \n\n");
 
 		fprintf(fp, "# %d vertices \n", (int)vertexList.size());
 
 		for (int i = 0; i < vertexList.size(); i++)
 		{
-			fprintf(fp, "v %f %f %f \n", vertexList[i].x , vertexList[i].y, vertexList[i].z );
+			fprintf(fp, "v %f %f %f \n", vertexList[i]->pos.x() , vertexList[i]->pos.y(), vertexList[i]->pos.z());
 		}
 		fprintf(fp, "\n");
 
-
-//		for(int i = 0; i < texCoordList.size(); i++)
-//		{
-//			fprintf(fp, "vt %f %f \n", texCoordList[i].x , texCoordList[i].y);
-//		}
-//		fprintf(fp, "\n");
+        fprintf(fp, "# %d tex points \n", (int)texList.size());
+		for(int i = 0; i < texList.size(); i++)
+		{
+			fprintf(fp, "vt %f %f \n", texList[i]->texCoord.x(), texList[i]->texCoord.y());
+		}
+		fprintf(fp, "\n");
 
 		///////////////////////////////////////////////////////////////////
 		// 3. Write each polygon info of the mesh
@@ -596,45 +616,39 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate)
 		{
 			pPolygon poly = polyList[i];
 
-			//fprintf(fp, "f ");
-			//for (int j = 0; j < poly->verIDs.size(); j++)
-			//{
-			//	//Since the index in OBJ file starting from 1 instead of 0, we need to add 1 to each index
-			//	fprintf(fp, " %d", poly->verIDs[j] + 1);
-			//}
-			//fprintf(fp, "\n");
-
-            if(!triangulate){
+            if(!triangulate)
+            {
                 fprintf(fp, "f ");
                 for (int j = 0; j < poly->vers.size(); j++)
                 {
-                    int verID = poly->verIDs[j];
+                    int verID = poly->vers[j]->verID;
                     //Since the index in OBJ file starting from 1 instead of 0, we need to add 1 to each index
-//                    if(texCoordList.empty())
-//                        fprintf(fp, " %d", verID + 1);
-//                    else
-//                    {
-//                        int texID = poly->texIDs[j];
-//                        fprintf(fp, " %d/%d", verID + 1, texID + 1);
-//                    }
+
+                    if(texList.empty())
+                        fprintf(fp, " %d", verID + 1);
+                    else
+                    {
+                        int texID = poly->texs[j]->texID;
+                        fprintf(fp, " %d/%d", verID + 1, texID + 1);
+                    }
 
                 }
                 fprintf(fp, "\n");
             }
             else{
-                for(int j = 0; j < poly->vers.size() - 2; j++)
+                for(int j = 0; j < (int)(poly->vers.size()) - 2; j++)
                 {
                     fprintf(fp, "f ");
                     int indices[3] = {0, j + 1, j + 2};
                     for(int k = 0; k < 3; k++)
                     {
-						int verID = poly->verIDs[indices[k]];
-//                        if(texCoordList.empty())
-//                            fprintf(fp, " %d", verID + 1);
-//                        else{
-//                            int texID = poly->texIDs[indices[k]];
-//                            fprintf(fp, " %d/%d", verID + 1, texID + 1);
-//                        }
+						int verID = poly->vers[indices[k]]->verID;
+                        if(texList.empty())
+                            fprintf(fp, " %d", verID + 1);
+                        else{
+                            int texID = poly->texs[indices[k]]->texID;
+                            fprintf(fp, " %d/%d", verID + 1, texID + 1);
+                        }
                     }
                     fprintf(fp, "\n");
                 }
@@ -649,30 +663,35 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate)
 template<typename Scalar>
 void PolyMesh<Scalar>::removeDuplicatedVertices(double eps)
 {
-    std::set<duplicate_vertex, duplicate_vertex_compare> setVertices;
-	vertexList.clear();
-	int vID = 0;
+    std::set<sort_vertex, sort_vertex_compare> setVertices;
+
+    vertexList.clear();
+
+    int vID = 0;
 	for (int i = 0; i < polyList.size(); i++)
 	{
 		pPolygon poly = polyList[i];
 		if(poly == nullptr) continue;
-		poly->verIDs.clear();
 		for (int j = 0; j < poly->vers.size(); j++)
 		{
-            duplicate_vertex ver;
-            ver.pos = poly->vers[j].pos;
-            ver.vID = 0;
-            ver.eps = eps;
-			auto find_it = setVertices.find(ver);
+            sort_vertex sver;
+            {
+                sver.pos = poly->vers[j]->pos;
+                sver.vID = 0;
+                sver.eps = eps;
+                sver.ptr = poly->vers[j];
+            }
+
+			auto find_it = setVertices.find(sver);
 			if(find_it != setVertices.end())
 			{
-			    poly->verIDs.push_back(find_it->vID);
+			    poly->vers[j] = find_it->ptr;
 			}
 			else{
-                vertexList.push_back(ver.pos);
-			    ver.vID = vID ++;
-                poly->verIDs.push_back(ver.vID);
-			    setVertices.insert(ver);
+                vertexList.push_back(sver.ptr);
+                sver.vID = vID ++;
+                poly->vers[j]->verID = sver.vID;
+			    setVertices.insert(sver);
 			}
 		}
 	}
@@ -683,7 +702,7 @@ void PolyMesh<Scalar>::removeDuplicatedVertices(double eps)
 //**************************************************************************************//
 
 template<typename Scalar>
-void PolyMesh<Scalar>::convertToTriMesh(vector<pTriangle> &triList)
+void PolyMesh<Scalar>::convertToTriMesh(vector<pTriangle> &triList) const
 {
     for (int i = 0; i < polyList.size(); i++)
     {
