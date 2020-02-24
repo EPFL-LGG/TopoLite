@@ -51,7 +51,7 @@ void PartGeom::ParseCrossData(shared_ptr<Cross> _cross)
         oriPoints.push_back(pt);
     }
 
-    for (int i = 0; i < oriPoints.size(); i++)
+    for (size_t i = 0; i < oriPoints.size(); i++)
     {
         oriPoints[i].lock()->normal = oriPoints[i].lock()->normal / len(oriPoints[i].lock()->normal);
     }
@@ -60,13 +60,13 @@ void PartGeom::ParseCrossData(shared_ptr<Cross> _cross)
 PartGeom::PartGeom(const PartGeom &_geom): TopoObject(_geom)
 {
     ParseCrossData(_geom.cross.lock());
-    for(int id = 0; id < _geom.hypList.size(); id++){
+    for(size_t id = 0; id < _geom.hypList.size(); id++){
     	if(_geom.hypList[id]){
 			pHypPlane hyp = make_shared<HypPlane>(*_geom.hypList[id]);
 			hypList.push_back(hyp);
     	}
     }
-    for(int id = 0; id < _geom.edgeList.size(); id++)
+    for(size_t id = 0; id < _geom.edgeList.size(); id++)
     {
     	if(_geom.edgeList[id])
     	{
@@ -75,14 +75,14 @@ PartGeom::PartGeom(const PartGeom &_geom): TopoObject(_geom)
     	}
 
     }
-    for(int id = 0; id < _geom.verList.size(); id++)
+    for(size_t id = 0; id < _geom.verList.size(); id++)
     {
     	if(_geom.verList[id]){
 			pHypVertex ver = make_shared<HypVertex>(*_geom.verList[id]);
 			verList.push_back(ver);
     	}
     }
-    for(int id = 0; id < _geom.faceList.size(); id++)
+    for(size_t id = 0; id < _geom.faceList.size(); id++)
     {
     	if(_geom.faceList[id]){
 			pPolygon poly = make_shared<_Polygon>(*_geom.faceList[id]);
@@ -109,9 +109,9 @@ void PartGeom::Clear()
 
 bool PartGeom::ValidateTiltNormal()
 {
-	for (int i = 0; i < oriPoints.size(); i++)
+	for (size_t i = 0; i < oriPoints.size(); i++)
 	{
-		for (int j = 0; j < oriPoints.size(); j++)
+		for (size_t j = 0; j < oriPoints.size(); j++)
 		{
 			if (j == i) continue;
 			Vector3f to_oriPoint =  oriPoints[j].lock()->point - oriPoints[i].lock()->point;
@@ -166,13 +166,13 @@ void PartGeom::ComputeVertices()
     // 1. compute all possible vertices by solving 3x3 matrices
     // 2. check valid vertices by testing Nx3 inequalities
     // 3. compute convex hull of all valid vertices
-    for(int l0 = 0; l0 < hypList.size(); l0++)
+    for(size_t l0 = 0; l0 < hypList.size(); l0++)
     {
         shared_ptr<HypPlane> P0 = hypList[l0];
-        for(int l1 = l0 + 1; l1 < hypList.size(); l1++)
+        for(size_t l1 = l0 + 1; l1 < hypList.size(); l1++)
         {
             shared_ptr<HypPlane> P1 = hypList[l1];
-            for(int l2 = l1 + 1; l2 < hypList.size(); l2++)
+            for(size_t l2 = l1 + 1; l2 < hypList.size(); l2++)
             {
                 shared_ptr<HypPlane> P2 = hypList[l2];
 
@@ -205,7 +205,7 @@ void PartGeom::ComputeFaces(Vector2f cutPlaneHeight)
 
 	float radius = _MAX(5.0 * len(oriPoints[1].lock()->point - oriPoints[0].lock()->point), 2.0);
 
-	for (int i = 0; i < oriPoints.size(); i++)
+	for (size_t i = 0; i < oriPoints.size(); i++)
 	{
 		pHypPlane face = make_shared<HypPlane>();
 
@@ -279,7 +279,7 @@ void PartGeom::Convert2PolyMesh(vector<Vector3f> &ver, vector<Vector3i> &tri, pP
 
 		double max_dot = 0;
 		shared_ptr<HypPlane> max_plane;
-		for(int kd = 0; kd < hypList.size(); kd++)
+		for(size_t kd = 0; kd < hypList.size(); kd++)
 		{
 			if(hypList[kd] == nullptr) continue;
 			shared_ptr<HypPlane> plane = hypList[kd];
@@ -304,7 +304,7 @@ void PartGeom::Convert2PolyMesh(vector<Vector3f> &ver, vector<Vector3i> &tri, pP
 	polyMesh = make_shared<PolyMesh>(getVarList());
 	polyMesh->vertexList = ver;
 	faceList.resize(hypList.size());
-	for(int id = 0; id < facePolygons.size(); id++)
+	for(size_t id = 0; id < facePolygons.size(); id++)
 	{
 		vector<Vector3f> poly = facePolygons[id];
 		if(poly.size() <= 2) continue;
@@ -343,7 +343,7 @@ void PartGeom::ComputeValidVertices(vector<Vector3f> &pointList)
 	//////////////////////////////////////////////////////////////////
 	// 1. Save only valid (intersection) vertices
 	pointList.clear();
-	for (int i = 0; i < verList.size(); i++)
+	for (size_t i = 0; i < verList.size(); i++)
 	{
 		verList[i]->isValid = IsValidVertex(verList[i]->point);
 
@@ -365,7 +365,7 @@ void PartGeom::ComputeValidVertices(vector<Vector3f> &pointList)
 
 bool PartGeom::IsValidVertex(Vector3f verPt)
 {
-	for (int i = 0; i < hypList.size(); i++)
+	for (size_t i = 0; i < hypList.size(); i++)
 	{
 		Vector3f tempPt = verPt - hypList[i]->point;
 		float dotp = tempPt DOT hypList[i]->normal;

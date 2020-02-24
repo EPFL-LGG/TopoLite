@@ -127,6 +127,14 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 11)
 set(Boost_NO_BOOST_CMAKE 1)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 #3rd party library
 if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
     set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
@@ -149,6 +157,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
 file(GLOB TpCoreFiles
+        ${CMAKE_CURRENT_SOURCE_DIR}/BaseMeshCreator.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/InputVar.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/math3D.cpp)
 
@@ -170,8 +179,10 @@ add_subdirectory(ext/Catch2)
 include(CTest)
 include(ParseAndAddCatchTests)
 
-#file(GLOB testTopoFiles test/Utility/Test_GeometricPrimitives.cpp)
-file(GLOB testTopoFiles test/Mesh/Test_Polygon.cpp)
+#file(GLOB testTopoFiles test/Utility/Test_PolyPolyBoolean.cpp)
+file(GLOB testTopoFiles test/CrossMesh/Test_BaseMeshCreator.cpp)
+#file(GLOB testTopoFiles test/Mesh/*.cpp
+#                        test/Utility/*.cpp)
 
 set(testTopoFiles ${testTopoFiles} test/Test_Main.cpp)
 

@@ -56,16 +56,16 @@ public:
         py::list vs;
         py::list fs;
 
-        for(int id = 0; id < mesh_->vertexList.size(); id++){
+        for(size_t id = 0; id < mesh_->vertexList.size(); id++){
             py::list v;
             v.append(mesh_->vertexList[id].x);
             v.append(mesh_->vertexList[id].y);
             v.append(mesh_->vertexList[id].z);
             vs.append(v);
         }
-        for(int id = 0; id < mesh_->polyList.size(); id++){
+        for(size_t id = 0; id < mesh_->polyList.size(); id++){
             py::list f;
-            for(int jd = 0; jd < mesh_->polyList[id]->verIDs.size(); jd++){
+            for(size_t jd = 0; jd < mesh_->polyList[id]->verIDs.size(); jd++){
                 f.append(mesh_->polyList[id]->verIDs[jd]);
             }
             fs.append(f);

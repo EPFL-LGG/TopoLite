@@ -50,7 +50,7 @@ void BaseMeshOptimizer::OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh)
             shared_ptr<Cross> cross = crossMesh->crossList[id];
             if(cross->atBoundary)
             {
-                for(int jd = 0; jd < cross->verIDs.size(); jd++){
+                for(size_t jd = 0; jd < cross->verIDs.size(); jd++){
                     std::vector<int> id_vector;
                     int verID = cross->verIDs[jd]; id_vector.push_back(verID);
                     ShapeOp::Vector3 pt;
@@ -83,7 +83,7 @@ void BaseMeshOptimizer::OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh)
         for(int id = 0; id < m; id++){
             shared_ptr<Cross> cross = crossMesh->crossList[id];
             int nC = cross->verIDs.size();
-            for(int jd = 0; jd < cross->neighbors.size(); jd++){
+            for(size_t jd = 0; jd < cross->neighbors.size(); jd++){
                 shared_ptr<Cross> ncross = cross->neighbors[jd].lock();
                 if(ncross == nullptr || cross->crossID > ncross->crossID) continue;
                 int edgeID = ncross->GetNeighborEdgeID(cross->crossID);

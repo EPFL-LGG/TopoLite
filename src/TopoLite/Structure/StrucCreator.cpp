@@ -64,7 +64,7 @@ StrucCreator::StrucCreator(const StrucCreator &_myStruc) : TopoObject(_myStruc)
     if(_myStruc.struc)
     {
         struc = make_shared<Struc>(*_myStruc.struc);
-        for(int id = 0; id < struc->partList.size(); id++)
+        for(size_t id = 0; id < struc->partList.size(); id++)
         {
             shared_ptr<Part> part = struc->partList[id];
             if(_myStruc.struc->partList[id]->cross.lock())
@@ -124,7 +124,7 @@ int StrucCreator::CreateStructure(  bool createCrossMesh,
 	sta = tbb::tick_count::now();
 	struc = make_shared<Struc>(getVarList());
 
-	for (int i = 0; i < crossMesh->crossList.size(); i++)
+	for (size_t i = 0; i < crossMesh->crossList.size(); i++)
 	{
 		pCross cross = crossMesh->crossList[i];
 		pPart part = make_shared<Part>(cross, getVarList());
@@ -186,7 +186,7 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 	struc = make_shared<Struc>(getVarList());
 
 	// TODO: double check these codes
-	for (int i = 0; i < crossMesh->crossList.size(); i++)
+	for (size_t i = 0; i < crossMesh->crossList.size(); i++)
 	{
 		pCross cross = crossMesh->crossList[i];
 		pPart part = make_shared<Part>(cross, getVarList());
@@ -205,7 +205,7 @@ int StrucCreator::UpdateStructureGeometry(bool previewMode)
 
 	vector<float> timer;
 	timer.resize(6, 0);
-	for (int i = 0; i < struc->partList.size(); i++)
+	for (size_t i = 0; i < struc->partList.size(); i++)
 	{
 		shared_ptr<Part> part = struc->partList[i];
 
@@ -240,7 +240,7 @@ void StrucCreator::BuildPartsGraph()
 		return;
 
 	CrossMesh *crossMesh = crossMeshCreator->crossMesh.get();
-	for (int i = 0; i < struc->partList.size(); i++)
+	for (size_t i = 0; i < struc->partList.size(); i++)
 	{
 		pPart part = struc->partList[i];
 		if(part == nullptr) continue;
@@ -250,7 +250,7 @@ void StrucCreator::BuildPartsGraph()
 
 		Cross *cross = crossMesh->crossList[partID].get();
 
-		for (int j = 0; j < cross->neighbors.size(); j++)
+		for (size_t j = 0; j < cross->neighbors.size(); j++)
 		{
 			Cross *neiborCross = cross->neighbors[j].lock().get();
 
@@ -268,7 +268,7 @@ void StrucCreator::BuildPartsGraph()
 		}
 	}
 
-	for (int i = 0; i < struc->partList.size(); i++)
+	for (size_t i = 0; i < struc->partList.size(); i++)
 	{
 		pPart part = struc->partList[i];
         if(part == nullptr) continue;

@@ -45,7 +45,7 @@ public:
     ContactGraphEdge(vector<ContactPolygon> &_polygons, EigenPoint &_normals)
     {
         polygons = _polygons;
-        for(int id = 0; id < polygons.size(); id++){
+        for(size_t id = 0; id < polygons.size(); id++){
             normals.push_back(_normals);
         }
     }

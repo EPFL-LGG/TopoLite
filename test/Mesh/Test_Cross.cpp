@@ -27,7 +27,7 @@ TEST_CASE("Cross")
         //initTiltNormal
         cross.initTiltNormals();
         for(int id = 0; id < N; id++){
-            Vector3d mid = (cross[id] + cross[id + 1]) / 2;
+            Vector3d mid = (cross.pos(id) + cross.pos(id + 1)) / 2;
             REQUIRE(Approx(mid.cross(cross.ori(id)->normal).norm()).margin(1e-10) == 0.0);
         }
 

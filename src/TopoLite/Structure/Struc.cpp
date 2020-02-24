@@ -59,7 +59,7 @@ Struc::Struc(const Struc& _struc) : TopoObject(_struc)
     ClearStruc();
 
     //part Geometry
-    for(int id = 0; id < _struc.partList.size(); id++)
+    for(size_t id = 0; id < _struc.partList.size(); id++)
     {
         shared_ptr<Part> part = make_shared<Part>(*_struc.partList[id]);
         partList.push_back(part);
@@ -92,7 +92,7 @@ void Struc::ComputeBoundaryParts()
 	* if part has null neighnor then it should be boundary
  	*/
 	{
-		for (int i = 0; i < partList.size(); i++)
+		for (size_t i = 0; i < partList.size(); i++)
 		{
 			shared_ptr<Part> part = partList[i];
 			if(part == nullptr || part->polyMesh == nullptr) continue;
@@ -221,7 +221,7 @@ void Struc::ComputeBoundaryParts()
 	int boundaryPartNum = BoundPartIDs.size();
 	int assembly = 0;
 	parts.clear();
-	for(int id = 0; id < partList.size(); id++)
+	for(size_t id = 0; id < partList.size(); id++)
 	{
 		if(partList[id]->atBoundary){
 			partList[id]->assemblyID = -1;
@@ -246,7 +246,7 @@ bool Struc::CheckPartsDeadLock(int partID) {
 	 * 2. get all contacts with boundary
 	 */
 	vector<Vector3f> normalsList;
-	for (int id = 0; id < part->initNeighbors.size(); id++) {
+	for (size_t id = 0; id < part->initNeighbors.size(); id++) {
 		pPart npart = part->initNeighbors[id].lock();
 		if (npart == NULL || !npart->atBoundary) continue;
 		normalsList.push_back(cross->oriPoints[id]->normal * -1.0f);
@@ -310,7 +310,7 @@ double Struc::ComputeLowestY()
     // Compute structure's lowest point
     float strucMinY = MAX_FLOAT;
 
-    for (int i = 0; i < partList.size(); i++)
+    for (size_t i = 0; i < partList.size(); i++)
     {
         pPart part = partList[i];
 
@@ -351,7 +351,7 @@ void Struc::ComputeTouchGroundParts()
 {
 	const float ydistThres = 0.08 * avgPartSize;
 
-	for (int i = 0; i < partList.size(); i++)
+	for (size_t i = 0; i < partList.size(); i++)
 	{
 		pPart part = partList[i];
 
@@ -372,7 +372,7 @@ void Struc::ComputeTouchGroundParts()
 
 void Struc::ResetTouchGround()
 {
-	for (int i = 0; i < partList.size(); i++)
+	for (size_t i = 0; i < partList.size(); i++)
 	{
 		pPart part = partList[i];
 		part->touchGround = false;
@@ -427,7 +427,7 @@ double Struc::ComputeAveragePartSize()
 {
 	avgPartSize = 0;
 
-	for (int i = 0; i < partList.size(); i++)
+	for (size_t i = 0; i < partList.size(); i++)
 	{
 		pPart part = partList[i];
 		if(part && part->polyMesh)
@@ -451,20 +451,20 @@ void Struc::ComputePartFaceContactsBruteForce()
 {
     numFaceFaceContacts = 0;
     std::vector<double> face_area_list;
-    for (int i = 0; i < partList.size(); i++)
+    for (size_t i = 0; i < partList.size(); i++)
     {
         shared_ptr<Part> part = partList[i];
         shared_ptr<Cross> cross = partList[i]->cross.lock();
-        for (int j = 0; j < part->initNeighbors.size(); j++) {
+        for (size_t j = 0; j < part->initNeighbors.size(); j++) {
             shared_ptr<Part> neibor = part->initNeighbors[j].lock();
 
             if (neibor == NULL || neibor->partID <= part->partID) continue;
             if (part->isRemove || neibor->isRemove) continue;
 
             //if (part->atBoundary && neibor->atBoundary) continue;
-            for (int currFaceID = 0; currFaceID < part->polyMesh->polyList.size(); currFaceID++)
+            for (size_t currFaceID = 0; currFaceID < part->polyMesh->polyList.size(); currFaceID++)
             {
-                for (int neiborFaceID = 0; neiborFaceID < neibor->polyMesh->polyList.size(); neiborFaceID++)
+                for (size_t neiborFaceID = 0; neiborFaceID < neibor->polyMesh->polyList.size(); neiborFaceID++)
                 {
 
                     shared_ptr<_Polygon> currFace = part->polyMesh->polyList[currFaceID];
@@ -536,11 +536,11 @@ void Struc::ComputePartFaceContacts()
 {
 	std::vector<double> face_area_list;
     numFaceFaceContacts = 0;
-	for (int i = 0; i < partList.size(); i++)
+	for (size_t i = 0; i < partList.size(); i++)
 	{
 		shared_ptr<Part> part = partList[i];
 		shared_ptr<Cross> cross = partList[i]->cross.lock();
-		for (int j = 0; j < part->initNeighbors.size(); j++)
+		for (size_t j = 0; j < part->initNeighbors.size(); j++)
 		{
 			shared_ptr<Part> neibor = part->initNeighbors[j].lock();
 
@@ -605,7 +605,7 @@ void Struc::ComputePartFaceContacts()
 void Struc::ComputePartContactArea()
 {
     minContactArea = 1 << 30;
-    for (int i = 0; i < innerContactList.size(); ++i)
+    for (size_t i = 0; i < innerContactList.size(); ++i)
     {
         shared_ptr<Contact> curr_contact = innerContactList[i].lock();
         if(curr_contact->contactType == Contact_FaceFace)
@@ -628,11 +628,11 @@ void Struc::ComputePartContactArea()
 void Struc::ComputePartEdgeContact(vector<vector<weak_ptr<Cross>>> &vertexCrossList)
 {
     numEdgeEdgeContacts = 0;
-	for(int id = 0; id < vertexCrossList.size(); id++)
+	for(size_t id = 0; id < vertexCrossList.size(); id++)
 	{
-	    for(int jd = 0; jd < vertexCrossList[id].size(); jd++)
+	    for(size_t jd = 0; jd < vertexCrossList[id].size(); jd++)
 	    {
-	        for(int kd = 0; kd < vertexCrossList[id].size(); kd++)
+	        for(size_t kd = 0; kd < vertexCrossList[id].size(); kd++)
 	        {
 	            shared_ptr<Cross> crossI = vertexCrossList[id][jd].lock();
 	            shared_ptr<Cross> crossJ = vertexCrossList[id][kd].lock();
@@ -694,7 +694,7 @@ void Struc::ComputePartEdgeContact(vector<vector<weak_ptr<Cross>>> &vertexCrossL
 void Struc::WriteStructure(const char *folderPath)
 {
 	vector<int> boundary_part;
-    for (int i = 0; i < partList.size(); i++)
+    for (size_t i = 0; i < partList.size(); i++)
     {
         shared_ptr<Part> part = partList[i];
         int assemblyID = part->assemblyID;
@@ -722,7 +722,7 @@ void Struc::WriteStructureWireFrame(const char *folderPath)
 {
     vector<int> partIDs;
     vector<shared_ptr<Part>> _partList;
-    for (int i = 0; i < partList.size(); i++)
+    for (size_t i = 0; i < partList.size(); i++)
     {
         partIDs.push_back(partList[i]->partID);
         shared_ptr<Part> part = make_shared<Part>(*partList[i]);
@@ -758,7 +758,7 @@ void Struc::WritePartGraph(char *folderPath)
 		//fprintf(fp, "# Part ID starts from 0 \n");
 		fprintf(fp, "Part Num %d\n", (int)partList.size());
 
-		for (int i = 0; i < partList.size(); i++)
+		for (size_t i = 0; i < partList.size(); i++)
 		{
 			pPart part = partList[i];
 			//char partFileName[FILE_NAME_LENGTH];
@@ -766,7 +766,7 @@ void Struc::WritePartGraph(char *folderPath)
 
 			fprintf(fp, "%2d    supp: %d    neighbor %d: [", part->partID, part->atBoundary, (int)part->initNeighbors.size());
 
-			for (int j = 0; j < part->initNeighbors.size(); j++)
+			for (size_t j = 0; j < part->initNeighbors.size(); j++)
 			{
 				pPart neibor = part->initNeighbors[j].lock();
 

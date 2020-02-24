@@ -404,7 +404,7 @@ void siftDown(vector<HEAP_SORT_Type> &Array, vector<int> &Indices, int start, in
 vector<int> BubbleSort(vector<float> &Array, bool isAscend)
 {
 	vector<int> Indices;
-	for (int i=0; i<Array.size(); i++)
+	for (size_t i=0; i<Array.size(); i++)
 		Indices.push_back(i);
 
 	//printf("Before Sorting: ");
@@ -450,7 +450,7 @@ vector<int> BubbleSort(vector<float> &Array, bool isAscend)
 vector<int> BubbleSort(vector<int> &Array, bool isAscend)
 {
 	vector<int> Indices;
-	for (int i=0; i<Array.size(); i++)
+	for (size_t i=0; i<Array.size(); i++)
 		Indices.push_back(i);
 
 	//printf("Before Sorting: ");
@@ -501,7 +501,7 @@ vector<int> BubbleSort(vector<int> &Array, bool isAscend)
 // Note: Part could be modelID, jointID, cycleID ect.
 int GetElementIndexInList(int targtElement, vector<int> elementList)
 {
-	for (int i=0; i<elementList.size(); i++)
+	for (size_t i=0; i<elementList.size(); i++)
 	{
 		if ( elementList[i] == targtElement )
 			return i;
@@ -512,7 +512,7 @@ int GetElementIndexInList(int targtElement, vector<int> elementList)
 
 int GetPointIndexInList(Vector3f tagtPoint, vector<Vector3f> pointList)
 {
-	for (int i = 0; i < pointList.size(); i++)
+	for (size_t i = 0; i < pointList.size(); i++)
 	{
 		float dist = len(tagtPoint - pointList[i]);
 		// Note: this threshold depends on the scale of elements
@@ -732,7 +732,7 @@ void PrintVector(vector<Vector3f> points)
 {
 	printf("PointNum: %d \n", (int)points.size());
 
-	for (int i = 0; i < points.size(); i++)
+	for (size_t i = 0; i < points.size(); i++)
 	{
 		printf("[%6.3f  %6.3f  %6.3f] \n", points[i].x, points[i].y, points[i].z);
 	}
@@ -934,7 +934,7 @@ void WriteOBJModel(char *objFileName, vector<Vector3f> verList, vector<Vector3i>
 
 		fprintf(fp, "# %d vertices \n", (int)verList.size());
 
-		for (int i = 0; i < verList.size(); i++)
+		for (size_t i = 0; i < verList.size(); i++)
 		{
 			fprintf(fp, "v %f %f %f \n", verList[i].x, verList[i].y, verList[i].z);
 		}
@@ -945,7 +945,7 @@ void WriteOBJModel(char *objFileName, vector<Vector3f> verList, vector<Vector3i>
 
 		fprintf(fp, "# %d faces \n", (int)triList.size());
 
-		for (int i = 0; i < triList.size(); i++)
+		for (size_t i = 0; i < triList.size(); i++)
 		{
 			fprintf(fp, "f ");
 			for (int j = 0; j < 3; j++)
@@ -977,7 +977,7 @@ void DrawPoints(vector<Vector3f> points, float size, Vector3f color)
 
 	glColor3f(color.x, color.y, color.z);
 	glBegin(GL_POINTS);
-	for (int i = 0; i < points.size(); i++)
+	for (size_t i = 0; i < points.size(); i++)
 	{
 		glVertex3f(points[i].x, points[i].y, points[i].z);
 	}
@@ -994,7 +994,7 @@ void DrawPolygon(vector<Vector3f> poly, float width, Vector3f color)
 
 	glColor3f(color.x, color.y, color.z);
 	glBegin(GL_POLYGON);
-	for (int i = 0; i < poly.size(); i++)
+	for (size_t i = 0; i < poly.size(); i++)
 	{
 		glVertex3f(poly[i].x, poly[i].y, poly[i].z);
 	}
@@ -1297,7 +1297,7 @@ void Draw3DText(Vector3f texPosition, float textScale, float lineWidth, int text
 	vector<int> allDigits = GetNumberDigits(textNumber);
 
 	Vector3f transVec;
-	for (int i = 0; i < allDigits.size(); i++)
+	for (size_t i = 0; i < allDigits.size(); i++)
 	{
 		//transVec = Vector3f(0.1f*i, 0.1f*i, 0.1f*i);
 		transVec = Vector3f(2.6f, 0, 0);

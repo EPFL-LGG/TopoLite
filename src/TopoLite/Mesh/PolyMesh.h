@@ -38,6 +38,10 @@ public:
 
     typedef shared_ptr<VTex<Scalar>> pVTex;
 
+    typedef Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> MatrixX;
+
+    typedef Matrix<int, Eigen::Dynamic, Eigen::Dynamic> MatrixXi;
+
 public:
 
     struct sort_vertex
@@ -87,19 +91,11 @@ public:
 
     vector<pVTex> texList;               // Tex Coordinate
 
-	Box<Scalar> bbox;                    // Bounding box of polygonal mesh
-
-    Box<Scalar> texBBox;                 // Bounding box of polygonal mesh's texture
-
-	Vector3 centroid;                    // Centroid of polygonal mesh
-
-	Scalar volume;                       // Volume if the mesh is closed
-
-	Vector3 lowestPt;                    // lowest point in terms of y coordinate
-
 public:
     
-    PolyMesh(std::shared_ptr<InputVarList> var) : TopoObject(var){}
+    PolyMesh(std::shared_ptr<InputVarList> var) : TopoObject(var){
+        clear();
+    }
 
     PolyMesh(const PolyMesh &_mesh);
 
@@ -123,27 +119,18 @@ public:
 
     void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
 
+    // Update vertexList and texList
+
+    void computeVertexList();
+
+    void computeTexList();
+
     // Transform Mesh
     void translateMesh(Vector3 move);
 
     void scaleMesh(Vector3 scale);
 
     void rotateMesh(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle);
-
-    // Auxiliary Data Computation
-    void computeBBox();
-
-    void computeTextureBBox();
-
-    void computeCentroid();
-
-    void computeVolume();
-
-    void computeLowestPt();
-
-    void computeVertexList();
-
-    void computeTexList();
 
 public:
 /***********************************************
@@ -155,7 +142,7 @@ public:
     vector<Vector3> getVertices() const{
         vector<Vector3> pointLists;
         for(pVertex vertex: vertexList){
-            pointLists.push_back(vertex.pos);
+            pointLists.push_back(vertex->pos);
         }
         return pointLists;
     }
@@ -167,6 +154,22 @@ public:
 
     //convert to triangle mesh
     void convertToTriMesh(vector<pTriangle> &triList) const;
+
+    //convert to Eigen mesh
+    void convertPosToEigenMesh(MatrixX &V, MatrixXi &F, Eigen::VectorXi &C);
+
+    void convertTexToEigenMesh(MatrixX &V, MatrixXi &F, Eigen::VectorXi &C);
+
+    // Auxiliary Data Computation
+    Box<Scalar> bbox() const;
+
+    Box<Scalar> texBBox() const;
+
+    Vector3 centroid() const;
+
+    Scalar volume() const;
+
+    Vector3 lowestPt() const;
 
 private:
 

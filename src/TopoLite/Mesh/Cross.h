@@ -59,13 +59,23 @@ public:
 
 public:
 
-    Cross(const Cross &Cross);
+    Cross(const _Polygon<Scalar> &polygon, std::shared_ptr<InputVarList> var);
+
+    Cross(const Cross<Scalar> &cross);
 
     Cross(std::shared_ptr<InputVarList> var);
 
     ~Cross();
 
 	virtual void print();
+
+	void clear(){
+        crossID = -1;
+        atBoundary = false;
+        neighbors.clear();
+        oriPoints.clear();
+        isVisited = false;
+	}
 
     shared_ptr<OrientPoint<Scalar>> ori(int index)
     {

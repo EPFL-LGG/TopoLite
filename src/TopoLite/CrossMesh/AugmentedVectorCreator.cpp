@@ -49,7 +49,7 @@ void AugmentedVectorCreator::CreateAugmentedVector(float tiltAngle, pCrossMesh &
 
 void AugmentedVectorCreator::InitMeshTiltNormals(pCrossMesh crossMesh)
 {
-	for (int i = 0; i < crossMesh->crossList.size(); i++)
+	for (size_t i = 0; i < crossMesh->crossList.size(); i++)
 	{
 		shared_ptr<Cross> cross = crossMesh->crossList[i];
 
@@ -67,7 +67,7 @@ void AugmentedVectorCreator::InitMeshTiltNormalsResolveConflicts(pCrossMesh cros
 	// Find a root for Breadth-First Search Traversal
 
 	shared_ptr<Cross> root;
-	for(int id = 0; id < crossMesh->crossList.size(); id++){
+	for(size_t id = 0; id < crossMesh->crossList.size(); id++){
 		if(!crossMesh->crossList[id]->atBoundary)
         {
             root = crossMesh->crossList[id];
@@ -103,7 +103,7 @@ void AugmentedVectorCreator::InitMeshTiltNormalsResolveConflicts(pCrossMesh cros
 
 		// Quit if all crosses have been visited
 		bool isAllVisited = true;
-		for (int i = 0; i < crossMesh->crossList.size(); i++)
+		for (size_t i = 0; i < crossMesh->crossList.size(); i++)
 		{
 			pCross cross = crossMesh->crossList[i];
 			if(cross == nullptr)
@@ -121,7 +121,7 @@ void AugmentedVectorCreator::InitMeshTiltNormalsResolveConflicts(pCrossMesh cros
 		}
 
 		// Process the neighbors of current cross
-		for (int i = 0; i < currVisit->neighbors.size(); i++)
+		for (size_t i = 0; i < currVisit->neighbors.size(); i++)
 		{
 			//printf(" i=%d \n", i);
 			shared_ptr<Cross> nextVisit = currVisit->neighbors[i].lock();
@@ -148,7 +148,7 @@ void AugmentedVectorCreator::InitMeshTiltNormalsResolveConflicts(pCrossMesh cros
 	}
 
 	if(getVarList()->get<bool>("ground_touch_bdry")){
-        for(int id = 0; id < crossMesh->crossList.size(); id++)
+        for(size_t id = 0; id < crossMesh->crossList.size(); id++)
         {
             if(crossMesh->crossList[id]->atBoundary)
                 crossMesh->crossList[id]->UpdateTiltNormal(tiltAngle);
@@ -167,7 +167,7 @@ void AugmentedVectorCreator::UpdateMeshTiltNormals(pCrossMesh crossMesh, float t
     {
         shared_ptr<Cross> cross = crossMesh->crossList[id];
         if(cross == nullptr) continue;
-        for(int jd = 0; jd < cross->oriPoints.size(); jd++)
+        for(size_t jd = 0; jd < cross->oriPoints.size(); jd++)
         {
             shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
             if(cross->neighbors[jd].lock() != nullptr){
@@ -194,7 +194,7 @@ bool AugmentedVectorCreator::UpdateMeshTiltRange(shared_ptr<CrossMesh> crossMesh
 	{
 		shared_ptr<Cross> cross = crossMesh->crossList[id];
 		if(cross == nullptr) continue;
-		for(int jd = 0; jd < cross->oriPoints.size(); jd++){
+		for(size_t jd = 0; jd < cross->oriPoints.size(); jd++){
 			shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
 			if(oriPt == nullptr) continue;
 			
@@ -203,7 +203,7 @@ bool AugmentedVectorCreator::UpdateMeshTiltRange(shared_ptr<CrossMesh> crossMesh
 			Vector3f y = oriPt->rotation_base CROSS oriPt->rotation_axis; y /= len(y);
 			if(oriPt->tiltSign == 1) y *= -1;
 			Vector3f p0 = oriPt->point;
-			for(int kd = 0; kd < cross->vers.size(); kd++)
+			for(size_t kd = 0; kd < cross->vers.size(); kd++)
 			{
 				Vector3f pi = cross->vers[kd].pos;
 				double yPiP0 = (y) DOT(pi - p0);
@@ -241,7 +241,7 @@ bool AugmentedVectorCreator::UpdateMeshTiltRange(shared_ptr<CrossMesh> crossMesh
 	double max_min = 0;
 	for(int id = 0; id < m; id++){
 		shared_ptr<Cross> cross = crossMesh->crossList[id];
-		for(int jd = 0; jd < cross->neighbors.size(); jd++)
+		for(size_t jd = 0; jd < cross->neighbors.size(); jd++)
 		{
 			shared_ptr<Cross> ncross = cross->neighbors[jd].lock();
 			if(ncross == nullptr || cross->crossID > ncross->crossID) continue;

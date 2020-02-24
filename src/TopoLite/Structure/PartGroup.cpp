@@ -32,7 +32,7 @@
 
 PartGroup::PartGroup(const vector<wpPart>& _groupParts, shared_ptr<InputVarList> var) :TopoObject(var)
 {
-	for (int i = 0; i < _groupParts.size(); i++)
+	for (size_t i = 0; i < _groupParts.size(); i++)
 	{
 		pPart part = _groupParts[i].lock();
 		if(part)
@@ -43,7 +43,7 @@ PartGroup::PartGroup(const vector<wpPart>& _groupParts, shared_ptr<InputVarList>
 
 PartGroup::PartGroup(vector<pPart> partList, vector<int> groupPartIDs, shared_ptr<InputVarList> var):TopoObject(var)
 {
-	for (int i = 0; i < groupPartIDs.size(); i++)
+	for (size_t i = 0; i < groupPartIDs.size(); i++)
 	{
 		int partID = groupPartIDs[i];
 
@@ -61,7 +61,7 @@ PartGroup::PartGroup(vector<pPart> partList, vector<int> groupPartIDs, shared_pt
 
 PartGroup::PartGroup(vector<wpPart> partList, vector<int> groupPartIDs, shared_ptr<InputVarList> var):TopoObject(var)
 {
-	for (int i = 0; i < groupPartIDs.size(); i++)
+	for (size_t i = 0; i < groupPartIDs.size(); i++)
 	{
 		int partID = groupPartIDs[i];
 
@@ -87,14 +87,14 @@ vector<Vector3f> PartGroup::GetAllVertices()
 {
 	vector<Vector3f> allVertices;
 
-	for (int i = 0; i < groupParts.size(); i++)
+	for (size_t i = 0; i < groupParts.size(); i++)
 	{
 		pPolyMesh polyMesh = make_shared<PolyMesh>(*groupParts[i].lock()->polyMesh);
         polyMesh->TranslateMesh(Vector3f(0, -getVarList()->get<float>("ground_height"), 0));
 
 		//allVertices.insert(allVertices.end(), polyMesh->verList.begin(), polyMesh->verList.end());
 
-		for (int j = 0; j < polyMesh->vertexList.size(); j++)
+		for (size_t j = 0; j < polyMesh->vertexList.size(); j++)
 		{
 			allVertices.push_back(polyMesh->vertexList[j]);
 		}
@@ -107,18 +107,18 @@ vector<vector<int>> PartGroup::GetAllPolygons(const vector<Vector3f> &allVertice
 {
 	vector<vector<int>> allPolys;
 
-	for (int i = 0; i < groupParts.size(); i++)
+	for (size_t i = 0; i < groupParts.size(); i++)
 	{
 		pPolyMesh polyMesh = make_shared<PolyMesh>(*groupParts[i].lock()->polyMesh);
         polyMesh->TranslateMesh(Vector3f(0, -getVarList()->get<float>("ground_height"), 0));
 		
-		for (int j = 0; j < polyMesh->polyList.size(); j++)
+		for (size_t j = 0; j < polyMesh->polyList.size(); j++)
 		{
 			pPolygon poly = polyMesh->polyList[j];
 
 			// Push back one face of a part
 			vector<int> polyIndices;
-			for (int k = 0; k < poly->vers.size(); k++)
+			for (size_t k = 0; k < poly->vers.size(); k++)
 			{
 				int index = GetPointIndexInList(poly->vers[k].pos, allVertices);
 
@@ -161,7 +161,7 @@ void PartGroup::WriteGroupOBJModel(const char *objFileName, bool triangulate)
 
         fprintf(fp, "# %d vertices \n", (int) allVertices.size());
 
-        for (int i = 0; i < allVertices.size(); i++)
+        for (size_t i = 0; i < allVertices.size(); i++)
         {
             fprintf(fp, "v %f %f %f \n", allVertices[i].x, allVertices[i].y, allVertices[i].z);
         }
@@ -173,13 +173,13 @@ void PartGroup::WriteGroupOBJModel(const char *objFileName, bool triangulate)
 
         fprintf(fp, "# %d faces \n", (int)allPolys.size());
 
-        for (int i = 0; i < allPolys.size(); i++)
+        for (size_t i = 0; i < allPolys.size(); i++)
         {
             vector<int> poly = allPolys[i];
 
             if(!triangulate){
                 fprintf(fp, "f ");
-                for (int j = 0; j < poly.size(); j++)
+                for (size_t j = 0; j < poly.size(); j++)
                 {
                     //Since the index in OBJ file starting from 1 instead of 0, we need to add 1 to each index
                     fprintf(fp, " %d", poly[j] + 1);
@@ -229,7 +229,7 @@ void PartGroup::WriteGroupOBJWireModel(char *objFileName)
         hedgeMesh->InitHEdgeMesh(mesh);
         hedgeMesh->BuildHalfEdgeMesh();
 
-        for(int id = 0; id < hedgeMesh->edgeList.size(); id++)
+        for(size_t id = 0; id < hedgeMesh->edgeList.size(); id++)
         {
             shared_ptr<HVertex> sta = hedgeMesh->edgeList[id]->staVer.lock();
             shared_ptr<HVertex> end = hedgeMesh->edgeList[id]->endVer.lock();

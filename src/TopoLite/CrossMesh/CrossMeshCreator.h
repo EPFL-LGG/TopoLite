@@ -19,7 +19,7 @@
 #include "TopoLite/Utility/TopoObject.h"
 #include "TopoLite/Mesh/CrossMesh.h"
 
-#include "QuadTree.h"
+#include "TopoLite/Mesh/PolyMesh_AABBTree.h"
 #include "igl/AABB.h"
 #include "Eigen/Dense"
 #include <vector>

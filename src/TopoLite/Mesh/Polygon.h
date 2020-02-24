@@ -38,22 +38,16 @@ public:
     typedef shared_ptr<VPoint<Scalar>> pVertex;
     typedef shared_ptr<VTex<Scalar>> pVTex;
 
-private:
+public:
     //storage
-	vector<pVertex> vers_;        //!< Vertices Position
+	vector<pVertex> vers;        //!< Vertices Position
 
-	vector<pVTex> texs_;          //!< Tex coordinates
+	vector<pVTex> texs;          //!< Tex coordinates
 
-	int dist_;                            //!< Discrete distance to a root polygon (e.g., BFS search)
+private:
+	int dist;                            //!< Discrete distance to a root polygon (e.g., BFS search)
 
-	int polyType_;                        //!< Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
-
-    //computed
-	Vector3 normal_;                     //!< Normal vector
-
-    Vector3 center_;                     //!< Center point
-
-    bool compute_data_dirty;            //!< dirty means need to recompute normal and center;
+	int polyType;                        //!< Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
 
 public:
 
@@ -77,77 +71,25 @@ public:
 
 public:
 
-    //will make computed data dirty
-
     void setVertices(vector<Vector3> _vers);
 
     size_t push_back(Vector3 pt);
 
     size_t push_back(Vector3 pt, Vector2 tex);
 
-    pVertex useless_ver;
-    pVertex& vers(int index)
-    {
-        if(vers_.empty()) return useless_ver;
-
-        dirty();
-        index = index % vers_.size();
-        return vers_.at(index);
-    }
-
-    pVTex useless_tex;
-    pVTex& texs(int index)
-    {
-        if(texs_.empty()) return useless_tex;
-
-        dirty();
-        index = index % texs_.size();
-        return texs_.at(index);
-    }
-
-public:
-
-    //update and get computed data
-
-    void update()
-    {
-        normal_ = computeNormal();
-        center_ = computeCenter();
-        compute_data_dirty = false;
-    }
-
-    void dirty(){compute_data_dirty = true;}
-
-    Vector3 normal()
-    {
-        if(compute_data_dirty) update();
-        return normal_;
-    }
-
-    Vector3 center(){
-        if(compute_data_dirty) update();
-            compute_data_dirty = false;
-        return center_;
-    }
-
-public:
-
-    //won't make computed data dirty
-
     void reverseVertices();
 
-    void setDistance(int _dist){dist_ = _dist;}
+    void setDistance(int _dist){dist = _dist;}
 
-    void setPolyType(float _polyType){polyType_ = _polyType;}
+    void setPolyType(float _polyType){polyType = _polyType;}
 
     void translatePolygon(Vector3 transVec);
 
     void clear()
     {
-        vers_.clear();
-        normal_ = center_ = Vector3(0, 0, 0);
-        dist_ = polyType_ = 0;
-        compute_data_dirty = false;
+        vers.clear();
+        texs.clear();
+        dist = polyType = 0;
     }
 
 /***********************************************
@@ -158,49 +100,62 @@ public:
 
 public:
 
+    Vector3 pos(int index)
+    {
+        if(vers.empty()) return Vector3(0, 0, 0);
+        index = index % vers.size();
+        return vers.at(index)->pos;
+    }
+
+    Vector2 tex(int index){
+        if(texs.empty()) return Vector2(0, 0);
+        index = index % texs.size();
+        return texs.at(index)->texCoord;
+    }
+
     bool checkEquality(const _Polygon &poly) const;
 
     virtual void print() const;
 
-    size_t size() const {return vers_.size();}
+    size_t size() const {return vers.size();}
 
     vector<Vector3> getVertices() const
     {
         vector<Vector3> vertices;
-        for (int i = 0; i < vers_.size(); i++)
-            vertices.push_back( vers_[i]->pos );
+        for (size_t i = 0; i < vers.size(); i++)
+            vertices.push_back( vers[i]->pos );
         return vertices;
     }
 
     vector<Vector2> getVerticesTex() const
     {
-        vector<Vector2> vertices;
-        for (int i = 0; i < vers_.size(); i++)
+        vector<Vector2> texCoords;
+        for (size_t i = 0; i < texs.size(); i++)
         {
-            vertices.push_back( vers_[i].texCoord );
+            texCoords.push_back( texs[i]->texCoord);
         }
-        return vertices;
+        return texCoords;
     }
 
-    int getDistance() const {return dist_;}
+    int getDistance() const {return dist;}
 
-    int getPolyType() const {return polyType_;}
+    int getPolyType() const {return polyType;}
 
 public:
 
     //compute the data
 
-    Vector3 computeCenter() const;
+    Vector3 center() const;
 
-    Vector3 computeNormal() const;
+    Vector3 normal() const;
 
     Vector3 computeFitedPlaneNormal() const;
 
-    Scalar computeArea() const;
+    Scalar area() const;
 
-    Scalar computeAverageEdge() const;
+    Scalar average_edge() const;
 
-    Scalar computeMaxRadius() const;
+    Scalar max_radius() const;
 
     void computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &origin) const;
 

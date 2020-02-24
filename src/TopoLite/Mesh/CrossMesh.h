@@ -50,7 +50,7 @@ public:
 
 public:
 
-	shared_ptr<PolyMesh<Scalar>> baseMesh2D;            //
+	shared_ptr<PolyMesh<Scalar>> baseMesh2D;    // the 2D tiling pattern
 
 public:
 
@@ -68,17 +68,39 @@ public:
 
     void setBaseMesh2D(shared_ptr<PolyMesh<Scalar>> _baseMesh2D);
 
+    void createConnectivity();
+
     void print();
+
+    void clear()
+    {
+        PolyMesh<Scalar>::clear();
+        crossList.clear();
+        vertexCrossList.clear();
+        baseMesh2D.reset();
+    }
 
 public:
 
     using PolyMesh<Scalar>::getVertices;
+    using PolyMesh<Scalar>::getVarList;
+    using PolyMesh<Scalar>::setVarList;
+
+    using PolyMesh<Scalar>::volume;
+    using PolyMesh<Scalar>::centroid;
+    using PolyMesh<Scalar>::bbox;
+    using PolyMesh<Scalar>::texBBox;
+    using PolyMesh<Scalar>::lowestPt;
 
 public:
 
 	void updateCrossID();
 
     Scalar computeAverageCrossSize();
+
+private:
+
+    pCross getNeighbor(pCross cross, pVertex v0, pVertex v1);
 };
 
 #include "CrossMesh.cpp"

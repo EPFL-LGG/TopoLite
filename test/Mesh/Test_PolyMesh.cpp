@@ -44,16 +44,20 @@ TEST_CASE("PolyMesh")
         REQUIRE((polyMesh.vertexList[4]->pos - Vector3d(2, 0, 0)).norm() == Approx(0.0));
         REQUIRE((polyMesh.vertexList[5]->pos - Vector3d(2, 1, 0)).norm() == Approx(0.0));
 
-        REQUIRE((polyMesh.bbox.minPt - Vector3d(0, 0, 0)).norm() == Approx(0.0));
-        REQUIRE((polyMesh.bbox.maxPt - Vector3d(2, 2, 0)).norm() == Approx(0.0));
-        REQUIRE((polyMesh.bbox.cenPt - Vector3d(1, 1, 0)).norm() == Approx(0.0));
-        REQUIRE((polyMesh.bbox.size - Vector3d(2, 2, 0)).norm() == Approx(0.0));
+        Box<double> bbox = polyMesh.bbox();
+        REQUIRE((bbox.minPt - Vector3d(0, 0, 0)).norm() == Approx(0.0));
+        REQUIRE((bbox.maxPt - Vector3d(2, 2, 0)).norm() == Approx(0.0));
+        REQUIRE((bbox.cenPt - Vector3d(1, 1, 0)).norm() == Approx(0.0));
+        REQUIRE((bbox.size - Vector3d(2, 2, 0)).norm() == Approx(0.0));
 
-        REQUIRE((polyMesh.centroid - Vector3d(0, 0, 0)).norm() == Approx(0.0));
+        Vector3d centroid =  polyMesh.centroid();
+        REQUIRE((centroid - Vector3d(0, 0, 0)).norm() == Approx(0.0));
 
-        REQUIRE(polyMesh.volume == Approx(0.0));
+        double volume = polyMesh.volume();
+        REQUIRE(volume == Approx(0.0));
 
-        REQUIRE((polyMesh.lowestPt - Vector3d(0.5, 0, 0)).norm() == Approx(0.0));
+        Vector3d lowestPt = polyMesh.lowestPt();
+        REQUIRE((lowestPt - Vector3d(0.5, 0, 0)).norm() == Approx(0.0));
     }
 
     SECTION("Cube"){
@@ -81,22 +85,24 @@ TEST_CASE("PolyMesh")
         }
 
         polyMesh.setPolyLists(polyLists);
-        REQUIRE((polyMesh.centroid - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
-        REQUIRE(polyMesh.volume == Approx(1).margin(1e-6));
+        REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
+        REQUIRE(polyMesh.volume() == Approx(1).margin(1e-6));
         REQUIRE(polyMesh.vertexList.size() == 24);
 
         polyMesh.removeDuplicatedVertices();
         REQUIRE(polyMesh.vertexList.size() == 8);
 
-        polyMesh.computeCentroid();
-        REQUIRE((polyMesh.centroid - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
+        REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
 
-        polyMesh.computeVolume();
-        REQUIRE(polyMesh.volume == Approx(1).margin(1e-6));
+        REQUIRE(polyMesh.volume() == Approx(1).margin(1e-6));
 
+        //Eigen Matrix Mesh
+        PolyMesh<double>::MatrixX3 V;
+        PolyMesh<double>::MatrixX3i F;
+        polyMesh.convertPosToEigenMesh(V, F);
+        REQUIRE(V.rows() == 8);
+        REQUIRE(F.rows() == 12);
     }
-
-
 
     SECTION("read polyhedron"){
         bool texturedModel;

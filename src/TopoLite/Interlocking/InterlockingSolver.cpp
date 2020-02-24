@@ -85,7 +85,7 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
         Ajk = Eigen::MatrixXd(6, 2 * num_vks);
 
         int stack_vk = 0;
-        for(int id = 0; id < edge->polygons.size(); id++)
+        for(size_t id = 0; id < edge->polygons.size(); id++)
         {
             ContactPolygon poly = edge->polygons[id];
             int num_vk = poly.points.size();
@@ -129,7 +129,7 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
         int num_vks = edge->num_points();
         Ajk = Eigen::MatrixXd(6, 4 * num_vks);
         int stack_vk = 0;
-        for(int id = 0; id < edge->polygons.size(); id++)
+        for(size_t id = 0; id < edge->polygons.size(); id++)
         {
             ContactPolygon poly = edge->polygons[id];
             int num_vk = poly.points.size();
@@ -214,7 +214,7 @@ void InterlockingSolver::computeRotationalInterlockingMatrix(vector<EigenTriple>
         EigenPoint ctA = nodeA->centroid;
         EigenPoint ctB = nodeB->centroid;
 
-        for(int id = 0; id < edge->normals.size(); id++)
+        for(size_t id = 0; id < edge->normals.size(); id++)
         {
             ContactPolygon poly = edge->polygons[id];
             EigenPoint nrm = edge->normals[id];
@@ -310,7 +310,7 @@ void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool wi
          * 2.0 build matrix
          */
 
-        for (int id = 0; id < graph->edges.size(); id++) {
+        for (size_t id = 0; id < graph->edges.size(); id++) {
             shared_ptr<ContactGraphEdge> edge = graph->edges[id];
             shared_ptr<ContactGraphNode> partA = graph->nodes[edge->partIDA];
             shared_ptr<ContactGraphNode> partB = graph->nodes[edge->partIDB];
@@ -347,7 +347,7 @@ void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool wi
          * 2.0 build matrix
          */
 
-        for (int id = 0; id < graph->edges.size(); id++) {
+        for (size_t id = 0; id < graph->edges.size(); id++) {
             shared_ptr<ContactGraphEdge> edge = graph->edges[id];
             shared_ptr<ContactGraphNode> partA = graph->nodes[edge->partIDA];
             shared_ptr<ContactGraphNode> partB = graph->nodes[edge->partIDB];

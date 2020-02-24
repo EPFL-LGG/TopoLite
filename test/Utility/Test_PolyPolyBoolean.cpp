@@ -4,6 +4,7 @@
 #include "Utility/PolyPolyBoolean.h"
 #include <catch2/catch.hpp>
 using Eigen::Vector3d;
+using Eigen::Vector2d;
 
 void Scale_ListVector3d(vector<Vector3d>& poly, double Scale = 10000){
     for(Vector3d &pt : poly){
@@ -202,4 +203,68 @@ TEST_CASE("Class PolyPolyBoolean")
 
         REQUIRE(polyIntersec.size() == 4);
     }
+
+
+    SECTION("check2DPolygonsIntersection", "intersected 1/8"){
+
+        vector<Vector2d> A;
+        A.push_back(Vector2d(0, 0));
+        A.push_back(Vector2d(1, 0));
+        A.push_back(Vector2d(1, 0.8));
+        A.push_back(Vector2d(1, 1));
+        A.push_back(Vector2d(0.8, 1));
+        A.push_back(Vector2d(0, 1));
+
+        vector<Vector2d> B;
+        B.push_back(Vector2d(0.5, 0.5));
+        B.push_back(Vector2d(1.5, 0.5));
+        B.push_back(Vector2d(1.5, 1.5));
+
+        double area = 0;
+        REQUIRE(polyBoolean.check2DPolygonsIntersection(A, B, area) == true);
+        REQUIRE(area == Approx(1.0 / 8).margin(1e-6));
+    }
+
+    SECTION("check2DPolygonsIntersection", "intersected 3/8"){
+        //1) intersected
+        vector<Vector2d> A;
+        A.push_back(Vector2d(0, 0));
+        A.push_back(Vector2d(1, 0));
+        A.push_back(Vector2d(1, 0.8));
+        A.push_back(Vector2d(1, 1));
+        A.push_back(Vector2d(0.8, 1));
+        A.push_back(Vector2d(0, 1));
+
+        vector<Vector2d> B;
+        B.push_back(Vector2d(0.5, 0.5));
+        B.push_back(Vector2d(0, 1));
+        B.push_back(Vector2d(1, 1));
+        B.push_back(Vector2d(1, 0.5));
+
+        double area = 0;
+        REQUIRE(polyBoolean.check2DPolygonsIntersection(A, B, area) == true);
+        REQUIRE(area == Approx(3.0 / 8).margin(1e-6));
+    }
+
+    SECTION("check2DPolygonsIntersection Scaling", "intersected"){
+        //1) intersected
+        vector<Vector2d> A;
+        A.push_back(Vector2d(0, 0));
+        A.push_back(Vector2d(1, 0));
+        A.push_back(Vector2d(1, 0.8));
+        A.push_back(Vector2d(1, 1));
+        A.push_back(Vector2d(0.8, 1));
+        A.push_back(Vector2d(0, 1));
+
+        vector<Vector2d> B;
+        B.push_back(Vector2d(0, 0));
+        B.push_back(Vector2d(0, 1000000));
+        B.push_back(Vector2d(1000000, 1000000));
+
+        double area = 0;
+        REQUIRE(polyBoolean.check2DPolygonsIntersection(A, B, area) == true);
+        REQUIRE(area == Approx(1.0 / 2).margin(1e-6));
+    }
+
+
 }

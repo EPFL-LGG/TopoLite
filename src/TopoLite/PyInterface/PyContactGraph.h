@@ -38,7 +38,7 @@ public:
         vector<pPolyMesh> meshes;
         vector<bool> atBoundary;
 
-        for(int id = 0; id < pyPolymeshes.size(); id++)
+        for(size_t id = 0; id < pyPolymeshes.size(); id++)
         {
             meshes.push_back(pyPolymeshes[id].mesh_);
             atBoundary.push_back(pyPolymeshes[id].atBoundary_);

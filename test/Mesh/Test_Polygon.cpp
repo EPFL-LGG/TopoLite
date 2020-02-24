@@ -23,7 +23,7 @@ TEST_CASE("Polygon")
 
         poly.setVertices(pts);
         REQUIRE(poly.size() == 4);
-        REQUIRE((poly.vers(1)->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+        REQUIRE((poly.pos(1) - Vector3d(1, 0, 0)).norm() == Approx(0));
     }
 
     SECTION("deep copy"){
@@ -39,7 +39,7 @@ TEST_CASE("Polygon")
         newpoly = poly;
         poly.clear();
 
-        REQUIRE((newpoly.vers(1)->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+        REQUIRE((newpoly.pos(1) - Vector3d(1, 0, 0)).norm() == Approx(0));
     }
 
     SECTION("push_back"){
@@ -49,7 +49,7 @@ TEST_CASE("Polygon")
         poly.push_back(Vector3d(0, 1, 0));
 
         REQUIRE(poly.size() == 4);
-        REQUIRE((poly.vers(1)->pos - Vector3d(1, 0, 0)).norm() == Approx(0));
+        REQUIRE((poly.pos(1) - Vector3d(1, 0, 0)).norm() == Approx(0));
     }
 
     SECTION("the polygon has a simple input")
@@ -63,7 +63,8 @@ TEST_CASE("Polygon")
             poly.reverseVertices();
 
             REQUIRE(poly.size() == 4);
-            REQUIRE((poly.vers(1)->pos - Vector3d(2, 2, 0)).norm() == Approx(0));
+            REQUIRE((poly.pos(1) - Vector3d(2, 2, 0)).norm() == Approx(0));
+            REQUIRE((poly.normal() - Vector3d(0, 0, -1)).norm() == Approx(0));
         }
 
         SECTION("checkEquality"){
@@ -90,7 +91,7 @@ TEST_CASE("Polygon")
         }
 
         SECTION("computeCenter"){
-            REQUIRE((poly.computeCenter() - Vector3d(1, 1, 0)).norm()  == Approx(0.0));
+            REQUIRE((poly.center() - Vector3d(1, 1, 0)).norm()  == Approx(0.0));
         }
 
         SECTION("computeNormal"){
@@ -104,23 +105,23 @@ TEST_CASE("Polygon")
         }
 
         SECTION("computeArea"){
-            REQUIRE(poly.computeArea() == Approx(4.0));
+            REQUIRE(poly.area() == Approx(4.0));
         }
 
         SECTION("computeAverageEdge"){
-            REQUIRE(poly.computeAverageEdge() == Approx(2.0));
+            REQUIRE(poly.average_edge() == Approx(2.0));
         }
 
         SECTION("computeMaxRadius"){
-            REQUIRE(poly.computeMaxRadius() == Approx(sqrt(2)));
+            REQUIRE(poly.max_radius() == Approx(sqrt(2)));
         }
 
         SECTION("computeFrame")
         {
             Vector3d x_axis, y_axis, origin;
             poly.computeFrame(x_axis, y_axis, origin);
-            REQUIRE(x_axis.dot(poly.computeNormal()) == Approx(0.0));
-            REQUIRE(y_axis.dot(poly.computeNormal()) == Approx(0.0));
+            REQUIRE(x_axis.dot(poly.normal()) == Approx(0.0));
+            REQUIRE(y_axis.dot(poly.normal()) == Approx(0.0));
         }
 
         SECTION("convertToTriangles"){
@@ -135,14 +136,14 @@ TEST_CASE("Polygon")
 
         SECTION("executeTranslation"){
             poly.translatePolygon(Vector3d(1, 1, 1));
-            REQUIRE((poly.vers(1)->pos - Vector3d(3, 1, 1)).norm() == Approx(0.0));
+            REQUIRE((poly.pos(1) - Vector3d(3, 1, 1)).norm() == Approx(0.0));
         }
 
-        SECTION("vers()"){
+        SECTION("pos()"){
             //support circular index
-            REQUIRE((poly.vers(-1)->pos - Vector3d(0, 2, 0)).norm() == Approx(0.0));
-            REQUIRE((poly.vers(1)->pos - Vector3d(2, 0, 0)).norm() == Approx(0.0));
-            REQUIRE((poly.vers(4)->pos - Vector3d(0, 0, 0)).norm() == Approx(0.0));
+            REQUIRE((poly.pos(-1) - Vector3d(0, 2, 0)).norm() == Approx(0.0));
+            REQUIRE((poly.pos(1) - Vector3d(2, 0, 0)).norm() == Approx(0.0));
+            REQUIRE((poly.pos(4) - Vector3d(0, 0, 0)).norm() == Approx(0.0));
         }
     }
 }

@@ -82,7 +82,7 @@ void Part::PrintPart()
 	printf("partID: %2d   ", partID);
 
 	printf("%d neighbors: ", (int)initNeighbors.size());
-	for (int i = 0; i < initNeighbors.size(); i++)
+	for (size_t i = 0; i < initNeighbors.size(); i++)
 	{
 		if (initNeighbors[i].lock() == nullptr)
 		{
@@ -154,7 +154,7 @@ void Part::Compute3DTextPosition()
 
 int Part::GetNeighborIndex(pPart neiborPart)
 {
-	for (int i = 0; i < initNeighbors.size(); i++)
+	for (size_t i = 0; i < initNeighbors.size(); i++)
 	{
 		if ( initNeighbors[i].lock() == nullptr )
 			continue;
@@ -175,7 +175,7 @@ int Part::GetFaceIndex(pPolygon neiborPartFace)
 
 	printf("partNorm: [%.3f %.3f %.3f] \n", partFaceNormal.x, partFaceNormal.y, partFaceNormal.z);
 
-	for (int i = 0; i < polyMesh->polyList.size(); i++)
+	for (size_t i = 0; i < polyMesh->polyList.size(); i++)
 	{
 		Vector3f tempFaceNormal = polyMesh->polyList[i]->ComputeNormal();
 
@@ -198,13 +198,13 @@ int Part::GetFaceIndex(pPolygon neiborPartFace)
 
 void Part::GetContactFaces(pPart neiborPart, vector<pair<int, int>> &contaFaceIDPairs)
 {
-	for (int i = 0; i < this->polyMesh->polyList.size(); i++)
+	for (size_t i = 0; i < this->polyMesh->polyList.size(); i++)
 	{
 		pPolygon currFace = this->polyMesh->polyList[i];
 		Vector3f currNormal = currFace->ComputeNormal();
 		Vector3f currCenter = currFace->ComputeCenter();
 
-		for (int j = 0; j < neiborPart->polyMesh->polyList.size(); j++)
+		for (size_t j = 0; j < neiborPart->polyMesh->polyList.size(); j++)
 		{
 			pPolygon neiborFace = neiborPart->polyMesh->polyList[j];
 			Vector3f neiborNormal = neiborFace->ComputeNormal();
@@ -229,7 +229,7 @@ void Part::GetContactFaces(pPart neiborPart, vector<pair<int, int>> &contaFaceID
 Vector2f Part::computeYExtrem()
 {
 	Vector2f extrem(std::numeric_limits<float>::max(), std::numeric_limits<float>::min());
-	for(int id = 0; id < polyMesh->vertexList.size(); id++)
+	for(size_t id = 0; id < polyMesh->vertexList.size(); id++)
 	{
 		Vector3f pt = polyMesh->vertexList[id];
 		if(pt[1] > extrem[1]) extrem[1] = pt[1];
@@ -276,7 +276,7 @@ void Part::WriteOBJWireFrameModel(const char *objFileName)
 
         float thickness = getVarList()->get<float>("wireframe_thickness");
         int circle_vertex_num = getVarList()->get<int>("wireframe_circle_vertex_num");
-        for(int id = 0; id < hedgeMesh->edgeList.size(); id++)
+        for(size_t id = 0; id < hedgeMesh->edgeList.size(); id++)
         {
             shared_ptr<HEdge> edge = hedgeMesh->edgeList[id];
             shared_ptr<HVertex> sta = edge->staVer.lock();

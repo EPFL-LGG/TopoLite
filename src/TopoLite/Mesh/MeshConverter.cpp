@@ -41,12 +41,12 @@ void MeshConverter::generateTexture(const PolyMesh *polyMesh, shared_ptr<PolyMes
     Eigen::MatrixXd V(out->vertexList.size(), 3);
     Eigen::MatrixXi F(out->polyList.size(), 3);
 
-    for(int id = 0; id < out->vertexList.size(); id ++ )
+    for(size_t id = 0; id < out->vertexList.size(); id ++ )
     {
         Vector3f pt = out->vertexList[id];
         V.row(id) = Eigen::RowVector3d(pt.x, pt.y, pt.z);
     }
-    for(int id = 0; id < out->polyList.size(); id++)
+    for(size_t id = 0; id < out->polyList.size(); id++)
     {
         F.row(id) << out->polyList[id]->verIDs[0], out->polyList[id]->verIDs[1], out->polyList[id]->verIDs[2];
     }
@@ -80,7 +80,7 @@ void MeshConverter::generateTexture(const PolyMesh *polyMesh, shared_ptr<PolyMes
         out->texCoordList.push_back(Vector2f(tex[0], tex[1]));
     }
 
-    for(int id = 0; id < out->polyList.size(); id++)
+    for(size_t id = 0; id < out->polyList.size(); id++)
     {
         out->polyList[id]->texIDs.resize(3);
         out->polyList[id]->texIDs[0] = F(id, 0);
@@ -104,14 +104,14 @@ void MeshConverter::generateTexture(const PolyMesh *polyMesh, shared_ptr<PolyMes
 void MeshConverter::Convert2TriMesh(const PolyMesh* polyMesh, vector<pTriangle> &triList)
 {
     if(polyMesh == nullptr) return;
-	for (int i = 0; i < polyMesh->polyList.size(); i++)
+	for (size_t i = 0; i < polyMesh->polyList.size(); i++)
 	{
 		pPolygon poly = polyMesh->polyList[i];
 
 		vector<pTriangle> triangles;
 		poly->Convert2Triangles(triangles);
 
-		for (int j = 0; j < triangles.size(); j++)
+		for (size_t j = 0; j < triangles.size(); j++)
 		{
 			triList.push_back(triangles[j]);
 		}
@@ -122,13 +122,13 @@ void MeshConverter::Convert2TriMesh(const PolyMesh* polyMesh,  shared_ptr<PolyMe
 {
 	vector<Vector3f> inVerList;
 	vector<Vector3i> inTriList;
-	for (int i = 0; i < polyMesh->polyList.size(); i++) {
+	for (size_t i = 0; i < polyMesh->polyList.size(); i++) {
 		pPolygon poly = polyMesh->polyList[i];
 
 		vector<pTriangle> triangles;
 		poly->Convert2Triangles(triangles);
 
-		for (int j = 0; j < triangles.size(); j++) {
+		for (size_t j = 0; j < triangles.size(); j++) {
 			for(int k = 0; k < 3; k++){
 				inVerList.push_back(triangles[j]->v[k]);
 			}
@@ -153,7 +153,7 @@ void MeshConverter::InitPolyMesh(   const vector<Vector3f> &inVerList,
     polyMesh->vertexList = inVerList;
 
     // Initialize faces
-    for (int i = 0; i < inTriList.size(); i++)
+    for (size_t i = 0; i < inTriList.size(); i++)
     {
         pPolygon poly = make_shared<_Polygon>();
 
@@ -299,7 +299,7 @@ void MeshConverter::Convert2PolyMesh(pPolyMesh polyMesh, double eps)
             vector<vector<Vector3f>> mergeFaces;
             PolyPolyBoolean polyBoolean(getVarList());
             polyBoolean.ComputePolygonsUnion(allFaces, mergeFaces);
-            for(int kd = 0; kd < mergeFaces.size(); kd++){
+            for(size_t kd = 0; kd < mergeFaces.size(); kd++){
                 shared_ptr<_Polygon> poly = make_shared<_Polygon>();
                 poly->SetVertices(mergeFaces[kd]);
                 polygons.push_back(poly);
@@ -332,7 +332,7 @@ void MeshConverter::Convert2EigenMesh(const PolyMesh *polyMesh, Eigen::MatrixXd 
     Convert2TriMesh(polyMesh, triangles);
     V = Eigen::MatrixXd(triangles.size() * 3, 3);
     F = Eigen::MatrixXi(triangles.size(), 3);
-    for(int id = 0; id < triangles.size(); id++)
+    for(size_t id = 0; id < triangles.size(); id++)
     {
         Triangle tri = *triangles[id];
         for(int kd = 0; kd < 3; kd++){
@@ -356,7 +356,7 @@ void MeshConverter::Convert2EigenMesh(  const PolyMesh *polyMesh,
 
     if(rhinoMesh == nullptr) return;
 
-    for(int id = 0; id < polyMesh->polyList.size(); id++)
+    for(size_t id = 0; id < polyMesh->polyList.size(); id++)
     {
         //for each polygon
         pPolygon poly = polyMesh->polyList[id];
@@ -370,7 +370,7 @@ void MeshConverter::Convert2EigenMesh(  const PolyMesh *polyMesh,
         rhinoMesh->verticesGroups.push_back(vector<int>());
         rhinoMesh->facesGroups.push_back(vector<int>());
 
-        for(int jd = 0; jd < poly->vers.size(); jd++)
+        for(size_t jd = 0; jd < poly->vers.size(); jd++)
         {
             rhinoMesh->vertices.push_back(poly->vers[jd].pos);
             int pVertexIdx = cVertexIdx + 1 + jd;
@@ -391,11 +391,11 @@ void MeshConverter::Convert2EigenMesh(const vector<Vector3f> &inVerList,
                                       Eigen::MatrixXi &F){
     V = Eigen::MatrixXd(inVerList.size(), 3);
     F = Eigen::MatrixXi(inTriList.size(), 3);
-    for(int id = 0; id < inVerList.size(); id++){
+    for(size_t id = 0; id < inVerList.size(); id++){
         V.row(id) << inVerList[id][0], inVerList[id][1], inVerList[id][2];
     }
 
-    for(int id = 0; id < inTriList.size(); id++){
+    for(size_t id = 0; id < inTriList.size(); id++){
         F.row(id) << inTriList[id][0], inTriList[id][1], inTriList[id][2];
     }
 }
@@ -404,14 +404,14 @@ void MeshConverter::Convert2PolyLines(const PolyMesh *polyMesh, PolyLineRhino *p
 
     if(polylines == nullptr) return;
 
-    for(int id = 0; id < polyMesh->polyList.size(); id++)
+    for(size_t id = 0; id < polyMesh->polyList.size(); id++)
     {
         //for each polygon
         pPolygon poly = polyMesh->polyList[id];
         if(poly->vers.size() < 3) continue;
 
         polylines->data.push_back(vector<Vector3f>());
-        for(int jd = 0; jd < poly->vers.size(); jd++)
+        for(size_t jd = 0; jd < poly->vers.size(); jd++)
         {
             polylines->data.back().push_back(poly->vers[jd].pos);
         }
@@ -425,7 +425,7 @@ void MeshConverter::Convert2PolyLines(const PolyMesh *polyMesh, PolyLineRhino *p
 
     if(polylines == nullptr) return;
 
-    for(int id = 0; id < polyMesh->polyList.size(); id++)
+    for(size_t id = 0; id < polyMesh->polyList.size(); id++)
     {
         //for each polygon
         pPolygon poly = polyMesh->polyList[id];
@@ -433,7 +433,7 @@ void MeshConverter::Convert2PolyLines(const PolyMesh *polyMesh, PolyLineRhino *p
 
         polylines->data.push_back(vector<Vector3f>());
         Vector3f matpt;
-        for(int jd = 0; jd < poly->vers.size(); jd++)
+        for(size_t jd = 0; jd < poly->vers.size(); jd++)
         {
             Vector3f pt = poly->vers[jd].pos;
             MultiplyPoint(pt, mat, matpt);
@@ -458,11 +458,11 @@ void MeshConverter::EigenMesh2ClipperPath(const Eigen::MatrixXd &V, const Eigen:
     igl::boundary_loop(F, L);
 
     double Scale = CLIPPER_INTERGER_SCALE;
-    for(int id = 0; id < L.size(); id++)
+    for(size_t id = 0; id < L.size(); id++)
     {
         ClipperLib::Path path;
         Eigen::RowVector3d preV(0, -1, 0);
-        for(int jd = 0; jd < L[id].size(); jd++)
+        for(size_t jd = 0; jd < L[id].size(); jd++)
         {
             int vID = L[id][jd];
             ClipperLib::IntPoint pt;
@@ -619,7 +619,7 @@ void MeshConverter::UpdatePolyList( pPolygon polyA,
     MergePolygons(polyA, polyB, vertexList, newPoly);
 
     vector<pPolygon> newPolyList;
-    for (int i = 0; i < polyList.size(); i++)
+    for (size_t i = 0; i < polyList.size(); i++)
     {
         if (i == polyAID || i == polyBID)
         {
@@ -646,7 +646,7 @@ void MeshConverter::MergePolygons(pPolygon polyA, pPolygon polyB, const vector<V
     vector<_Vertex> polyVers;
     polyVers = polyA->vers;
 
-    for (int i = 0; i < polyB->vers.size(); i++)
+    for (size_t i = 0; i < polyB->vers.size(); i++)
     {
         Vector3f ver = polyB->vers[i].pos;
 
@@ -673,7 +673,7 @@ void MeshConverter::MergePolygons(pPolygon polyA, pPolygon polyB, const vector<V
     // 3. Transform the vertices such that their z-coordinates are the same
 
     vector<Vector3f> projPtList;
-    for (int i = 0; i < polyVers.size(); i++)
+    for (size_t i = 0; i < polyVers.size(); i++)
     {
         Vector3f projPt;
         MultiplyPoint(polyVers[i].pos, transMat, projPt);
@@ -692,7 +692,7 @@ void MeshConverter::MergePolygons(pPolygon polyA, pPolygon polyB, const vector<V
     // 5. Project back the hull vertices (note: order is important)
 
     vector<Vector3f> newPolyVers;
-    for (int i = 0; i < hullPtList.size(); i++)
+    for (size_t i = 0; i < hullPtList.size(); i++)
     {
         Vector3f newVer;
         MultiplyPoint(hullPtList[i], inveTransMat, newVer);
@@ -701,7 +701,7 @@ void MeshConverter::MergePolygons(pPolygon polyA, pPolygon polyB, const vector<V
     }
 
     vector<int> newPolyVerIDs;
-    for (int i = 0; i < newPolyVers.size(); i++)
+    for (size_t i = 0; i < newPolyVers.size(); i++)
     {
         Vector3f newVer = newPolyVers[i];
 
@@ -723,7 +723,7 @@ void MeshConverter::MergePolygons(pPolygon polyA, pPolygon polyB, const vector<V
     newPoly.reset();
     newPoly = make_shared<_Polygon>();
 
-    for (int i = 0; i < newPolyVers.size(); i++)
+    for (size_t i = 0; i < newPolyVers.size(); i++)
     {
         newPoly->vers.push_back(_Vertex(newPolyVers[i]));
     }

@@ -436,7 +436,7 @@ void copyPolyLineI(PolyLineRhino *polylines, int lID, float *points)
 {
     if(polylines && lID >= 0 && lID < getNPolyLines(polylines))
     {
-        for(int id = 0; id < polylines->data[lID].size(); id++)
+        for(size_t id = 0; id < polylines->data[lID].size(); id++)
         {
             Vector3f pt = ((polylines->data[lID])[id]);
             points[id * 3 + 0] = pt[0];
@@ -452,7 +452,7 @@ void copyVertexGroupI(PolyMeshRhino *mesh, int vgID, int* vg){
     //vg should be not null
     if(mesh && vgID >= 0 && vgID < mesh->verticesGroups.size() && vg)
     {
-        for(int id = 0; id < mesh->verticesGroups[vgID].size(); id++){
+        for(size_t id = 0; id < mesh->verticesGroups[vgID].size(); id++){
             vg[id] = mesh->verticesGroups[vgID][id];
         }
     }
@@ -464,7 +464,7 @@ void copyFaceGroupI(PolyMeshRhino *mesh, int fgID, int* fg){
     //vg should be not null
     if(mesh && fgID >= 0 && fgID < mesh->facesGroups.size() && fg)
     {
-        for(int id = 0; id < mesh->facesGroups[fgID].size(); id++){
+        for(size_t id = 0; id < mesh->facesGroups[fgID].size(); id++){
             fg[id] = mesh->facesGroups[fgID][id];
         }
     }

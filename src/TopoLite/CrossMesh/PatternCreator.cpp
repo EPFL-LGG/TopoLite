@@ -12,15 +12,12 @@
 ///////////////////////////////////////////////////////////////
 
 #include "Utility/HelpDefine.h"
-#include "Utility/HelpFunc.h"
 
 #include "CrossMesh/BaseMeshCreator.h"
 #include "CrossMesh/PatternCreator.h"
 
 #include "Mesh/Polygon.h"
 #include "Mesh/PolyMesh.h"
-#include "Mesh/MeshConverter.h"
-#include "Mesh/HEdgeMesh.h"
 
 //**************************************************************************************//
 //                                   Initialization
@@ -56,11 +53,11 @@ void PatternCreator::CreateMesh_Merge(vector<pPolyMesh> polyMeshes, pPolyMesh &p
 //		}
 //	}
 
-	for (int i = 0; i < polyMeshes.size(); i++)
+	for (size_t i = 0; i < polyMeshes.size(); i++)
 	{
 		pPolyMesh tempMesh = polyMeshes[i];
 
-		for (int j = 0; j < tempMesh->polyList.size(); j++)
+		for (size_t j = 0; j < tempMesh->polyList.size(); j++)
 		{
 			tempMesh->polyList[j]->ComputeNormal();
 
@@ -126,7 +123,7 @@ void PatternCreator::CreateMesh_2DPattern( int patternID,
             vector<pPolygon> neighbors;
             ComputeNeighbors(patternID, currVisit, neighbors);
 
-            for (int i = 0; i < neighbors.size(); i++)
+            for (size_t i = 0; i < neighbors.size(); i++)
             {
                 pPolygon nextVisit = neighbors[i];
 
@@ -290,7 +287,7 @@ void PatternCreator::CreateMesh_2DPattern_PentagonPattern3(int patternRadius, sh
     double scaleX = 0.8;
     CreatePolygon_Hexagon(hex[0], 1);
 
-    for(int id = 0; id < hex[0]->vers.size(); id++){
+    for(size_t id = 0; id < hex[0]->vers.size(); id++){
         hex[0]->vers[id].pos = Vector3f(hex[0]->vers[id].pos[0] * scaleX,  hex[0]->vers[id].pos[1], 0);
     }
 
@@ -358,7 +355,7 @@ void PatternCreator::CreateMesh_2DPattern(vector<_Polygon> &root_polys, Vector3f
         for(int jd = 0; jd < Nx; jd++)
         {
             //col
-            for(int kd = 0; kd < root_polys.size(); kd++){
+            for(size_t kd = 0; kd < root_polys.size(); kd++){
                 shared_ptr<_Polygon> poly = make_shared<_Polygon>(root_polys[kd]);
                 float dx = ((id % 2 == 0) ? 0 : 1) * DY[0] + DX[0] * jd;
                 float dy = DY[1] * id;
@@ -386,7 +383,7 @@ void PatternCreator::CreateMesh_2DPattern(vector<_Polygon> &root_polys, Vector3f
 
 int PatternCreator::GetPolygonIndexInList(pPolygon tagtPoly, vector<pPolygon> polyList)
 {
-	for (int i = 0; i < polyList.size(); i++)
+	for (size_t i = 0; i < polyList.size(); i++)
 	{
 		if (polyList[i]->IsEqual(tagtPoly.get()) == true)
 		{
@@ -403,7 +400,7 @@ int PatternCreator::GetPolygonIndexInList(pPolygon tagtPoly, vector<pPolygon> po
 
 void PatternCreator::ComputeNeighbors(int patternID, pPolygon poly, vector<pPolygon> &neighbors)
 {
-	for (int i = 0; i < poly->vers.size(); i++)
+	for (size_t i = 0; i < poly->vers.size(); i++)
 	{
 		Vector3f staPt = poly->vers[i].pos;
 		Vector3f endPt = poly->vers[(i + 1) % poly->vers.size()].pos;
@@ -452,7 +449,7 @@ Vector3f PatternCreator::ComputeTileTranslation(pPolygon neighbor, Vector3f tagt
 	// Identify the edge shared by tagtCross and neighborCross
 	Vector3f transVec = Vector3f(0, 0, 0);
 	bool reverseTheta;
-	for (int i = 0; i < neighbor->vers.size(); i++)
+	for (size_t i = 0; i < neighbor->vers.size(); i++)
 	{
 		Vector3f staPt = neighbor->vers[i].pos;
 		Vector3f endPt = neighbor->vers[(i + 1) % neighbor->vers.size()].pos;
@@ -891,7 +888,7 @@ void PatternCreator::CreatePolygon_Pentagon_Cross(pPolygon &poly, float edgeLen,
 	poly->vers.push_back( _Vertex(Vector3f( A,  A, 0)) );
 
 	// Rotate the whole polygon
-	for (int i = 0; i < poly->vers.size(); ++i)
+	for (size_t i = 0; i < poly->vers.size(); ++i)
 	{
 		poly->vers[i].pos = RotateVector(Vector3f(0,0,0), Vector3f(0,0,1), rotTheta, poly->vers[i].pos);
 	}
@@ -929,7 +926,7 @@ void PatternCreator::CreatePolygon_Pentagon_Snow(pPolygon &poly, float edgeLen, 
 	poly->vers.push_back( _Vertex(Vector3f( B,  E, 0)) );
 
     // Rotate the whole polygon
-	for (int i = 0; i < poly->vers.size(); ++i)
+	for (size_t i = 0; i < poly->vers.size(); ++i)
 	{
 		poly->vers[i].pos = RotateVector(Vector3f(0,0,0), Vector3f(0,0,1), rotTheta, poly->vers[i].pos);
 	}
@@ -962,7 +959,7 @@ void PatternCreator::CreatePolygon_Pentagon_Mirror(pPolygon &poly, float edgeLen
 	poly->vers.push_back( _Vertex(Vector3f( 0,  C, 0)) );
 
 	// Rotate the whole polygon
-	for (int i = 0; i < poly->vers.size(); ++i)
+	for (size_t i = 0; i < poly->vers.size(); ++i)
 	{
 		poly->vers[i].pos = RotateVector(Vector3f(0,0,0), Vector3f(0,0,1), rotTheta, poly->vers[i].pos);
 	}
@@ -1091,7 +1088,7 @@ void PatternCreator::CreatePolygon_Rhombus(pPolygon &poly, float edgeLen, int po
 	poly->vers.push_back( _Vertex(Vector3f( 0, -B, 0)) );
 
 	// Rotate the whole polygon
-	for (int i = 0; i < poly->vers.size(); ++i)
+	for (size_t i = 0; i < poly->vers.size(); ++i)
 	{
 		poly->vers[i].pos = RotateVector(Vector3f(0,0,0), Vector3f(0,0,1), rotTheta, poly->vers[i].pos);
 	}
@@ -1115,7 +1112,7 @@ void PatternCreator::CreateMesh_Fan(Vector3f verA, Vector3f verB, Vector3f verM,
 	polyMesh.reset();
 	polyMesh = make_shared<PolyMesh>(getVarList());
 
-	for (int i = 0; i < poly->vers.size(); i++)
+	for (size_t i = 0; i < poly->vers.size(); i++)
 	{
 		polyMesh->vertexList.push_back(poly->vers[i].pos);
 	}
@@ -1179,10 +1176,10 @@ vector<vector<double>> PatternCreator::PyCreateMesh_2DPattern(int patternID, int
     CreateMesh_2DPattern(patternID, patternRadius, crossMesh);
 
     vector<vector<double>> polys;
-    for(int id = 0; id < crossMesh->baseMesh2D->polyList.size(); id++){
+    for(size_t id = 0; id < crossMesh->baseMesh2D->polyList.size(); id++){
         pPolygon poly = crossMesh->baseMesh2D->polyList[id];
         vector<double> coords;
-        for(int jd = 0; jd < poly->vers.size(); jd++){
+        for(size_t jd = 0; jd < poly->vers.size(); jd++){
             coords.push_back(poly->vers[jd].pos[0]);
             coords.push_back(poly->vers[jd].pos[1]);
         }

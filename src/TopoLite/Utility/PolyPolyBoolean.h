@@ -13,8 +13,13 @@ class PolyPolyBoolean: TopoObject
 {
 
     typedef Matrix<Scalar, 3 ,1> Vector3;
+    typedef Matrix<Scalar, 2 ,1> Vector2;
+
     typedef vector<Vector3> PolyVector3;
     typedef vector<vector<Vector3>> PolysVector3;
+
+    typedef vector<Vector2> PolyVector2;
+    typedef vector<vector<Vector2>> PolysVector2;
 
 public:
     PolyPolyBoolean(shared_ptr<InputVarList> varList) : TopoObject(varList){
@@ -28,6 +33,8 @@ public:
 
     void computePolygonsIntersection(const PolyVector3 &polyA, const PolyVector3 &polyB, PolysVector3 &polyIntsec);
 
+    bool check2DPolygonsIntersection(const PolyVector2 &polyA, const PolyVector2 &polyB, Scalar &area);
+
 public:
 
     void printPolygon(const PolyVector3& poly);
@@ -37,6 +44,8 @@ public:
     void computeFrame(const PolyVector3 &poly, Vector3 &xaxis, Vector3 &yaxis, Vector3 &origin);
 
     Scalar computeScale(const PolysVector3 &poly, Vector3 &xaxis, Vector3 &yaxis, Vector3 &origin);
+
+    Scalar computeScale(const PolysVector2 &poly);
 
     Vector3 computeNormal(const PolyVector3 &poly);
 
@@ -60,7 +69,7 @@ void PolyPolyBoolean<Scalar>::computePolygonsUnion(PolyPolyBoolean::PolysVector3
 
     vector<ClipperLib::Path> clipperPaths;
 
-    for(int id = 0; id < polys.size(); id++)
+    for(size_t id = 0; id < polys.size(); id++)
     {
         ClipperLib::Path path;
         path = projectToNormalPlane(polys[id], x_axis, y_axis, origin, Scale);
@@ -107,7 +116,7 @@ void PolyPolyBoolean<Scalar>::computePolygonsIntersection(const PolyPolyBoolean:
 template<typename Scalar>
 void PolyPolyBoolean<Scalar>::printPolygon(const PolyPolyBoolean::PolyVector3 &poly) {
     std::cout << "{";
-    for (int id = 0; id < poly.size(); id++) {
+    for (size_t id = 0; id < poly.size(); id++) {
         std::cout << "{" << poly[id].x << ", " << poly[id].y << "}, ";
     }
     std::cout << "}\n";
@@ -145,7 +154,7 @@ void PolyPolyBoolean<Scalar>::computePolygonsIntersection(const PolyPolyBoolean:
     if (path_int.empty())
         return;
 
-    for(int id = 0; id < path_int.size(); id++)
+    for(size_t id = 0; id < path_int.size(); id++)
     {
         PolyVector3 polylist = projectTo3D(path_int[id], x_axis, y_axis, origin, Scale);
         cleanPath(polylist);
@@ -153,6 +162,59 @@ void PolyPolyBoolean<Scalar>::computePolygonsIntersection(const PolyPolyBoolean:
     }
 
     return;
+}
+
+template<typename Scalar>
+bool PolyPolyBoolean<Scalar>::check2DPolygonsIntersection(const PolyPolyBoolean::PolyVector2 &polyA,
+                                                          const PolyPolyBoolean::PolyVector2 &polyB,
+                                                          Scalar &area){
+    PolysVector2 polys;
+    polys.push_back(polyA);
+    polys.push_back(polyB);
+    Scalar Scale = computeScale(polys);
+
+    ClipperLib::Path pathA, pathB;
+    for(size_t id = 0; id < polyA.size(); id++){
+        int x = polyA[id].x() * Scale;
+        int y = polyA[id].y() * Scale;
+        pathA.push_back(ClipperLib::IntPoint(x, y));
+    }
+
+    for(size_t id = 0; id < polyB.size(); id++){
+        int x = polyB[id].x() * Scale;
+        int y = polyB[id].y() * Scale;
+        pathB.push_back(ClipperLib::IntPoint(x, y));
+    }
+
+    if(!ClipperLib::Orientation(pathA))
+    {
+        ClipperLib::ReversePath(pathA);
+        //std::cout << "PathA is Wrong" << std::endl;
+    }
+    if(!ClipperLib::Orientation(pathB))
+    {
+        ClipperLib::ReversePath(pathB);
+        //std::cout << "pathB is Wrong" << std::endl;
+    }
+
+    ClipperLib::Clipper solver;
+    solver.AddPath(pathA, ClipperLib::ptSubject, true);
+    solver.AddPath(pathB, ClipperLib::ptClip, true);
+    ClipperLib::Paths path_int;
+    solver.Execute(ClipperLib::ctIntersection, path_int, ClipperLib::pftPositive, ClipperLib::pftPositive);
+
+    if(path_int.empty() || path_int.front().empty())
+    {
+        area = 0;
+        return false;
+    }
+    else{
+        area = 0;
+        for(ClipperLib::Path path : path_int){
+            area += ClipperLib::Area(path) / Scale / Scale;
+        }
+        return true;
+    }
 }
 
 template<typename Scalar>
@@ -165,7 +227,7 @@ void PolyPolyBoolean<Scalar>::cleanPath(PolyPolyBoolean::PolyVector3 &polyIntsec
 
     int N = polyIntsec.size();
     //remove duplicate points first
-    for (int id = 0; id < polyIntsec.size(); id++) {
+    for (size_t id = 0; id < polyIntsec.size(); id++) {
 
         Vector3 ppt = polyIntsec[(id - 1 + N) % N];
         Vector3 pt = polyIntsec[id];
@@ -186,7 +248,7 @@ void PolyPolyBoolean<Scalar>::cleanPath(PolyPolyBoolean::PolyVector3 &polyIntsec
     polyIntsec = polySimplest;
     polySimplest.clear();
     N = polyIntsec.size();
-    for(int id = 0; id < polyIntsec.size(); id++){
+    for(size_t id = 0; id < polyIntsec.size(); id++){
         Vector3 ppt = polyIntsec[(id - 1 + N) % N];
         Vector3 pt = polyIntsec[id];
         Vector3 npt = polyIntsec[(id + 1) % N];
@@ -240,7 +302,7 @@ Matrix<Scalar, 3, 1> PolyPolyBoolean<Scalar>::computeCenter(const PolyPolyBoolea
 {
     Vector3 center(0, 0, 0);
 
-    for(int id = 0; id < poly.size(); id++)
+    for(size_t id = 0; id < poly.size(); id++)
     {
         center += poly[id];
     }
@@ -260,7 +322,7 @@ PolyPolyBoolean<Scalar>::projectToNormalPlane(  const PolyPolyBoolean::PolyVecto
                                                 PolyPolyBoolean::Vector3 origin,
                                                 Scalar Scale) {
     ClipperLib::Path path;
-    for(int id = 0; id < poly.size(); id++)
+    for(size_t id = 0; id < poly.size(); id++)
     {
         Vector3 pos = poly[id];
         int x = (int)((pos - origin).dot(xaxis) * Scale);
@@ -280,7 +342,7 @@ PolyPolyBoolean<Scalar>::projectTo3D(const ClipperLib::Path &path,
                                      Scalar Scale) {
 
     PolyVector3 poly;
-    for(int id = 0; id < path.size(); id++)
+    for(size_t id = 0; id < path.size(); id++)
     {
         float x = path[id].X / Scale;
         float y = path[id].Y / Scale;
@@ -299,11 +361,33 @@ Scalar PolyPolyBoolean<Scalar>::computeScale(const PolyPolyBoolean::PolysVector3
     int maxdigit = 0;
     for(PolyVector3 poly:polys)
     {
-        for(int id = 0; id < poly.size(); id++)
+        for(size_t id = 0; id < poly.size(); id++)
         {
             Vector3 pos = poly[id];
             Scalar x = std::abs((pos - origin).dot(xaxis));
             Scalar y = std::abs((pos - origin).dot(yaxis));
+            int digit = std::floor(std::max(std::log10(x) + 1, std::log10(y) + 1));
+            maxdigit = std::max(digit, maxdigit);
+        }
+    }
+
+    Scale = std::max(Scale, std::pow(10, std::max(0, 8 - maxdigit)));
+    return Scale;
+}
+
+template<typename Scalar>
+Scalar PolyPolyBoolean<Scalar>::computeScale(const PolyPolyBoolean::PolysVector2 &polys) {
+
+    Scalar Scale = 1;
+    int maxdigit = 0;
+
+    for(PolyVector2 poly:polys)
+    {
+        for(size_t id = 0; id < poly.size(); id++)
+        {
+            Vector2 pos = poly[id];
+            Scalar x = pos.x();
+            Scalar y = pos.y();
             int digit = std::floor(std::max(std::log10(x) + 1, std::log10(y) + 1));
             maxdigit = std::max(digit, maxdigit);
         }

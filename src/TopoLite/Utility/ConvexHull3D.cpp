@@ -9,7 +9,7 @@ void ConvexHull3D<Scalar>::compute(ListVector3 &pointList, ListVector3 &ver, Lis
 {
     quickhull::QuickHull<Scalar> qh;
     std::vector<quickhull::Vector3<Scalar>> pointCloud;
-    for(int id = 0; id < pointList.size(); id++)
+    for(size_t id = 0; id < pointList.size(); id++)
     {
         pointCloud.push_back(quickhull::Vector3<Scalar>(pointList[id].x(), pointList[id].y(), pointList[id].z()));
     }
@@ -28,7 +28,7 @@ void ConvexHull3D<Scalar>::compute(ListVector3 &pointList, ListVector3 &ver, Lis
         tri.push_back(Vector3i(a, c, b));
     }
 
-    for(int id = 0; id < vertex_buff.size(); id++){
+    for(size_t id = 0; id < vertex_buff.size(); id++){
         Scalar a = vertex_buff[id].x;
         Scalar b = vertex_buff[id].y;
         Scalar c = vertex_buff[id].z;
@@ -47,10 +47,10 @@ void ConvexHull3D<Scalar>::compute(ListVector3 &pointList, Matrix<Scalar, Dynami
     V = Eigen::MatrixXd(ver.size(), 3);
     F = Eigen::MatrixXi(tri.size(), 3);
 
-    for(int id = 0; id < ver.size(); id++){
+    for(size_t id = 0; id < ver.size(); id++){
         V.row(id) = Eigen::RowVector3d(ver[id].x(), ver[id].y(), ver[id].z());
     }
-    for(int id = 0; id < tri.size(); id++){
+    for(size_t id = 0; id < tri.size(); id++){
         F.row(id) = Eigen::RowVector3i(tri[id].x(), tri[id].y(), tri[id].z());
     }
     return;

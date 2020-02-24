@@ -147,7 +147,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             if (!node_pickpartIDs) node_pickpartIDs = node_guisettings.append_child("pickPartIDs");
             pugi::xml_text text_pickpartIDs = node_pickpartIDs.text();
             string str_pickpartIDs;
-            for (int id = 0; id < data.pickPartIDs.size(); id++){
+            for (size_t id = 0; id < data.pickPartIDs.size(); id++){
                 str_pickpartIDs += to_string(data.pickPartIDs[id]);
                 if(id != (int)data.pickPartIDs.size() - 1) str_pickpartIDs += ",";
             }
@@ -175,7 +175,7 @@ void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             if(!node_boundary) node_boundary = node_guisettings.append_child("Boundary_PartIDs");
             pugi::xml_text text_boundary = node_boundary.text();
             char boundary_string[10000] = "";
-            for(int id = 0; id < data.strucCreator->struc->partList.size(); id++)
+            for(size_t id = 0; id < data.strucCreator->struc->partList.size(); id++)
             {
                 pPart part = data.strucCreator->struc->partList[id];
                 if(part && part->atBoundary){
@@ -247,7 +247,7 @@ void XMLIO::XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &x
                 shared_ptr<Cross> cross;
                 shared_ptr<Part> part = make_shared<Part>(cross, data.varList);
                 shared_ptr<PolyMesh> polyMesh = make_shared<PolyMesh>(data.varList);
-                for(int id = 0; id < crossMesh->crossList.size(); id++){
+                for(size_t id = 0; id < crossMesh->crossList.size(); id++){
                     shared_ptr<_Polygon> poly = make_shared<_Polygon>(*((_Polygon *)crossMesh->crossList[id].get()));
                     polyMesh->polyList.push_back(poly);
                 }
@@ -367,7 +367,7 @@ void XMLIO::XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::p
                 char str_center[256];
                 sprintf(str_center, "(%f,%f,%f)", center[0], center[1], center[2]);
                 cross_node.append_attribute("Center").set_value(str_center);
-                for(int jd = 0; jd < cross->oriPoints.size(); jd++)
+                for(size_t jd = 0; jd < cross->oriPoints.size(); jd++)
                 {
                     OrientPoint *pt = cross->oriPoints[jd].get();
                     pugi::xml_node oript_node = cross_node.append_child("OrientPoint");
@@ -723,7 +723,7 @@ void XMLIO::XMLReader_Boundary(pugi::xml_node &xml_root, XMLData &data)
             boost::split(str_partIDs, text_str, boost::is_any_of(","));
 
             //3) assign boundary marker
-            for(int id = 0; id < str_partIDs.size(); id++)
+            for(size_t id = 0; id < str_partIDs.size(); id++)
             {
                 if(str_partIDs[id] == "") continue;
                 int partID = std::atoi(str_partIDs[id].c_str());

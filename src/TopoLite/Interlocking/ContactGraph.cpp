@@ -33,7 +33,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
 
     //0) scale the meshes into united box
     double maxD = 1;
-    for (int id = 0; id < meshes.size(); id++) {
+    for (size_t id = 0; id < meshes.size(); id++) {
         pPolyMesh poly = meshes[id];
         if (poly == nullptr) return false;
         for (shared_ptr<_Polygon> face : poly->polyList) {
@@ -53,7 +53,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
     std::set<plane_contact, plane_contact_compare> setPlanes;
 
     int groupID = 0;
-    for (int id = 0; id < meshes.size(); id++)
+    for (size_t id = 0; id < meshes.size(); id++)
     {
         pPolyMesh poly = meshes[id];
         if (poly == nullptr)
@@ -100,7 +100,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
     });
 
      //2) add nodes
-     for(int id = 0; id < meshes.size(); id++){
+     for(size_t id = 0; id < meshes.size(); id++){
          meshes[id]->ComputeVolume();
          meshes[id]->ComputeCentroid();
          EigenPoint centroid(meshes[id]->centroid.x, meshes[id]->centroid.y, meshes[id]->centroid.z);
@@ -202,7 +202,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
      });
 
      //5) add contact edges
-     for(int id = 0; id < planeIJ.size(); id++)
+     for(size_t id = 0; id < planeIJ.size(); id++)
      {
          pContactGraphEdge edge = planeIJEdges[id];
          if(edge != nullptr){
