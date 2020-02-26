@@ -16,10 +16,7 @@
 
 #include <vector>
 
-#include "TopoLite/Utility/vec.h"
 #include "TopoLite/Utility/TopoObject.h"
-
-#include "TopoLite/Mesh/HEdgeMesh.h"
 #include "TopoLite/Mesh/Cross.h"
 #include "PartGeom.h"
 

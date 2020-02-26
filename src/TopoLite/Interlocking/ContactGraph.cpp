@@ -2,31 +2,27 @@
 // Created by ziqwang on 14.01.19.
 //
 
-#include "ContactGraph.h"
 
-#include "Utility/PolyPolyBoolean.h"
-#include <iostream>
-#include <algorithm>
-#include <set>
-#include <tbb/tbb.h>
-#include <cmath>
 /*************************************************
 *
 *                  Basic Operation
 *
 *************************************************/
-using pPolyMesh = shared_ptr<PolyMesh>;
-ContactGraph::ContactGraph(shared_ptr<InputVarList> varList):TopoObject(varList)
+
+template<typename Scalar>
+ContactGraph<Scalar>::ContactGraph(shared_ptr<InputVarList> varList):TopoObject(varList)
 {
 }
 
-ContactGraph::~ContactGraph()
+template<typename Scalar>
+ContactGraph<Scalar>::~ContactGraph()
 {
     nodes.clear();
     edges.clear();
 }
 
-bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
+template<typename Scalar>
+bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
                                            vector<bool> &atBoundary,
                                            double eps)
 {
@@ -36,14 +32,14 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
     for (size_t id = 0; id < meshes.size(); id++) {
         pPolyMesh poly = meshes[id];
         if (poly == nullptr) return false;
-        for (shared_ptr<_Polygon> face : poly->polyList) {
+        for (pPolygon face : poly->polyList) {
             //1.1) construct plane
             plane_contact plane;
-            Vector3f nrm = face->ComputeNormal();
-            Vector3f center = face->vers[0].pos;
-            plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
+            Vector3 nrm = face->normal();
+            Vector3 center = face->vers[0]->pos;
+            plane.nrm = nrm;
 
-            plane.D = nrm ^ center;
+            plane.D = nrm.dot(center);
             maxD = (std::max)(maxD, (double)std::abs(plane.D));
         }
     }
@@ -58,23 +54,23 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
         pPolyMesh poly = meshes[id];
         if (poly == nullptr)
             return false;
-        for (shared_ptr<_Polygon> face : poly->polyList)
+        for (pPolygon face : poly->polyList)
         {
             if(face->vers.size() < 3) continue;
 
             //1.1) construct plane
             plane_contact plane;
-            Vector3f nrm = face->ComputeNormal();
-            Vector3f center = face->vers[0].pos;
-            plane.nrm = EigenPoint(nrm[0], nrm[1], nrm[2]);
+            Vector3 nrm = face->normal();
+            Vector3 center = face->vers[0]->pos;
+            plane.nrm = Vector3(nrm[0], nrm[1], nrm[2]);
             
-            plane.D = (nrm ^ center) / maxD;
+            plane.D = nrm.dot(center) / maxD;
             plane.partID = id;
             plane.polygon = face;
             plane.eps = eps;
 
             //1.2) find groupID
-            std::set<plane_contact, plane_contact_compare>::iterator find_it = setPlanes.end();
+            typename std::set<plane_contact, plane_contact_compare>::iterator find_it = setPlanes.end();
             for(int reverse = -1; reverse <= 1; reverse += 2){
                 plane_contact tmp_plane = plane;
                 tmp_plane.nrm *= reverse;
@@ -101,10 +97,9 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
 
      //2) add nodes
      for(size_t id = 0; id < meshes.size(); id++){
-         meshes[id]->ComputeVolume();
-         meshes[id]->ComputeCentroid();
-         EigenPoint centroid(meshes[id]->centroid.x, meshes[id]->centroid.y, meshes[id]->centroid.z);
-         pContactGraphNode node = make_shared<ContactGraphNode>(atBoundary[id], centroid, centroid, meshes[id]->volume);
+         Vector3 centroid = meshes[id]->centroid();
+         Scalar volume = meshes[id]->volume();
+         pContactGraphNode node = make_shared<ContactGraphNode<Scalar>>(atBoundary[id], centroid, centroid, volume);
          addNode(node);
      }
 
@@ -129,8 +124,8 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
                       int partI = planes[id].partID;
                       int partJ = planes[jd].partID;
 
-                      EigenPoint nrmI = planes[id].nrm.normalized();
-                      EigenPoint nrmJ = planes[jd].nrm.normalized();
+                      Vector3 nrmI = planes[id].nrm.normalized();
+                      Vector3 nrmJ = planes[jd].nrm.normalized();
 
                       if(partI != partJ
                       && std::abs(nrmI.dot(nrmJ) + 1) < FLOAT_ERROR_LARGE
@@ -144,7 +139,7 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
 
 
      //4) parallel compute contacts
-     vector<shared_ptr<ContactGraphEdge>> planeIJEdges;
+     vector<pContactGraphEdge> planeIJEdges;
      planeIJEdges.resize(planeIJ.size());
 
      tbb::parallel_for(tbb::blocked_range<size_t>(0, planeIJ.size()), [&](const tbb::blocked_range<size_t>& r)
@@ -159,43 +154,31 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
              double projMat[16];
              double invsProjMat[16];
 
-             pPolygon polyI = planes[planeI].polygon.lock();
-             pPolygon polyJ = planes[planeJ].polygon.lock();
+             vector<Vector3> polyI = planes[planeI].polygon.lock()->getVertices();
+             vector<Vector3> polyJ = planes[planeJ].polygon.lock()->getVertices();
+             vector<vector<Vector3>> contactPtLists;
 
-             polyI->ComputeProjectMatrixTo2D(projMat, invsProjMat);
-             vector<Vector3f> polyI2D = polyI->ProjectPolygonTo2D(projMat);
-             vector<Vector3f> polyJ2D = polyJ->ProjectPolygonTo2D(projMat);
-             vector<vector<Vector3f>> overlapPolyPts;
+             PolyPolyBoolean<Scalar> ppIntersec(getVarList());
 
-             PolyPolyBoolean ppIntersec(getVarList());
-
-             ppIntersec.ComputePolygonsIntersection(polyI2D, polyJ2D, overlapPolyPts);
-             if (overlapPolyPts.size() == 0)
+             ppIntersec.computePolygonsIntersection(polyI, polyJ, contactPtLists);
+             if (contactPtLists.empty())
                  continue;
 
-             vector<ContactPolygon> contactPolyEigens;
-             for(vector<Vector3f> overlapPoly: overlapPolyPts){
-                 vector<Vector3f> contactPoly;
-                 ppIntersec.ProjectPolygonTo3D(overlapPoly, invsProjMat, contactPoly);
-                 if(contactPoly.size() >= 3){
-                     ContactPolygon contactPolyEigen;
-                     EigenPoint ct(0, 0, 0);
-                     for(Vector3f pt: contactPoly)
-                     {
-                        EigenPoint ptEigen(pt[0], pt[1], pt[2]);
-                        contactPolyEigen.points.push_back(ptEigen);
-                        ct += ptEigen;
-                     }
-                     contactPolyEigen.center = ct/contactPoly.size();
-                     contactPolyEigens.push_back(contactPolyEigen);
+             vector<pPolygon> contactPolys;
+             for(vector<Vector3> contactPtList: contactPtLists)
+             {
+                 if(contactPtList.size() >= 3){
+                     pPolygon contactPoly = make_shared<_Polygon<Scalar>>();
+                     contactPoly->setVertices(contactPtList);
+                     contactPolys.push_back(contactPoly);
                  }
              }
 
-             if(!contactPolyEigens.empty()){
+             if(!contactPolys.empty()){
                  int partI = planes[planeI].partID;
                  int partJ = planes[planeJ].partID;
 
-                 shared_ptr<ContactGraphEdge> edge = make_shared<ContactGraphEdge>(contactPolyEigens, planes[planeI].nrm);
+                 shared_ptr<ContactGraphEdge<Scalar>> edge = make_shared<ContactGraphEdge<Scalar>>(contactPolys, planes[planeI].nrm);
                  planeIJEdges[id] = edge;
              }
          }
@@ -222,8 +205,8 @@ bool ContactGraph::constructFromPolyMeshes(vector<shared_ptr<PolyMesh>> &meshes,
 *                  Graph Operation
 *
 *************************************************/
-
-void ContactGraph::addNode(shared_ptr<ContactGraphNode> _node)
+template<typename Scalar>
+void ContactGraph<Scalar>::addNode(pContactGraphNode _node)
 {
     _node->staticID = nodes.size();
 
@@ -232,7 +215,8 @@ void ContactGraph::addNode(shared_ptr<ContactGraphNode> _node)
     return;
 }
 
-void ContactGraph::addContact(shared_ptr<ContactGraphNode> _nodeA, shared_ptr<ContactGraphNode> _nodeB, shared_ptr<ContactGraphEdge> _edge)
+template<typename Scalar>
+void ContactGraph<Scalar>::addContact(pContactGraphNode _nodeA, pContactGraphNode _nodeB, pContactGraphEdge _edge)
 {
 
     if (_nodeA->isBoundary && _nodeB->isBoundary)
@@ -256,11 +240,12 @@ void ContactGraph::addContact(shared_ptr<ContactGraphNode> _nodeA, shared_ptr<Co
     return;
 }
 
-void ContactGraph::finalize()
+template<typename Scalar>
+void ContactGraph<Scalar>::finalize()
 {
     int dynamicID = 0;
     dynamic_nodes.clear();
-    for (shared_ptr<ContactGraphNode> node : nodes)
+    for (pContactGraphNode node : nodes)
     {
         if (!node->isBoundary)
         {
@@ -274,20 +259,16 @@ void ContactGraph::finalize()
     }
 }
 
-void ContactGraph::getContactMesh(pPolyMesh &mesh)
+template<typename Scalar>
+void ContactGraph<Scalar>::getContactMesh(pPolyMesh &mesh)
 {
     mesh.reset();
-    mesh = make_shared<PolyMesh>(getVarList());
+    mesh = make_shared<PolyMesh<Scalar>>(getVarList());
     for(pContactGraphEdge edge: edges)
     {
-        for(ContactPolygon poly: edge->polygons)
+        for(pPolygon poly: edge->polygons)
         {
-            shared_ptr<_Polygon> face = make_shared<_Polygon>();
-            for(EigenPoint pt: poly.points)
-            {
-                face->push_back(Vector3f(pt[0], pt[1], pt[2]));
-            }
-            mesh->polyList.push_back(face);
+            mesh->polyList.push_back(poly);
         }
     }
 

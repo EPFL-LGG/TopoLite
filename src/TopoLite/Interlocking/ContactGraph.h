@@ -8,65 +8,89 @@
 #include "ContactGraphNode.h"
 #include "Mesh/PolyMesh.h"
 #include "Utility/TopoObject.h"
-#include <string>
+#include "Utility/PolyPolyBoolean.h"
 
+#include <string>
 #include <map>
+
+#include <iostream>
+#include <algorithm>
+#include <set>
+#include <tbb/tbb.h>
+#include <cmath>
 
 using pairIJ = std::pair<int, int>;
 
-using pContactGraphNode = shared_ptr<ContactGraphNode>;
-using pContactGraphEdge = shared_ptr<ContactGraphEdge>;
-using wpContactGraphEdge = weak_ptr<ContactGraphEdge>;
-using wpContactGraphNode = weak_ptr<ContactGraphNode>;
-using pPolyMesh = shared_ptr<PolyMesh>;
-struct plane_contact
-{
-    EigenPoint nrm;
-    double D;
-    int partID;
-    int groupID;
-    weak_ptr<_Polygon> polygon;
-    double eps;
-};
-
-struct plane_contact_compare
-{
-    bool operator()(const plane_contact& A, const plane_contact& B) const
-    {
-        double eps = A.eps / 2;
-
-        if (A.nrm[0] - B.nrm[0] < -eps)
-            return true;
-        if (A.nrm[0] - B.nrm[0] > eps)
-            return false;
-
-        if (A.nrm[1] - B.nrm[1] < -eps)
-            return true;
-        if (A.nrm[1] - B.nrm[1] > eps)
-            return false;
-
-        if (A.nrm[2] - B.nrm[2] < -eps)
-            return true;
-        if (A.nrm[2] - B.nrm[2] > eps)
-            return false;
-
-        if (A.D - B.D < -eps)
-            return true;
-        if (A.D - B.D > eps)
-            return false;
-
-        return false;
-    }
-};
-
+template<typename Scalar>
 class ContactGraph : public TopoObject
 {
 public:
+    typedef shared_ptr<ContactGraphNode<Scalar>> pContactGraphNode;
 
-    vector<shared_ptr<ContactGraphNode>> nodes;
-    vector<shared_ptr<ContactGraphEdge>> edges;
+    typedef shared_ptr<ContactGraphEdge<Scalar>> pContactGraphEdge;
+
+    typedef weak_ptr<ContactGraphEdge<Scalar>> wpContactGraphEdge;
+
+    typedef weak_ptr<ContactGraphNode<Scalar>> wpContactGraphNode;
+
+    typedef shared_ptr<_Polygon<Scalar>> pPolygon;
+
+    typedef weak_ptr<_Polygon<Scalar>> wpPolygon;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
+
+
+public:
+
+    struct plane_contact
+    {
+
+        Matrix<Scalar, 3, 1> nrm;
+        double D;
+        int partID;
+        int groupID;
+        wpPolygon polygon;
+        double eps;
+    };
+
+    struct plane_contact_compare
+    {
+        bool operator()(const plane_contact& A, const plane_contact& B) const
+        {
+            double eps = A.eps / 2;
+
+            if (A.nrm[0] - B.nrm[0] < -eps)
+                return true;
+            if (A.nrm[0] - B.nrm[0] > eps)
+                return false;
+
+            if (A.nrm[1] - B.nrm[1] < -eps)
+                return true;
+            if (A.nrm[1] - B.nrm[1] > eps)
+                return false;
+
+            if (A.nrm[2] - B.nrm[2] < -eps)
+                return true;
+            if (A.nrm[2] - B.nrm[2] > eps)
+                return false;
+
+            if (A.D - B.D < -eps)
+                return true;
+            if (A.D - B.D > eps)
+                return false;
+
+            return false;
+        }
+    };
+
+public:
+
+    vector<pContactGraphNode> nodes;
+    vector<pContactGraphEdge> edges;
     //automatic generate
-    vector<weak_ptr<ContactGraphNode>> dynamic_nodes;
+    vector<wpContactGraphNode> dynamic_nodes;
 
 public:
 
@@ -76,13 +100,13 @@ public:
 
 public:
 
-    bool constructFromPolyMeshes(   vector<shared_ptr<PolyMesh>> &meshes,
+    bool constructFromPolyMeshes(   vector<pPolyMesh> &meshes,
                                     vector<bool> &atBoundary,
                                     double eps = 0.002);
 
 public:
 
-    void normalize_meshes(vector<shared_ptr<PolyMesh>> &meshes);
+    void normalize_meshes(vector<pPolyMesh> &meshes);
 
 public:
 
@@ -100,5 +124,7 @@ public:
 
     void getContactMesh(pPolyMesh &mesh);
 };
+
+#include "ContactGraph.cpp"
 
 #endif //TOPOLOCKCREATOR_CONTACTGRAPH_H

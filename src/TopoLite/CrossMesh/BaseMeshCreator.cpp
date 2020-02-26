@@ -19,19 +19,23 @@
 //                                   Initialization
 //**************************************************************************************//
 
-BaseMeshCreator::BaseMeshCreator(pPolyMesh _polyMesh,
-                                 pCrossMesh _pattern2D)
-: TopoObject(_quadTree->getVarList())
+template <typename Scalar>
+BaseMeshCreator<Scalar>::BaseMeshCreator(pPolyMeshAABB _polyMesh,
+                                         pCrossMesh _pattern2D)
+: TopoObject(_polyMesh->getVarList())
 {
-
+    polyMesh = _polyMesh;
+    pattern2D = _pattern2D;
 }
 
-BaseMeshCreator::BaseMeshCreator(shared_ptr<InputVarList> var)
+template <typename Scalar>
+BaseMeshCreator<Scalar>::BaseMeshCreator(shared_ptr<InputVarList> var)
 : TopoObject(var){
 
 }
 
-BaseMeshCreator::~BaseMeshCreator()
+template <typename Scalar>
+BaseMeshCreator<Scalar>::~BaseMeshCreator()
 {
 
 }
@@ -40,7 +44,8 @@ BaseMeshCreator::~BaseMeshCreator()
 //                               Compute Lifted 3D Mesh 
 //**************************************************************************************//
 
-void BaseMeshCreator::Pattern2CrossMesh(double *inverTextureMat,
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::Pattern2CrossMesh(double *inverTextureMat,
                                         pPolyMesh &baseMesh2D,
                                         pCrossMesh &crossMesh)
 {
@@ -54,7 +59,7 @@ void BaseMeshCreator::Pattern2CrossMesh(double *inverTextureMat,
 
 	ComputeInsideCross(inverTextureMat, baseMesh2D, crossMesh);
 
-	if(getVarList()->get<bool>("smooth_bdry"))
+	if(getVarList()->template get<bool>("smooth_bdry"))
 	{
         ComputeBoundaryCross(inverTextureMat, baseMesh2D, crossMesh);
 		//remove dangling
@@ -74,13 +79,14 @@ void BaseMeshCreator::Pattern2CrossMesh(double *inverTextureMat,
 }
 
 
-void BaseMeshCreator::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)
 {
     for (size_t i = 0; i < polyMesh->polyList.size(); i++)
     {
         pPolygon poly = polyMesh->polyList[i];
 
-        shared_ptr<Cross> cross = make_shared<Cross>(getVarList());
+        pCross cross = make_shared<Cross>(getVarList());
         cross->atBoundary = false;
         cross->crossID = i;
 
@@ -99,16 +105,17 @@ void BaseMeshCreator::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)
 }
 
 
-void BaseMeshCreator::RemoveDanglingCross(pCrossMesh crossMesh)
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::RemoveDanglingCross(pCrossMesh crossMesh)
 {
 	if(crossMesh == nullptr) return;
 	if(crossMesh->crossList.size() < 3) return;
 	for(auto it = crossMesh->crossList.begin(); it != crossMesh->crossList.end();)
 	{
-		shared_ptr<Cross> cross = *it;
+		pCross cross = *it;
 		if(cross == nullptr) continue;
 		int numNeighbor = 0;
-		shared_ptr<Cross> ncross = nullptr;
+		pCross ncross = nullptr;
 		for(size_t jd = 0; jd < cross->neighbors.size(); jd++){
 			if(cross->neighbors[jd].lock() == nullptr) continue;
 			numNeighbor ++;
@@ -118,7 +125,7 @@ void BaseMeshCreator::RemoveDanglingCross(pCrossMesh crossMesh)
 			it = crossMesh->crossList.erase(it);
 		}
 		else if(numNeighbor == 1){
-			ncross->neighbors[ncross->GetNeighborEdgeID(cross->crossID)] = shared_ptr<Cross>();
+			ncross->neighbors[ncross->GetNeighborEdgeID(cross->crossID)] = pCross();
 			it = crossMesh->crossList.erase(it);
 		}
 		else{
@@ -128,16 +135,18 @@ void BaseMeshCreator::RemoveDanglingCross(pCrossMesh crossMesh)
     crossMesh->updateCrossID();
 }
 
-void BaseMeshCreator::ComputeInsideCross(   double *inverTextureMat,
-                                            shared_ptr <PolyMesh> &baseMesh2D,
-                                            shared_ptr <CrossMesh> &crossMesh)
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::ComputeInsideCross( double *inverTextureMat,
+                                                  pPolyMesh &baseMesh2D,
+                                                  pCrossMesh &crossMesh)
 {
 	for(size_t id = 0; id < pattern2D.lock()->vertexList.size(); id++)
 	{
-		Vector3f ver = pattern2D.lock()->vertexList[id];
-		Vector3f texCoord = GetTextureCoord(ver, viewSize);
-		MultiplyPoint(texCoord, inverTextureMat, texCoord);
-		Vector3f ver3D;
+		Vector3 ver = pattern2D.lock()->vertexList[id];
+
+		Vector3 texCoord = GetTextureCoord(ver, viewSize, inverTextureMat);
+
+		Vector3 ver3D;
 		bool isSuccess = ComputeSurfaceCoord(polyMesh.lock(), texCoord, ver3D);
 		if(isSuccess) {
 			map_vertex2D_3D.push_back(crossMesh->vertexList.size());
@@ -152,7 +161,7 @@ void BaseMeshCreator::ComputeInsideCross(   double *inverTextureMat,
 	for(size_t i = 0; i <  pattern2D.lock()->crossList.size(); i++)
 	{
 		pPolygon poly2D = pattern2D.lock()->crossList[i];
-		shared_ptr<Cross> cross = make_shared<Cross>(getVarList());
+		pCross cross = make_shared<Cross>(getVarList());
 		cross->atBoundary = false;
 		cross->crossID = crossMesh->crossList.size();
 		bool is_all_vertices_in_texture = true;
@@ -193,9 +202,9 @@ void BaseMeshCreator::ComputeInsideCross(   double *inverTextureMat,
 		int cross3ID = map_cross2D_3D[id];
 		if(cross3ID != -1)
 		{
-			shared_ptr<Cross> cross = pattern2D.lock()->crossList[id];
+			pCross cross = pattern2D.lock()->crossList[id];
 			for(size_t jd = 0; jd < cross->neighbors.size(); jd ++){
-				shared_ptr<Cross> ncross = cross->neighbors[jd].lock();
+				pCross ncross = cross->neighbors[jd].lock();
 				int ncross3ID = (ncross != nullptr ? map_cross2D_3D[ncross->crossID] : -1);
 				if(ncross3ID != -1)
 				{
@@ -203,7 +212,7 @@ void BaseMeshCreator::ComputeInsideCross(   double *inverTextureMat,
 				}
 				else
 				{
-					crossMesh->crossList[cross3ID]->neighbors.push_back(shared_ptr<Cross>());
+					crossMesh->crossList[cross3ID]->neighbors.push_back(pCross());
 				}
 			}
 		}
@@ -211,12 +220,13 @@ void BaseMeshCreator::ComputeInsideCross(   double *inverTextureMat,
 }
 
 
-void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 									   pPolyMesh &baseMesh2D,
 									   pCrossMesh &crossMesh)
 {
 
-    float minimumCrossArea = getVarList()->get<float>("minCrossArea");
+    float minimumCrossArea = getVarList()->template get<float>("minCrossArea");
 	//get all the half_inside pattern2D
 
 	vector<int> half_inside_pattern2D;
@@ -225,7 +235,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 	    if(pattern2D.lock()->crossList[id] == nullptr) continue;
 		int cross2ID = pattern2D.lock()->crossList[id]->crossID;
 		if(map_cross2D_3D[cross2ID] != -1) continue;
-		shared_ptr<Cross> cross2D = pattern2D.lock()->crossList[id];
+		pCross cross2D = pattern2D.lock()->crossList[id];
 		bool has_vertex_in_texture = false;
 		for(size_t jd = 0; jd < cross2D->verIDs.size(); jd++)
 		{
@@ -247,7 +257,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 	{
 
 		int cross2ID = half_inside_pattern2D[id];
-		shared_ptr<Cross> cross2D = pattern2D.lock()->crossList[cross2ID];
+		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
 		if(cross2D == nullptr) continue;
 
 		vector<int> cut_conner3D, cut_conner2D;
@@ -257,7 +267,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			int next_ver2ID = cross2D->verIDs[(jd + 1) % cross2D->verIDs.size()];
 			if((map_vertex2D_3D[ver2ID] == -1) ^ (map_vertex2D_3D[next_ver2ID] == -1))
 			{
-				shared_ptr<Cross> ncross2D = cross2D->neighbors[jd].lock();
+				pCross ncross2D = cross2D->neighbors[jd].lock();
 
 				//check whether neighbor has computed
 				if(ncross2D != nullptr)
@@ -275,7 +285,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 				}
 
 				//need to compute
-				Vector3f sta2D, end2D;
+				Vector3 sta2D, end2D;
 				if(map_vertex2D_3D[ver2ID] != -1){
 					sta2D = pattern2D.lock()->vertexList[ver2ID];
 					end2D = pattern2D.lock()->vertexList[next_ver2ID];
@@ -285,7 +295,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 					sta2D = pattern2D.lock()->vertexList[next_ver2ID];
 				}
 
-				Vector3f pos2D, pos3D;
+				Vector3 pos2D, pos3D;
                 if(ComputeBoundaryVertex(inverTextureMat, sta2D, end2D, pos2D, pos3D))
 				{
 					cut_conner3D.push_back(crossMesh->vertexList.size());
@@ -310,18 +320,18 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
     }
 
     //compute the cut cross mesh
-	std::unordered_map<int, vector<weak_ptr<Cross>>> pattern2D_edge_cross3D;
+	std::unordered_map<int, vector<wpCross>> pattern2D_edge_cross3D;
 	std::unordered_map<int, vector<int>> pattern2D_edge_cross3D_edgeIDs;
 	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
 	{
 		int cross2ID = half_inside_pattern2D[id];
-		shared_ptr<Cross> cross2D = pattern2D.lock()->crossList[cross2ID];
+		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
 
 		std::unordered_map<int, bool> vertex_visited;
 		int size = cross2D->verIDs.size();
-		vector<weak_ptr<Cross>> edge_cross3D;
+        vector<wpCross> edge_cross3D;
 		vector<int> edge_cross3D_edgeIDs;
-		edge_cross3D.resize(size, shared_ptr<Cross>());
+		edge_cross3D.resize(size, pCross());
 		edge_cross3D_edgeIDs.resize(size, -1);
 		for(size_t jd = 0; jd < cross2D->verIDs.size(); jd++)
 		{
@@ -339,10 +349,10 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			}
 
 			//insert into base2DMesh
-			shared_ptr<_Polygon> polygon = make_shared<_Polygon>();
+			pPolygon polygon = make_shared<_Polygon<Scalar>>();
 
 			//insert into Crossmesh
-			shared_ptr<Cross> cross = make_shared<Cross>(getVarList());
+			pCross cross = make_shared<Cross>(getVarList());
 			cross->atBoundary = false;
 			cross->crossID = crossMesh->crossList.size();
 
@@ -404,7 +414,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			float area = cross->ComputeArea();
 			if(cross->vers.size() >= 3 && area >= minimumCrossArea)
 			{
-				cross->neighbors.resize(cross->vers.size(), shared_ptr<Cross>());
+				cross->neighbors.resize(cross->vers.size(), pCross());
 				crossMesh->crossList.push_back(cross);
 				baseMesh2D->polyList.push_back(polygon);
 				kd = startID;
@@ -425,11 +435,11 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
 	{
 		int cross2ID = half_inside_pattern2D[id];
-		shared_ptr<Cross> cross2D = pattern2D.lock()->crossList[cross2ID];
+		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
 		for(size_t jd = 0; jd < cross2D->neighbors.size(); jd++)
 		{
-			shared_ptr<Cross> ncross2D = cross2D->neighbors[jd].lock();
-			shared_ptr<Cross> cross3D = pattern2D_edge_cross3D[cross2ID][jd].lock();
+			pCross ncross2D = cross2D->neighbors[jd].lock();
+			pCross cross3D = pattern2D_edge_cross3D[cross2ID][jd].lock();
 			if(!ncross2D || !cross3D) continue;
 
 			int ncross2ID = ncross2D->crossID;
@@ -440,7 +450,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			//neighbor is a inside polygon
 			if(ncross3ID != -1)
 			{
-				shared_ptr<Cross> ncross3D = crossMesh->crossList[ncross3ID];
+				pCross ncross3D = crossMesh->crossList[ncross3ID];
 				ncross3D->neighbors[edgeID] = cross3D;
 				cross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[cross2ID][jd]] = ncross3D;
 			}
@@ -450,7 +460,7 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 			auto find_it = pattern2D_edge_cross3D.find(ncross2ID);
 			if(ncross3ID == -1 && find_it != pattern2D_edge_cross3D.end())
 			{
-				shared_ptr<Cross> ncross3D = find_it->second[edgeID].lock();
+				pCross ncross3D = find_it->second[edgeID].lock();
 				if(ncross3D != nullptr){
 					ncross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[ncross2ID][edgeID]] = cross3D;
 					cross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[cross2ID][jd]] = ncross3D;
@@ -461,92 +471,84 @@ void BaseMeshCreator::ComputeBoundaryCross(double *inverTextureMat,
 	}
 }
 
-Vector3f BaseMeshCreator::GetTextureCoord(Vector3f point, float viewSize)
+template <typename Scalar>
+Matrix<Scalar, 3, 1> BaseMeshCreator<Scalar>::GetTextureCoord(Vector3 point, Scalar viewSize, double inverTextureMat[16])
 {
-	Vector3f texCoord;
+	Vector3 texCoord;
 
-	texCoord.x = (point.x + 0.5f*viewSize) / viewSize;
-	texCoord.y = (point.y + 0.5f*viewSize) / viewSize;
-	texCoord.z = 0;
+	texCoord.x() = (point.x() + 0.5f*viewSize) / viewSize;
+	texCoord.y() = (point.y() + 0.5f*viewSize) / viewSize;
+	texCoord.z() = 0;
 
 	return texCoord;
 }
 
 // TODO: make the function more general (i.e., triangle to polygon)
-bool BaseMeshCreator::ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3f ptTexCoord, Vector3f &ptSurfCoord)
+template <typename Scalar>
+bool BaseMeshCreator<Scalar>::ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3 ptTexCoord, Vector3 &ptSurfCoord)
 {
-	vector<pPolygon> polyLists;
-	if(ptTexCoord.x < -1.5 || ptTexCoord.x > 1.5) return false;
-	if(ptTexCoord.y < -1.5 || ptTexCoord.y > 1.5) return false;
-	if(quadTree.lock() == nullptr) return false;
-	quadTree.lock()->search_point(Vector2f(ptTexCoord.x, ptTexCoord.y), polyLists);
-	//std::cout << Vector2f(ptTexCoord.x, ptTexCoord.y) << std::endl;
-	for (pPolygon poly : polyLists)
-	{
-		if (poly->vers.size() != 3)
-		{
-			printf("Warning: the polygon is not a triangle. \n");
-		}
+	if(ptTexCoord.x() < -1.5 || ptTexCoord.x() > 1.5) return false;
+	if(ptTexCoord.y() < -1.5 || ptTexCoord.y() > 1.5) return false;
+	if(polyMesh.lock() == nullptr) return false;
 
-		Triangle texTri;
-		for (int j = 0; j < 3; j++)
-		{
-			texTri.v[j] = Vector3f(poly->vers[j].texCoord.x, poly->vers[j].texCoord.y, 0);
-		}
+    pPolygon poly = polyMesh.lock()->findTexPoint(Vector2(ptTexCoord.x(), ptTexCoord.y()));
 
-		// Get the triangle in geometrical space
-		Triangle geoTri;
-		for (int j = 0; j < 3; j++)
-		{
-			geoTri.v[j] = poly->vers[j].pos;
-		}
+    if (poly->vers.size() != 3)
+    {
+        printf("Warning: the polygon is not a triangle. \n");
+        return false;
+    }
 
-		// Skip the triangle if the point is out of its bounding box
-		Vector3f triMinPt = texTri.GetBBoxMinPt();
-		Vector3f triMaxPt = texTri.GetBBoxMaxPt();
-		if (ptTexCoord.x < triMinPt.x || ptTexCoord.x > triMaxPt.x ||
-			ptTexCoord.y < triMinPt.y || ptTexCoord.y > triMaxPt.y)
-		{
-			continue;
-		}
+    Triangle<Scalar> texTri;
+    for (int j = 0; j < 3; j++)
+    {
+        texTri.v[j] = Vector3(poly->vers[j].texCoord.x(), poly->vers[j].texCoord.y(), 0);
+    }
 
-		// Barycentric interpolation if point is inside the triangle
-		if (IsPointInsideTriangle(ptTexCoord, texTri, false))
-		{
-			// Compute total and partial triangle area
-			float totalArea = GetTriangleArea(texTri.v[0], texTri.v[1], texTri.v[2]);
-            float subArea0 = GetTriangleArea(ptTexCoord, texTri.v[1], texTri.v[2]);
-            float subArea1 = GetTriangleArea(texTri.v[0], ptTexCoord, texTri.v[2]);
-            float subArea2 = GetTriangleArea(texTri.v[0], texTri.v[1], ptTexCoord);
+    // Get the triangle in geometrical space
+    Triangle<Scalar> geoTri;
+    for (int j = 0; j < 3; j++)
+    {
+        geoTri.v[j] = poly->vers[j].pos;
+    }
 
-			ptSurfCoord = (subArea0 / totalArea)*geoTri.v[0] +
-						  (subArea1 / totalArea)*geoTri.v[1] +
-						  (subArea2 / totalArea)*geoTri.v[2];
+    // Barycentric interpolation if point is inside the triangle
+    if (IsPointInsideTriangle(ptTexCoord, texTri, false))
+    {
+        // Compute total and partial triangle area
+        float totalArea = GetTriangleArea(texTri.v[0], texTri.v[1], texTri.v[2]);
+        float subArea0 = GetTriangleArea(ptTexCoord, texTri.v[1], texTri.v[2]);
+        float subArea1 = GetTriangleArea(texTri.v[0], ptTexCoord, texTri.v[2]);
+        float subArea2 = GetTriangleArea(texTri.v[0], texTri.v[1], ptTexCoord);
 
-			return true;
-		}
-	}
+        ptSurfCoord = (subArea0 / totalArea)*geoTri.v[0] +
+                      (subArea1 / totalArea)*geoTri.v[1] +
+                      (subArea2 / totalArea)*geoTri.v[2];
+
+        return true;
+    }
 
 	return false;
 }
 
-bool BaseMeshCreator::ComputeBoundaryVertex(double *inverTextureMat, Vector3f sta2D, Vector3f end2D, Vector3f &pos2D, Vector3f &pos3D)
+template<typename Scalar>
+bool BaseMeshCreator<Scalar>::ComputeBoundaryVertex(double *inverTextureMat, Vector3 sta2D, Vector3 end2D, Vector3 &pos2D, Vector3 &pos3D)
 {
-	Vector3f init_pos3D;
+	Vector3 init_pos3D;
 	{
-		Vector3f texCoord = GetTextureCoord(sta2D, viewSize);
+		Vector3 texCoord = GetTextureCoord(sta2D, viewSize);
 		MultiplyPoint(texCoord, inverTextureMat, texCoord);
 		ComputeSurfaceCoord(polyMesh.lock(), texCoord, init_pos3D);
 	}
 
 	pos3D = init_pos3D;
 	pos2D = sta2D;
-	while(len(sta2D - end2D) > 1e-4)
+	while((sta2D - end2D).norm() > 1e-4)
 	{
-		Vector3f mid = (sta2D + end2D) * 0.5f;
-		Vector3f texCoord = GetTextureCoord(mid, viewSize);
+		Vector3 mid = (sta2D + end2D) * 0.5f;
+		Vector3 texCoord = GetTextureCoord(mid, viewSize);
 		MultiplyPoint(texCoord, inverTextureMat, texCoord);
-		Vector3f ver3D;
+		Vector3 ver3D;
 		bool isSuccess = ComputeSurfaceCoord(polyMesh.lock(), texCoord, ver3D);
 		if(isSuccess)
 		{
@@ -558,7 +560,7 @@ bool BaseMeshCreator::ComputeBoundaryVertex(double *inverTextureMat, Vector3f st
 			end2D = mid;
 		}
 	}
-	if(len(init_pos3D - pos3D) < 1e-5){
+	if((init_pos3D - pos3D).norm() < 1e-5){
 		return false;
 	}
 	else{
@@ -566,58 +568,23 @@ bool BaseMeshCreator::ComputeBoundaryVertex(double *inverTextureMat, Vector3f st
 	}
 }
 
-void BaseMeshCreator::ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh crossMesh)
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::ComputePracticalBoundary(pCrossMesh &crossMesh)
 {
-    vector<pHFace> faceList = hedgeMesh->GetFaceList();
-
-    // Find neighboring cross based on the half-edge graph
-    for (size_t i = 0; i < faceList.size(); i++)
-    {
-        pHFace face = faceList[i];
-        shared_ptr<Cross> cross = crossMesh->crossList[i];
-
-        for (size_t j = 0; j < face->edges.size(); j++)
-        {
-            if (face->edges[j].lock()->twin.lock() == nullptr)
-            {
-                cross->neighbors.push_back(weak_ptr<Cross>());
-                cross->atBoundary = true;
-                continue;
-            }
-
-            int neiborFaceID = face->edges[j].lock()->twin.lock()->face.lock()->id;
-
-            if (neiborFaceID < 0 || neiborFaceID >= crossMesh->crossList.size())
-            {
-                printf("Warning: neiborFaceID = %d is invalid \n", neiborFaceID);
-                cross->neighbors.push_back(weak_ptr<Cross>());
-                continue;
-            }
-
-            //printf("i=%d   j=%d   neiborFaceID: %d \n", i, j, neiborFaceID);
-
-            shared_ptr<Cross> neiborCross = crossMesh->crossList[neiborFaceID];
-            cross->neighbors.push_back(neiborCross);
-        }
-    }
-}
-
-void BaseMeshCreator::ComputePracticalBoundary(pCrossMesh &crossMesh)
-{
-    vector<weak_ptr<Cross>> boundaryCross;
+    vector<wpCross> boundaryCross;
     crossMesh->UpdateCrossVertexIndex();
-    vector<vector<weak_ptr<Cross>>> &vertexCrossList = crossMesh->vertexCrossList;
+    vector<vector<wpCross>> &vertexCrossList = crossMesh->vertexCrossList;
 
     for(size_t id = 0; id < crossMesh->crossList.size(); id++)
     {
-        shared_ptr<Cross> cross = crossMesh->crossList[id];
+        pCross cross = crossMesh->crossList[id];
         cross->atBoundary = false;
     }
 
     auto setVertexRingBoundary = [&](int verID){
         if(verID >= 0 && verID < vertexCrossList.size())
         {
-            for(weak_ptr<Cross> cross: vertexCrossList[verID]){
+            for(wpCross cross: vertexCrossList[verID]){
                 if(!cross.lock()->atBoundary){
                     boundaryCross.push_back(cross);
                     cross.lock()->atBoundary = true;
@@ -629,7 +596,7 @@ void BaseMeshCreator::ComputePracticalBoundary(pCrossMesh &crossMesh)
 
     for(size_t id = 0; id < crossMesh->crossList.size(); id++)
     {
-        shared_ptr<Cross> cross = crossMesh->crossList[id];
+        pCross cross = crossMesh->crossList[id];
         for(size_t jd = 0; jd < cross->neighbors.size(); jd ++)
         {
             if(cross->neighbors[jd].lock() == nullptr)
@@ -642,10 +609,10 @@ void BaseMeshCreator::ComputePracticalBoundary(pCrossMesh &crossMesh)
         }
     }
 
-    float minBoundaryEdge = getVarList()->get<float>("minBoundaryEdge");
+    float minBoundaryEdge = getVarList()->template get<float>("minBoundaryEdge");
     for(size_t id = 0; id < boundaryCross.size(); id++)
     {
-        shared_ptr<Cross> cross = boundaryCross[id].lock();
+        pCross cross = boundaryCross[id].lock();
         size_t size = cross->vers.size();
         for(int jd = 0; jd < size; jd++)
         {
@@ -656,11 +623,11 @@ void BaseMeshCreator::ComputePracticalBoundary(pCrossMesh &crossMesh)
             //if the length of the edge is too small, then include one more part
             if(minBoundaryEdge > edgeLen)
             {
-                weak_ptr<Cross> ncross = cross->neighbors[jd];
+                wpCross ncross = cross->neighbors[jd];
                 int shared_id = cross->GetSharedCross(ncross);
 
                 if(shared_id >= 0 && shared_id < crossMesh->crossList.size()){
-                    shared_ptr<Cross> shared_cross = crossMesh->crossList[shared_id];
+                    pCross shared_cross = crossMesh->crossList[shared_id];
                     shared_cross->atBoundary = true;
                 }
             }
@@ -668,11 +635,11 @@ void BaseMeshCreator::ComputePracticalBoundary(pCrossMesh &crossMesh)
     }
 
     for(size_t id = 0; id < crossMesh->crossList.size(); id++) {
-        shared_ptr<Cross> cross = crossMesh->crossList[id];
+        pCross cross = crossMesh->crossList[id];
         if (cross == nullptr || cross->atBoundary) continue;
         bool allBoundary = true;
         for (size_t jd = 0; jd < cross->neighbors.size(); jd++) {
-            weak_ptr<Cross> ncross = cross->neighbors[jd];
+            wpCross ncross = cross->neighbors[jd];
             if (ncross.lock() != nullptr && ncross.lock()->atBoundary == false) {
                 allBoundary = false;
                 break;

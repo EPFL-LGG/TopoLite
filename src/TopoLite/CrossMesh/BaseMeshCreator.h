@@ -28,17 +28,35 @@ using namespace std;
  * \brief Mapping the 2D pattern into the 3D surface
  * \return the base polygonal mesh
  */
+
+template<typename Scalar>
 class BaseMeshCreator: public TopoObject
 {
 public:
 
-    typedef shared_ptr<PolyMesh_AABBTree<double>> pPolyMeshAABB;
+    typedef shared_ptr<PolyMesh_AABBTree<Scalar>> pPolyMeshAABB;
 
-    typedef weak_ptr<PolyMesh_AABBTree<double>> wpPolyMeshAABB;
+    typedef weak_ptr<PolyMesh_AABBTree<Scalar>> wpPolyMeshAABB;
 
-    typedef shared_ptr<CrossMesh<double>> pCrossMesh;
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
 
-    typedef weak_ptr<CrossMesh<double>> wpCrossMesh;
+    typedef weak_ptr<PolyMesh<Scalar>> wpPolyMesh;
+
+    typedef shared_ptr<CrossMesh<Scalar>> pCrossMesh;
+
+    typedef weak_ptr<CrossMesh<Scalar>> wpCrossMesh;
+
+    typedef shared_ptr<_Polygon<Scalar>> pPolygon;
+
+    typedef weak_ptr<_Polygon<Scalar>> wpPolygon;
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef Matrix<Scalar, 2, 1> Vector2;
 
 public:
 
@@ -98,23 +116,25 @@ public:
 
 	void RemoveDanglingCross(pCrossMesh crossMesh);
 
-	bool ComputeBoundaryVertex(double inverTextureMat[16], Vector3f sta2D, Vector3f end2D, Vector3f &pos2D, Vector3f &pos3D);
+	bool ComputeBoundaryVertex(double inverTextureMat[16], Vector3 sta2D, Vector3 end2D, Vector3 &pos2D, Vector3 &pos3D);
 	/*!
 	 * \brief: scale the 2D pattern position into UV space
 	 */
-	Vector3f GetTextureCoord(Vector3f point, float viewSize);
+	Vector3 GetTextureCoord(Vector3 point, Scalar viewSize, double inverTextureMat[16]);
 
 	/*!
 	 * \brief: project the 2D ptTexCoord into the Surface
 	 * \return: the 3D position of 2D pattern vertices
 	 */
-	bool ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3f ptTexCoord, Vector3f &ptSurfCoord);
+	bool ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3 ptTexCoord, Vector3 &ptSurfCoord);
 
 
 //
 //	// Remove Dangling Polygon
 //	void RemoveDanglingCross(pCrossMesh crossMesh);
 };
+
+#include "BaseMeshCreator.cpp"
 
 #endif
 

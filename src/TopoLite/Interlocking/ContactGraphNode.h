@@ -14,34 +14,40 @@ using std::weak_ptr;
 using std::vector;
 using std::pair;
 
-class ContactGraphNode;
-
-using pContactGraphNode = shared_ptr<ContactGraphNode>;
-using pContactGraphEdge = shared_ptr<ContactGraphEdge>;
-using wpContactGraphEdge = weak_ptr<ContactGraphEdge>;
-using wpContactGraphNode = weak_ptr<ContactGraphNode>;
-
-using ContactNeighbor = pair<wpContactGraphNode, wpContactGraphEdge> ;
-
 /*!
  * \brief Graph node records one part's geometry and contacts with its neighbors.
  */
+
+template<typename Scalar>
 class ContactGraphNode
 {
+public:
 
+    typedef shared_ptr<ContactGraphNode<Scalar>> pContactGraphNode;
+
+    typedef shared_ptr<ContactGraphEdge<Scalar>> pContactGraphEdge;
+
+    typedef weak_ptr<ContactGraphEdge<Scalar>> wpContactGraphEdge;
+
+    typedef weak_ptr<ContactGraphNode<Scalar>> wpContactGraphNode;
+    
+    using ContactNeighbor = pair<wpContactGraphNode, wpContactGraphEdge> ;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+    
 public:
 
     bool isBoundary; //!< True if the part is fixed
 
-    EigenPoint centroid; //!< the arithmetic mean position of all the points
+    Vector3 centroid; //!< the arithmetic mean position of all the points
 
-    EigenPoint centerofmass; //!< the gravity center
+    Vector3 centerofmass; //!< the gravity center
 
     float mass;
 
 public:
 
-    ContactGraphNode(bool _isBoundary, EigenPoint _centroid, EigenPoint _centerofmass, float _mass)
+    ContactGraphNode(bool _isBoundary, Vector3 _centroid, Vector3 _centerofmass, float _mass)
     {
         isBoundary = _isBoundary;
         centroid = _centroid;
