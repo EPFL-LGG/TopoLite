@@ -160,7 +160,7 @@ file(GLOB TpCoreFiles
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/InputVar.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/math3D.cpp)
 
-add_library(TpCorelib STATIC ${TpCoreFiles})
+add_library(TpCorelib SHARED ${TpCoreFiles})
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})
 

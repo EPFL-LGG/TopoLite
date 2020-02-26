@@ -10,7 +10,6 @@ using pPolyMesh = shared_ptr<PolyMesh<double>>;
 using pPolygon = shared_ptr<_Polygon<double>>;
 using Eigen::Vector3d;
 
-
 TEST_CASE("Class ContactGraph")
 {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();

@@ -504,7 +504,7 @@ bool PolyMesh<Scalar>::readOBJModel(
             for(size_t jd = 0; jd < F[id].size(); jd++)
 			{
 				poly->vers.push_back(vertexList[F[id][jd]]);
-				if(FTC[id].size() > jd) poly->texs.push_back(texList[FTC[id][jd]]);
+				if(FTC[id].size() > jd) poly->texs.push_back(texList[FTC[id][jd]]); //can have a memory error without the if condition
 			}
             polyList.push_back(poly);
         }

@@ -151,9 +151,6 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
              int planeI = planeIJ[id].first;
              int planeJ = planeIJ[id].second;
 
-             double projMat[16];
-             double invsProjMat[16];
-
              vector<Vector3> polyI = planes[planeI].polygon.lock()->getVertices();
              vector<Vector3> polyJ = planes[planeJ].polygon.lock()->getVertices();
              vector<vector<Vector3>> contactPtLists;
