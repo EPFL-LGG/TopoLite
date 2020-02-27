@@ -131,7 +131,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-#set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -160,7 +160,7 @@ file(GLOB TpCoreFiles
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/InputVar.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/math3D.cpp)
 
-add_library(TpCorelib SHARED ${TpCoreFiles})
+add_library(TpCorelib STATIC ${TpCoreFiles})
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})
 
