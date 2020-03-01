@@ -7,6 +7,9 @@ set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 #Cpp Subprocess
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
+#Filesystem
+set(FILESYSTEM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/filesystem)
+
 #PUGIXML
 option(BUILD_SHARED_LIBS OFF)
 find_package(PUGIXML REQUIRED)
@@ -63,6 +66,7 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
+                ${FILESYSTEM_INCLUDE_DIR}
                 PARENT_SCOPE)
 
 set(ext_lib pugixml

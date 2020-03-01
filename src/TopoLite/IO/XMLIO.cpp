@@ -425,24 +425,24 @@
 //                                  XML Reader
 //**************************************************************************************//
 
-//bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
-//{
-//
-//    //load xmlfile
-//    if(!xmldoc.load_file(xmlFileName.c_str()))
-//        return false;
-//    pugi::xml_node xml_root = xmldoc.child("Documents");
-//
-//    if (xml_root)
-//    {
-//        //0) allocate memorry
-//        data.varList = make_shared<InputVarList>();
+bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
+{
+
+    //load xmlfile
+    if(!xmldoc.load_file(xmlFileName.c_str()))
+        return false;
+    pugi::xml_node xml_root = xmldoc.child("Documents");
+
+    if (xml_root)
+    {
+        //0) allocate memorry
+        data.varList = make_shared<InputVarList>();
 //        data.strucCreator = make_shared<StrucCreator>(data.varList);
-//
-//        //1) read all gui settings
-//        InitVar(data.varList.get());
-//        XMLReader_GUISettings(xml_root, data);
-//
+
+        //1) read all gui settings
+        InitVar(data.varList.get());
+        XMLReader_GUISettings(xml_root, data);
+
 //        //2) construct the cross mesh
 //        boost::filesystem::path xmlPathBoost(xmlFileName);
 //        data.varList->filename = xmlPathBoost.stem().string();
@@ -480,10 +480,10 @@
 //                XMLReader_Boundary(xml_root, data);
 //            }
 //        }
-//    }
-//
-//    return true;
-//}
+    }
+
+    return true;
+}
 
 void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
 {
