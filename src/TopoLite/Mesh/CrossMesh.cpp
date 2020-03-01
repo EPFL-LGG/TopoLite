@@ -21,7 +21,8 @@
 
 
 template<typename Scalar>
-CrossMesh<Scalar>::CrossMesh(std::shared_ptr<InputVarList> var) : TopoObject(var)
+CrossMesh<Scalar>::CrossMesh(std::shared_ptr<InputVarList> var)
+:PolyMesh<Scalar>::PolyMesh(var)
 {
 	clear();
 }
@@ -86,6 +87,9 @@ void CrossMesh<Scalar>::setPolyMesh(const PolyMesh<Scalar> &polyMesh)
 template<typename Scalar>
 void CrossMesh<Scalar>::createConnectivity()
 {
+    //0)
+    vertexCrossList.clear();
+
     //1) create vertexCrossList
     vertexCrossList.resize(PolyMesh<Scalar>::vertexList.size());
     for(pCross cross: crossList){
@@ -116,7 +120,7 @@ void CrossMesh<Scalar>::createConnectivity()
 template<typename Scalar>
 shared_ptr<Cross<Scalar>> CrossMesh<Scalar>::getNeighbor(pCross cross,
                                                          CrossMesh::pVertex v0,
-                                                         CrossMesh::pVertex v1)
+                                                         CrossMesh::pVertex v1) const
 {
 
     if(v0 == nullptr || v1 == nullptr || cross == nullptr)
@@ -148,7 +152,7 @@ shared_ptr<Cross<Scalar>> CrossMesh<Scalar>::getNeighbor(pCross cross,
 }
 
 template<typename Scalar>
-void CrossMesh<Scalar>::print()
+void CrossMesh<Scalar>::print() const
 {
 	printf("cross num: %lu \n", crossList.size());
 
@@ -171,7 +175,7 @@ void CrossMesh<Scalar>::setBaseMesh2D(shared_ptr<PolyMesh<Scalar>> _baseMesh2D)
 
 
 template<typename Scalar>
-Scalar CrossMesh<Scalar>::computeAverageCrossSize()
+Scalar CrossMesh<Scalar>::computeAverageCrossSize() const
 {
     Scalar area = 0;
     for(pCross cross: crossList){

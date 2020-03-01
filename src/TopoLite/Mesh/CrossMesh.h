@@ -42,7 +42,7 @@ public:
 
     typedef shared_ptr<VTex<Scalar>> pVTex;
 
-public:
+private:
 
 	vector<pCross> crossList;                   // Cross list of the mesh
 
@@ -70,7 +70,7 @@ public:
 
     void createConnectivity();
 
-    void print();
+    void print() const;
 
     void clear()
     {
@@ -78,6 +78,33 @@ public:
         crossList.clear();
         vertexCrossList.clear();
         baseMesh2D.reset();
+    }
+
+    void push_back(pCross _cross)
+    {
+        crossList.push_back(_cross);
+        PolyMesh<Scalar>::polyList.push_back(_cross);
+    }
+
+    void set_cross(size_t index, pCross _cross)
+    {
+        if(index >= 0 || index < crossList.size())
+        {
+            crossList[index] = _cross;
+            PolyMesh<Scalar>::polyList[index] = _cross;
+        }
+    }
+
+    pCross cross(size_t index)
+    {
+        if(index >= 0 || index < crossList.size()){
+            return crossList[index];
+        }
+        return nullptr;
+    }
+
+    size_t size() const{
+        return crossList.size();
     }
 
 public:
@@ -92,15 +119,17 @@ public:
     using PolyMesh<Scalar>::texBBox;
     using PolyMesh<Scalar>::lowestPt;
 
+    using PolyMesh<Scalar>::vertexList;
+
 public:
 
 	void updateCrossID();
 
-    Scalar computeAverageCrossSize();
+    Scalar computeAverageCrossSize() const;
 
 private:
 
-    pCross getNeighbor(pCross cross, pVertex v0, pVertex v1);
+    pCross getNeighbor(pCross cross, pVertex v0, pVertex v1) const;
 };
 
 #include "CrossMesh.cpp"

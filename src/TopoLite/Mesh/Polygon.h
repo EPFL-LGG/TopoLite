@@ -159,6 +159,11 @@ public:
 
     void computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &origin) const;
 
+    //the find the barycentric coordinates of the tex polygon
+    vector<Scalar> computeBaryCentric(Vector2 pt) const;
+
+    vector<Scalar> computeBaryCentric(Vector2 sta, Vector2 end, Vector2 pt) const;
+
 public:
 
     // Polygon Operations

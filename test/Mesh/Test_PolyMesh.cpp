@@ -97,9 +97,10 @@ TEST_CASE("PolyMesh")
         REQUIRE(polyMesh.volume() == Approx(1).margin(1e-6));
 
         //Eigen Matrix Mesh
-        PolyMesh<double>::MatrixX3 V;
-        PolyMesh<double>::MatrixX3i F;
-        polyMesh.convertPosToEigenMesh(V, F);
+        PolyMesh<double>::MatrixX V;
+        PolyMesh<double>::MatrixXi F;
+        Eigen::VectorXi C;
+        polyMesh.convertPosToEigenMesh(V, F, C);
         REQUIRE(V.rows() == 8);
         REQUIRE(F.rows() == 12);
     }

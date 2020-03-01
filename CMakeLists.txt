@@ -125,15 +125,16 @@ project(TopoLite)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_CXX_STANDARD 11)
-set(Boost_NO_BOOST_CMAKE 1)
+
+add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+#set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -stdlib=libc++")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -stdlib=libc++")
 
 #3rd party library
 #if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
@@ -157,8 +158,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
 file(GLOB TpCoreFiles
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/InputVar.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/math3D.cpp)
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/XMLIO.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/InputVar.cpp)
 
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
@@ -179,7 +180,10 @@ include(CTest)
 include(ParseAndAddCatchTests)
 
 #file(GLOB testTopoFiles test/Utility/Test_PolyPolyBoolean.cpp)
-file(GLOB testTopoFiles test/Interlocking/Test_ContactGraph.cpp)
+file(GLOB testTopoFiles test/CrossMesh/Test_BaseMeshCreator.cpp
+                        test/IO/*.cpp
+                        test/Utility/*.cpp
+                        test/Mesh/*.cpp)
 #file(GLOB testTopoFiles test/Mesh/*.cpp
 #                        test/Utility/*.cpp)
 

@@ -136,17 +136,21 @@ TEST_CASE("Triangle"){
     }
 
     SECTION("computeCenter"){
-        CHECK(tri.center.x() == Approx(1.0 / 3));
-        CHECK(tri.center.y() == Approx(1.0 / 3));
-        CHECK(tri.center.z() == Approx(1.0 / 3));
+        CHECK(tri.computeCenter().x() == Approx(1.0 / 3));
+        CHECK(tri.computeCenter().y() == Approx(1.0 / 3));
+        CHECK(tri.computeCenter().z() == Approx(1.0 / 3));
     }
 
     SECTION("computeArea"){
-        CHECK(tri.area == Approx(sqrt(3) / 2));
+        CHECK(tri.computeArea() == Approx(sqrt(3) / 2));
+    }
+
+    SECTION("computeSignedArea"){
+        CHECK(tri.computeSignedArea() == Approx(0.5));
     }
 
     SECTION("computeNormal"){
-        CHECK((tri.normal - Vector3d(1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3))).norm() == Approx(0));
+        CHECK((tri.computeNormal() - Vector3d(1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3))).norm() == Approx(0));
     }
 
     SECTION("correctNormal"){

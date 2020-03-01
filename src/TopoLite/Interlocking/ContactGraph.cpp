@@ -172,11 +172,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
              }
 
              if(!contactPolys.empty()){
-                 int partI = planes[planeI].partID;
-                 int partJ = planes[planeJ].partID;
-
-                 shared_ptr<ContactGraphEdge<Scalar>> edge = make_shared<ContactGraphEdge<Scalar>>(contactPolys, planes[planeI].nrm);
-                 planeIJEdges[id] = edge;
+                 planeIJEdges[id] = make_shared<ContactGraphEdge<Scalar>>(contactPolys, planes[planeI].nrm);
              }
          }
      });

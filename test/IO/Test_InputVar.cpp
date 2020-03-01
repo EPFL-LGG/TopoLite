@@ -11,7 +11,6 @@ TEST_CASE("InputVar")
     REQUIRE(varList->varLists.empty());
 
     SECTION("InputVarLite"){
-        REQUIRE(!varList->get<bool>("showDemo"));
         InitVarLite(varList.get());
         REQUIRE(varList->get<bool>("showDemo"));
     }

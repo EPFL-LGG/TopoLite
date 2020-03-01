@@ -299,6 +299,82 @@ void _Polygon<Scalar>::computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &o
 	y_axis.normalize();
 }
 
+//https://www.mn.uio.no/math/english/people/aca/michaelf/papers/wach_mv.pdf
+template <typename Scalar>
+vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 pt) const{
+    vector<Scalar> barycentric;
+
+    if(texs.empty()){
+        return barycentric;
+    }
+
+    vector<Scalar> wi;
+    Scalar sumw = 0;
+    for(int id = 0; id < texs.size(); id++)
+    {
+        Vector2 mv = texs[(id - 1 + texs.size()) % texs.size()]->texCoord;
+        Vector2 v =  texs[id]->texCoord;
+        Vector2 pv = texs[(id + 1 + texs.size()) % texs.size()]->texCoord;
+
+        Triangle<Scalar> A_mv_v_pv(mv, v, pv);
+        Triangle<Scalar> A_pt_mv_v(pt, mv, v);
+        Triangle<Scalar> A_pt_v_pv(pt, v, pv);
+
+        Scalar area_pt_mv_v = A_pt_mv_v.computeSignedArea();
+        Scalar area_pt_v_pv = A_pt_v_pv.computeSignedArea();
+
+        //line case 1)
+        if(std::abs(area_pt_mv_v) < FLOAT_ERROR_SMALL){
+            vector<Scalar> line = computeBaryCentric(mv, v, pt);
+            barycentric.resize(texs.size(), 0);
+            barycentric[(id - 1 + texs.size()) % texs.size()] = line[0];
+            barycentric[id] = line[1];
+            return barycentric;
+        }
+
+        //line case 2)
+        if(std::abs(area_pt_v_pv) < FLOAT_ERROR_SMALL){
+            vector<Scalar> line = computeBaryCentric(v, pv, pt);
+            barycentric.resize(texs.size(), 0);
+            barycentric[id] = line[0];
+            barycentric[(id + 1) % texs.size()] = line[1];
+            return barycentric;
+        }
+
+        Scalar w = A_mv_v_pv.computeSignedArea() / area_pt_mv_v / area_pt_v_pv;
+        wi.push_back(w);
+        sumw += w;
+    }
+
+    for(size_t id = 0; id < texs.size(); id++){
+        barycentric.push_back(wi[id] / sumw);
+    }
+
+    return barycentric;
+}
+
+template <typename Scalar>
+vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 sta, Vector2 end, Vector2 pt) const{
+
+    //notice we don't handle the case where pt is not on the segment (sta, end)
+    if((pt - sta).norm() < FLOAT_ERROR_SMALL){
+        return vector<Scalar>({1, 0});
+    }
+
+    if((pt - end).norm() < FLOAT_ERROR_SMALL){
+        return vector<Scalar>({0, 1});
+    }
+
+    if((sta - end).norm() < FLOAT_ERROR_SMALL){
+        return vector<Scalar>();
+    }
+
+    Scalar l0 = (pt - end).norm() / (sta - end).norm();
+    return vector<Scalar>({l0, 1 - l0});
+}
+
+
+
 template <typename Scalar>
 void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris) const
 {

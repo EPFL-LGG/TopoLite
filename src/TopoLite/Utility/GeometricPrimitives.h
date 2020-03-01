@@ -389,17 +389,34 @@ struct Triangle
 public:
     typedef Matrix<Scalar,3, 1> Vector3;
 
+    typedef Matrix<Scalar,2, 1> Vector2;
+
 public:
 
     Vector3 v[3];
 
-    Vector3 normal;
-
-    Scalar area;            // Face area
-
-	Vector3 center;
-
 	int vIndices[3];       // Index of each vertex
+
+public:
+    Triangle(){
+        v[0] = Vector3(0, 0, 0);
+        v[1] = Vector3(0, 0, 0);
+        v[2] = Vector3(0, 0, 0);
+    }
+
+    Triangle(Vector3 _v0, Vector3 _v1, Vector3 _v2)
+    {
+        v[0] = _v0;
+        v[1] = _v1;
+        v[2] = _v2;
+    }
+
+    Triangle(Vector2 _v0, Vector2 _v1, Vector2 _v2)
+    {
+        v[0].x() = _v0.x(); v[0].y() = _v0.y(); v[0].z() = 0;
+        v[1].x() = _v1.x(); v[1].y() = _v1.y(); v[1].z() = 0;
+        v[2].x() = _v2.x(); v[2].y() = _v2.y(); v[2].z() = 0;
+    }
 
 public:
 
@@ -415,13 +432,15 @@ public:
 
 	Vector3 computeBBoxMaxPt();
 
-	void computeCenter();
+    Vector3 computeCenter();
 
-	void computeArea();
+	Scalar computeArea();
 
-	void computeNormal();
+    Scalar computeSignedArea(); //for 2D triangle
 
-	void correctNormal(Vector3 tagtNormal);
+	Vector3 computeNormal();
+
+    void correctNormal(Vector3 tagtNormal);
 };
 
 template<typename Scalar>
@@ -430,10 +449,6 @@ void Triangle<Scalar>::init(Vector3 _v0, Vector3 _v1, Vector3 _v2)
     v[0] = _v0;
     v[1] = _v1;
     v[2] = _v2;
-
-    computeCenter();
-    computeArea();
-    computeNormal();
 }
 
 template<typename Scalar>
@@ -447,11 +462,6 @@ Triangle<Scalar> & Triangle<Scalar>::operator=(const Triangle &tri)
         this->v[i] = tri.v[i];
         this->vIndices[i] = tri.vIndices[i];
     }
-
-    this->normal = tri.normal;
-    this->center = tri.center;
-    this->area   = tri.area;
-
     return *this;
 }
 
@@ -503,35 +513,53 @@ Matrix<Scalar, 3, 1> Triangle<Scalar>::computeBBoxMaxPt()
 }
 
 template<typename Scalar>
-void Triangle<Scalar>::computeCenter()
+Matrix<Scalar, 3, 1> Triangle<Scalar>::computeCenter()
 {
-    center = (v[0] + v[1] + v[2]) / 3.0;
+    Vector3 center = (v[0] + v[1] + v[2]) / 3.0;
+    return center;
 }
 
 template<typename Scalar>
-void Triangle<Scalar>::computeArea()
+Scalar Triangle<Scalar>::computeArea()
 {
     Vector3 normal  = (v[1] - v[0]).cross(v[2] - v[0]);
-    area  = 0.5f * normal.norm();
+    Scalar area  = 0.5f * normal.norm();
+    return area;
 }
 
+//https://www.mn.uio.no/math/english/people/aca/michaelf/papers/wach_mv.pdf
 template<typename Scalar>
-void Triangle<Scalar>::computeNormal()
+Scalar Triangle<Scalar>::computeSignedArea()
+{
+    Matrix<Scalar, 3, 3> A;
+    A << 1, 1, 1,
+    v[0].x(), v[1].x(), v[2].x(),
+    v[0].y(), v[1].y(), v[2].y();
+    return A.determinant() / 2;
+}
+
+
+template<typename Scalar>
+Matrix<Scalar, 3, 1> Triangle<Scalar>::computeNormal()
 {
     Vector3 tempNor = (v[1] - v[0]).cross(v[2] - v[0]);  // Assume the vertices are saved in counter-clockwise
     Scalar tempNorLen = tempNor.norm();
-
+    Vector3 normal;
     if ( tempNorLen > FLOAT_ERROR_SMALL )
+    {
         normal = tempNor / tempNorLen;
-    else
+    }
+    else{
         normal = Vector3(1,0,0);     // Note: this default vector also can be others
+    }
+    return normal;
 }
 
 template<typename Scalar>
 void Triangle<Scalar>::correctNormal(Vector3 tagtNormal)
 {
     // Compute initial normal
-    computeNormal();
+    Vector3 normal = computeNormal();
 
     // Rearrange vertex order if needed
     Scalar dotp = normal.dot(tagtNormal);
@@ -547,9 +575,6 @@ void Triangle<Scalar>::correctNormal(Vector3 tagtNormal)
         v[1] = triVers[2];
         v[2] = triVers[1];
     }
-
-    // Recompute the normal
-    computeNormal();
 }
 
 ////////////////////////////////////////////

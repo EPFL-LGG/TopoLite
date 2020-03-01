@@ -16,7 +16,9 @@
 #define _HELP_DEFINE_H
 
 #include <math.h>
-
+#ifndef UNITTEST_DATAPATH
+    #define UNITTEST_DATAPATH
+#endif
 ///////////////////////////////////////////////////////////////////////
 //
 //  Debug Flag

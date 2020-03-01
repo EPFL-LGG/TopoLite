@@ -22,7 +22,7 @@
 template <typename Scalar>
 BaseMeshCreator<Scalar>::BaseMeshCreator(pPolyMeshAABB _polyMesh,
                                          pCrossMesh _pattern2D)
-: TopoObject(_polyMesh->getVarList())
+: TopoObject(_polyMesh?_polyMesh->getVarList():make_shared<InputVarList>())
 {
     polyMesh = _polyMesh;
     pattern2D = _pattern2D;
@@ -30,7 +30,8 @@ BaseMeshCreator<Scalar>::BaseMeshCreator(pPolyMeshAABB _polyMesh,
 
 template <typename Scalar>
 BaseMeshCreator<Scalar>::BaseMeshCreator(shared_ptr<InputVarList> var)
-: TopoObject(var){
+: TopoObject(var)
+{
 
 }
 
@@ -45,37 +46,37 @@ BaseMeshCreator<Scalar>::~BaseMeshCreator()
 //**************************************************************************************//
 
 template <typename Scalar>
-void BaseMeshCreator<Scalar>::Pattern2CrossMesh(double *inverTextureMat,
-                                        pPolyMesh &baseMesh2D,
-                                        pCrossMesh &crossMesh)
+void BaseMeshCreator<Scalar>::computeBaseCrossMesh(double *inverTextureMat,
+                                                   pPolyMesh &baseMesh2D,
+                                                   pCrossMesh &crossMesh)
 {
 	tbb::tick_count sta = tbb::tick_count::now();
-	crossMesh.reset();
-	baseMesh2D.reset();
+
 	crossMesh = make_shared<CrossMesh<double>>(getVarList());
 	baseMesh2D = make_shared<PolyMesh<double>>(getVarList());
+
 	map_cross2D_3D.clear();
 	map_cross3D_2D.clear();
 
-	ComputeInsideCross(inverTextureMat, baseMesh2D, crossMesh);
+    computeInternalCross(inverTextureMat, baseMesh2D, crossMesh);
 
-	if(getVarList()->template get<bool>("smooth_bdry"))
-	{
-        ComputeBoundaryCross(inverTextureMat, baseMesh2D, crossMesh);
-		//remove dangling
-		RemoveDanglingCross(crossMesh);
-    }
-
-    if(baseMesh2D){
-        baseMesh2D->setVarList(getVarList());
-    }
-
-	if(crossMesh){
-        crossMesh->setVarList(getVarList());
-        ComputePracticalBoundary(crossMesh);
-    }
-
-	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
+//	if(getVarList()->template get<bool>("smooth_bdry"))
+//	{
+//        ComputeBoundaryCross(inverTextureMat, baseMesh2D, crossMesh);
+//		//remove dangling
+//		RemoveDanglingCross(crossMesh);
+//    }
+//
+//    if(baseMesh2D){
+//        baseMesh2D->setVarList(getVarList());
+//    }
+//
+//	if(crossMesh){
+//        crossMesh->setVarList(getVarList());
+//        ComputePracticalBoundary(crossMesh);
+//    }
+//
+//	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 }
 
 
@@ -136,87 +137,96 @@ void BaseMeshCreator<Scalar>::RemoveDanglingCross(pCrossMesh crossMesh)
 }
 
 template <typename Scalar>
-void BaseMeshCreator<Scalar>::ComputeInsideCross( double *inverTextureMat,
-                                                  pPolyMesh &baseMesh2D,
-                                                  pCrossMesh &crossMesh)
+void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
+                                                   pPolyMesh &baseMesh2D,
+                                                   pCrossMesh &crossMesh)
 {
+    //at this stage, baseMes2D and crossMesh are empty.
+    if(pattern2D.lock() == nullptr) return;
+
+    //map 2D pattern vertices on 3D input surface
 	for(size_t id = 0; id < pattern2D.lock()->vertexList.size(); id++)
 	{
-		Vector3 ver = pattern2D.lock()->vertexList[id];
+        if(pattern2D.lock()->vertexList[id] == nullptr) continue;
 
-		Vector3 texCoord = GetTextureCoord(ver, viewSize, inverTextureMat);
+        //1) get the interactive position of each vertex.
+		Vector2 ver_2DCoord = pattern2D.lock()->vertexList[id]->pos.head(2);
+		Vector2 tex_2DCoord = GetTextureCoord(ver_2DCoord, viewSize, inverTextureMat);
+		//MultiplyPoint(texCoord, inverTextureMat, texCoord);
 
-		Vector3 ver3D;
-		bool isSuccess = ComputeSurfaceCoord(polyMesh.lock(), texCoord, ver3D);
-		if(isSuccess) {
-			map_vertex2D_3D.push_back(crossMesh->vertexList.size());
+		//2) compute the 3D coordinates of the 2D texture vertices
+		//by inversing the parametrization mapping
+		Vector3 ver_3DCoord;
+		if(mapTexPointBackToSurface(tex_2DCoord, ver_3DCoord))
+		{
+		    //if find its corresponding point on the surface
+            int ver_index2D = id;
+            int ver_index3D = crossMesh->vertexList.size();
+
+            //create a new pVertex and add it to crossMesh
+            pVertex ver3D = make_shared<VPoint<Scalar>>(ver_3DCoord); //coordinate
+            ver3D->verID = crossMesh->vertexList.size(); //index
 			crossMesh->vertexList.push_back(ver3D);
-			map_vertex3D_2D.push_back(id);
+
+            map_vertex2D_3D.push_back(ver_index3D);
+			map_vertex3D_2D.push_back(ver_index2D);
 		}
 		else{
+		    //use -1 to represent no corresponding point
+            int ver_index2D = id;
+            int ver_index3D = -1;
 			map_vertex2D_3D.push_back(-1);
 		}
+
 	}
 
-	for(size_t i = 0; i <  pattern2D.lock()->crossList.size(); i++)
+	//generating all internal crosses
+	for(size_t id = 0; id < pattern2D.lock()->size(); id++)
 	{
-		pPolygon poly2D = pattern2D.lock()->crossList[i];
-		pCross cross = make_shared<Cross>(getVarList());
-		cross->atBoundary = false;
-		cross->crossID = crossMesh->crossList.size();
-		bool is_all_vertices_in_texture = true;
+	    if(pattern2D.lock()->cross(id) == nullptr) continue;
+        pCross poly2D = pattern2D.lock()->cross(id);
 
-		for (size_t j = 0; j < poly2D->verIDs.size(); j++)
+		//create an empty 3D internal cross
+		pCross cross3D = make_shared<Cross<Scalar>>(getVarList());
+        cross3D->atBoundary = false;
+        cross3D->crossID = crossMesh->size();
+
+        //from previous section,
+		//we know the 3D corresponding coordinate of each poly2D's vertex.
+		//if exist, add it to the cross3D
+		//if not, stop
+		size_t jd = 0;
+		for (; jd < poly2D->vers.size(); jd++)
 		{
-			int ver2ID = poly2D->verIDs[j];
-			int ver3ID = map_vertex2D_3D[ver2ID];
-			if(ver3ID == -1)
-			{
-				is_all_vertices_in_texture = false;
-				break;
-			}
+			int ver_index2D = poly2D->vers[jd]->verID;
+			int ver_index3D = map_vertex2D_3D[ver_index2D];
+			if(ver_index3D == -1) break;
 
-			cross->verIDs.push_back(ver3ID);
-			cross->vers.push_back(_Vertex(crossMesh->vertexList[ver3ID]));
+			pVertex vertex = crossMesh->vertexList[ver_index3D];
+			cross3D->vers.push_back(vertex);
 		}
 
-		if(is_all_vertices_in_texture)
+		//if all vertex of poly2D is interal.
+		if(jd != poly2D->vers.size())
 		{
-			map_cross2D_3D.push_back(cross->crossID);
-			map_cross3D_2D.push_back(i);
+		    int cross_index2D = id;
+		    int cross_index3D = cross3D->crossID;
 
-			cross->ComputeCenter();
-			cross->ComputeNormal();
-			crossMesh->crossList.push_back(cross);
+			map_cross2D_3D.push_back(cross_index3D);
+			map_cross3D_2D.push_back(cross_index2D);
 
-			pPolygon poly2DCopy = make_shared<_Polygon>(*poly2D);
-			baseMesh2D->polyList.push_back(poly2DCopy);  // Cross mesh in the texture UV space
+			crossMesh->push_back(cross3D);
+
+			baseMesh2D->polyList.push_back(make_shared<_Polygon<Scalar>>(*poly2D));  // Cross mesh in the texture UV space
 		}
+		//if not, currently no corresponding 3D cross.
 		else {
 			map_cross2D_3D.push_back(-1);
 		}
 	}
 
-	for(size_t id = 0; id < pattern2D.lock()->crossList.size(); id++)
-	{
-		int cross3ID = map_cross2D_3D[id];
-		if(cross3ID != -1)
-		{
-			pCross cross = pattern2D.lock()->crossList[id];
-			for(size_t jd = 0; jd < cross->neighbors.size(); jd ++){
-				pCross ncross = cross->neighbors[jd].lock();
-				int ncross3ID = (ncross != nullptr ? map_cross2D_3D[ncross->crossID] : -1);
-				if(ncross3ID != -1)
-				{
-					crossMesh->crossList[cross3ID]->neighbors.push_back(crossMesh->crossList[ncross3ID]);
-				}
-				else
-				{
-					crossMesh->crossList[cross3ID]->neighbors.push_back(pCross());
-				}
-			}
-		}
-	}
+	//build crossMesh connectivity
+	crossMesh->createConnectivity();
 }
 
 
@@ -472,20 +482,28 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 }
 
 template <typename Scalar>
-Matrix<Scalar, 3, 1> BaseMeshCreator<Scalar>::GetTextureCoord(Vector3 point, Scalar viewSize, double inverTextureMat[16])
+Matrix<Scalar, 2, 1> BaseMeshCreator<Scalar>::GetTextureCoord(Vector2 point, Scalar viewSize, double *interactMat)
 {
-	Vector3 texCoord;
+    Vector2 texCoord;
 
 	texCoord.x() = (point.x() + 0.5f*viewSize) / viewSize;
 	texCoord.y() = (point.y() + 0.5f*viewSize) / viewSize;
-	texCoord.z() = 0;
 
-	return texCoord;
+
+	Matrix<Scalar, 4, 4> mat;
+	mat << interactMat[0], interactMat[4], interactMat[8], interactMat[12],
+	       interactMat[1], interactMat[5], interactMat[9], interactMat[13],
+	       interactMat[2], interactMat[6], interactMat[10], interactMat[14],
+	       interactMat[3], interactMat[7], interactMat[11], interactMat[15];
+
+    texCoord = (mat * Matrix<Scalar, 4, 1>(texCoord.x(), texCoord.y(), 0, 1)).head(2);
+
+    return texCoord;
 }
 
-// TODO: make the function more general (i.e., triangle to polygon)
+//able to handle polygonal mesh
 template <typename Scalar>
-bool BaseMeshCreator<Scalar>::ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3 ptTexCoord, Vector3 &ptSurfCoord)
+bool BaseMeshCreator<Scalar>::mapTexPointBackToSurface(Vector2 ptTexCoord, Vector3 &ptSurfCoord)
 {
 	if(ptTexCoord.x() < -1.5 || ptTexCoord.x() > 1.5) return false;
 	if(ptTexCoord.y() < -1.5 || ptTexCoord.y() > 1.5) return false;
@@ -493,42 +511,19 @@ bool BaseMeshCreator<Scalar>::ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3 pt
 
     pPolygon poly = polyMesh.lock()->findTexPoint(Vector2(ptTexCoord.x(), ptTexCoord.y()));
 
-    if (poly->vers.size() != 3)
-    {
-        printf("Warning: the polygon is not a triangle. \n");
-        return false;
+    if(poly != nullptr){
+        vector<Scalar> barycentric = poly->computeBaryCentric(ptTexCoord);
+        if(barycentric.size() == poly->size())
+        {
+            ptSurfCoord = Vector3(0, 0, 0);
+            for(int id = 0; id < poly->size(); id++){
+                ptSurfCoord += poly->pos(id) * barycentric[id];
+            }
+            return true;
+        }
     }
 
-    Triangle<Scalar> texTri;
-    for (int j = 0; j < 3; j++)
-    {
-        texTri.v[j] = Vector3(poly->vers[j].texCoord.x(), poly->vers[j].texCoord.y(), 0);
-    }
-
-    // Get the triangle in geometrical space
-    Triangle<Scalar> geoTri;
-    for (int j = 0; j < 3; j++)
-    {
-        geoTri.v[j] = poly->vers[j].pos;
-    }
-
-    // Barycentric interpolation if point is inside the triangle
-    if (IsPointInsideTriangle(ptTexCoord, texTri, false))
-    {
-        // Compute total and partial triangle area
-        float totalArea = GetTriangleArea(texTri.v[0], texTri.v[1], texTri.v[2]);
-        float subArea0 = GetTriangleArea(ptTexCoord, texTri.v[1], texTri.v[2]);
-        float subArea1 = GetTriangleArea(texTri.v[0], ptTexCoord, texTri.v[2]);
-        float subArea2 = GetTriangleArea(texTri.v[0], texTri.v[1], ptTexCoord);
-
-        ptSurfCoord = (subArea0 / totalArea)*geoTri.v[0] +
-                      (subArea1 / totalArea)*geoTri.v[1] +
-                      (subArea2 / totalArea)*geoTri.v[2];
-
-        return true;
-    }
-
-	return false;
+    return false;
 }
 
 template<typename Scalar>

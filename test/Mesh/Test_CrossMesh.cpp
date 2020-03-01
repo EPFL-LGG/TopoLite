@@ -52,7 +52,7 @@ TEST_CASE("CrossMesh")
         REQUIRE(crossMesh.getVertices().size() == 8);
 
         //neighbor
-        REQUIRE(crossMesh.crossList[0]->neighbors[0].lock()->crossID == 3);
-        REQUIRE(crossMesh.crossList[0]->neighbors[3].lock()->crossID == 4);
+        REQUIRE(crossMesh.cross(0)->neighbors[0].lock()->crossID == 3);
+        REQUIRE(crossMesh.cross(0)->neighbors[3].lock()->crossID == 4);
     }
 }

@@ -4,20 +4,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 #EIGEN
 set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 
-#set(EIGEN3_INCLUDE_DIR /usr/local/include/eigen3)
-
-if (WIN32)
-    #the boost in anaconda has some bugs
-    #instead we use https://sourceforge.net/projects/boost/files/boost-binaries/
-    set(BOOST_ROOT "C:/local/boost_1_66_0")
-else ()
-    set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
-endif()
-
-set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem REQUIRED)
-
 #Cpp Subprocess
 set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 

@@ -12,5 +12,8 @@ TEST_CASE("BaseMeshCreator")
     std::shared_ptr<PolyMesh_AABBTree<double>> _polyMesh;
     std::shared_ptr<CrossMesh<double>> _pattern2D;
     BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D);
-
+    double interactive[16] = {0};
+    std::shared_ptr<PolyMesh<double>> outBaseMesh2D;
+    std::shared_ptr<CrossMesh<double>> outCrossMesh2D;
+    baseMeshCreator.computeBaseCrossMesh(interactive, outBaseMesh2D, outCrossMesh2D);
 }

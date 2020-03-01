@@ -5,9 +5,10 @@
 #include <catch2/catch.hpp>
 #include "Mesh/Polygon.h"
 #include "Utility/GeometricPrimitives.h"
+#include <iostream>
 
 typedef std::vector<Eigen::Vector3d> PolyVector3d;
-
+using Eigen::Vector2d;
 TEST_CASE("Polygon")
 {
     _Polygon<double> poly;
@@ -116,6 +117,7 @@ TEST_CASE("Polygon")
             REQUIRE(poly.max_radius() == Approx(sqrt(2)));
         }
 
+
         SECTION("computeFrame")
         {
             Vector3d x_axis, y_axis, origin;
@@ -146,5 +148,92 @@ TEST_CASE("Polygon")
             REQUIRE((poly.pos(4) - Vector3d(0, 0, 0)).norm() == Approx(0.0));
         }
     }
+
+    SECTION("computeBaryCentric"){
+        poly.push_back(Vector3d(0, 0, 0), Vector2d(0, 0));
+        poly.push_back(Vector3d(2, 0, 0), Vector2d(1.1, 0));
+        poly.push_back(Vector3d(2, 2, 0), Vector2d(1.5, 2));
+        poly.push_back(Vector3d(0, 2, 0), Vector2d(0, 1.3));
+
+        Vector2d pt(0.1, 0.8);
+
+        vector<double> barycentric = poly.computeBaryCentric(pt);
+        Vector2d barypt(0, 0);
+        for(int id = 0; id < 4; id++){
+            barypt += poly.tex(id) * barycentric[id];
+        }
+        REQUIRE((barypt - pt).norm() == Approx(0).margin(1e-7));
+    }
+
+    SECTION("computeBaryCentric corner case") {
+        poly.push_back(Vector3d(0, 0, 0), Vector2d(0, 0));
+        poly.push_back(Vector3d(2, 0, 0), Vector2d(1.1, 0));
+        poly.push_back(Vector3d(2, 2, 0), Vector2d(1.5, 2));
+        poly.push_back(Vector3d(0, 2, 0), Vector2d(0, 1.3));
+
+        SECTION("(0, 0.8)") {
+
+
+            Vector2d pt(0, 0.8);
+
+            vector<double> barycentric = poly.computeBaryCentric(pt);
+            Vector2d barypt(0, 0);
+            for (int id = 0; id < 4; id++) {
+                barypt += poly.tex(id) * barycentric[id];
+            }
+            REQUIRE((barypt - pt).norm() == Approx(0).margin(1e-7));
+        }
+
+        SECTION("(0.8, 0)")
+        {
+            poly.push_back(Vector3d(0, 0, 0), Vector2d(0, 0));
+            poly.push_back(Vector3d(2, 0, 0), Vector2d(1.1, 0));
+            poly.push_back(Vector3d(2, 2, 0), Vector2d(1.5, 2));
+            poly.push_back(Vector3d(0, 2, 0), Vector2d(0, 1.3));
+
+            Vector2d pt(0.8, 0);
+
+            vector<double> barycentric = poly.computeBaryCentric(pt);
+            Vector2d barypt(0, 0);
+            for (int id = 0; id < 4; id++) {
+                barypt += poly.tex(id) * barycentric[id];
+            }
+            REQUIRE((barypt - pt).norm() == Approx(0).margin(1e-7));
+        }
+
+        SECTION("(0, 0)")
+        {
+            poly.push_back(Vector3d(0, 0, 0), Vector2d(0, 0));
+            poly.push_back(Vector3d(2, 0, 0), Vector2d(1.1, 0));
+            poly.push_back(Vector3d(2, 2, 0), Vector2d(1.5, 2));
+            poly.push_back(Vector3d(0, 2, 0), Vector2d(0, 1.3));
+
+            Vector2d pt(0, 0);
+
+            vector<double> barycentric = poly.computeBaryCentric(pt);
+            Vector2d barypt(0, 0);
+            for (int id = 0; id < 4; id++) {
+                barypt += poly.tex(id) * barycentric[id];
+            }
+            REQUIRE((barypt - pt).norm() == Approx(0).margin(1e-7));
+        }
+
+    }
+
+    SECTION("computeBaryCentric LINE")
+    {
+        vector<double> barycentric = poly.computeBaryCentric(Vector2d(0, 0), Vector2d(1, 0), Vector2d(0.2, 0));
+        REQUIRE(barycentric[0] == Approx(0.8).margin(1e-7));
+        REQUIRE(barycentric[1] == Approx(0.2).margin(1e-7));
+
+        barycentric = poly.computeBaryCentric(Vector2d(0, 0), Vector2d(1, 0), Vector2d(0, 0));
+        REQUIRE(barycentric[0] == Approx(1).margin(1e-7));
+        REQUIRE(barycentric[1] == Approx(0).margin(1e-7));
+
+        barycentric = poly.computeBaryCentric(Vector2d(0, 0), Vector2d(1, 0), Vector2d(1, 0));
+        REQUIRE(barycentric[0] == Approx(0).margin(1e-7));
+        REQUIRE(barycentric[1] == Approx(1).margin(1e-7));
+    }
+
 }
 
