@@ -22,7 +22,7 @@
 template <typename Scalar>
 _Polygon<Scalar>::_Polygon()
 {
-	dist = polyType = 0;
+	polyType = 0;
 }
 
 template <typename Scalar>
@@ -45,7 +45,6 @@ _Polygon<Scalar>::_Polygon(const _Polygon<Scalar> &poly)
     }
 
     this->polyType = poly.polyType;
-    this->dist = poly.dist;
 }
 
 //**************************************************************************************//

@@ -45,7 +45,6 @@ public:
 	vector<pVTex> texs;          //!< Tex coordinates
 
 private:
-	int dist;                            //!< Discrete distance to a root polygon (e.g., BFS search)
 
 	int polyType;                        //!< Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
 
@@ -79,8 +78,6 @@ public:
 
     void reverseVertices();
 
-    void setDistance(int _dist){dist = _dist;}
-
     void setPolyType(float _polyType){polyType = _polyType;}
 
     void translatePolygon(Vector3 transVec);
@@ -89,7 +86,7 @@ public:
     {
         vers.clear();
         texs.clear();
-        dist = polyType = 0;
+        polyType = 0;
     }
 
 /***********************************************
@@ -136,8 +133,6 @@ public:
         }
         return texCoords;
     }
-
-    int getDistance() const {return dist;}
 
     int getPolyType() const {return polyType;}
 
