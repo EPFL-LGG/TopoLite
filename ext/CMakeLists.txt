@@ -35,17 +35,13 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 #        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release")
 #endif()
 
-#TBB
+# TBB
+# Handled in cmake/TopoliteDependencies.cmake
+
 set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
-set(TBB_BUILD_SHARED          OFF  CACHE BOOL " " FORCE)
-set(TBB_BUILD_STATIC          ON   CACHE BOOL " " FORCE)
-set(TBB_BUILD_TBBMALLOC       OFF  CACHE BOOL " " FORCE)
-set(TBB_BUILD_TBBMALLOC_PROXY OFF  CACHE BOOL " " FORCE)
-set(TBB_BUILD_TESTS           OFF  CACHE BOOL " " FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tbb)
-set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
 
 #Pybind11
+
 if(USE_PYTHON_PLUGIN)
     #Pybind11
     if(WIN32)
@@ -74,6 +70,7 @@ set(ext_lib pugixml
             Clipper
             igl::core
             ShapeOp
+            tbb
             tbb_static
             ${Boost_LIBRARIES}
             PARENT_SCOPE)

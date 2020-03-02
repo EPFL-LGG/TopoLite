@@ -14,3 +14,9 @@ Release
 
 data\origin_data\PartGeometry\*.*
 data\origin_data\Simulation\*.*
+
+# These are downloaded via Cmake
+
+ext/tbb
+ext/Catch2
+ext/.cache
