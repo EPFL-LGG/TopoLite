@@ -110,7 +110,7 @@ public:
 
     void clear();
 
-    void normalize(Vector3 &trans, Scalar &scale);
+    std::pair<Matrix<Scalar, 3, 1>, Scalar> normalize();
 
     void setPolyLists(vector<pPolygon> _polyList);
 

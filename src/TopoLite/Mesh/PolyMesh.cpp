@@ -115,18 +115,20 @@ void PolyMesh<Scalar>::print() const
 }
 
 template<typename Scalar>
-void PolyMesh<Scalar>::normalize(Vector3 &trans, Scalar &scale)
+std::pair<Matrix<Scalar, 3, 1>, Scalar> PolyMesh<Scalar>::normalize()
 {
     Box<Scalar> bbox_ = bbox();
 
-    scale = 2.0 / std::max(bbox_.size.x(), std::max(bbox_.size.y(), bbox_.size.z()));
-    trans = -bbox_.cenPt;
+    Scalar scale = 2.0 / std::max(bbox_.size.x(), std::max(bbox_.size.y(), bbox_.size.z()));
+    Vector3 trans = -bbox_.cenPt;
 
     for (size_t i = 0; i < vertexList.size(); ++i)
     {
         Vector3 origVer = vertexList[i]->pos;
         vertexList[i]->pos = (origVer + trans) * scale;
     }
+
+    return std::pair<Matrix<Scalar, 3, 1>, Scalar>(trans, scale);
 }
 
 //**************************************************************************************//

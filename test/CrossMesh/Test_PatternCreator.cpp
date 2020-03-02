@@ -11,5 +11,5 @@ TEST_CASE("PatternCreator")
     InitVarLite(varList.get());
     PatternCreator<double> patternCreator(varList);
     PatternCreator<double>::pCrossMesh crossMesh;
-    //patternCreator.CreateMesh_2DPattern(4, 10, crossMesh);
+    patternCreator.create2DPattern(4, 10, crossMesh);
 }
