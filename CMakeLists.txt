@@ -6,13 +6,28 @@ set(CMAKE_CXX_STANDARD 11)
 
 add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
+#########################################
+#####                               #####
+#####      Compiler flags           #####
+#####                               #####
+#########################################
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -stdlib=libc++")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -stdlib=libc++")
+
+# MacOS uses CLANG/LLVM -- Linux uses GCC - Compiler flags are slightly different
+
+if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -stdlib=libc++")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -stdlib=libc++")
+else()
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+endif()
+
 
 #3rd party library
 #if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
@@ -70,11 +85,11 @@ set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
 include(CTest)
 include(ParseAndAddCatchTests)
 
-#file(GLOB testTopoFiles test/Utility/Test_PolyPolyBoolean.cpp)
-file(GLOB testTopoFiles test/CrossMesh/*.cpp
-                        test/IO/*.cpp
-                        test/Utility/*.cpp
-                        test/Mesh/*.cpp)
+file(GLOB testTopoFiles test/Mesh/*.cpp)
+#file(GLOB testTopoFiles test/CrossMesh/Test_BaseMeshCreator.cpp
+#                        test/IO/*.cpp
+#                        test/Utility/*.cpp
+#                        test/Mesh/*.cpp)
 #file(GLOB testTopoFiles test/Mesh/*.cpp
 #                        test/Utility/*.cpp)
 
