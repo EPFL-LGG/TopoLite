@@ -32,9 +32,6 @@ TEST_CASE("BaseMeshCreator")
         bool texturedModel;
         _polyMesh = make_shared<PolyMesh_AABBTree<double>>(data.varList);
         _polyMesh->readOBJModel(surface_objfile.str().c_str(), texturedModel, true);
-//        std::shared_ptr<PolyMesh<double>> outBaseMesh2D;
-//        std::shared_ptr<CrossMesh<double>> outCrossMesh2D;
-//        baseMeshCreator.computeBaseCrossMesh(interactive, outBaseMesh2D, outCrossMesh2D);
     }
 
 }

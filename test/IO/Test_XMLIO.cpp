@@ -29,7 +29,8 @@ TEST_CASE("Test_XMLIO"){
         REQUIRE(data.interactMatrix[0] == 2.344562);
     }
 
-    SECTION("XMLReader"){
+    SECTION("XMLReader")
+    {
         filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         XMLData data;

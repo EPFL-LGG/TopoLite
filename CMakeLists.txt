@@ -180,7 +180,7 @@ include(CTest)
 include(ParseAndAddCatchTests)
 
 #file(GLOB testTopoFiles test/Utility/Test_PolyPolyBoolean.cpp)
-file(GLOB testTopoFiles test/CrossMesh/Test_BaseMeshCreator.cpp
+file(GLOB testTopoFiles test/CrossMesh/*.cpp
                         test/IO/*.cpp
                         test/Utility/*.cpp
                         test/Mesh/*.cpp)
