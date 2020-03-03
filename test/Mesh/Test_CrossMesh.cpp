@@ -51,7 +51,7 @@ TEST_CASE("CrossMesh")
         CrossMesh<double> crossMesh(polyMesh);
         REQUIRE(crossMesh.getVertices().size() == 8);
 
-        //neighbor
+        // neighbor
         REQUIRE(crossMesh.cross(0)->neighbors[0].lock()->crossID == 3);
         REQUIRE(crossMesh.cross(0)->neighbors[3].lock()->crossID == 4);
     }

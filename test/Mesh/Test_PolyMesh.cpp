@@ -96,7 +96,7 @@ TEST_CASE("PolyMesh")
 
         REQUIRE(polyMesh.volume() == Approx(1).margin(1e-6));
 
-        //Eigen Matrix Mesh
+        // Eigen Matrix Mesh
         PolyMesh<double>::MatrixX V;
         PolyMesh<double>::MatrixXi F;
         Eigen::VectorXi C;

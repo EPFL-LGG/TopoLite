@@ -142,7 +142,7 @@ TEST_CASE("Polygon")
         }
 
         SECTION("pos()"){
-            //support circular index
+            // support circular index
             REQUIRE((poly.pos(-1) - Vector3d(0, 2, 0)).norm() == Approx(0.0));
             REQUIRE((poly.pos(1) - Vector3d(2, 0, 0)).norm() == Approx(0.0));
             REQUIRE((poly.pos(4) - Vector3d(0, 0, 0)).norm() == Approx(0.0));

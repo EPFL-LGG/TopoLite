@@ -63,7 +63,7 @@ TEST_CASE(){
                          "0.4916198379282093 -0.345391701297268 \n"
                          "-0.4404289572876217 -0.2894855991839297 ";
 
-    //convert to ListVector3
+    // convert to ListVector3
 
     ConvexHull2D<double>::ListVector3 pts,resPts;
     convertString2ToListVector3(data, pts);
