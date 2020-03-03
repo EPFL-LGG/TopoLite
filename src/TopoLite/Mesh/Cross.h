@@ -44,18 +44,18 @@ public:
 public:
     //storage
 
-	int crossID;                               			//!< Cross ID in the list
+	int crossID;                               			// Cross ID in the list
 
-	bool atBoundary;									//!< At Boundary or not
+	bool atBoundary;									// At Boundary or not
 
-	vector<wpCross> neighbors;                          //!< Neighbors of the cross
+	vector<wpCross> neighbors;                          // Neighbors of the cross
 
-	vector<shared_ptr<OrientPoint<Scalar>>> oriPoints;  //!< A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
+	vector<shared_ptr<OrientPoint<Scalar>>> oriPoints;  // A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
 
 public:
     //temporary variables
 
-	bool isVisited;                           			//!< For correcting tilt angles
+	bool isVisited;                           			// For correcting tilt angles
 
 public:
 

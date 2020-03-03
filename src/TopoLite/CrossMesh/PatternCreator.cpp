@@ -74,8 +74,8 @@ void PatternCreator<Scalar>::CreateMesh_Merge(vector<pPolyMesh> polyMeshes, pPol
 
     polyMesh->removeDuplicatedVertices();
 
-	//MeshConverter myMeshConverter;
-	//myMeshConverter.Convert2PolyMesh( polyMesh, true );
+	// MeshConverter myMeshConverter;
+	// myMeshConverter.Convert2PolyMesh( polyMesh, true );
 }
 
 //**************************************************************************************//
@@ -87,11 +87,11 @@ void PatternCreator<Scalar>::create2DPattern(int patternID,
                                              int patternRadius,
                                              pCrossMesh &crossMesh)
 {
-    //The algorithm is a BFS searching.
-    //Each time, we pop a polygon from the queue
+    // The algorithm is a BFS searching.
+    // Each time, we pop a polygon from the queue
     //, expand the polygon by finding all its neighbouring polygon
-    //and add the neighbouring polygons into the queue
-    //until the depth of the BFS tree reaches the user specific number.
+    // and add the neighbouring polygons into the queue
+    // until the depth of the BFS tree reaches the user specific number.
 
 
     //BFS(Breadth-First Search) Node Data Structure

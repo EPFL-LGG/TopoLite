@@ -37,11 +37,11 @@ public:
     
 public:
 
-    bool isBoundary; //!< True if the part is fixed
+    bool isBoundary; // True if the part is fixed
 
-    Vector3 centroid; //!< the arithmetic mean position of all the points
+    Vector3 centroid; // the arithmetic mean position of all the points
 
-    Vector3 centerofmass; //!< the gravity center
+    Vector3 centerofmass; // the gravity center
 
     float mass;
 
@@ -62,11 +62,11 @@ public:
 
 public: //Automatic Generated
 
-    vector<ContactNeighbor> neighbors; //!< neighbor and the corresponding contact
+    vector<ContactNeighbor> neighbors; // neighbor and the corresponding contact
 
-    int staticID; //!< Static part ID (include the fixed parts).
+    int staticID; // Static part ID (include the fixed parts).
 
-    int dynamicID; //!< Dynamic part ID (exclude the fixed parts)
+    int dynamicID; // Dynamic part ID (exclude the fixed parts)
 };
 
 

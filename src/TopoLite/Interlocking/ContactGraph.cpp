@@ -27,13 +27,13 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
                                            double eps)
 {
 
-    //0) scale the meshes into united box
+    // 0) scale the meshes into united box
     double maxD = 1;
     for (size_t id = 0; id < meshes.size(); id++) {
         pPolyMesh poly = meshes[id];
         if (poly == nullptr) return false;
         for (pPolygon face : poly->polyList) {
-            //1.1) construct plane
+            // 1.1) construct plane
             plane_contact plane;
             Vector3 nrm = face->normal();
             Vector3 center = face->vers[0]->pos;
@@ -44,7 +44,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
         }
     }
 
-    //1) create contact planes
+    // 1) create contact planes
     vector<plane_contact> planes;
     std::set<plane_contact, plane_contact_compare> setPlanes;
 
@@ -58,7 +58,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
         {
             if(face->vers.size() < 3) continue;
 
-            //1.1) construct plane
+            // 1.1) construct plane
             plane_contact plane;
             Vector3 nrm = face->normal();
             Vector3 center = face->vers[0]->pos;
@@ -69,7 +69,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
             plane.polygon = face;
             plane.eps = eps;
 
-            //1.2) find groupID
+            // 1.2) find groupID
             typename std::set<plane_contact, plane_contact_compare>::iterator find_it = setPlanes.end();
             for(int reverse = -1; reverse <= 1; reverse += 2){
                 plane_contact tmp_plane = plane;
@@ -95,7 +95,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
         return A.groupID < B.groupID;
     });
 
-     //2) add nodes
+     // 2) add nodes
      for(size_t id = 0; id < meshes.size(); id++){
          Vector3 centroid = meshes[id]->centroid();
          Scalar volume = meshes[id]->volume();
@@ -103,7 +103,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
          addNode(node);
      }
 
-     //3) find all pairs of contact polygon
+     // 3) find all pairs of contact polygon
      int sta = 0, end = 0;
      vector<pairIJ> planeIJ;
      while(sta < planes.size())
@@ -138,14 +138,14 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
       }
 
 
-     //4) parallel compute contacts
+     // 4) parallel compute contacts
      vector<pContactGraphEdge> planeIJEdges;
      planeIJEdges.resize(planeIJ.size());
 
      tbb::parallel_for(tbb::blocked_range<size_t>(0, planeIJ.size()), [&](const tbb::blocked_range<size_t>& r)
 	 {
          for (size_t id = r.begin(); id != r.end(); ++id)
-         //for (size_t id = 0; id != planeIJ.size(); ++id)
+         // for (size_t id = 0; id != planeIJ.size(); ++id)
 	 	{
 
              int planeI = planeIJ[id].first;
@@ -177,7 +177,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
          }
      });
 
-     //5) add contact edges
+     // 5) add contact edges
      for(size_t id = 0; id < planeIJ.size(); id++)
      {
          pContactGraphEdge edge = planeIJEdges[id];

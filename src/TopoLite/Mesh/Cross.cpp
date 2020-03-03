@@ -31,10 +31,10 @@ Cross<Scalar>::~Cross() {
 
 template<typename Scalar>
 Cross<Scalar>::Cross(const Cross &_cross) : _Polygon<Scalar>(_cross), TopoObject(_cross) {
-    //clear();
+    // clear();
     clear();
 
-    //copy data
+    // copy data
     crossID = _cross.crossID;
     atBoundary = _cross.atBoundary;
     isVisited = _cross.isVisited;
@@ -141,31 +141,31 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
     Vector3 normal = _Polygon<Scalar>::normal();
     bool boundary_not_tilt = getVarList()->template get<bool>("ground_touch_bdry");
 
-    //1) Clear all signs
+    // 1) Clear all signs
     for (size_t id = 0; id < oriPoints.size(); id++) {
         ori(id)->tiltSign = TILT_SIGN_NONE;
     }
 
     int startEdgeID = -1;
     int num_edges_assigned = 0;
-    //2) If neighbor has a sign, reverse it
+    // 2) If neighbor has a sign, reverse it
     for (size_t i = 0; i < oriPoints.size(); i++) {
 
-        //1) check neighbor exist and has been visited
+        // 1) check neighbor exist and has been visited
         if (neighbors.size() <= i)
             break;
         pCross neighbor = neighbors[i].lock();
         if (neighbor == nullptr or neighbor->isVisited == false)
             continue;
 
-        //2)reverse the tilt sign of its neighbor
+        // 2)reverse the tilt sign of its neighbor
         int neiborEdgeID = neighbor->getEdgeIDOfGivenCross(this);
         TopoASSERT(neiborEdgeID != NONE_ELEMENT);
 
         if (neiborEdgeID == NONE_ELEMENT)
             continue;
 
-        //3)reverse the tilt sign of its neighbor
+        // 3)reverse the tilt sign of its neighbor
         oriPoints[i]->tiltSign = (-1) * neighbor->oriPoints[neiborEdgeID]->tiltSign; // Reverse the sign
         if (atBoundary && neighbor->atBoundary && boundary_not_tilt) {
             oriPoints[i]->updateAngle(0);
@@ -177,7 +177,7 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
     }
 
 
-    //3) Update tilt normals for the remaining edges
+    // 3) Update tilt normals for the remaining edges
     int currEdgeID = startEdgeID;
     while (num_edges_assigned < oriPoints.size()) {
         // Process edges that have not been updated
@@ -188,7 +188,7 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
             if (currEdgeID != -1) {
                 oriPoints[nextEdgeID]->tiltSign = -1 * oriPoints[currEdgeID]->tiltSign;
             } else {
-                //force it to be positive
+                // force it to be positive
                 oriPoints[nextEdgeID]->tiltSign = TILT_SIGN_POSITIVE;
             }
 

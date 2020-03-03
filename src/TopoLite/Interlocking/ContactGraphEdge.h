@@ -22,8 +22,8 @@ public:
     typedef Matrix<Scalar, 3, 1> Vector3;
 
 public:
-    vector<pPolygon> polygons;  //!< a list which polygons are simple and closed (better to be convex)
-    vector<Vector3> normals; //!< contact normal from partIDA to partIDB
+    vector<pPolygon> polygons;  // a list which polygons are simple and closed (better to be convex)
+    vector<Vector3> normals; // contact normal from partIDA to partIDB
 
 public:
 
@@ -83,9 +83,9 @@ public:
 
 public: //Automatic Generate
 
-    int partIDA; //!< Static ID for start node of this edge
+    int partIDA; // Static ID for start node of this edge
 
-    int partIDB; //!< Static ID for end node of this edge
+    int partIDB; // Static ID for end node of this edge
 };
 
 
