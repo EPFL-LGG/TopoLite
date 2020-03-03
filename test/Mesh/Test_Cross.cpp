@@ -12,34 +12,40 @@ TEST_CASE("Cross")
     varList = make_shared<InputVarList>();
     InitVarLite(varList.get());
 
+    /**
+     * Define an Hexagon with 6 pt - Create a cross object + tilt it by 30 degrees
+     */
     SECTION("Hexagon"){
         Cross<double> cross(varList);
 
-
-        double radius = 1.0;
         int N = 6;
         for(int id = 0; id < N; id++){
             Vector3d pt(std::cos(2 * M_PI / N * id), std::sin(2 * M_PI / N * id), 0);
             cross.push_back(pt);
         }
 
+        // initTiltNormal - Angle 0
 
-        //initTiltNormal
         cross.initTiltNormals();
         for(int id = 0; id < N; id++){
             Vector3d mid = (cross.pos(id) + cross.pos(id + 1)) / 2;
             REQUIRE(Approx(mid.cross(cross.ori(id)->normal).norm()).margin(1e-10) == 0.0);
+            REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 0.0);
         }
 
-        //updateTiltNormalsRoot
+        // updateTiltNormalsRoot - Check angle is 30 with phase -1
         cross.updateTiltNormalsRoot(-30);
         for(int id = 0; id < N; id++){
             REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 30.0);
             REQUIRE(cross.ori(id)->tiltSign == (id % 2 == 0?1 :-1));
         }
-        REQUIRE(Approx((cross.ori(0)->normal - Vector3d(3.0/4, sqrt(3)/4, -1.0 / 2)).norm()).margin(1e-10) == 0.0);
+        // Check that normal rotated (and in that pi/6 rotation is above/below each of its respective point)
+        REQUIRE(Approx((cross.ori(0)->normal - Vector3d( 0.75,  sqrt(3.0)/4.0, -0.5)).norm()).margin(1e-10) == 0.0);
+        REQUIRE(Approx((cross.ori(1)->normal - Vector3d( 0.0 ,  sqrt(3.0)/2.0,  0.5)).norm()).margin(1e-10) == 0.0);
+        REQUIRE(Approx((cross.ori(2)->normal - Vector3d(-0.75,  sqrt(3.0)/4.0, -0.5)).norm()).margin(1e-10) == 0.0);
+        REQUIRE(Approx((cross.ori(3)->normal - Vector3d(-0.75, -sqrt(3.0)/4.0,  0.5)).norm()).margin(1e-10) == 0.0);
 
-        //updateTiltNormals
+        // updateTiltNormals
         cross.updateTiltNormals(30);
     }
 

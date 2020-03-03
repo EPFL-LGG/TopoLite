@@ -587,18 +587,18 @@ struct OrientPoint
     typedef Matrix<Scalar, 3, 1> Vector3;
     typedef Matrix<Scalar, 2, 1> Vector2;
 
-    /*for geometry generation*/
+    // for geometry generation
     Vector3 point;
-    Vector3 normal;
+    Vector3 normal;             // normed vector
     Vector3 rotation_axis;
     Vector3 rotation_base;
 
-	/*for optimization*/
-	Scalar rotation_angle;     //always possitive
+	// for optimization
+	Scalar rotation_angle;     // always positive
 	int tiltSign;              // Flag that indicates the direction to tilt the normal (possible values are {-1, 1})
-    int oriptID;               //the index of the oriented point in the whole structure
-    Vector2 tilt_range;	       //the lower and upper bound of tilt angle such that the structure have valid geometry.
-    Vector2 sided_range;	   //for debug, show the side range
+    int oriptID;               // the index of the oriented point in the whole structure
+    Vector2 tilt_range;	       // the lower and upper bound of tilt angle such that the structure have valid geometry.
+    Vector2 sided_range;	   // for debug, show the side range
 public:
 
 	OrientPoint(Vector3 _point, Vector3 _normal)
@@ -627,26 +627,27 @@ public:
 		tilt_range[1] = 180;
 	};
 
-    /*!
-    * \brief: Compute vector rotation
-    * \param[in] normal based vector
-    * \param[in] rotAxis rotation axis
-    * \param[in] rotAngle rotation angle
-    * \return vector after rotation
+    /**
+        @brief: Compute vector rotation
+        @param[in] normal based vector
+        @param[in] rotAxis rotation axis
+        @param[in] rotAngle rotation angle
+        @return vector after rotation
     */
     static Vector3 rotateVecAroundAxis(Vector3 normal, Vector3 rotAxis, Scalar rotAngle)
     {
         rotAngle = rotAngle / 180 * M_PI;
-        Eigen::Matrix<Scalar, 3, 3> mat, ux;
-        ux <<   0, -rotAxis.z(), rotAxis.y(),
-                rotAxis.z(), 0, -rotAxis.x(),
-                -rotAxis.y(), rotAxis.x(), 0;
-        mat = Eigen::Matrix<Scalar, 3, 3>::Identity() * std::cos(rotAngle) + ux * std::sin(rotAngle);
-        return mat * normal;
+        Eigen::Matrix<Scalar, 3, 3> rotationMat, crossprodMat;
+        crossprodMat << 0,             -rotAxis.z(),   rotAxis.y(),
+                        rotAxis.z(),    0,            -rotAxis.x(),
+                       -rotAxis.y(),    rotAxis.x(),   0;
+        rotationMat = Eigen::Matrix<Scalar, 3, 3>::Identity() * std::cos(rotAngle) + crossprodMat * std::sin(rotAngle);
+        return rotationMat * normal;
     }
 
-
-    //will convert the angle to be positive
+    /**
+        Update rotation_angle (always positive) + define normal
+    */
     void updateAngle(Scalar _angle)
 	{
 		rotation_angle = std::abs(_angle);

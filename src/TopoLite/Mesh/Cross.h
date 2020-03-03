@@ -79,7 +79,8 @@ public:
 
     shared_ptr<OrientPoint<Scalar>> ori(int index)
     {
-        if(oriPoints.empty()) return nullptr;
+        if(oriPoints.empty())
+            return nullptr;
         else{
             int rID = index % oriPoints.size();
             return oriPoints.at(rID);
@@ -87,7 +88,8 @@ public:
     }
 
     pCross nei(int index){
-        if(index < 0 || index >= neighbors.size()) return nullptr;
+        if(index < 0 || index >= neighbors.size())
+            return nullptr;
         return neighbors[index].lock();
     }
 
