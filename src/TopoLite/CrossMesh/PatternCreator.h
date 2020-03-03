@@ -18,6 +18,21 @@
 #include <vector>
 #include "Mesh/CrossMesh.h"
 
+enum PatternType{
+    CROSS_SQUARE = 1,
+    CROSS_RHOMBUS = 2,
+    CROSS_SQUARE_RHOMBUS = 3,
+    CROSS_HEXAGON = 4,
+    CROSS_HEXAGON_RHOMBUS = 5,
+    CROSS_DODECAGON_HEXAGON_QUAD = 6,
+    CROSS_OCTAGON_SQUARE = 7,
+    CROSS_OCTAGON_SQUARE_COLINEAR = 8,
+    CROSS_DODECAGON = 9,
+    CROSS_PENTAGON_CROSS = 10,
+    CROSS_PENTAGON_SNOW = 11,
+    CROSS_PENTAGON_MIRROR = 12
+};
+
 template<typename Scalar>
 class PatternCreator : public TopoObject
 {
@@ -30,19 +45,19 @@ public:
         {
             double eps = FLOAT_ERROR_LARGE;
 
-            if (A.pos[0] - B.pos[0] < -eps)
+            if (A->pos[0] - B->pos[0] < -eps)
                 return true;
-            if (A.pos[0] - B.pos[0] > eps)
+            if (A->pos[0] - B->pos[0] > eps)
                 return false;
 
-            if (A.pos[1] - B.pos[1] < -eps)
+            if (A->pos[1] - B->pos[1] < -eps)
                 return true;
-            if (A.pos[1] - B.pos[1] > eps)
+            if (A->pos[1] - B->pos[1] > eps)
                 return false;
 
-            if (A.pos[2] - B.pos[2] < -eps)
+            if (A->pos[2] - B->pos[2] < -eps)
                 return true;
-            if (A.pos[2] - B.pos[2] > eps)
+            if (A->pos[2] - B->pos[2] > eps)
                 return false;
 
             return false;
@@ -71,7 +86,7 @@ public:
 public:
 
 	// Create Mesh (2D Regular Pattern)
-	void create2DPattern(int patternID,
+	void create2DPattern(PatternType patternID,
 	                     int patternRadius,
 	                     pCrossMesh &out);
 
@@ -79,35 +94,13 @@ public:
     void createPolygonRoot(int edgeNum, Scalar edgeLen, pPolygon &out);
 
     // Compute Neighbors
-    void computeNeighbors(int crosstype, pPolygon poly, vector<pPolygon> &out);
-
-    void addToPolyMesh(pPolygon poly, pPolyMesh mesh, setVertex &vertices_set);
+    void computeNeighbors(PatternType crosstype, pPolygon poly, vector<pPolygon> &out);
 
     bool checkPolygonExistance(pPolygon poly, const setVertex &vertices_set);
 
     Vector3 rotateVector(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle, Vector3 tagtPt);
 
 public:
-
-    // Create Mesh from Multiple Meshes
-    void CreateMesh_Merge(vector<pPolyMesh> polyMeshes, pPolyMesh &out);
-
-	void CreateMesh_2DPattern(vector<_Polygon<Scalar>> &root_polys,
-                              Vector3 DX,
-                              Vector3 DY,
-                              int Nx,
-                              int Ny,
-                              pCrossMesh &out);
-
-
-	void CreateMesh_2DPattern_HexagonPattern2(int patternRadius, pCrossMesh &out);
-    void CreateMesh_2DPattern_HexagonPattern3(int patternRadius, pCrossMesh &out);
-    void CreateMesh_2DPattern_PentagonPattern3(int patternRadius, pCrossMesh &out);
-	int GetPolygonIndexInList(pPolygon tagtPoly, vector<pPolygon> polyList);
-
-public:
-
-
 
 	void ComputeNeighbor_Square(pPolygon poly, pPolygon &out);
 	void ComputeNeighbor_Hexagon(pPolygon poly, pPolygon &out);
@@ -120,12 +113,10 @@ public:
 	void ComputeNeighbor_Pentagon_Snow(pPolygon poly, int edgeID, pPolygon &out);
 	void ComputeNeighbor_Pentagon_Mirror(pPolygon poly, int edgeID, pPolygon &out);
 	void ComputeNeighbor_Rhombus(pPolygon poly, int edgeID, pPolygon &out);
-
     void ComputeNeighbor_Octagon_Square_Colinear(pPolygon poly, int edgeID, pPolygon &out);
 
     Matrix<Scalar, 3, 1> ComputeTileTranslation(pPolygon neighbor, Vector3 tagtStaPt, Vector3 tagtEndPt);
     Matrix<Scalar, 3, 1> ComputeTileTranslation_OCTAGON_SQUARE_COLINEAR(pPolygon poly, int edgeID);
-
 
 	void CreatePolygon_Square(pPolygon &out, Scalar edgeLen, int polyType = POLY_SQUARE_THETA_45);
 	void CreatePolygon_Hexagon(pPolygon &out, Scalar edgeLen, int polyType = POLY_HEXAGON_TYPE_0);
@@ -136,10 +127,6 @@ public:
 	void CreatePolygon_Pentagon_Cross(pPolygon &out, Scalar edgeLen, int polyType = POLY_PENTAGON_CROSS_TYPE_0);
 	void CreatePolygon_Pentagon_Snow(pPolygon &out, Scalar edgeLen, int polyType = POLY_PENTAGON_SNOW_TYPE_0);
     void CreatePolygon_Pentagon_Mirror(pPolygon &out, Scalar edgeLen, int polyType = POLY_PENTAGON_MIRROR_TYPE_0);
-
-	// Create Mesh (a Single Fan)
-	void CreateMesh_Fan(Vector3 edgeA, Vector3 edgeB, Vector3 edgeMid, pPolyMesh &out);
-	void CreatePolygon_Fan(Vector3 verA, Vector3 verB, Vector3 verM, pPolygon &out);
 
 public:
     //python

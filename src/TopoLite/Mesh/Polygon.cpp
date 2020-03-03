@@ -22,7 +22,7 @@
 template <typename Scalar>
 _Polygon<Scalar>::_Polygon()
 {
-	polyType = 0;
+	polyType = POLY_NONE;
 }
 
 template <typename Scalar>

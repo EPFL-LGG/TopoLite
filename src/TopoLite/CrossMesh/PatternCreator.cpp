@@ -40,50 +40,49 @@ PatternCreator<Scalar>::~PatternCreator()
 }
 
 //**************************************************************************************//
-//                           Create Mesh from Multiple Meshes
-//**************************************************************************************//
-
-// TODO: remove duplicated vertices and faces
-template<typename Scalar>
-void PatternCreator<Scalar>::CreateMesh_Merge(vector<pPolyMesh> polyMeshes, pPolyMesh &polyMesh)
-{
-	polyMesh.reset();
-	polyMesh = make_shared<PolyMesh>(getVarList());
-
-//	for (int i = 0; i < polyMeshes.size(); i++)
-//	{
-//		Mesh *tempMesh = polyMeshes[i];
-//
-//		for (int j = 0; j < tempMesh->vertexList.size(); j++)
-//		{
-//			polyMesh->vertexList.push_back( tempMesh->vertexList[j] );
-//		}
-//	}
-
-	for (size_t i = 0; i < polyMeshes.size(); i++)
-	{
-		pPolyMesh tempMesh = polyMeshes[i];
-
-		for (size_t j = 0; j < tempMesh->polyList.size(); j++)
-		{
-			tempMesh->polyList[j]->ComputeNormal();
-
-			polyMesh->polyList.push_back( tempMesh->polyList[j] );
-		}
-	}
-
-    polyMesh->removeDuplicatedVertices();
-
-	//MeshConverter myMeshConverter;
-	//myMeshConverter.Convert2PolyMesh( polyMesh, true );
-}
-
-//**************************************************************************************//
 //                           Create Mesh (2D Regular Pattern)
 //**************************************************************************************//
 
 template<typename Scalar>
-void PatternCreator<Scalar>::create2DPattern(int patternID,
+bool PatternCreator<Scalar>::checkPolygonExistance(PatternCreator::pPolygon poly, const PatternCreator::setVertex &vertices_set) {
+    for(pVertex vertex : poly->vers)
+    {
+        if(vertices_set.find(vertex) == vertices_set.end()){
+            return false;
+        }
+    }
+    return true;
+}
+
+template<typename Scalar>
+Matrix<Scalar, 3, 1> PatternCreator<Scalar>::rotateVector(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle, Vector3 tagtPt)
+{
+    // Get the rotation matrix using OpenGL modelView matrix
+    Matrix<Scalar, 4, 4> trans1 = Matrix<Scalar, 4, 4>::Identity();
+    trans1(0, 3) = rotCenter.x(); trans1(1, 3) = rotCenter.y(); trans1(2, 3) = rotCenter.z();
+
+    Matrix<Scalar, 4, 4> rotate = Matrix<Scalar, 4, 4>::Identity();
+    Scalar x, y, z, c, s;
+    x = rotAxis.x(); y = rotAxis.y(); z = rotAxis.z();
+    c = std::cos(rotAngle / 180 * M_PI);
+    s = std::sin(rotAngle / 180 * M_PI);
+    rotate << c + x * x *(1 - c), x * y * (1 - c) - z * s, x * z * (1 - c) + y * s, 0,
+            y * x * (1 - c) + z * s, c + y * y * (1 - c), y * z * (1 - c) - x * s, 0,
+            z * x * (1 - c) - y * s, z * y * (1 - c) + x * s, c + z * z * (1 - c), 0,
+            0, 0, 0, 1;
+
+    Matrix<Scalar, 4, 4> trans2 = Matrix<Scalar, 4, 4>::Identity();
+    trans2(0, 3) = -rotCenter.x(); trans2(1, 3) = -rotCenter.y(); trans2(2, 3) = -rotCenter.z();
+
+    Matrix<Scalar, 4, 1> pos;
+    pos << tagtPt.x(), tagtPt.y(), tagtPt.z(), 1;
+
+    Matrix<Scalar, 4, 1> result = trans1 * rotate * trans2 * pos;
+    return result.head(3);
+}
+
+template<typename Scalar>
+void PatternCreator<Scalar>::create2DPattern(PatternType patternID,
                                              int patternRadius,
                                              pCrossMesh &crossMesh)
 {
@@ -118,11 +117,11 @@ void PatternCreator<Scalar>::create2DPattern(int patternID,
     createPolygonRoot(patternID, CROSS_L, root_poly);
     BFSNode node_root(root_poly, 0);
 
-    //create a BFS queue and add the root to the queue
+    // create a BFS queue and add the root to the queue
     queue<BFSNode> bfsQueue;
     bfsQueue.push(node_root);
 
-    // Start Breadth-First Search Traversal
+    // start Breadth-First Search Traversal
     while(!bfsQueue.empty())
     {
         BFSNode curr_node = bfsQueue.front();
@@ -130,23 +129,35 @@ void PatternCreator<Scalar>::create2DPattern(int patternID,
 
         if (curr_node.depth >= patternRadius)
         {
-            //if deepth is larger than a user specific number, exit
+            // if deepth is larger than a user specific number, exit
             break;
         }
         else{
-            //add it to the polyMesh
-            addToPolyMesh(curr_node.poly, patternMesh, vertices_set);
+            // add the polygon into the mesh
+            patternMesh->polyList.push_back(curr_node.poly);
         }
 
-        //find a one ring neighbor of the polygon.
+        // find a one ring neighbor of the polygon.
         vector<pPolygon> neighbor_polys;
         computeNeighbors(patternID, curr_node.poly, neighbor_polys);
 
         for (size_t i = 0; i < neighbor_polys.size(); i++)
         {
             if(!checkPolygonExistance(neighbor_polys[i], vertices_set)){
+
+                // if the polygon is not existed in the queue
+                // add the polygon into the queue
                 BFSNode next_node(neighbor_polys[i], curr_node.depth + 1);
                 bfsQueue.push(next_node);
+
+                // update the vertices_set to avoid duplicate polygon inside the queue
+                // add the vertices into the vertices_set
+                for(pVertex vertex : neighbor_polys[i]->vers)
+                {
+                    if(vertices_set.find(vertex) == vertices_set.end()){
+                        vertices_set.insert(vertex);
+                    }
+                }
             }
         }
     }
@@ -159,66 +170,13 @@ void PatternCreator<Scalar>::create2DPattern(int patternID,
     return;
 }
 
-template<typename Scalar>
-void PatternCreator<Scalar>::CreateMesh_2DPattern(vector<_Polygon<Scalar>> &root_polys,
-                                                  Vector3 DX,
-                                                  Vector3 DY,
-                                                  int Nx,
-                                                  int Ny,
-                                                  pCrossMesh &crossMesh) {
-    pPolyMesh polyMesh= make_shared<PolyMesh>(getVarList());
-    for(int id = 0; id < Ny; id++)
-    {
-        //row
-        for(int jd = 0; jd < Nx; jd++)
-        {
-            //col
-            for(size_t kd = 0; kd < root_polys.size(); kd++){
-                pPolygon poly = make_shared<_Polygon<Scalar>>(root_polys[kd]);
-                Scalar dx = ((id % 2 == 0) ? 0 : 1) * DY[0] + DX[0] * jd;
-                Scalar dy = DY[1] * id;
-                poly->Translate(Vector3(dx, dy, 0));
-                polyMesh->polyList.push_back(poly);
-            }
-        }
-    }
-
-    polyMesh->removeDuplicatedVertices();
-    Vector3 trans;
-    Scalar scale;
-    polyMesh->NormalizeMesh(trans, scale);
-    //Todo: Fixing here
-//    BaseMeshCreator meshCreator(getVarList());
-//    crossMesh = make_shared<CrossMesh>(getVarList());
-//    meshCreator.InitCrossMesh(polyMesh, crossMesh);
-//    pHEdgeMesh hedgeMesh = make_shared<HEdgeMesh>();
-//    hedgeMesh->InitHEdgeMesh(polyMesh);
-//    hedgeMesh->BuildHalfEdgeMesh();
-//    meshCreator.ComputeCrossNeighbors(hedgeMesh, crossMesh);
-    crossMesh->baseMesh2D = polyMesh;
-    return;
-}
-
-template<typename Scalar>
-int PatternCreator<Scalar>::GetPolygonIndexInList(pPolygon tagtPoly, vector<pPolygon> polyList)
-{
-	for (size_t i = 0; i < polyList.size(); i++)
-	{
-		if (polyList[i]->IsEqual(tagtPoly.get()) == true)
-		{
-			return i;
-		}
-	}
-
-	return ELEMENT_OUT_LIST;
-}
 
 //**************************************************************************************//
 //                           Create Mesh (2D Regular Pattern)
 //**************************************************************************************//
 
 template<typename Scalar>
-void PatternCreator<Scalar>::computeNeighbors(int patternID, pPolygon poly, vector<pPolygon> &neighbors)
+void PatternCreator<Scalar>::computeNeighbors(PatternType patternID, pPolygon poly, vector<pPolygon> &neighbors)
 {
 	for (size_t i = 0; i < poly->vers.size(); i++)
 	{
@@ -727,35 +685,6 @@ void PatternCreator<Scalar>::CreatePolygon_Pentagon_Cross(pPolygon &poly, Scalar
 	}
 }
 
-
-template<typename Scalar>
-Matrix<Scalar, 3, 1> PatternCreator<Scalar>::rotateVector(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle, Vector3 tagtPt)
-{
-    // Get the rotation matrix using OpenGL modelView matrix
-    Matrix<Scalar, 4, 4> trans1 = Matrix<Scalar, 4, 4>::Identity();
-    trans1(0, 3) = rotCenter.x(); trans1(1, 3) = rotCenter.y(); trans1(2, 3) = rotCenter.z();
-
-    Matrix<Scalar, 4, 4> rotate = Matrix<Scalar, 4, 4>::Identity();
-    Scalar x, y, z, c, s;
-    x = rotAxis.x(); y = rotAxis.y(); z = rotAxis.z();
-    c = std::cos(rotAngle / 180 * M_PI);
-    s = std::sin(rotAngle / 180 * M_PI);
-    rotate << c + x * x *(1 - c), x * y * (1 - c) - z * s, x * z * (1 - c) + y * s, 0,
-            y * x * (1 - c) + z * s, c + y * y * (1 - c), y * z * (1 - c) - x * s, 0,
-            z * x * (1 - c) - y * s, z * y * (1 - c) + x * s, c + z * z * (1 - c), 0,
-            0, 0, 0, 1;
-
-    Matrix<Scalar, 4, 4> trans2 = Matrix<Scalar, 4, 4>::Identity();
-    trans2(0, 3) = -rotCenter.x(); trans2(1, 3) = -rotCenter.y(); trans2(2, 3) = -rotCenter.z();
-
-    Matrix<Scalar, 4, 1> pos;
-    pos << tagtPt.x(), tagtPt.y(), tagtPt.z(), 1;
-
-    Matrix<Scalar, 4, 1> result = trans1 * rotate * trans2 * pos;
-    return result.head(3);
-}
-
-
 template<typename Scalar>
 void PatternCreator<Scalar>::CreatePolygon_Pentagon_Snow(pPolygon &poly, Scalar edgeLen, int polyType)
 {
@@ -822,7 +751,6 @@ void PatternCreator<Scalar>::CreatePolygon_Pentagon_Mirror(pPolygon &poly, Scala
 	}
 
 }
-
 
 template<typename Scalar>
 void PatternCreator<Scalar>::CreatePolygon_Hexagon(pPolygon &poly, Scalar edgeLen, int polyType)
@@ -948,263 +876,10 @@ void PatternCreator<Scalar>::CreatePolygon_Rhombus(pPolygon &poly, Scalar edgeLe
 
 }
 
-//**************************************************************************************//
-//                           Create Mesh (a Single Fan)
-//**************************************************************************************//
-
-template<typename Scalar>
-void PatternCreator<Scalar>::CreateMesh_Fan(Vector3 verA, Vector3 verB, Vector3 verM, pPolyMesh &polyMesh)
-{
-	// Construct a fan-shaped polygon
-	pPolygon poly;
-	CreatePolygon_Fan(verA, verB, verM, poly);
-
-	// Construct the mesh
-	polyMesh.reset();
-	polyMesh = make_shared<PolyMesh>(getVarList());
-
-	for (size_t i = 0; i < poly->vers.size(); i++)
-	{
-		polyMesh->vertexList.push_back(poly->vers[i]->pos);
-	}
-
-	polyMesh->polyList.push_back(poly);
-}
-
-
-template<typename Scalar>
-void PatternCreator<Scalar>::CreatePolygon_Fan(Vector3 verA, Vector3 verB, Vector3 verM, pPolygon &poly)
-{
-	Vector3 edgeDirA = verA / len(verA);
-	Vector3 edgeDirB = verB / len(verB);
-	Vector3 edgeDirM = verM / len(verM);
-
-	Vector3 rotAxis = edgeDirA.cross(edgeDirM);
-
-	// Compute fan angle
-	Scalar dotp = edgeDirA.dot(edgeDirB);
-	Scalar angle;
-	if (fabs(dotp + 1) < FLOAT_ERROR_LARGE)
-	{
-		angle = 180;
-
-	}
-	else
-	{
-		angle = acos(dotp) * 180 / M_PI;
-	}
-
-
-	poly.reset();
-	poly = make_shared<_Polygon<Scalar>>();
-
-	// Compute fan vertices
-	poly->push_back(_Vertex(Vector3(0, 0, 0)));
-	poly->push_back(_Vertex(verA));
-
-	const Scalar angleStep = 10; // Unit: degree
-	Scalar sampleAngle = 0;
-	do
-	{
-		Vector3 ver = RotateVector(Vector3(0, 0, 0), rotAxis, sampleAngle, verA);
-
-		poly->push_back(_Vertex(ver));
-
-		sampleAngle += angleStep;
-	} while (sampleAngle < angle);
-
-	poly->push_back(_Vertex(verB));
-
-	poly->ComputeCenter();
-	poly->ComputeNormal();
-}
-
-template<typename Scalar>
-void PatternCreator<Scalar>::CreateMesh_2DPattern_HexagonPattern2(int patternRadius, pCrossMesh &crossMesh)
-{
-    Vector3 DX, DY;
-    vector<_Polygon<Scalar>> root_polys;
-    vector<pPolygon> hex;
-    hex.resize(4);
-    CreatePolygon_Hexagon(hex[0], 1);
-
-    int cornerCentroid[3] = {1, 3, 5};
-
-    for(int id = 0; id < 3; id++){
-        CreatePolygon_Hexagon(hex[id + 1], 0.3);
-        int verID = cornerCentroid[id];
-        hex[id + 1]->Translate(Vector3(hex[0]->vers[verID]->pos[0], hex[0]->vers[verID]->pos[1], 0));
-    }
-
-    int polyID[4][6] = {
-            {2, 2, 2, 2, 2, 2},
-            {1, 1, 0, 2, 2, 0},
-            {3, 3, 0, 2, 2, 0},
-            {1, 1, 0, 3, 3, 0},
-    };
-    int verID[4][6] = {
-            {0, 1, 2, 3, 4, 5},
-            {4, 3, 2, 1, 0, -1},
-            {3, 2, -1, 0, 5, 4},
-            {5, 4, -1, 2, 1, 0}
-    };
-
-    for(int id = 0; id < 4; id++)
-    {
-        _Polygon<Scalar> poly;
-        for(int jd = 0; jd < 6; jd++)
-        {
-            int pID = polyID[id][jd], vID = verID[id][jd];
-            if(vID >= 0)
-            {
-                poly.push_back(hex[pID]->vers[vID]->pos);
-            }
-            else{
-                poly.push_back(Vector3(0, 0, 0));
-            }
-        }
-        root_polys.push_back(poly);
-    }
-
-    DY = hex[1]->vers[0]->pos - hex[2]->vers[0]->pos;
-    DX = 3.0f * hex[0]->vers[0]->pos;
-
-
-    CreateMesh_2DPattern(root_polys, DX, DY, patternRadius,2 * patternRadius, crossMesh);
-}
-
-template<typename Scalar>
-void PatternCreator<Scalar>::CreateMesh_2DPattern_HexagonPattern3(int patternRadius, pCrossMesh &crossMesh)
-{
-    Vector3 DX, DY;
-    vector<_Polygon<Scalar>> root_polys;
-    vector<pPolygon> hex;
-    hex.resize(4);
-    double dH = 0.8;
-    CreatePolygon_Hexagon(hex[0], 1);
-    CreatePolygon_Hexagon(hex[1], 1 + dH);
-    CreatePolygon_Hexagon(hex[2], 1 + dH / 2);
-
-    hex[3] = make_shared<_Polygon<Scalar>>();
-    for(int id = 0; id < 6; id++){
-        int jd = (id + 1) % 6;
-        Vector3 dx = hex[0]->vers[jd]->pos - hex[0]->vers[id]->pos; dx.normalize();
-        Vector3 dv = hex[1]->vers[jd]->pos - hex[0]->vers[id]->pos;
-        Vector3 dh = dv - dx * (dv.dot(dx));
-        hex[3]->vers.push_back(_Vertex(hex[0]->vers[id]->pos + dh));
-        hex[3]->vers.push_back(_Vertex(hex[0]->vers[jd]->pos + dh));
-    }
-
-    int polyID[4][6] = {
-            {0, 0, 0, 0, 0, 0},
-            {0, 2, 3, 3, 2, 0},
-            {0, 2, 3, 3, 2, 0},
-            {0, 2, 3, 3, 2, 0},
-    };
-    int verID[4][6] = {
-            {0, 1, 2, 3, 4, 5},
-            {1, 1, 2, 3, 2, 2},
-            {2, 2, 4, 5, 3, 3},
-            {3, 3, 6, 7, 4, 4}
-    };
-
-    for(int id = 0; id < 4; id++){
-        _Polygon<Scalar> poly;
-        for(int jd = 0; jd < 6; jd++)
-        {
-            int pID = polyID[id][jd], vID = verID[id][jd];
-            if(vID >= 0)
-            {
-                poly.push_back(hex[pID]->vers[vID]->pos);
-            }
-            else{
-                poly.push_back(Vector3(0, 0, 0));
-            }
-        }
-        root_polys.push_back(poly);
-    }
-
-
-    DY = root_polys[3].vers[2]->pos - root_polys[0].vers[1]->pos;
-    DX = 2.0f * (root_polys[2].vers[5]->pos - root_polys[2].vers[4]->pos)
-         + (root_polys[0].vers[0]->pos - root_polys[0].vers[3]->pos)
-         + (hex[2]->vers[1]->pos - hex[2]->vers[2]->pos);
-    CreateMesh_2DPattern(root_polys, DX, DY, patternRadius,2 * patternRadius, crossMesh);
-}
-
-template<typename Scalar>
-void PatternCreator<Scalar>::CreateMesh_2DPattern_PentagonPattern3(int patternRadius, pCrossMesh &crossMesh)
-{
-    Vector3 DX, DY;
-    vector<_Polygon<Scalar>> root_polys;
-    vector<pPolygon> hex;
-    hex.resize(2);
-    double scaleX = 0.8;
-    CreatePolygon_Hexagon(hex[0], 1);
-
-    for(size_t id = 0; id < hex[0]->vers.size(); id++){
-        hex[0]->vers[id]->pos = Vector3(hex[0]->vers[id]->pos[0] * scaleX,  hex[0]->vers[id]->pos[1], 0);
-    }
-
-    Vector3 a = hex[0]->vers[1]->pos - hex[0]->vers[2]->pos;
-    Vector3 b = hex[0]->vers[3]->pos - hex[0]->vers[2]->pos;
-    double angle = acos(a.dot(b) / a.norm() / b.norm()) / 2;
-    hex[1] = make_shared<_Polygon<Scalar>>();
-
-    Scalar y0 = hex[0]->vers[1]->pos[1]  - len(a) / 2 * tan(angle);
-    Scalar y1 = hex[0]->vers[5]->pos[1]  + len(a) / 2 * tan(angle);
-
-    hex[1]->vers.push_back(Vector3(0, y0, 0));
-    hex[1]->vers.push_back(Vector3(0, y1, 0));
-    hex[1]->vers.push_back((hex[0]->vers[0]->pos + hex[0]->vers[1]->pos) * 0.5f);
-    hex[1]->vers.push_back((hex[0]->vers[2]->pos + hex[0]->vers[3]->pos) * 0.5f);
-    hex[1]->vers.push_back((hex[0]->vers[3]->pos + hex[0]->vers[4]->pos) * 0.5f);
-    hex[1]->vers.push_back((hex[0]->vers[0]->pos + hex[0]->vers[5]->pos) * 0.5f);
-
-    int polyID[5][5] = {
-            {0, 0, 0, 0, 0},
-            {1, 0, 0, 1, 1},
-            {1, 1, 0, 1, 1},
-            {1, 1, 1, 1, 0},
-            {1, 1, 1, 0, 0}
-    };
-    int verID[5][5] = {
-            {0, 1, 2, 3, 4},
-            {2, 1 ,2 ,3 ,0},
-            {0, 3, 3, 4, 1},
-            {2, 0, 1, 5, 0},
-            {5, 1, 4, 4, 5}
-    };
-
-    for(int id = 1; id < 5; id++){
-        _Polygon<Scalar> poly;
-        for(int jd = 0; jd < 5; jd++)
-        {
-            int pID = polyID[id][jd], vID = verID[id][jd];
-            if(vID >= 0)
-            {
-                poly.vers.push_back(_Vertex(hex[pID]->vers[vID]->pos));
-            }
-            else{
-                poly.vers.push_back(_Vertex(Vector3(0, 0, 0)));
-            }
-        }
-        poly.ComputeCenter();
-        poly.ComputeNormal();
-        root_polys.push_back(poly);
-    }
-
-
-    DY = hex[1]->vers[2]->pos - hex[1]->vers[4]->pos;
-    DX = hex[0]->vers[1]->pos - hex[0]->vers[2]->pos + hex[0]->vers[0]->pos - hex[0]->vers[3]->pos;
-
-    CreateMesh_2DPattern(root_polys, DX, DY, patternRadius,2 * patternRadius, crossMesh);
-}
 
 //**************************************************************************************//
 //                           Python Interface
 //**************************************************************************************//
-
 template<typename Scalar>
 vector<vector<double>> PatternCreator<Scalar>::PyCreateMesh_2DPattern(int patternID, int patternRadius) {
     pCrossMesh crossMesh;
@@ -1223,19 +898,6 @@ vector<vector<double>> PatternCreator<Scalar>::PyCreateMesh_2DPattern(int patter
     return polys;
 }
 
-template<typename Scalar>
-void PatternCreator<Scalar>::addToPolyMesh(PatternCreator::pPolygon poly, PatternCreator::pPolyMesh mesh,
-                                           PatternCreator::setVertex &vertices_set)
-                                           {
-    
-}
 
-template<typename Scalar>
-bool PatternCreator<Scalar>::checkPolygonExistance(PatternCreator::pPolygon poly,
-                                                   const PatternCreator::setVertex &vertices_set)
-                                                   {
-    return false;
-
-}
 
 

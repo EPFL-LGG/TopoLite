@@ -11,5 +11,6 @@ TEST_CASE("PatternCreator")
     InitVarLite(varList.get());
     PatternCreator<double> patternCreator(varList);
     PatternCreator<double>::pCrossMesh crossMesh;
-    patternCreator.create2DPattern(4, 10, crossMesh);
+    patternCreator.create2DPattern(static_cast<PatternType>(4), 10, crossMesh);
+    crossMesh->writeOBJModel("hexagon.obj");
 }

@@ -57,7 +57,7 @@ void InitVar(InputVarList *varList)
     varList->add(false, "mult_move", "Mult. Move") = "Show_TI_Assembly";
 
     // Para Basic
-    varList->add(CROSS_HEXAGON, Vector2f(1, 15), "patternID", "Pattern\t:") << "Pattern_ID" = "Para_Basic";
+    varList->add(4, Vector2f(1, 15), "patternID", "Pattern\t:") << "Pattern_ID" = "Para_Basic";
     varList->add(20.0f, Vector2f(0, 90), "tiltAngle", "Alpha\t:") << "Tile_Angle_Upper" = "Para_Basic";
     varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Upper Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
     varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Lower Depth\t:") << "Cut_Plane_Height" = "Para_Basic";

@@ -120,6 +120,8 @@ public:
     using PolyMesh<Scalar>::lowestPt;
 
     using PolyMesh<Scalar>::vertexList;
+    using PolyMesh<Scalar>::readOBJModel;
+    using PolyMesh<Scalar>::writeOBJModel;
 
 public:
 

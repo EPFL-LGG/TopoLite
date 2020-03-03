@@ -22,6 +22,36 @@ using namespace std;
 using std::make_shared;
 using Eigen::Matrix;
 
+enum PolygonType{
+    POLY_NONE = 0,
+    POLY_SQUARE_THETA_45        =   1,
+    POLY_SQUARE_THETA_15        =   2,
+    POLY_SQUARE_THETA_75        =   3,
+    POLY_RHOMBUS_THETA_0        =   4,
+    POLY_RHOMBUS_THETA_90       =   5,
+    POLY_RHOMBUS_THETA_120      =   6,
+    POLY_RHOMBUS_THETA_240      =   7,
+    POLY_HEXAGON_TYPE_0         =   8,
+    POLY_HEXAGON_TYPE_1         =   9,
+    POLY_OCTAGON_REGULAR        =   10,
+    POLY_OCTAGON_COLINEAR       =   11,
+    POLY_DODECAGON              =   12,
+    POLY_PENTAGON_CROSS_TYPE_0  =   13,
+    POLY_PENTAGON_CROSS_TYPE_1  =   14,
+    POLY_PENTAGON_CROSS_TYPE_2  =   15,
+    POLY_PENTAGON_CROSS_TYPE_3  =   16,
+    POLY_PENTAGON_SNOW_TYPE_0   =   17,
+    POLY_PENTAGON_SNOW_TYPE_1   =   18,
+    POLY_PENTAGON_SNOW_TYPE_2   =   19,
+    POLY_PENTAGON_SNOW_TYPE_3   =   20,
+    POLY_PENTAGON_SNOW_TYPE_4   =   21,
+    POLY_PENTAGON_SNOW_TYPE_5   =   22,
+    POLY_PENTAGON_MIRROR_TYPE_0 =   23,
+    POLY_PENTAGON_MIRROR_TYPE_1 =   24,
+    POLY_RHOMBUS_TYPE_0         =   25,
+    POLY_RHOMBUS_TYPE_1         =   26
+};
+
 /*!
  * @brief: Polygon class
  * @note: we do not name the class as Polygon to avoid confusion with Polygon defined in windows.h
@@ -46,7 +76,7 @@ public:
 
 private:
 
-	int polyType;                        //!< Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
+    PolygonType polyType;                        //!< Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
 
 public:
 
@@ -78,7 +108,14 @@ public:
 
     void reverseVertices();
 
-    void setPolyType(float _polyType){polyType = _polyType;}
+    void setPolyType(int _polyType){
+        polyType = static_cast<PolygonType >(_polyType);
+    }
+
+    void setPolyType(PolygonType _polyType){
+        polyType = _polyType;
+    }
+
 
     void translatePolygon(Vector3 transVec);
 
@@ -86,7 +123,7 @@ public:
     {
         vers.clear();
         texs.clear();
-        polyType = 0;
+        polyType = POLY_NONE;
     }
 
 /***********************************************
@@ -134,7 +171,9 @@ public:
         return texCoords;
     }
 
-    int getPolyType() const {return polyType;}
+    int getPolyType() const {
+        return static_cast<int>(polyType);
+    }
 
 public:
 

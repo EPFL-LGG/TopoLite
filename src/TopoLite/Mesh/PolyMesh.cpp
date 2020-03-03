@@ -518,9 +518,7 @@ bool PolyMesh<Scalar>::readOBJModel(
             texturedModel = textureModel_ = true;
 	    }
 
-        Vector3 trans;
-	    Scalar scale;
-	    if(normalized) normalize(trans, scale);
+	    if(normalized) normalize();
         removeDuplicatedVertices();
 		return true;
 	}
@@ -542,7 +540,7 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) 
 	{
 		///////////////////////////////////////////////////////////////////
 		// 1. Check whether vertexList and texList exists
-		if(vertexList.empty() || texList.empty()) return;
+		if(vertexList.empty()) return;
 
 		///////////////////////////////////////////////////////////////////
 		// 2. Write the vertex info of the mesh
