@@ -19,13 +19,13 @@ TEST_CASE("BaseMeshCreator")
     XMLIO IO;
 
     SECTION("origin.xml"){
-        //read xml
+        // read xml
         filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         XMLData data;
         IO.XMLReader(xmlFileName.str(), data);
 
-        //read _polyMesh
+        // read _polyMesh
         filesystem::path surface_objfile(UNITTEST_DATAPATH);
         surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
 

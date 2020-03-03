@@ -97,7 +97,7 @@ public:
 
 public:
 
-    Vector3 pos;				//!< vertex's postion (X,Y,Z)
+    Vector3 pos;				// vertex's postion (X,Y,Z)
 
     int verID;
 
@@ -124,7 +124,7 @@ public:
 
 public:
 
-    Vector2 texCoord;				//!< vertex's postion (X,Y,Z)
+    Vector2 texCoord;				// vertex's postion (X,Y,Z)
 
     int texID;
 

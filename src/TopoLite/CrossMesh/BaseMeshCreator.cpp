@@ -141,38 +141,38 @@ void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
                                                    pPolyMesh &baseMesh2D,
                                                    pCrossMesh &crossMesh)
 {
-    //at this stage, baseMes2D and crossMesh are empty.
+    // at this stage, baseMes2D and crossMesh are empty.
     if(pattern2D.lock() == nullptr) return;
 
-    //map 2D pattern vertices on 3D input surface
+    // map 2D pattern vertices on 3D input surface
 	for(size_t id = 0; id < pattern2D.lock()->vertexList.size(); id++)
 	{
         if(pattern2D.lock()->vertexList[id] == nullptr) continue;
 
-        //1) get the interactive position of each vertex.
+        // 1) get the interactive position of each vertex.
 		Vector2 ver_2DCoord = pattern2D.lock()->vertexList[id]->pos.head(2);
 		Vector2 tex_2DCoord = GetTextureCoord(ver_2DCoord, viewSize, inverTextureMat);
-		//MultiplyPoint(texCoord, inverTextureMat, texCoord);
+		// MultiplyPoint(texCoord, inverTextureMat, texCoord);
 
-		//2) compute the 3D coordinates of the 2D texture vertices
-		//by inversing the parametrization mapping
+		// 2) compute the 3D coordinates of the 2D texture vertices
+		// by inversing the parametrization mapping
 		Vector3 ver_3DCoord;
 		if(mapTexPointBackToSurface(tex_2DCoord, ver_3DCoord))
 		{
-		    //if find its corresponding point on the surface
+		    // if find its corresponding point on the surface
             int ver_index2D = id;
             int ver_index3D = crossMesh->vertexList.size();
 
-            //create a new pVertex and add it to crossMesh
-            pVertex ver3D = make_shared<VPoint<Scalar>>(ver_3DCoord); //coordinate
-            ver3D->verID = crossMesh->vertexList.size(); //index
+            // create a new pVertex and add it to crossMesh
+            pVertex ver3D = make_shared<VPoint<Scalar>>(ver_3DCoord); // coordinate
+            ver3D->verID = crossMesh->vertexList.size(); // index
 			crossMesh->vertexList.push_back(ver3D);
 
             map_vertex2D_3D.push_back(ver_index3D);
 			map_vertex3D_2D.push_back(ver_index2D);
 		}
 		else{
-		    //use -1 to represent no corresponding point
+		    // use -1 to represent no corresponding point
             int ver_index2D = id;
             int ver_index3D = -1;
 			map_vertex2D_3D.push_back(-1);
@@ -180,21 +180,21 @@ void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
 
 	}
 
-	//generating all internal crosses
+	// generating all internal crosses
 	for(size_t id = 0; id < pattern2D.lock()->size(); id++)
 	{
 	    if(pattern2D.lock()->cross(id) == nullptr) continue;
         pCross poly2D = pattern2D.lock()->cross(id);
 
-		//create an empty 3D internal cross
+		// create an empty 3D internal cross
 		pCross cross3D = make_shared<Cross<Scalar>>(getVarList());
         cross3D->atBoundary = false;
         cross3D->crossID = crossMesh->size();
 
-        //from previous section,
-		//we know the 3D corresponding coordinate of each poly2D's vertex.
-		//if exist, add it to the cross3D
-		//if not, stop
+        // from previous section,
+		// we know the 3D corresponding coordinate of each poly2D's vertex.
+		// if exist, add it to the cross3D
+		// if not, stop
 		size_t jd = 0;
 		for (; jd < poly2D->vers.size(); jd++)
 		{
@@ -206,7 +206,7 @@ void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
 			cross3D->vers.push_back(vertex);
 		}
 
-		//if all vertex of poly2D is interal.
+		// if all vertex of poly2D is interal.
 		if(jd != poly2D->vers.size())
 		{
 		    int cross_index2D = id;
@@ -219,13 +219,13 @@ void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
 
 			baseMesh2D->polyList.push_back(make_shared<_Polygon<Scalar>>(*poly2D));  // Cross mesh in the texture UV space
 		}
-		//if not, currently no corresponding 3D cross.
+		// if not, currently no corresponding 3D cross.
 		else {
 			map_cross2D_3D.push_back(-1);
 		}
 	}
 
-	//build crossMesh connectivity
+	// build crossMesh connectivity
 	crossMesh->createConnectivity();
 }
 
@@ -237,7 +237,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 {
 
     float minimumCrossArea = getVarList()->template get<float>("minCrossArea");
-	//get all the half_inside pattern2D
+	// get all the half_inside pattern2D
 
 	vector<int> half_inside_pattern2D;
 	for(size_t id = 0; id < pattern2D.lock()->crossList.size(); id++)
@@ -258,8 +258,8 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 		if(has_vertex_in_texture) half_inside_pattern2D.push_back(cross2ID);
 	}
 
-	//for each cut the polygon by the mesh boundary
-	//here only compute the vertex position of the cut conner
+	// for each cut the polygon by the mesh boundary
+	// here only compute the vertex position of the cut conner
 
 
     std::unordered_map<int, vector<int>> patter2D_cut_conner3D, patter2D_cut_conner2D;
@@ -279,7 +279,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 			{
 				pCross ncross2D = cross2D->neighbors[jd].lock();
 
-				//check whether neighbor has computed
+				// check whether neighbor has computed
 				if(ncross2D != nullptr)
 				{
 					auto find3D = patter2D_cut_conner3D.find(ncross2D->crossID);
@@ -294,7 +294,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 					}
 				}
 
-				//need to compute
+				// need to compute
 				Vector3 sta2D, end2D;
 				if(map_vertex2D_3D[ver2ID] != -1){
 					sta2D = pattern2D.lock()->vertexList[ver2ID];
@@ -329,7 +329,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 
     }
 
-    //compute the cut cross mesh
+    // compute the cut cross mesh
 	std::unordered_map<int, vector<wpCross>> pattern2D_edge_cross3D;
 	std::unordered_map<int, vector<int>> pattern2D_edge_cross3D_edgeIDs;
 	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
@@ -350,7 +350,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 			if(ver3ID == -1) continue;
 			if(vertex_visited[jd] == true) continue;
 
-			//iterate anti-clockwise
+			// iterate anti-clockwise
 			int kd = jd;
 			while(ver3ID != -1)
 			{
@@ -358,15 +358,15 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 				ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
 			}
 
-			//insert into base2DMesh
+			// insert into base2DMesh
 			pPolygon polygon = make_shared<_Polygon<Scalar>>();
 
-			//insert into Crossmesh
+			// insert into Crossmesh
 			pCross cross = make_shared<Cross>(getVarList());
 			cross->atBoundary = false;
 			cross->crossID = crossMesh->crossList.size();
 
-			//iterate clockwise
+			// iterate clockwise
 			//(1) present kd has conner or not?
 			int startID, endID;
 			int v3ID = patter2D_cut_conner3D[cross2ID][kd];
@@ -457,7 +457,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 
 			int ncross3ID = map_cross2D_3D[ncross2ID];
 
-			//neighbor is a inside polygon
+			// neighbor is a inside polygon
 			if(ncross3ID != -1)
 			{
 				pCross ncross3D = crossMesh->crossList[ncross3ID];
@@ -466,7 +466,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 			}
 
 
-			//neighbor is a new created polygon
+			// neighbor is a new created polygon
 			auto find_it = pattern2D_edge_cross3D.find(ncross2ID);
 			if(ncross3ID == -1 && find_it != pattern2D_edge_cross3D.end())
 			{
@@ -501,7 +501,7 @@ Matrix<Scalar, 2, 1> BaseMeshCreator<Scalar>::GetTextureCoord(Vector2 point, Sca
     return texCoord;
 }
 
-//able to handle polygonal mesh
+// able to handle polygonal mesh
 template <typename Scalar>
 bool BaseMeshCreator<Scalar>::mapTexPointBackToSurface(Vector2 ptTexCoord, Vector3 &ptSurfCoord)
 {
@@ -611,11 +611,11 @@ void BaseMeshCreator<Scalar>::ComputePracticalBoundary(pCrossMesh &crossMesh)
         size_t size = cross->vers.size();
         for(int jd = 0; jd < size; jd++)
         {
-            //the neighbor must exists
+            // the neighbor must exists
             if(!cross->neighbors[jd].lock()) continue;
 
             float edgeLen = len(cross->vers[(jd + 1) % size].pos - cross->vers[jd].pos);
-            //if the length of the edge is too small, then include one more part
+            // if the length of the edge is too small, then include one more part
             if(minBoundaryEdge > edgeLen)
             {
                 wpCross ncross = cross->neighbors[jd];

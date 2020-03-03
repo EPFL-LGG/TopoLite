@@ -125,7 +125,7 @@ void Part::ComputePartGeometry(bool convexPart, Vector2f cutPlaneHeight, bool pr
 	{
 		clock_t sta = clock();
 		partGeom->ComputePartGeometry(cutPlaneHeight, polyMesh);
-		//timer[5] += (float)(clock() - sta) /(CLOCKS_PER_SEC);
+		// timer[5] += (float)(clock() - sta) /(CLOCKS_PER_SEC);
 	}
 
 	if(!previewMode)
@@ -216,9 +216,9 @@ void Part::GetContactFaces(pPart neiborPart, vector<pair<int, int>> &contaFaceID
 			// Determine two contacting faces from two different parts
 			if (fabs(dotp+1) < FLOAT_ERROR_LARGE && fabs(dist) < FLOAT_ERROR_LARGE)
 			{
-				//currContaFaceID = i;
-				//neiborContaFaceID = j;
-				//return true;
+				// currContaFaceID = i;
+				// neiborContaFaceID = j;
+				// return true;
 
 				contaFaceIDPairs.push_back( make_pair(i, j) );
 			}

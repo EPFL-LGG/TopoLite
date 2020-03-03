@@ -71,15 +71,13 @@ void InterlockingSolver::get_moment_from_norm_fric_vertex(Eigen::Vector3d n,   E
 void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk, bool withFriction)
 {
     if(!withFriction){
-        /*
-     * 1.0 get interface and part
-     */
+
+        // 1.0 get interface and part
+
         shared_ptr<ContactGraphEdge> edge = graph->edges[edgeID];
         shared_ptr<ContactGraphNode> part = graph->nodes[partID];
 
-        /*
-         * 2.0 initialize the matrix Ajk
-         */
+        // 2.0 initialize the matrix Ajk
 
         int num_vks = edge->num_points();
         Ajk = Eigen::MatrixXd(6, 2 * num_vks);
@@ -89,9 +87,9 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
         {
             ContactPolygon poly = edge->polygons[id];
             int num_vk = poly.points.size();
-            /*
-             * 3.0 filling the force fx, fy, fz, term
-             */
+
+            // 3.0 filling the force fx, fy, fz, term
+
             Eigen::Vector3d normal, u_fric, v_fric;
             Eigen::RowVector2d fkx, fky, fkz;
             edge->get_norm_fric_for_block(partID, id, normal, u_fric, v_fric);
@@ -100,9 +98,7 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
             Ajk.block(1, 2 * stack_vk, 1, 2 * num_vk) = fky.replicate(1, num_vk);
             Ajk.block(2, 2 * stack_vk, 1, 2 * num_vk) = fkz.replicate(1, num_vk);
 
-            /*
-             * 4.0 filling the torque mx, my, mz term
-             */
+            // 4.0 filling the torque mx, my, mz term
             for(int jd = 0; jd < num_vk; jd++)
             {
                 Eigen::Vector3d r = (poly.points[jd] - part->centroid).cast<double>();
@@ -115,16 +111,14 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
             stack_vk += num_vk;
         }
     }
-    else{
-        /*
-        * 1.0 get interface and part
-        */
+    else {
+
+        // 1.0 get interface and part
+
         shared_ptr<ContactGraphEdge> edge = graph->edges[edgeID];
         shared_ptr<ContactGraphNode> part = graph->nodes[partID];
 
-        /*
-         * 2.0 initialize the matrix Ajk
-         */
+        // 2.0 initialize the matrix Ajk
 
         int num_vks = edge->num_points();
         Ajk = Eigen::MatrixXd(6, 4 * num_vks);
@@ -133,9 +127,9 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
         {
             ContactPolygon poly = edge->polygons[id];
             int num_vk = poly.points.size();
-            /*
-             * 3.0 filling the force fx, fy, fz, term
-             */
+
+            // 3.0 filling the force fx, fy, fz, term
+
             Eigen::Vector3d normal, u_fric, v_fric;
             Eigen::RowVector4d fkx, fky, fkz;
             edge->get_norm_fric_for_block(partID, id, normal, u_fric, v_fric);
@@ -144,9 +138,9 @@ void InterlockingSolver::get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk,
             Ajk.block(1, 4 * stack_vk, 1, 4 * num_vk) = fky.replicate(1, num_vk);
             Ajk.block(2, 4 * stack_vk, 1, 4 * num_vk) = fkz.replicate(1, num_vk);
 
-            /*
-             * 4.0 filling the torque mx, my, mz term
-             */
+
+            // 4.0 filling the torque mx, my, mz term
+
             for(int jd = 0; jd < num_vk; jd++)
             {
                 Eigen::Vector3d r = (poly.points[jd] - part->centroid).cast<double>();
@@ -294,21 +288,21 @@ void InterlockingSolver::computeRotationalInterlockingMatrixSparse(EigenSpMat &s
 void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool withFriction) {
     if (!withFriction)
     {
-        /*
-         * 1.0 init the matrix
-         */
+
+        // 1.0 init the matrix
+
         vector<int> row_start_index;
         int start_index = 0;
         for (shared_ptr<ContactGraphEdge> edge: graph->edges) {
             row_start_index.push_back(start_index);
-            //std::cout << edge->partIDA << ",\t" << edge->partIDB << ",\t" << edge->num_points() << std::endl;
+            // std::cout << edge->partIDA << ",\t" << edge->partIDB << ",\t" << edge->num_points() << std::endl;
             start_index += edge->num_points() * 2;
         }
         Aeq = Eigen::MatrixXd::Zero(graph->dynamic_nodes.size() * 6, start_index);
 
-        /*
-         * 2.0 build matrix
-         */
+
+        // 2.0 build matrix
+
 
         for (size_t id = 0; id < graph->edges.size(); id++) {
             shared_ptr<ContactGraphEdge> edge = graph->edges[id];
@@ -331,21 +325,19 @@ void InterlockingSolver::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool wi
     }
 
     else{
-        /*
-         * 1.0 init the matrix
-         */
+
+        // 1.0 init the matrix
+
         vector<int> row_start_index;
         int start_index = 0;
         for (shared_ptr<ContactGraphEdge> edge: graph->edges) {
             row_start_index.push_back(start_index);
-            //std::cout << edge->partIDA << ",\t" << edge->partIDB << ",\t" << edge->num_points() << std::endl;
+            // std::cout << edge->partIDA << ",\t" << edge->partIDB << ",\t" << edge->num_points() << std::endl;
             start_index += edge->num_points() * 4;
         }
         Aeq = Eigen::MatrixXd::Zero(graph->dynamic_nodes.size() * 6, start_index);
 
-        /*
-         * 2.0 build matrix
-         */
+        // 2.0 build matrix
 
         for (size_t id = 0; id < graph->edges.size(); id++) {
             shared_ptr<ContactGraphEdge> edge = graph->edges[id];

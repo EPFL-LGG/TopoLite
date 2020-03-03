@@ -226,7 +226,7 @@ TEST_CASE("Class PolyPolyBoolean")
     }
 
     SECTION("check2DPolygonsIntersection", "intersected 3/8"){
-        //1) intersected
+        // 1) intersected
         vector<Vector2d> A;
         A.push_back(Vector2d(0, 0));
         A.push_back(Vector2d(1, 0));
@@ -247,7 +247,7 @@ TEST_CASE("Class PolyPolyBoolean")
     }
 
     SECTION("check2DPolygonsIntersection Scaling", "intersected"){
-        //1) intersected
+        // 1) intersected
         vector<Vector2d> A;
         A.push_back(Vector2d(0, 0));
         A.push_back(Vector2d(1, 0));

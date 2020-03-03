@@ -70,13 +70,13 @@ public:
 
 public:
     //storage
-	vector<pVertex> vers;        //!< Vertices Position
+	vector<pVertex> vers;        // Vertices Position
 
-	vector<pVTex> texs;          //!< Tex coordinates
+	vector<pVTex> texs;          // Tex coordinates
 
 private:
 
-    PolygonType polyType;                        //!< Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
+    PolygonType polyType;                        // Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
 
 public:
 

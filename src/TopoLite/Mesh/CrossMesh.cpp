@@ -38,7 +38,7 @@ CrossMesh<Scalar>::CrossMesh(const CrossMesh<Scalar> &crossMesh)
 {
     clear();
 
-    //create cross geometry
+    // create cross geometry
     for(size_t id = 0; id < crossMesh.crossList.size(); id++)
     {
         pCross cross = make_shared<Cross>(*crossMesh.crossList[id]);
@@ -68,7 +68,7 @@ void CrossMesh<Scalar>::setPolyMesh(const PolyMesh<Scalar> &polyMesh)
 
     setVarList(polyMesh.getVarList());
 
-    //1) create Cross
+    // 1) create Cross
     for(size_t id = 0; id < polyMesh.polyList.size(); id++)
     {
         pCross cross = make_shared<Cross<Scalar>>(*polyMesh.polyList[id], polyMesh.getVarList());
@@ -87,10 +87,10 @@ void CrossMesh<Scalar>::setPolyMesh(const PolyMesh<Scalar> &polyMesh)
 template<typename Scalar>
 void CrossMesh<Scalar>::createConnectivity()
 {
-    //0)
+    // 0)
     vertexCrossList.clear();
 
-    //1) create vertexCrossList
+    // 1) create vertexCrossList
     vertexCrossList.resize(PolyMesh<Scalar>::vertexList.size());
     for(pCross cross: crossList){
         for(pVertex vertex: cross->vers){
@@ -98,7 +98,7 @@ void CrossMesh<Scalar>::createConnectivity()
         }
     }
 
-    //2) create neighbors
+    // 2) create neighbors
     for(pCross cross: crossList)
     {
         cross->neighbors.clear();

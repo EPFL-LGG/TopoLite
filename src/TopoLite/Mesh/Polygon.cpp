@@ -51,7 +51,7 @@ _Polygon<Scalar>::_Polygon(const _Polygon<Scalar> &poly)
 //                                    modify operation
 //**************************************************************************************//
 
-//1) will affect computed data
+// 1) will affect computed data
 template <typename Scalar>
 void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
 {
@@ -85,7 +85,7 @@ size_t _Polygon<Scalar>::push_back(Vector3 pt, Vector2 tex)
     return vers.size();
 }
 
-//2) will not affect computed data
+// 2) will not affect computed data
 
 template <typename Scalar>
 void _Polygon<Scalar>::reverseVertices()
@@ -182,13 +182,13 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::normal() const
 	if(tempNor.norm() < FLOAT_ERROR_LARGE)
 	    return Vector3(0, 0, 0);
 
-	//normal already normalized
+	// normal already normalized
 	Vector3 _normal = computeFitedPlaneNormal();
 	if(_normal.dot(tempNor) < 0) _normal *= -1;
 	return _normal;
 }
 
-//see https://www.ilikebigbits.com/2015_03_04_plane_from_points.html
+// see https://www.ilikebigbits.com/2015_03_04_plane_from_points.html
 template <typename Scalar>
 Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal() const
 {
@@ -298,7 +298,7 @@ void _Polygon<Scalar>::computeFrame(Vector3 &x_axis, Vector3 &y_axis, Vector3 &o
 	y_axis.normalize();
 }
 
-//https://www.mn.uio.no/math/english/people/aca/michaelf/papers/wach_mv.pdf
+// https://www.mn.uio.no/math/english/people/aca/michaelf/papers/wach_mv.pdf
 template <typename Scalar>
 vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 pt) const{
     vector<Scalar> barycentric;
@@ -322,7 +322,7 @@ vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 pt) const{
         Scalar area_pt_mv_v = A_pt_mv_v.computeSignedArea();
         Scalar area_pt_v_pv = A_pt_v_pv.computeSignedArea();
 
-        //line case 1)
+        // line case 1)
         if(std::abs(area_pt_mv_v) < FLOAT_ERROR_SMALL){
             vector<Scalar> line = computeBaryCentric(mv, v, pt);
             barycentric.resize(texs.size(), 0);
@@ -331,7 +331,7 @@ vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 pt) const{
             return barycentric;
         }
 
-        //line case 2)
+        // line case 2)
         if(std::abs(area_pt_v_pv) < FLOAT_ERROR_SMALL){
             vector<Scalar> line = computeBaryCentric(v, pv, pt);
             barycentric.resize(texs.size(), 0);
@@ -355,7 +355,7 @@ vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 pt) const{
 template <typename Scalar>
 vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 sta, Vector2 end, Vector2 pt) const{
 
-    //notice we don't handle the case where pt is not on the segment (sta, end)
+    // notice we don't handle the case where pt is not on the segment (sta, end)
     if((pt - sta).norm() < FLOAT_ERROR_SMALL){
         return vector<Scalar>({1, 0});
     }

@@ -9,7 +9,7 @@
 //                                  XML Writer
 //**************************************************************************************//
 
-//bool XMLIO::XMLWriter(string xmlFileName, XMLData &data)
+// bool XMLIO::XMLWriter(string xmlFileName, XMLData &data)
 //{
 //    if(xmlFileName == "") return false;
 //    boost::filesystem::path xmlFileName_path(xmlFileName);
@@ -61,7 +61,7 @@
 //    return true;
 //}
 //
-//void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root, XMLData &data)
+// void XMLIO::XMLWriter_GUISettings(pugi::xml_node &xml_root, XMLData &data)
 //{
 //    pugi::xml_node node_guisettings = xml_root.child("GUISettings");
 //    //guisettings
@@ -428,28 +428,28 @@
 bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
 {
 
-    //load xmlfile
+    // load xmlfile
     if(!xmldoc.load_file(xmlFileName.c_str()))
         return false;
     pugi::xml_node xml_root = xmldoc.child("Documents");
 
     if (xml_root)
     {
-        //0) allocate memorry
+        // 0) allocate memorry
         data.varList = make_shared<InputVarList>();
 //        data.strucCreator = make_shared<StrucCreator>(data.varList);
 
-        //1) read all gui settings
+        // 1) read all gui settings
         InitVar(data.varList.get());
         XMLReader_GUISettings(xml_root, data);
 
-//        //2) construct the cross mesh
+//        // 2) construct the cross mesh
 //        boost::filesystem::path xmlPathBoost(xmlFileName);
 //        data.varList->filename = xmlPathBoost.stem().string();
 //        string geomDataFolder = boost::filesystem::path(xmlFileName).parent_path().string();
 //        if (data.varList->get<bool>("texturedModel") == false)
 //        {
-//            //2.1) if the model does not have texture
+//            // 2.1) if the model does not have texture
 //            pugi::xml_node crossMeshNode = xml_root.child("Output").child("CrossMesh");
 //            if (crossMeshNode)
 //            {
@@ -461,7 +461,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
 //        }
 //        else
 //        {
-//            //2.2) if the model has texture
+//            // 2.2) if the model has texture
 //            pugi::xml_node surfaceMesh = xml_root.child("Output").child("Structure");
 //            if (surfaceMesh)
 //            {
@@ -472,7 +472,7 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
 //            }
 //        }
 //
-//        //3) update each cross
+//        // 3) update each cross
 //        if (data.strucCreator->struc != nullptr) {
 //            if (xml_root)
 //            {
@@ -487,13 +487,13 @@ bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
 
 void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
 {
-    //TODO: fixing the camera settings
+    // TODO: fixing the camera settings
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
-    //guisettings
+    // guisettings
     {
         if(!node_guisettings) return;
 
-        //para basic
+        // para basic
         InputVarManager varOrganizer;
         {
             vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Basic");
@@ -501,48 +501,48 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
         }
 
 
-        //para shapeop
+        // para shapeop
         {
             pugi::xml_node node_shapeop = node_guisettings.child("ShapeOp_Settings");
             if(node_shapeop){
-                //Para_ShapeOp
+                // Para_ShapeOp
                 vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_ShapeOp");
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_shapeop);
             }
         }
 
 
-        //para mitsuba
+        // para mitsuba
         {
             pugi::xml_node node_mitsuba = node_guisettings.child("Para_Mitsuba");
             if(node_mitsuba){
-                //Para_Mitsuba
+                // Para_Mitsuba
                 vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Mitsuba");
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_mitsuba);
             }
         }
 
-        //para contactgraph
+        // para contactgraph
         {
             pugi::xml_node node_contactgraph = node_guisettings.child("Para_ContactGraph");
             if(node_contactgraph){
-                //Para_ContactGraph
+                // Para_ContactGraph
                 vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_ContactGraph");
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_contactgraph);
             }
         }
 
-        //para crossmesh
+        // para crossmesh
         {
             pugi::xml_node node_crossmesh = node_guisettings.child("Para_CrossMesh");
             if(node_crossmesh){
-                //Para_CrossMesh
+                // Para_CrossMesh
                 vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_CrossMesh");
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_crossmesh);
             }
         }
 
-        //para opt
+        // para opt
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(node){
@@ -551,7 +551,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             }
         }
 
-        //Para_Assembly
+        // Para_Assembly
         {
             pugi::xml_node node = node_guisettings.child("Para_Assembly");
             if(node){
@@ -560,7 +560,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             }
         }
 
-        //Para_Support
+        // Para_Support
         {
             pugi::xml_node node = node_guisettings.child("Para_Support");
             if(node){
@@ -569,7 +569,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             }
         }
 
-        //Para_Opt
+        // Para_Opt
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(node){
@@ -578,7 +578,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             }
         };
 
-        //pickPartIDs
+        // pickPartIDs
         {
             pugi::xml_node node_pickPartIDs = node_guisettings.child("pickPartIDs");
             data.pickPartIDs.clear();
@@ -599,7 +599,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             }
         }
 
-        //interactMatrix
+        // interactMatrix
         {
             pugi::xml_node node_interactmatrix = node_guisettings.child("Interact_Matrix");
             if(node_interactmatrix)
@@ -614,12 +614,12 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
             }
         }
 
-        //Camera
+        // Camera
 //        {
 //            pugi::xml_node node_camera = node_guisettings.child("Camera");
 //            if(node_camera)
 //            {
-//                //worldAxesMat
+//                // worldAxesMat
 //                {
 //                    pugi::xml_node node_worldAxesMat = node_camera.child("worldAxesMat");
 //                    if(node_worldAxesMat)
@@ -634,7 +634,7 @@ void XMLIO::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
 //                               worldAxesMat + 12,worldAxesMat + 13, worldAxesMat + 14, worldAxesMat + 15);
 //                    }
 //                }
-//                //worldMatrix
+//                // worldMatrix
 //                {
 //                    pugi::xml_node node_worldMatrix = node_camera.child("worldMatrix");
 //                    if(node_worldMatrix)

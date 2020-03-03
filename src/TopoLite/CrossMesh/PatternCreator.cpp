@@ -77,8 +77,6 @@ Matrix<Scalar, 3, 1> PatternCreator<Scalar>::rotateVector(Vector3 rotCenter, Vec
     Matrix<Scalar, 4, 1> pos;
     pos << tagtPt.x(), tagtPt.y(), tagtPt.z(), 1;
 
-    Matrix<Scalar, 4, 1> result = trans1 * rotate * trans2 * pos;
-    return result.head(3);
 }
 
 template<typename Scalar>
@@ -86,11 +84,11 @@ void PatternCreator<Scalar>::create2DPattern(PatternType patternID,
                                              int patternRadius,
                                              pCrossMesh &crossMesh)
 {
-    //The algorithm is a BFS searching.
-    //Each time, we pop a polygon from the queue
+    // The algorithm is a BFS searching.
+    // Each time, we pop a polygon from the queue
     //, expand the polygon by finding all its neighbouring polygon
-    //and add the neighbouring polygons into the queue
-    //until the depth of the BFS tree reaches the user specific number.
+    // and add the neighbouring polygons into the queue
+    // until the depth of the BFS tree reaches the user specific number.
 
 
     //BFS(Breadth-First Search) Node Data Structure
