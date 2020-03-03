@@ -37,36 +37,6 @@ template<typename Scalar>
 class PatternCreator : public TopoObject
 {
 public:
-    typedef shared_ptr<VPoint<Scalar>> pVertex;
-
-    struct pVertex_compare
-    {
-        bool operator()(const pVertex &A, const pVertex &B) const
-        {
-            double eps = FLOAT_ERROR_LARGE;
-
-            if (A->pos[0] - B->pos[0] < -eps)
-                return true;
-            if (A->pos[0] - B->pos[0] > eps)
-                return false;
-
-            if (A->pos[1] - B->pos[1] < -eps)
-                return true;
-            if (A->pos[1] - B->pos[1] > eps)
-                return false;
-
-            if (A->pos[2] - B->pos[2] < -eps)
-                return true;
-            if (A->pos[2] - B->pos[2] > eps)
-                return false;
-
-            return false;
-        }
-    };
-
-    typedef std::set<pVertex, pVertex_compare> setVertex;
-
-public:
     typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
 
     typedef shared_ptr<_Polygon<Scalar>> pPolygon;
@@ -76,7 +46,35 @@ public:
     typedef Matrix<Scalar, 3, 1> Vector3;
 
     typedef Matrix<Scalar, 2, 1> Vector2;
+    
+public:
+    
+    struct pVertex_compare
+    {
+        bool operator()(const Vector3 &A, const Vector3 &B) const
+        {
+            double eps = FLOAT_ERROR_LARGE;
 
+            if (A[0] - B[0] < -eps)
+                return true;
+            if (A[0] - B[0] > eps)
+                return false;
+
+            if (A[1] - B[1] < -eps)
+                return true;
+            if (A[1] - B[1] > eps)
+                return false;
+
+            if (A[2] - B[2] < -eps)
+                return true;
+            if (A[2] - B[2] > eps)
+                return false;
+
+            return false;
+        }
+    };
+
+    typedef std::set<Vector3, pVertex_compare> setVertex;
 
 public:
 	PatternCreator();
@@ -97,6 +95,8 @@ public:
     void computeNeighbors(PatternType crosstype, pPolygon poly, vector<pPolygon> &out);
 
     bool checkPolygonExistance(pPolygon poly, const setVertex &vertices_set);
+    
+    void addToVerticesSet(pPolygon poly, setVertex &vertices_set);
 
     Vector3 rotateVector(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle, Vector3 tagtPt);
 

@@ -45,13 +45,30 @@ PatternCreator<Scalar>::~PatternCreator()
 
 template<typename Scalar>
 bool PatternCreator<Scalar>::checkPolygonExistance(PatternCreator::pPolygon poly, const PatternCreator::setVertex &vertices_set) {
-    for(pVertex vertex : poly->vers)
+    for(size_t j = 0; j < poly->size(); j++)
     {
-        if(vertices_set.find(vertex) == vertices_set.end()){
+        Vector3 edge_sta = poly->pos(j);
+        Vector3 edge_end = poly->pos(j + 1);
+        Vector3 edge_mid = (edge_sta + edge_end) / 2;
+        if(vertices_set.find(edge_mid) == vertices_set.end()){
             return false;
         }
     }
     return true;
+}
+
+template<typename Scalar>
+void PatternCreator<Scalar>::addToVerticesSet(pPolygon poly, setVertex &vertices_set)
+{
+    // add the vertices into the vertices_set
+    for(size_t j = 0; j < poly->size(); j++){
+        Vector3 edge_sta = poly->pos(j);
+        Vector3 edge_end = poly->pos(j + 1);
+        Vector3 edge_mid = (edge_sta + edge_end) / 2;
+        if(vertices_set.find(edge_mid) == vertices_set.end()){
+            vertices_set.insert(edge_mid);
+        }
+    }
 }
 
 template<typename Scalar>
@@ -77,6 +94,8 @@ Matrix<Scalar, 3, 1> PatternCreator<Scalar>::rotateVector(Vector3 rotCenter, Vec
     Matrix<Scalar, 4, 1> pos;
     pos << tagtPt.x(), tagtPt.y(), tagtPt.z(), 1;
 
+    Matrix<Scalar, 4, 1> result = trans1 * rotate * trans2 * pos;
+    return result.head(3);
 }
 
 template<typename Scalar>
@@ -113,6 +132,7 @@ void PatternCreator<Scalar>::create2DPattern(PatternType patternID,
     //BFS node
     pPolygon root_poly;
     createPolygonRoot(patternID, CROSS_L, root_poly);
+    addToVerticesSet(root_poly, vertices_set);
     BFSNode node_root(root_poly, 0);
 
     // create a BFS queue and add the root to the queue
@@ -149,13 +169,7 @@ void PatternCreator<Scalar>::create2DPattern(PatternType patternID,
                 bfsQueue.push(next_node);
 
                 // update the vertices_set to avoid duplicate polygon inside the queue
-                // add the vertices into the vertices_set
-                for(pVertex vertex : neighbor_polys[i]->vers)
-                {
-                    if(vertices_set.find(vertex) == vertices_set.end()){
-                        vertices_set.insert(vertex);
-                    }
-                }
+                addToVerticesSet(neighbor_polys[i], vertices_set);
             }
         }
     }

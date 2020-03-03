@@ -4,6 +4,7 @@
 
 #include "CrossMesh/PatternCreator.h"
 #include <catch2/catch.hpp>
+#include <filesystem/path.h>
 TEST_CASE("PatternCreator")
 {
     shared_ptr<InputVarList> varList;
@@ -11,6 +12,15 @@ TEST_CASE("PatternCreator")
     InitVarLite(varList.get());
     PatternCreator<double> patternCreator(varList);
     PatternCreator<double>::pCrossMesh crossMesh;
-    patternCreator.create2DPattern(static_cast<PatternType>(4), 10, crossMesh);
-    crossMesh->writeOBJModel("hexagon.obj");
+
+    filesystem::create_directory("Pattern");
+
+    SECTION("CROSS_SQUARE"){
+        patternCreator.create2DPattern(CROSS_SQUARE, 10, crossMesh);
+        crossMesh->writeOBJModel("Pattern/square.obj");
+    }
+    SECTION("Hexagon"){
+        patternCreator.create2DPattern(CROSS_HEXAGON, 10, crossMesh);
+        crossMesh->writeOBJModel("Pattern/hexagon.obj");
+    }
 }
