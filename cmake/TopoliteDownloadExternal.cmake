@@ -24,7 +24,7 @@ endfunction()
 ################################################################################
 ## Catch2
 function(topolite_download_catch)
-    topolite_download_project(Catch2
+    topolite_download_project(catch2
             GIT_REPOSITORY https://github.com/catchorg/Catch2.git
             GIT_TAG        d63307279412de3870cf97cc6802bae8ab36089e # v 2.7.0
             )

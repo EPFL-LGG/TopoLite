@@ -16,7 +16,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-#set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+# set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
 # MacOS uses CLANG/LLVM -- Linux uses GCC - Compiler flags are slightly different
 

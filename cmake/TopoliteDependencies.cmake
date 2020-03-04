@@ -8,10 +8,10 @@ list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 include(TopoliteDownloadExternal)
 
 # Catch2
-if(NOT TARGET Catch2::Catch2 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET catch2::catch2 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     topolite_download_catch()
-    add_subdirectory(${TOPOLITE_EXTERNAL}/Catch2)
-    list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/Catch2/contrib)
+    add_subdirectory(${TOPOLITE_EXTERNAL}/catch2)
+    list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/catch2/contrib)
 endif()
 
 # TBB library
