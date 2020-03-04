@@ -46,7 +46,7 @@ BaseMeshCreator<Scalar>::~BaseMeshCreator()
 //**************************************************************************************//
 
 template <typename Scalar>
-void BaseMeshCreator<Scalar>::computeBaseCrossMesh(double *inverTextureMat,
+void BaseMeshCreator<Scalar>::computeBaseCrossMesh(Matrix4 interactMat,
                                                    pPolyMesh &baseMesh2D,
                                                    pCrossMesh &crossMesh)
 {
@@ -58,7 +58,8 @@ void BaseMeshCreator<Scalar>::computeBaseCrossMesh(double *inverTextureMat,
 	map_cross2D_3D.clear();
 	map_cross3D_2D.clear();
 
-    computeInternalCross(inverTextureMat, baseMesh2D, crossMesh);
+	Matrix4 textureMat = computeTextureMat(polyMesh.lock(), interactMat);
+    computeInternalCross(textureMat, baseMesh2D, crossMesh);
 
 //	if(getVarList()->template get<bool>("smooth_bdry"))
 //	{
@@ -137,7 +138,7 @@ void BaseMeshCreator<Scalar>::RemoveDanglingCross(pCrossMesh crossMesh)
 }
 
 template <typename Scalar>
-void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
+void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
                                                    pPolyMesh &baseMesh2D,
                                                    pCrossMesh &crossMesh)
 {
@@ -151,8 +152,7 @@ void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
 
         // 1) get the interactive position of each vertex.
 		Vector2 ver_2DCoord = pattern2D.lock()->vertexList[id]->pos.head(2);
-		Vector2 tex_2DCoord = GetTextureCoord(ver_2DCoord, viewSize, inverTextureMat);
-		// MultiplyPoint(texCoord, inverTextureMat, texCoord);
+		Vector2 tex_2DCoord = GetTextureCoord(ver_2DCoord, textureMat);
 
 		// 2) compute the 3D coordinates of the 2D texture vertices
 		// by inversing the parametrization mapping
@@ -231,7 +231,7 @@ void BaseMeshCreator<Scalar>::computeInternalCross(double *inverTextureMat,
 
 
 template <typename Scalar>
-void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
+void BaseMeshCreator<Scalar>::ComputeBoundaryCross(Matrix4 textureMat,
 									   pPolyMesh &baseMesh2D,
 									   pCrossMesh &crossMesh)
 {
@@ -306,7 +306,7 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 				}
 
 				Vector3 pos2D, pos3D;
-                if(ComputeBoundaryVertex(inverTextureMat, sta2D, end2D, pos2D, pos3D))
+                if(ComputeBoundaryVertex(textureMat, sta2D, end2D, pos2D, pos3D))
 				{
 					cut_conner3D.push_back(crossMesh->vertexList.size());
 					crossMesh->vertexList.push_back(pos3D);
@@ -482,24 +482,50 @@ void BaseMeshCreator<Scalar>::ComputeBoundaryCross(double *inverTextureMat,
 }
 
 template <typename Scalar>
-Matrix<Scalar, 2, 1> BaseMeshCreator<Scalar>::GetTextureCoord(Vector2 point, Scalar viewSize, double *interactMat)
+Matrix<Scalar, 2, 1> BaseMeshCreator<Scalar>::GetTextureCoord(Vector2 point, Matrix4 textureMat)
 {
     Vector2 texCoord;
 
 	texCoord.x() = (point.x() + 0.5f*viewSize) / viewSize;
 	texCoord.y() = (point.y() + 0.5f*viewSize) / viewSize;
 
-
-	Matrix<Scalar, 4, 4> mat;
-	mat << interactMat[0], interactMat[4], interactMat[8], interactMat[12],
-	       interactMat[1], interactMat[5], interactMat[9], interactMat[13],
-	       interactMat[2], interactMat[6], interactMat[10], interactMat[14],
-	       interactMat[3], interactMat[7], interactMat[11], interactMat[15];
-
-    texCoord = (mat * Matrix<Scalar, 4, 1>(texCoord.x(), texCoord.y(), 0, 1)).head(2);
+    texCoord = (textureMat * Matrix<Scalar, 4, 1>(texCoord.x(), texCoord.y(), 0, 1)).head(2);
 
     return texCoord;
 }
+
+template<typename Scalar>
+Matrix<Scalar, 4, 4> BaseMeshCreator<Scalar>::computeTextureMat(const pPolyMesh &referenceSurface, Matrix4 interactMat)
+{
+    // Compute 2D bounding box of the parameterized surface mesh
+    Box<Scalar> texBBox = referenceSurface->texBBox();
+    Scalar scale_factor = getVarList()->template get<float>("textureScaleFactor");
+    Scalar footScale = scale_factor / max(texBBox.maxPt.x() - texBBox.minPt.x(), texBBox.maxPt.y() - texBBox.minPt.y());
+
+    //Compute foot matrix that transform the 2D bbox into a unit 2D box [minPt(0,0), maxPt(1,1)]
+    Matrix4 trans1 = Eigen::Matrix4d::Identity();
+    trans1(0, 3) = 0.5; trans1(1, 3) = 0.5; trans1(2, 3) = 0;
+
+    Matrix4 scale = Eigen::Matrix4d::Identity();
+    scale(0, 0) = footScale; scale(1, 1) = footScale;
+
+    Matrix4 trans2 = Eigen::Matrix4d::Identity();
+    trans2(0, 3) = -0.5f*(texBBox.minPt.x() + texBBox.maxPt.x()); trans2(1, 3) = -0.5f*(texBBox.minPt.y() + texBBox.maxPt.y()); trans2(2, 3) = 0;
+
+    Matrix4 footMat = trans1 * scale * trans2;
+    Matrix4 inveInteractMat = interactMat.inverse();
+    // Since the scale of 2D pattern space is [-1, 1] while the scale of 2D texture space is [0, 1]
+    inveInteractMat(0, 3) /= 2;
+    inveInteractMat(1, 3) /= 2;
+    inveInteractMat(2, 3) /= 2;
+
+    Matrix4 trans3 = Eigen::Matrix4d::Identity();
+    trans3(0, 3) = -0.5; trans3(1, 3) = -0.5f; trans3(2, 3) = 0;
+
+    Matrix4 textureMat = trans1 * inveInteractMat * trans3 * footMat;
+    return textureMat.inverse();
+}
+
 
 // able to handle polygonal mesh
 template <typename Scalar>
@@ -643,3 +669,4 @@ void BaseMeshCreator<Scalar>::ComputePracticalBoundary(pCrossMesh &crossMesh)
         cross->atBoundary = allBoundary;
     }
 }
+

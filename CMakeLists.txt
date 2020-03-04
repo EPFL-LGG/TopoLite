@@ -86,7 +86,7 @@ include(CTest)
 include(ParseAndAddCatchTests)
 
 #file(GLOB testTopoFiles test/Mesh/*.cpp)
-file(GLOB testTopoFiles test/CrossMesh/Test_PatternCreator.cpp
+file(GLOB testTopoFiles test/CrossMesh/*.cpp
                         test/IO/*.cpp
                         test/Utility/*.cpp
                         test/Mesh/*.cpp)

@@ -157,6 +157,7 @@ public:
             if (typeid(Scalar) == typeid(int)) return ((InputVarInt *) var)->value;
             if (typeid(Scalar) == typeid(float)) return ((InputVarFloat *) var)->value;
             if (typeid(Scalar) == typeid(bool)) return ((InputVarBool *) var)->value;
+            if (typeid(Scalar) == typeid(double)) return ((InputVarFloat *) var)->value;
         }
         else{
             std::cout << "Error: get a unresgistered variable" << std::endl;
@@ -172,6 +173,7 @@ public:
             if (typeid(Scalar) == typeid(int)) ((InputVarInt *) var)->value = _v;
             if (typeid(Scalar) == typeid(float)) ((InputVarFloat *) var)->value = _v;
             if (typeid(Scalar) == typeid(bool)) ((InputVarBool *) var)->value = _v;
+            if (typeid(Scalar) == typeid(double)) ((InputVarFloat *) var)->value = _v;
         }
         return;
     }

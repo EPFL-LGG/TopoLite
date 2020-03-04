@@ -173,15 +173,15 @@ Box<Scalar> PolyMesh<Scalar>::texBBox() const
     minU = minV = MAX_FLOAT;
     maxU = maxV = MIN_FLOAT;
 
-    for (size_t i = 0; i < vertexList.size(); i++)
+    for (size_t i = 0; i < texList.size(); i++)
     {
-        Vector2 texCoord = vertexList[i]->tex;
+        Vector2 texCoord = texList[i]->texCoord;
 
-        if (maxU < texCoord.x)   maxU = texCoord.x();
-        if (minU > texCoord.x)   minU = texCoord.x();
+        if (maxU < texCoord.x())   maxU = texCoord.x();
+        if (minU > texCoord.x())   minU = texCoord.x();
 
-        if (maxV < texCoord.y)   maxV = texCoord.y();
-        if (minV > texCoord.y)   minV = texCoord.y();
+        if (maxV < texCoord.y())   maxV = texCoord.y();
+        if (minV > texCoord.y())   minV = texCoord.y();
     }
 
     Box<Scalar> texBBox_;

@@ -19,8 +19,12 @@ TEST_CASE("PatternCreator")
         patternCreator.create2DPattern(CROSS_SQUARE, 10, crossMesh);
         crossMesh->writeOBJModel("Pattern/square.obj");
     }
-    SECTION("Hexagon"){
+    SECTION("CROSS_HEXAGON"){
         patternCreator.create2DPattern(CROSS_HEXAGON, 10, crossMesh);
         crossMesh->writeOBJModel("Pattern/hexagon.obj");
+    }
+    SECTION("CROSS_RHOMBUS"){
+        patternCreator.create2DPattern(CROSS_RHOMBUS, 10, crossMesh);
+        crossMesh->writeOBJModel("Pattern/rhombus.obj");
     }
 }

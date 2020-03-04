@@ -60,6 +60,8 @@ public:
 
     typedef shared_ptr<VPoint<Scalar>> pVertex;
 
+    typedef Matrix<Scalar, 4, 4> Matrix4;
+
 public:
 
 	vector<int> map_vertex2D_3D;
@@ -96,18 +98,18 @@ public:
 	 * \param[out] baseMesh: output the base mesh
 	 * \note: it requires polyMesh with texture.
 	 */
-	void computeBaseCrossMesh(double *inverTextureMat,
+	void computeBaseCrossMesh(Matrix<Scalar, 4, 4> interactMat,
 	                          pPolyMesh &baseMesh2D,
 	                          pCrossMesh &crossMesh);
 
     void InitCrossMesh(     pPolyMesh polyMesh,
                             pCrossMesh &crossMesh);
 
-	void computeInternalCross(  double *inverTextureMat,
-							    pPolyMesh &baseMesh2D,
-							    pCrossMesh &crossMesh);
+	void computeInternalCross(Matrix4 textureMat,
+	                          pPolyMesh &baseMesh2D,
+	                          pCrossMesh &crossMesh);
 
-	void ComputeBoundaryCross(double *inverTextureMat,
+	void ComputeBoundaryCross(Matrix4 textureMat,
 							  pPolyMesh &baseMesh2D,
 							  pCrossMesh &crossMesh);
 
@@ -120,11 +122,13 @@ public:
 	bool ComputeBoundaryVertex(double inverTextureMat[16], Vector3 sta2D, Vector3 end2D, Vector3 &pos2D, Vector3 &pos3D);
 
 
+    Matrix4 computeTextureMat(const pPolyMesh &referenceSurface, Matrix4 interactMat);
+
 private:
 	/*!
 	 * \brief: scale the 2D pattern position into UV space
 	 */
-    Vector2 GetTextureCoord(Vector2 point, Scalar viewSize, double interactMat[16]);
+    Vector2 GetTextureCoord(Vector2 point, Matrix4 textureMat);
 
 	/*!
 	 * \brief: project the 2D ptTexCoord into the Surface
