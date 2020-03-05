@@ -4,7 +4,8 @@
 
 #include <catch2/catch.hpp>
 #include "Mesh/PolyMesh.h"
-
+#include "filesystem/path.h"
+#include "filesystem/resolver.h"
 TEST_CASE("PolyMesh")
 {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
@@ -107,14 +108,19 @@ TEST_CASE("PolyMesh")
 
     SECTION("read polyhedron"){
         bool texturedModel;
-        polyMesh.readOBJModel("../data/Mesh/primitives/Icosphere.obj", texturedModel, true);
+        
+        filesystem::path dataFolder(UNITTEST_DATAPATH);
+        filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
+
+        polyMesh.readOBJModel(filepath.str().c_str(), texturedModel, true);
         REQUIRE(texturedModel == true);
 
         polyMesh.rotateMesh(Vector3d(0, 0, 0), Vector3d(0, 0, 1), 10);
         polyMesh.translateMesh(Vector3d(1, 1, 1));
         polyMesh.scaleMesh(Vector3d(2, 2, 2));
 
-        polyMesh.getTextureMesh()->writeOBJModel("../data/Mesh/primitives/Icosphere2.obj", false);
+        filesystem::path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
+        polyMesh.getTextureMesh()->writeOBJModel(outputfile.str().c_str(), false);
 
         SECTION("Test copy and construct function")
         {

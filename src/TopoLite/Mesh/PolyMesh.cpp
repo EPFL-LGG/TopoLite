@@ -791,5 +791,7 @@ shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh() const
         polymesh->polyList.push_back(poly);
     }
 
+    //rebuild the vertexList and texList of the polymesh
+    polymesh->update();
     return polymesh;
 }

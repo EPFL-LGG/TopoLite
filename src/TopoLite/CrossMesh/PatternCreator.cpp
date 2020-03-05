@@ -174,6 +174,8 @@ void PatternCreator<Scalar>::create2DPattern(PatternType patternID,
         }
     }
 
+
+    patternMesh->update();
     patternMesh->normalize();
 
     crossMesh = make_shared<CrossMesh<Scalar>>(*patternMesh);

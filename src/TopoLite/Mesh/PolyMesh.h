@@ -110,6 +110,11 @@ public:
 
     void clear();
 
+    void update(){
+        removeDuplicatedVertices();
+        computeTexList();
+    }
+
     std::pair<Matrix<Scalar, 3, 1>, Scalar> normalize();
 
     void setPolyLists(vector<pPolygon> _polyList);

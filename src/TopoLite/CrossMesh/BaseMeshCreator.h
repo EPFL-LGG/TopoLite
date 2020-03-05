@@ -124,11 +124,11 @@ public:
 
     Matrix4 computeTextureMat(const pPolyMesh &referenceSurface, Matrix4 interactMat);
 
-private:
+public:
 	/*!
 	 * \brief: scale the 2D pattern position into UV space
 	 */
-    Vector2 GetTextureCoord(Vector2 point, Matrix4 textureMat);
+    Vector2 getTextureCoord(Vector2 point, Matrix4 textureMat);
 
 	/*!
 	 * \brief: project the 2D ptTexCoord into the Surface
