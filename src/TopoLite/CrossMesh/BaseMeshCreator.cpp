@@ -61,12 +61,12 @@ void BaseMeshCreator<Scalar>::computeBaseCrossMesh(Matrix4 interactMat,
 	Matrix4 textureMat = computeTextureMat(polyMesh.lock(), interactMat);
     computeInternalCross(textureMat, baseMesh2D, crossMesh);
 
-//	if(getVarList()->template get<bool>("smooth_bdry"))
-//	{
-//        ComputeBoundaryCross(inverTextureMat, baseMesh2D, crossMesh);
-//		//remove dangling
-//		RemoveDanglingCross(crossMesh);
-//    }
+	if(getVarList()->template get<bool>("smooth_bdry"))
+	{
+        computeBoundaryCross(textureMat, baseMesh2D, crossMesh);
+		//remove dangling
+		//RemoveDanglingCross(crossMesh);
+    }
 //
 //    if(baseMesh2D){
 //        baseMesh2D->setVarList(getVarList());
@@ -81,30 +81,30 @@ void BaseMeshCreator<Scalar>::computeBaseCrossMesh(Matrix4 interactMat,
 }
 
 
-template <typename Scalar>
-void BaseMeshCreator<Scalar>::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)
-{
-    for (size_t i = 0; i < polyMesh->polyList.size(); i++)
-    {
-        pPolygon poly = polyMesh->polyList[i];
-
-        pCross cross = make_shared<Cross>(getVarList());
-        cross->atBoundary = false;
-        cross->crossID = i;
-
-        for (size_t j = 0; j < poly->vers.size(); j++)
-        {
-            cross->vers.push_back(poly->vers[j]);
-            cross->verIDs.push_back(poly->verIDs[j]);
-        }
-
-        cross->ComputeNormal();
-        crossMesh->crossList.push_back(cross);
-    }
-
-    crossMesh->vertexList = polyMesh->vertexList;
-    return;
-}
+//template <typename Scalar>
+//void BaseMeshCreator<Scalar>::InitCrossMesh(pPolyMesh polyMesh, pCrossMesh &crossMesh)
+//{
+//    for (size_t i = 0; i < polyMesh->polyList.size(); i++)
+//    {
+//        pPolygon poly = polyMesh->polyList[i];
+//
+//        pCross cross = make_shared<Cross>(getVarList());
+//        cross->atBoundary = false;
+//        cross->crossID = i;
+//
+//        for (size_t j = 0; j < poly->vers.size(); j++)
+//        {
+//            cross->vers.push_back(poly->vers[j]);
+//            cross->verIDs.push_back(poly->verIDs[j]);
+//        }
+//
+//        cross->ComputeNormal();
+//        crossMesh->crossList.push_back(cross);
+//    }
+//
+//    crossMesh->vertexList = polyMesh->vertexList;
+//    return;
+//}
 
 
 template <typename Scalar>
@@ -231,9 +231,9 @@ void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
 
 
 template <typename Scalar>
-void BaseMeshCreator<Scalar>::ComputeBoundaryCross(Matrix4 textureMat,
-									   pPolyMesh &baseMesh2D,
-									   pCrossMesh &crossMesh)
+void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
+                                                   pPolyMesh &baseMesh2D,
+                                                   pCrossMesh &crossMesh)
 {
 
     float minimumCrossArea = getVarList()->template get<float>("minCrossArea");

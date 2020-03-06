@@ -102,16 +102,13 @@ public:
 	                          pPolyMesh &baseMesh2D,
 	                          pCrossMesh &crossMesh);
 
-    void InitCrossMesh(     pPolyMesh polyMesh,
-                            pCrossMesh &crossMesh);
-
 	void computeInternalCross(Matrix4 textureMat,
 	                          pPolyMesh &baseMesh2D,
 	                          pCrossMesh &crossMesh);
 
-	void ComputeBoundaryCross(Matrix4 textureMat,
-							  pPolyMesh &baseMesh2D,
-							  pCrossMesh &crossMesh);
+	void computeBoundaryCross(Matrix4 textureMat,
+                              pPolyMesh &baseMesh2D,
+                              pCrossMesh &crossMesh);
 
     void ComputePracticalBoundary(pCrossMesh &crossMesh);
 
