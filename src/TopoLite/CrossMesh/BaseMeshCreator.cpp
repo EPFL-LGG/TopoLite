@@ -77,7 +77,7 @@ void BaseMeshCreator<Scalar>::computeBaseCrossMesh(Matrix4 interactMat,
 //        ComputePracticalBoundary(crossMesh);
 //    }
 //
-//	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
+	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 }
 
 
