@@ -237,59 +237,52 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
 {
 
     float minimumCrossArea = getVarList()->template get<float>("minCrossArea");
-	// get all the half_inside pattern2D
 
-	vector<int> half_inside_pattern2D;
-	for(size_t id = 0; id < pattern2D.lock()->crossList.size(); id++)
+    // get all potential boundary cross in pattern2D
+	vector<pCross> boundary_cross2D;
+	for(size_t id = 0; id < pattern2D.lock()->size(); id++)
 	{
-	    if(pattern2D.lock()->crossList[id] == nullptr) continue;
-		int cross2ID = pattern2D.lock()->crossList[id]->crossID;
-		if(map_cross2D_3D[cross2ID] != -1) continue;
-		pCross cross2D = pattern2D.lock()->crossList[id];
-		bool has_vertex_in_texture = false;
-		for(size_t jd = 0; jd < cross2D->verIDs.size(); jd++)
+        pCross cross2D = pattern2D.lock()->cross(id);
+        //if cross2D exists or it already can be mapped into 3d, continue
+	    if(cross2D == nullptr || map_cross2D_3D[cross2D->crossID] != -1) continue;
+
+		for(pVertex vertex: cross2D->vers)
 		{
-			if(map_vertex2D_3D[cross2D->verIDs[jd]] != -1)
+			if(map_vertex2D_3D[vertex->verID] != -1)
 			{
-				has_vertex_in_texture = true;
-				break;
+                boundary_cross2D.push_back(cross2D);
+                break;
 			}
 		}
-		if(has_vertex_in_texture) half_inside_pattern2D.push_back(cross2ID);
 	}
 
-	// for each cut the polygon by the mesh boundary
-	// here only compute the vertex position of the cut conner
-
-
-    std::unordered_map<int, vector<int>> patter2D_cut_conner3D, patter2D_cut_conner2D;
-	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
+	// For each boundary cross, we cut it by using the mesh boundary
+	// Here only compute the vertex position of the cut conner
+    std::unordered_map<pCross, vector<pVertex>> cut_boundary_cross2D;
+    std::unordered_map<pCross, vector<pVertex>> cut_boundary_cross3D;
+	for(pCross cross2D: boundary_cross2D)
 	{
-
-		int cross2ID = half_inside_pattern2D[id];
-		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
-		if(cross2D == nullptr) continue;
-
 		vector<int> cut_conner3D, cut_conner2D;
-		for(size_t jd = 0; jd < cross2D->verIDs.size(); jd++)
+		for(size_t edgeID = 0; edgeID < cross2D->size(); edgeID++)
 		{
-			int ver2ID = cross2D->verIDs[jd];
-			int next_ver2ID = cross2D->verIDs[(jd + 1) % cross2D->verIDs.size()];
+			int ver2ID = cross2D->vers[edgeID]->verID;
+			int next_ver2ID = cross2D->vers[(edgeID + 1) % cross2D->size()]->verID;
+
 			if((map_vertex2D_3D[ver2ID] == -1) ^ (map_vertex2D_3D[next_ver2ID] == -1))
 			{
-				pCross ncross2D = cross2D->neighbors[jd].lock();
+				pCross ncross2D = cross2D->neighbors[edgeID].lock();
 
 				// check whether neighbor has computed
 				if(ncross2D != nullptr)
 				{
-					auto find3D = patter2D_cut_conner3D.find(ncross2D->crossID);
-					auto find2D = patter2D_cut_conner2D.find(ncross2D->crossID);
+					auto cut_vertices_cross3D = cut_boundary_cross3D.find(ncross2D);
+					auto cut_vertices_cross2D = cut_boundary_cross2D.find(ncross2D);
 
-					if(find3D != patter2D_cut_conner3D.end()){
-						int edgeID = ncross2D->GetNeighborEdgeID(cross2D->crossID);
-
-						cut_conner3D.push_back(find3D->second[edgeID]);
-						cut_conner2D.push_back(find2D->second[edgeID]);
+					if(cut_vertices_cross3D != cut_boundary_cross2D.end())
+					{
+						int edgeID = ncross2D->getEdgeIDOfGivenCross(cross2D.get());
+						cut_conner3D.push_back(cut_vertices_cross3D->second[edgeID]);
+						cut_conner2D.push_back(cut_vertices_cross2D->second[edgeID]);
 						continue;
 					}
 				}
