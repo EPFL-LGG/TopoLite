@@ -43,6 +43,7 @@ TEST_CASE("Cross")
             REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 30.0);
             REQUIRE(cross.ori(id)->tiltSign == (id % 2 == 0?1 :-1));
         }
+        
         // Check that normal rotated (and in that pi/6 rotation is above/below each of its respective point)
 
         REQUIRE(Approx((cross.ori(0)->normal - Vector3d( 0.75,  sqrt(3.0)/4.0, -0.5)).norm()).margin(1e-10) == 0.0);
@@ -50,15 +51,15 @@ TEST_CASE("Cross")
         REQUIRE(Approx((cross.ori(2)->normal - Vector3d(-0.75,  sqrt(3.0)/4.0, -0.5)).norm()).margin(1e-10) == 0.0);
         REQUIRE(Approx((cross.ori(3)->normal - Vector3d(-0.75, -sqrt(3.0)/4.0,  0.5)).norm()).margin(1e-10) == 0.0);
 
-        // updateTiltNormals - Tilt +30 deg - Back to initial state
+        // Back to initial state
 
-        cross.updateTiltNormalsRoot(tilt_angle);
-//        for(int id = 0; id < N; id++){
-//            Vector3d mid = (cross.pos(id) + cross.pos(id + 1)) / 2;
-//            REQUIRE(Approx(mid.cross(cross.ori(id)->normal).norm()).margin(1e-10) == 0.0);
-//            REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 0.0);
-//            REQUIRE(Approx((cross.ori(id)->normal - cross_initial_state.ori(id)->normal).norm()).margin(1e-10) == 0.0);
-//        }
+        cross.initTiltNormals();
+        for(int id = 0; id < N; id++){
+            Vector3d mid = (cross.pos(id) + cross.pos(id + 1)) / 2;
+            REQUIRE(Approx(mid.cross(cross.ori(id)->normal).norm()).margin(1e-10) == 0.0);
+            REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 0.0);
+            REQUIRE(Approx((cross.ori(id)->normal - cross_initial_state.ori(id)->normal).norm()).margin(1e-10) == 0.0);
+        }
     }
 
     SECTION("Four Quad"){
