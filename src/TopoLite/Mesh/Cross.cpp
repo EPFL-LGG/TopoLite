@@ -212,9 +212,13 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
 //                                 Compute Neighbor
 //**************************************************************************************//
 
+/*
+ * returns the edgeID shared between two crosses or NOT_FOUND
+ */
 template<typename Scalar>
 int Cross<Scalar>::getEdgeIDOfGivenCross(const Cross<Scalar> *ncross) {
-    if (ncross == nullptr) return NONE_ELEMENT;
+    if (ncross == nullptr)
+        return NOT_FOUND;
 
     for (size_t i = 0; i < neighbors.size(); i++) {
         if (neighbors[i].lock() == nullptr)
@@ -224,9 +228,14 @@ int Cross<Scalar>::getEdgeIDOfGivenCross(const Cross<Scalar> *ncross) {
             return i;
     }
 
-    return NONE_ELEMENT;
+    return NOT_FOUND;
 }
 
+/*
+ * returns the local index of a vertex in a polygon
+ *
+ * ex: for [1,2,4,3] getEdgeIDofGivenVertexID(4) = 2
+ */
 template<typename Scalar>
 int Cross<Scalar>::getEdgeIDOfGivenVertexID(int vertexID) {
     const vector<pVertex> &vers = _Polygon<Scalar>::vers;
@@ -235,9 +244,14 @@ int Cross<Scalar>::getEdgeIDOfGivenVertexID(int vertexID) {
             return i;
         }
     }
-    return NONE_ELEMENT;
+    return NOT_FOUND;
 }
 
+
+/*
+ * returns the previous local index of local index
+ *
+ */
 template<typename Scalar>
 int Cross<Scalar>::getPrevEdgeID(int edgeID) {
     const vector<pVertex> &vers = _Polygon<Scalar>::vers;
@@ -246,7 +260,8 @@ int Cross<Scalar>::getPrevEdgeID(int edgeID) {
 
 template<typename Scalar>
 int Cross<Scalar>::getCrossIDsSharedWithCross(const Cross<Scalar> *ncross, vector<int> &shared_crossIDs) {
-    if (ncross == nullptr) return NONE_ELEMENT;
+    if (ncross == nullptr)
+        return NOT_FOUND;
 
     vector<int> neigbor_crossID;
     for (size_t id = 0; id < neighbors.size(); id++) {
@@ -268,7 +283,7 @@ int Cross<Scalar>::getCrossIDsSharedWithCross(const Cross<Scalar> *ncross, vecto
     }
 
     if (shared_crossIDs.empty()) {
-        return NONE_ELEMENT;
+        return NOT_FOUND;
     } else {
         return shared_crossIDs.size();
     }
@@ -294,7 +309,7 @@ int Cross<Scalar>::getEdgeIDSharedWithCross(const Cross<Scalar> *ncross) {
             return id;
         }
     }
-    return NONE_ELEMENT;
+    return NOT_FOUND;
 }
 
 template<typename Scalar>

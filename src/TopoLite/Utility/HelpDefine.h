@@ -131,6 +131,7 @@
 #define NONE_GROUP              -1
 #define NONE_ELEMENT            -1
 #define NONE_FACE               -1
+#define NOT_FOUND               -1
 
 #define MOBILITY_SPHERE_R        3.0f
 
