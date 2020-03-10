@@ -295,6 +295,8 @@ public:
 
 public:
 	Box();
+	Box(const Line<Scalar> &line);
+	Box(const Box<Scalar> &b0, const Box<Scalar> &b1);
 	Box & operator=(const Box &box);
 	void print();
 
@@ -315,6 +317,36 @@ Box<Scalar>::Box()
     cenPt = Vector3(0, 0, 0);
     size = Vector3(0, 0, 0);
 }
+
+template<typename Scalar>
+Box<Scalar>::Box(const Line<Scalar> &line)
+{
+    for(size_t id = 0; id < 3; id++){
+        minPt[id] = std::min(line.point1[id], line.point2[id]);
+        maxPt[id] = std::max(line.point1[id], line.point2[id]);
+    }
+
+    cenPt = (minPt + maxPt)/2;
+    size = (maxPt - minPt);
+
+    return;
+}
+
+template<typename Scalar>
+Box<Scalar>::Box(const Box<Scalar> &b0, const Box<Scalar> &b1){
+
+    for(size_t id = 0; id < 3; id++)
+    {
+        minPt[id] = std::min(b0.minPt[id], b1.minPt[id]);
+        maxPt[id] = std::max(b0.maxPt[id], b1.maxPt[id]);
+    }
+
+    cenPt = (minPt + maxPt)/2;
+    size = (maxPt - minPt);
+
+    return;
+}
+
 
 template<typename Scalar>
 Box<Scalar> & Box<Scalar>::operator=(const Box &box)

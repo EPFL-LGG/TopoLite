@@ -110,6 +110,14 @@ void _Polygon<Scalar>::translatePolygon(Vector3 transVec)
     }
 }
 
+template <typename Scalar>
+void _Polygon<Scalar>::translatePolygonTex(Vector2 transVec)
+{
+    for (size_t i = 0; i < texs.size(); i++)
+    {
+        texs[i]->texCoord += transVec;
+    }
+}
 
 /***********************************************
  *                                             *
