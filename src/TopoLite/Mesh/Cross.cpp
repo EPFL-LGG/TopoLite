@@ -235,6 +235,8 @@ int Cross<Scalar>::getEdgeIDOfGivenCross(const Cross<Scalar> *ncross) {
  * returns the local index of a vertex in a polygon
  *
  * ex: for [1,2,4,3] getEdgeIDofGivenVertexID(4) = 2
+ *
+ * fixme: edgeID is not a well chosen name. We should think of changing.
  */
 template<typename Scalar>
 int Cross<Scalar>::getEdgeIDOfGivenVertexID(int vertexID) {
@@ -251,6 +253,7 @@ int Cross<Scalar>::getEdgeIDOfGivenVertexID(int vertexID) {
 /*
  * returns the previous local index of local index
  *
+ * fixme: edgeID is not a well chosen name. We should think of changing.
  */
 template<typename Scalar>
 int Cross<Scalar>::getPrevEdgeID(int edgeID) {
@@ -258,6 +261,12 @@ int Cross<Scalar>::getPrevEdgeID(int edgeID) {
     return (edgeID - 1 + vers.size()) % vers.size();
 }
 
+
+/*
+ * Fills up a vector with the IDs of crosses shared between this cross and another one.
+ * A cross is shared if in contact with both other crosses..
+ *
+ */
 template<typename Scalar>
 int Cross<Scalar>::getCrossIDsSharedWithCross(const Cross<Scalar> *ncross, vector<int> &shared_crossIDs) {
     if (ncross == nullptr)

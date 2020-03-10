@@ -135,10 +135,15 @@ TEST_CASE("Cross")
             REQUIRE(crossLists[0]->getCrossIDsSharedWithCross(crossLists[2].get(), shared_crossIDs) == 2);
             REQUIRE(shared_crossIDs[0] == 1);
             REQUIRE(shared_crossIDs[1] == 3);
+            REQUIRE(crossLists[1]->getCrossIDsSharedWithCross(crossLists[3].get(), shared_crossIDs) == 2);
+            REQUIRE(shared_crossIDs[0] == 0);
+            REQUIRE(shared_crossIDs[1] == 2);
         }
 
         SECTION("getEdgeIDSharedWithCross"){
             REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[1].get()) == 1);
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[3].get()) == 2);
+            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[0].get()) == 0);
             REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[2].get()) == NOT_FOUND);
         }
 
