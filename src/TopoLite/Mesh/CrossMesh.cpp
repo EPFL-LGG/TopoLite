@@ -47,7 +47,7 @@ CrossMesh<Scalar>::CrossMesh(const CrossMesh<Scalar> &crossMesh)
     }
 
     PolyMesh<Scalar>::computeVertexList();
-    PolyMesh<Scalar>::computeTexList();
+    PolyMesh<Scalar>::computeTextureList();
 
     createConnectivity();
 }
@@ -78,7 +78,7 @@ void CrossMesh<Scalar>::setPolyMesh(const PolyMesh<Scalar> &polyMesh)
     }
 
     PolyMesh<Scalar>::computeVertexList();
-    PolyMesh<Scalar>::computeTexList();
+    PolyMesh<Scalar>::computeTextureList();
     PolyMesh<Scalar>::removeDuplicatedVertices();
 
     createConnectivity();
