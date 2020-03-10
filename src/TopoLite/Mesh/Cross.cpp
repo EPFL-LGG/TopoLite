@@ -163,7 +163,7 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
 
         // 2) reverse the tilt sign of its neighbor
 
-        int neiborEdgeID = neighbor->getEdgeIDOfGivenCross(this);
+        int neiborEdgeID = neighbor->getEdgeIDSharedWithCross(this);
         TopoASSERT(neiborEdgeID != NONE_ELEMENT);
 
         if (neiborEdgeID == NONE_ELEMENT)
@@ -216,7 +216,7 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
  * returns the edgeID shared between two crosses or NOT_FOUND
  */
 template<typename Scalar>
-int Cross<Scalar>::getEdgeIDOfGivenCross(const Cross<Scalar> *ncross) {
+int Cross<Scalar>::getEdgeIDSharedWithCross(const Cross<Scalar> *ncross) {
     if (ncross == nullptr)
         return NOT_FOUND;
 
@@ -299,27 +299,30 @@ int Cross<Scalar>::getCrossIDsSharedWithCross(const Cross<Scalar> *ncross, vecto
 
 }
 
-template<typename Scalar>
-int Cross<Scalar>::getEdgeIDSharedWithCross(const Cross<Scalar> *ncross) {
-    if (ncross == nullptr) return NONE_ELEMENT;
+// --LEGACY CODE ---------------------------------------------------------------------------------------------------- //
 
-    const vector<pVertex> &vers = _Polygon<Scalar>::vers;
-
-    map<int, bool> neighborVertex;
-    for (size_t id = 0; id < ncross->vers.size(); id++) {
-        neighborVertex[ncross->vers[id]->verID] = true;
-    }
-
-    for (size_t id = 0; id < vers.size(); id++) {
-        int vID = vers[id]->verID;
-        int nvID = vers[(id + 1) % vers.size()]->verID;
-
-        if (neighborVertex[vID] && neighborVertex[nvID]) {
-            return id;
-        }
-    }
-    return NOT_FOUND;
-}
+//template<typename Scalar>
+//int Cross<Scalar>::getEdgeIDSharedWithCross(const Cross<Scalar> *ncross) {
+//    if (ncross == nullptr) return NONE_ELEMENT;
+//
+//    const vector<pVertex> &vers = _Polygon<Scalar>::vers;
+//
+//    map<int, bool> neighborVertex;
+//    for (size_t id = 0; id < ncross->vers.size(); id++) {
+//        neighborVertex[ncross->vers[id]->verID] = true;
+//    }
+//
+//    for (size_t id = 0; id < vers.size(); id++) {
+//        int vID = vers[id]->verID;
+//        int nvID = vers[(id + 1) % vers.size()]->verID;
+//
+//        if (neighborVertex[vID] && neighborVertex[nvID]) {
+//            return id;
+//        }
+//    }
+//    return NOT_FOUND;
+//}
+// --END LEGACY CODE ------------------------------------------------------------------------------------------------ //
 
 template<typename Scalar>
 bool Cross<Scalar>::checkNeighborAtBoundary(int nID) {

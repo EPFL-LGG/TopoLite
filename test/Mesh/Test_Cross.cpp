@@ -99,18 +99,18 @@ TEST_CASE("Cross")
         crossLists[3]->neighbors[1] = crossLists[2];
         crossLists[3]->neighbors[0] = crossLists[0];
 
-        SECTION("getEdgeIDOfGivenCross")
+        SECTION("getEdgeIDSharedWithCross")
         {
-            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[2].get()) == NOT_FOUND);    //  top edge    = 3
-            REQUIRE(crossLists[3]->getEdgeIDOfGivenCross(crossLists[1].get()) == NOT_FOUND);    //  left edge   = 0
-            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[1].get()) == 1);            //  bottom edge = 1
-            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[3].get()) == 2);            //  right edge  = 2
-            REQUIRE(crossLists[1]->getEdgeIDOfGivenCross(crossLists[0].get()) == 3);
-            REQUIRE(crossLists[1]->getEdgeIDOfGivenCross(crossLists[2].get()) == 2);
-            REQUIRE(crossLists[2]->getEdgeIDOfGivenCross(crossLists[1].get()) == 0);
-            REQUIRE(crossLists[2]->getEdgeIDOfGivenCross(crossLists[3].get()) == 3);
-            REQUIRE(crossLists[3]->getEdgeIDOfGivenCross(crossLists[2].get()) == 1);
-            REQUIRE(crossLists[3]->getEdgeIDOfGivenCross(crossLists[0].get()) == 0);
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[2].get()) == NOT_FOUND);    //  top edge    = 3
+            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[1].get()) == NOT_FOUND);    //  left edge   = 0
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[1].get()) == 1);            //  bottom edge = 1
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[3].get()) == 2);            //  right edge  = 2
+            REQUIRE(crossLists[1]->getEdgeIDSharedWithCross(crossLists[0].get()) == 3);
+            REQUIRE(crossLists[1]->getEdgeIDSharedWithCross(crossLists[2].get()) == 2);
+            REQUIRE(crossLists[2]->getEdgeIDSharedWithCross(crossLists[1].get()) == 0);
+            REQUIRE(crossLists[2]->getEdgeIDSharedWithCross(crossLists[3].get()) == 3);
+            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[2].get()) == 1);
+            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[0].get()) == 0);
         }
 
         SECTION("getEdgeIDOfGivenVertexID"){
@@ -138,13 +138,6 @@ TEST_CASE("Cross")
             REQUIRE(crossLists[1]->getCrossIDsSharedWithCross(crossLists[3].get(), shared_crossIDs) == 2);
             REQUIRE(shared_crossIDs[0] == 0);
             REQUIRE(shared_crossIDs[1] == 2);
-        }
-
-        SECTION("getEdgeIDSharedWithCross"){
-            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[1].get()) == 1);
-            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[3].get()) == 2);
-            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[0].get()) == 0);
-            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[2].get()) == NOT_FOUND);
         }
 
         crossLists[0]->atBoundary = true;

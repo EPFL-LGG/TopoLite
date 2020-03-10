@@ -280,7 +280,7 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
 
 					if(cut_vertices_cross3D != cut_boundary_cross2D.end())
 					{
-						int edgeID = ncross2D->getEdgeIDOfGivenCross(cross2D.get());
+						int edgeID = ncross2D->getEdgeIDSharedWithCross(cross2D.get());
 						cut_conner3D.push_back(cut_vertices_cross3D->second[edgeID]);
 						cut_conner2D.push_back(cut_vertices_cross2D->second[edgeID]);
 						continue;
