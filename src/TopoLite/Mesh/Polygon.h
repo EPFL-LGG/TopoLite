@@ -119,6 +119,8 @@ public:
 
     void translatePolygon(Vector3 transVec);
 
+    void translatePolygonTex(Vector2 transVec);
+
     void clear()
     {
         vers.clear();

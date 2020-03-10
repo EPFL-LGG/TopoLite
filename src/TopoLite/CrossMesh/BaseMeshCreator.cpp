@@ -63,7 +63,7 @@ void BaseMeshCreator<Scalar>::computeBaseCrossMesh(Matrix4 interactMat,
 
 	if(getVarList()->template get<bool>("smooth_bdry"))
 	{
-        computeBoundaryCross(textureMat, baseMesh2D, crossMesh);
+        //computeBoundaryCross(textureMat, baseMesh2D, crossMesh);
 		//remove dangling
 		//RemoveDanglingCross(crossMesh);
     }
@@ -230,249 +230,249 @@ void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
 }
 
 
-template <typename Scalar>
-void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
-                                                   pPolyMesh &baseMesh2D,
-                                                   pCrossMesh &crossMesh)
-{
-
-    float minimumCrossArea = getVarList()->template get<float>("minCrossArea");
-
-    // get all potential boundary cross in pattern2D
-	vector<pCross> boundary_cross2D;
-	for(size_t id = 0; id < pattern2D.lock()->size(); id++)
-	{
-        pCross cross2D = pattern2D.lock()->cross(id);
-        //if cross2D exists or it already can be mapped into 3d, continue
-	    if(cross2D == nullptr || map_cross2D_3D[cross2D->crossID] != -1) continue;
-
-		for(pVertex vertex: cross2D->vers)
-		{
-			if(map_vertex2D_3D[vertex->verID] != -1)
-			{
-                boundary_cross2D.push_back(cross2D);
-                break;
-			}
-		}
-	}
-
-	// For each boundary cross, we cut it by using the mesh boundary
-	// Here only compute the vertex position of the cut conner
-    std::unordered_map<pCross, vector<pVertex>> cut_boundary_cross2D;
-    std::unordered_map<pCross, vector<pVertex>> cut_boundary_cross3D;
-	for(pCross cross2D: boundary_cross2D)
-	{
-		vector<int> cut_conner3D, cut_conner2D;
-		for(size_t edgeID = 0; edgeID < cross2D->size(); edgeID++)
-		{
-			int ver2ID = cross2D->vers[edgeID]->verID;
-			int next_ver2ID = cross2D->vers[(edgeID + 1) % cross2D->size()]->verID;
-
-			if((map_vertex2D_3D[ver2ID] == -1) ^ (map_vertex2D_3D[next_ver2ID] == -1))
-			{
-				pCross ncross2D = cross2D->neighbors[edgeID].lock();
-
-				// check whether neighbor has computed
-				if(ncross2D != nullptr)
-				{
-					auto cut_vertices_cross3D = cut_boundary_cross3D.find(ncross2D);
-					auto cut_vertices_cross2D = cut_boundary_cross2D.find(ncross2D);
-
-					if(cut_vertices_cross3D != cut_boundary_cross2D.end())
-					{
-						int edgeID = ncross2D->getEdgeIDOfGivenCross(cross2D.get());
-						cut_conner3D.push_back(cut_vertices_cross3D->second[edgeID]);
-						cut_conner2D.push_back(cut_vertices_cross2D->second[edgeID]);
-						continue;
-					}
-				}
-
-				// need to compute
-				Vector3 sta2D, end2D;
-				if(map_vertex2D_3D[ver2ID] != -1){
-					sta2D = pattern2D.lock()->vertexList[ver2ID];
-					end2D = pattern2D.lock()->vertexList[next_ver2ID];
-				}
-				else{
-					end2D = pattern2D.lock()->vertexList[ver2ID];
-					sta2D = pattern2D.lock()->vertexList[next_ver2ID];
-				}
-
-				Vector3 pos2D, pos3D;
-                if(ComputeBoundaryVertex(textureMat, sta2D, end2D, pos2D, pos3D))
-				{
-					cut_conner3D.push_back(crossMesh->vertexList.size());
-					crossMesh->vertexList.push_back(pos3D);
-
-					cut_conner2D.push_back(baseMesh2D->vertexList.size());
-					baseMesh2D->vertexList.push_back(pos2D);
-				}
-				else {
-					cut_conner3D.push_back(-1);
-					cut_conner2D.push_back(-1);
-				}
-			}
-			else{
-				cut_conner3D.push_back(-1);
-				cut_conner2D.push_back(-1);
-			}
-		}
-		patter2D_cut_conner3D[cross2ID] = cut_conner3D;
-		patter2D_cut_conner2D[cross2ID] = cut_conner2D;
-
-    }
-
-    // compute the cut cross mesh
-	std::unordered_map<int, vector<wpCross>> pattern2D_edge_cross3D;
-	std::unordered_map<int, vector<int>> pattern2D_edge_cross3D_edgeIDs;
-	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
-	{
-		int cross2ID = half_inside_pattern2D[id];
-		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
-
-		std::unordered_map<int, bool> vertex_visited;
-		int size = cross2D->verIDs.size();
-        vector<wpCross> edge_cross3D;
-		vector<int> edge_cross3D_edgeIDs;
-		edge_cross3D.resize(size, pCross());
-		edge_cross3D_edgeIDs.resize(size, -1);
-		for(size_t jd = 0; jd < cross2D->verIDs.size(); jd++)
-		{
-			int ver2ID = cross2D->verIDs[jd];
-			int ver3ID = map_vertex2D_3D[ver2ID];
-			if(ver3ID == -1) continue;
-			if(vertex_visited[jd] == true) continue;
-
-			// iterate anti-clockwise
-			int kd = jd;
-			while(ver3ID != -1)
-			{
-				kd = (kd - 1 + size) % size;
-				ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
-			}
-
-			// insert into base2DMesh
-			pPolygon polygon = make_shared<_Polygon<Scalar>>();
-
-			// insert into Crossmesh
-			pCross cross = make_shared<Cross>(getVarList());
-			cross->atBoundary = false;
-			cross->crossID = crossMesh->crossList.size();
-
-			// iterate clockwise
-			//(1) present kd has conner or not?
-			int startID, endID;
-			int v3ID = patter2D_cut_conner3D[cross2ID][kd];
-			int v2ID = patter2D_cut_conner2D[cross2ID][kd];
-			if(v3ID != -1)
-			{
-				cross->verIDs.push_back(v3ID);
-				cross->vers.push_back(_Vertex(crossMesh->vertexList[v3ID]));
-
-				polygon->verIDs.push_back(v2ID);
-				polygon->vers.push_back(_Vertex(baseMesh2D->vertexList[v2ID]));
-
-				startID = kd;
-			}
-			else {
-				startID = (kd + 1) % size;
-			}
-
-			//(2) include the vertex already in the texture
-			kd = (kd + 1) % size;
-			ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
-			while(ver3ID != -1)
-			{
-				vertex_visited[kd] = true;
-				cross->verIDs.push_back(ver3ID);
-				cross->vers.push_back(_Vertex(crossMesh->vertexList[ver3ID]));
-
-				polygon->verIDs.push_back(-1);
-				polygon->vers.push_back(_Vertex(cross2D->vers[kd].pos));
-
-				kd = (kd + 1) % size;
-				ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
-			}
-
-			//(3) kd - 1 has a conner or not
-			kd = (kd - 1 + size) % size;
-			v3ID = patter2D_cut_conner3D[cross2ID][kd];
-			v2ID = patter2D_cut_conner2D[cross2ID][kd];
-			if(v3ID != -1)
-			{
-				cross->verIDs.push_back(v3ID);
-				cross->vers.push_back(_Vertex(crossMesh->vertexList[v3ID]));
-
-				polygon->verIDs.push_back(v2ID);
-				polygon->vers.push_back(_Vertex(baseMesh2D->vertexList[v2ID]));
-
-				endID = kd;
-			}
-			else {
-				endID = (kd - 1 + size) % size;
-			}
-
-			cross->ComputeCenter();
-			cross->ComputeNormal();
-			float area = cross->ComputeArea();
-			if(cross->vers.size() >= 3 && area >= minimumCrossArea)
-			{
-				cross->neighbors.resize(cross->vers.size(), pCross());
-				crossMesh->crossList.push_back(cross);
-				baseMesh2D->polyList.push_back(polygon);
-				kd = startID;
-				int it = 0;
-				do
-				{
-					edge_cross3D[kd] = cross;
-					edge_cross3D_edgeIDs[kd] = it ++;
-					kd = (kd + 1) % size;
-				}while(kd != (endID + 1) % size);
-			}
-		}
-
-		pattern2D_edge_cross3D[cross2ID] = edge_cross3D;
-		pattern2D_edge_cross3D_edgeIDs[cross2ID] = edge_cross3D_edgeIDs;
-	}
-
-	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
-	{
-		int cross2ID = half_inside_pattern2D[id];
-		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
-		for(size_t jd = 0; jd < cross2D->neighbors.size(); jd++)
-		{
-			pCross ncross2D = cross2D->neighbors[jd].lock();
-			pCross cross3D = pattern2D_edge_cross3D[cross2ID][jd].lock();
-			if(!ncross2D || !cross3D) continue;
-
-			int ncross2ID = ncross2D->crossID;
-			int edgeID = ncross2D->GetNeighborEdgeID(cross2ID);
-
-			int ncross3ID = map_cross2D_3D[ncross2ID];
-
-			// neighbor is a inside polygon
-			if(ncross3ID != -1)
-			{
-				pCross ncross3D = crossMesh->crossList[ncross3ID];
-				ncross3D->neighbors[edgeID] = cross3D;
-				cross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[cross2ID][jd]] = ncross3D;
-			}
-
-
-			// neighbor is a new created polygon
-			auto find_it = pattern2D_edge_cross3D.find(ncross2ID);
-			if(ncross3ID == -1 && find_it != pattern2D_edge_cross3D.end())
-			{
-				pCross ncross3D = find_it->second[edgeID].lock();
-				if(ncross3D != nullptr){
-					ncross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[ncross2ID][edgeID]] = cross3D;
-					cross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[cross2ID][jd]] = ncross3D;
-				}
-			}
-
-		}
-	}
-}
+//template <typename Scalar>
+//void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
+//                                                   pPolyMesh &baseMesh2D,
+//                                                   pCrossMesh &crossMesh)
+//{
+//
+//    float minimumCrossArea = getVarList()->template get<float>("minCrossArea");
+//
+//    // get all potential boundary cross in pattern2D
+//	vector<pCross> boundary_cross2D;
+//	for(size_t id = 0; id < pattern2D.lock()->size(); id++)
+//	{
+//        pCross cross2D = pattern2D.lock()->cross(id);
+//        //if cross2D exists or it already can be mapped into 3d, continue
+//	    if(cross2D == nullptr || map_cross2D_3D[cross2D->crossID] != -1) continue;
+//
+//		for(pVertex vertex: cross2D->vers)
+//		{
+//			if(map_vertex2D_3D[vertex->verID] != -1)
+//			{
+//                boundary_cross2D.push_back(cross2D);
+//                break;
+//			}
+//		}
+//	}
+//
+//	// For each boundary cross, we cut it by using the mesh boundary
+//	// Here only compute the vertex position of the cut conner
+//    std::unordered_map<pCross, vector<pVertex>> cut_boundary_cross2D;
+//    std::unordered_map<pCross, vector<pVertex>> cut_boundary_cross3D;
+//	for(pCross cross2D: boundary_cross2D)
+//	{
+//		vector<int> cut_conner3D, cut_conner2D;
+//		for(size_t edgeID = 0; edgeID < cross2D->size(); edgeID++)
+//		{
+//			int ver2ID = cross2D->vers[edgeID]->verID;
+//			int next_ver2ID = cross2D->vers[(edgeID + 1) % cross2D->size()]->verID;
+//
+//			if((map_vertex2D_3D[ver2ID] == -1) ^ (map_vertex2D_3D[next_ver2ID] == -1))
+//			{
+//				pCross ncross2D = cross2D->neighbors[edgeID].lock();
+//
+//				// check whether neighbor has computed
+//				if(ncross2D != nullptr)
+//				{
+//					auto cut_vertices_cross3D = cut_boundary_cross3D.find(ncross2D);
+//					auto cut_vertices_cross2D = cut_boundary_cross2D.find(ncross2D);
+//
+//					if(cut_vertices_cross3D != cut_boundary_cross2D.end())
+//					{
+//						int edgeID = ncross2D->getEdgeIDOfGivenCross(cross2D.get());
+//						cut_conner3D.push_back(cut_vertices_cross3D->second[edgeID]);
+//						cut_conner2D.push_back(cut_vertices_cross2D->second[edgeID]);
+//						continue;
+//					}
+//				}
+//
+//				// need to compute
+//				Vector3 sta2D, end2D;
+//				if(map_vertex2D_3D[ver2ID] != -1){
+//					sta2D = pattern2D.lock()->vertexList[ver2ID];
+//					end2D = pattern2D.lock()->vertexList[next_ver2ID];
+//				}
+//				else{
+//					end2D = pattern2D.lock()->vertexList[ver2ID];
+//					sta2D = pattern2D.lock()->vertexList[next_ver2ID];
+//				}
+//
+//				Vector3 pos2D, pos3D;
+//                if(ComputeBoundaryVertex(textureMat, sta2D, end2D, pos2D, pos3D))
+//				{
+//					cut_conner3D.push_back(crossMesh->vertexList.size());
+//					crossMesh->vertexList.push_back(pos3D);
+//
+//					cut_conner2D.push_back(baseMesh2D->vertexList.size());
+//					baseMesh2D->vertexList.push_back(pos2D);
+//				}
+//				else {
+//					cut_conner3D.push_back(-1);
+//					cut_conner2D.push_back(-1);
+//				}
+//			}
+//			else{
+//				cut_conner3D.push_back(-1);
+//				cut_conner2D.push_back(-1);
+//			}
+//		}
+//		patter2D_cut_conner3D[cross2ID] = cut_conner3D;
+//		patter2D_cut_conner2D[cross2ID] = cut_conner2D;
+//
+//    }
+//
+//    // compute the cut cross mesh
+//	std::unordered_map<int, vector<wpCross>> pattern2D_edge_cross3D;
+//	std::unordered_map<int, vector<int>> pattern2D_edge_cross3D_edgeIDs;
+//	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
+//	{
+//		int cross2ID = half_inside_pattern2D[id];
+//		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
+//
+//		std::unordered_map<int, bool> vertex_visited;
+//		int size = cross2D->verIDs.size();
+//        vector<wpCross> edge_cross3D;
+//		vector<int> edge_cross3D_edgeIDs;
+//		edge_cross3D.resize(size, pCross());
+//		edge_cross3D_edgeIDs.resize(size, -1);
+//		for(size_t jd = 0; jd < cross2D->verIDs.size(); jd++)
+//		{
+//			int ver2ID = cross2D->verIDs[jd];
+//			int ver3ID = map_vertex2D_3D[ver2ID];
+//			if(ver3ID == -1) continue;
+//			if(vertex_visited[jd] == true) continue;
+//
+//			// iterate anti-clockwise
+//			int kd = jd;
+//			while(ver3ID != -1)
+//			{
+//				kd = (kd - 1 + size) % size;
+//				ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
+//			}
+//
+//			// insert into base2DMesh
+//			pPolygon polygon = make_shared<_Polygon<Scalar>>();
+//
+//			// insert into Crossmesh
+//			pCross cross = make_shared<Cross>(getVarList());
+//			cross->atBoundary = false;
+//			cross->crossID = crossMesh->crossList.size();
+//
+//			// iterate clockwise
+//			//(1) present kd has conner or not?
+//			int startID, endID;
+//			int v3ID = patter2D_cut_conner3D[cross2ID][kd];
+//			int v2ID = patter2D_cut_conner2D[cross2ID][kd];
+//			if(v3ID != -1)
+//			{
+//				cross->verIDs.push_back(v3ID);
+//				cross->vers.push_back(_Vertex(crossMesh->vertexList[v3ID]));
+//
+//				polygon->verIDs.push_back(v2ID);
+//				polygon->vers.push_back(_Vertex(baseMesh2D->vertexList[v2ID]));
+//
+//				startID = kd;
+//			}
+//			else {
+//				startID = (kd + 1) % size;
+//			}
+//
+//			//(2) include the vertex already in the texture
+//			kd = (kd + 1) % size;
+//			ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
+//			while(ver3ID != -1)
+//			{
+//				vertex_visited[kd] = true;
+//				cross->verIDs.push_back(ver3ID);
+//				cross->vers.push_back(_Vertex(crossMesh->vertexList[ver3ID]));
+//
+//				polygon->verIDs.push_back(-1);
+//				polygon->vers.push_back(_Vertex(cross2D->vers[kd].pos));
+//
+//				kd = (kd + 1) % size;
+//				ver3ID = map_vertex2D_3D[cross2D->verIDs[kd]];
+//			}
+//
+//			//(3) kd - 1 has a conner or not
+//			kd = (kd - 1 + size) % size;
+//			v3ID = patter2D_cut_conner3D[cross2ID][kd];
+//			v2ID = patter2D_cut_conner2D[cross2ID][kd];
+//			if(v3ID != -1)
+//			{
+//				cross->verIDs.push_back(v3ID);
+//				cross->vers.push_back(_Vertex(crossMesh->vertexList[v3ID]));
+//
+//				polygon->verIDs.push_back(v2ID);
+//				polygon->vers.push_back(_Vertex(baseMesh2D->vertexList[v2ID]));
+//
+//				endID = kd;
+//			}
+//			else {
+//				endID = (kd - 1 + size) % size;
+//			}
+//
+//			cross->ComputeCenter();
+//			cross->ComputeNormal();
+//			float area = cross->ComputeArea();
+//			if(cross->vers.size() >= 3 && area >= minimumCrossArea)
+//			{
+//				cross->neighbors.resize(cross->vers.size(), pCross());
+//				crossMesh->crossList.push_back(cross);
+//				baseMesh2D->polyList.push_back(polygon);
+//				kd = startID;
+//				int it = 0;
+//				do
+//				{
+//					edge_cross3D[kd] = cross;
+//					edge_cross3D_edgeIDs[kd] = it ++;
+//					kd = (kd + 1) % size;
+//				}while(kd != (endID + 1) % size);
+//			}
+//		}
+//
+//		pattern2D_edge_cross3D[cross2ID] = edge_cross3D;
+//		pattern2D_edge_cross3D_edgeIDs[cross2ID] = edge_cross3D_edgeIDs;
+//	}
+//
+//	for(size_t id = 0; id < half_inside_pattern2D.size(); id++)
+//	{
+//		int cross2ID = half_inside_pattern2D[id];
+//		pCross cross2D = pattern2D.lock()->crossList[cross2ID];
+//		for(size_t jd = 0; jd < cross2D->neighbors.size(); jd++)
+//		{
+//			pCross ncross2D = cross2D->neighbors[jd].lock();
+//			pCross cross3D = pattern2D_edge_cross3D[cross2ID][jd].lock();
+//			if(!ncross2D || !cross3D) continue;
+//
+//			int ncross2ID = ncross2D->crossID;
+//			int edgeID = ncross2D->GetNeighborEdgeID(cross2ID);
+//
+//			int ncross3ID = map_cross2D_3D[ncross2ID];
+//
+//			// neighbor is a inside polygon
+//			if(ncross3ID != -1)
+//			{
+//				pCross ncross3D = crossMesh->crossList[ncross3ID];
+//				ncross3D->neighbors[edgeID] = cross3D;
+//				cross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[cross2ID][jd]] = ncross3D;
+//			}
+//
+//
+//			// neighbor is a new created polygon
+//			auto find_it = pattern2D_edge_cross3D.find(ncross2ID);
+//			if(ncross3ID == -1 && find_it != pattern2D_edge_cross3D.end())
+//			{
+//				pCross ncross3D = find_it->second[edgeID].lock();
+//				if(ncross3D != nullptr){
+//					ncross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[ncross2ID][edgeID]] = cross3D;
+//					cross3D->neighbors[pattern2D_edge_cross3D_edgeIDs[cross2ID][jd]] = ncross3D;
+//				}
+//			}
+//
+//		}
+//	}
+//}
 
 template <typename Scalar>
 Matrix<Scalar, 2, 1> BaseMeshCreator<Scalar>::getTextureCoord(Vector2 point, Matrix4 textureMat)

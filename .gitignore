@@ -2,7 +2,8 @@
 
 cmake_build_debug/
 cmake-build-debug/
-
+Cmake-build-debug-cmake316/
+Cmake-build-release-cmake316/
 \.idea/
 \build
 \cmake-build-release
