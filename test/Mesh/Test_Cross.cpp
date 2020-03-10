@@ -43,6 +43,7 @@ TEST_CASE("Cross")
             REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 30.0);
             REQUIRE(cross.ori(id)->tiltSign == (id % 2 == 0?1 :-1));
         }
+
         // Check that normal rotated (and in that pi/6 rotation is above/below each of its respective point)
 
         REQUIRE(Approx((cross.ori(0)->normal - Vector3d( 0.75,  sqrt(3.0)/4.0, -0.5)).norm()).margin(1e-10) == 0.0);
@@ -50,29 +51,31 @@ TEST_CASE("Cross")
         REQUIRE(Approx((cross.ori(2)->normal - Vector3d(-0.75,  sqrt(3.0)/4.0, -0.5)).norm()).margin(1e-10) == 0.0);
         REQUIRE(Approx((cross.ori(3)->normal - Vector3d(-0.75, -sqrt(3.0)/4.0,  0.5)).norm()).margin(1e-10) == 0.0);
 
-        // updateTiltNormals - Tilt +30 deg - Back to initial state
+        // Back to initial state
 
-        cross.updateTiltNormalsRoot(tilt_angle);
-//        for(int id = 0; id < N; id++){
-//            Vector3d mid = (cross.pos(id) + cross.pos(id + 1)) / 2;
-//            REQUIRE(Approx(mid.cross(cross.ori(id)->normal).norm()).margin(1e-10) == 0.0);
-//            REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 0.0);
-//            REQUIRE(Approx((cross.ori(id)->normal - cross_initial_state.ori(id)->normal).norm()).margin(1e-10) == 0.0);
-//        }
+        cross.initTiltNormals();
+        for(int id = 0; id < N; id++){
+            Vector3d mid = (cross.pos(id) + cross.pos(id + 1)) / 2;
+            REQUIRE(Approx(mid.cross(cross.ori(id)->normal).norm()).margin(1e-10) == 0.0);
+            REQUIRE(Approx(cross.ori(id)->rotation_angle).margin(1e-10) == 0.0);
+            REQUIRE(Approx((cross.ori(id)->normal - cross_initial_state.ori(id)->normal).norm()).margin(1e-10) == 0.0);
+        }
     }
 
     SECTION("Four Quad"){
         vector<shared_ptr<Cross<double>>> crossLists;
 
-        int dXY[4][2] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};
-        int verIDs[4][4] = {{0, 1, 2, 3},
-                            {1, 4, 5, 2},
-                            {2, 5, 6, 7},
-                            {3, 2, 7, 8}};
+        int dXY[4][2] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};   // 0---3---8
+        int verIDs[4][4] = {{0, 1, 2, 3},                   // | 0 | 3 |
+                            {1, 4, 5, 2},                   // 1---2---7
+                            {2, 5, 6, 7},                   // | 1 | 2 |
+                            {3, 2, 7, 8}};                  // 4---5---6
+
 
         for(int id = 0; id < 4; id++)
         {
             shared_ptr<Cross<double>> cross = make_shared<Cross<double>>(Cross<double>(varList));
+            // vertices position vectors
             cross->push_back(Vector3d(0 + dXY[id][0], 0 + dXY[id][1], 0));
             cross->push_back(Vector3d(1 + dXY[id][0], 0 + dXY[id][1], 0));
             cross->push_back(Vector3d(1 + dXY[id][0], 1 + dXY[id][1], 0));
@@ -96,38 +99,45 @@ TEST_CASE("Cross")
         crossLists[3]->neighbors[1] = crossLists[2];
         crossLists[3]->neighbors[0] = crossLists[0];
 
-        SECTION("getEdgeIDOfGivenCross")
+        SECTION("getEdgeIDSharedWithCross")
         {
-            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[2].get()) == NONE_ELEMENT);
-            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[1].get()) == 1);
-            REQUIRE(crossLists[0]->getEdgeIDOfGivenCross(crossLists[3].get()) == 2);
-            REQUIRE(crossLists[1]->getEdgeIDOfGivenCross(crossLists[0].get()) == 3);
-            REQUIRE(crossLists[1]->getEdgeIDOfGivenCross(crossLists[2].get()) == 2);
-            REQUIRE(crossLists[2]->getEdgeIDOfGivenCross(crossLists[1].get()) == 0);
-            REQUIRE(crossLists[2]->getEdgeIDOfGivenCross(crossLists[3].get()) == 3);
-            REQUIRE(crossLists[3]->getEdgeIDOfGivenCross(crossLists[2].get()) == 1);
-            REQUIRE(crossLists[3]->getEdgeIDOfGivenCross(crossLists[0].get()) == 0);
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[2].get()) == NOT_FOUND);    //  top edge    = 3
+            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[1].get()) == NOT_FOUND);    //  left edge   = 0
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[1].get()) == 1);            //  bottom edge = 1
+            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[3].get()) == 2);            //  right edge  = 2
+            REQUIRE(crossLists[1]->getEdgeIDSharedWithCross(crossLists[0].get()) == 3);
+            REQUIRE(crossLists[1]->getEdgeIDSharedWithCross(crossLists[2].get()) == 2);
+            REQUIRE(crossLists[2]->getEdgeIDSharedWithCross(crossLists[1].get()) == 0);
+            REQUIRE(crossLists[2]->getEdgeIDSharedWithCross(crossLists[3].get()) == 3);
+            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[2].get()) == 1);
+            REQUIRE(crossLists[3]->getEdgeIDSharedWithCross(crossLists[0].get()) == 0);
         }
 
         SECTION("getEdgeIDOfGivenVertexID"){
             REQUIRE(crossLists[1]->getEdgeIDOfGivenVertexID(4) == 1);
+            REQUIRE(crossLists[0]->getEdgeIDOfGivenVertexID(3) == 3);
+            REQUIRE(crossLists[3]->getEdgeIDOfGivenVertexID(3) == 0);
+            REQUIRE(crossLists[0]->getEdgeIDOfGivenVertexID(0) == 0);
+            // ensure that NOT_FOUND and -1 are equivalent
+            REQUIRE(crossLists[0]->getEdgeIDOfGivenVertexID(6) == NOT_FOUND);
+            REQUIRE(crossLists[0]->getEdgeIDOfGivenVertexID(6) == -1);
         }
 
         SECTION("getPrevEdgeID"){
             REQUIRE(crossLists[1]->getPrevEdgeID(0) == 3);
+            REQUIRE(crossLists[0]->getPrevEdgeID(0) == 3);
+            REQUIRE(crossLists[0]->getPrevEdgeID(1) == 0);
         }
 
         SECTION("getCrossIDSharedWithCross"){
             vector<int> shared_crossIDs;
-            REQUIRE(crossLists[0]->getCrossIDsSharedWithCross(crossLists[1].get(), shared_crossIDs) == NONE_ELEMENT);
+            REQUIRE(crossLists[0]->getCrossIDsSharedWithCross(crossLists[1].get(), shared_crossIDs) == NOT_FOUND);
             REQUIRE(crossLists[0]->getCrossIDsSharedWithCross(crossLists[2].get(), shared_crossIDs) == 2);
             REQUIRE(shared_crossIDs[0] == 1);
             REQUIRE(shared_crossIDs[1] == 3);
-        }
-
-        SECTION("getEdgeIDSharedWithCross"){
-            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[1].get()) == 1);
-            REQUIRE(crossLists[0]->getEdgeIDSharedWithCross(crossLists[2].get()) == NONE_ELEMENT);
+            REQUIRE(crossLists[1]->getCrossIDsSharedWithCross(crossLists[3].get(), shared_crossIDs) == 2);
+            REQUIRE(shared_crossIDs[0] == 0);
+            REQUIRE(shared_crossIDs[1] == 2);
         }
 
         crossLists[0]->atBoundary = true;

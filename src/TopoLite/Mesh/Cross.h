@@ -122,13 +122,11 @@ public:
     /*!
      * \brief: found the EdgeID (order in oriPoints) which correspond crossID is currCrossID
      */
-	int getEdgeIDOfGivenCross(const Cross<Scalar>* ncross);
+	int getEdgeIDSharedWithCross(const Cross<Scalar>* ncross);
 
 	int getEdgeIDOfGivenVertexID(int vertexID);
 
 	int getCrossIDsSharedWithCross(const Cross<Scalar>* ncross, vector<int> &shared_crossIDs);
-
-	int getEdgeIDSharedWithCross(const Cross<Scalar>* ncross);
 
 	int getPrevEdgeID(int edgeID);
 

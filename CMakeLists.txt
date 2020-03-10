@@ -18,12 +18,14 @@ endif()
 
 # set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
-# MacOS uses CLANG/LLVM -- Linux uses GCC - Compiler flags are slightly different
+# Handles GCC and CLANG - Note that GCC on macOS is actually CLANG
 
-if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+    message("Compiling ${CMAKE_CXX_COMPILER_ID}")
     set(CMAKE_CXX_FLAGS_DEBUG "-g -stdlib=libc++")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -stdlib=libc++")
-else()
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+    message("Compiling with ${CMAKE_CXX_COMPILER_ID} GCC")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
@@ -85,7 +87,7 @@ set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
 include(CTest)
 include(ParseAndAddCatchTests)
 
-file(GLOB testTopoFiles test/Mesh/Test_PolyMesh_AABBTree.cpp)
+file(GLOB testTopoFiles test/Mesh/*.cpp)
 #file(GLOB testTopoFiles test/CrossMesh/*.cpp
 #                        test/IO/*.cpp
 #                        test/Utility/*.cpp
