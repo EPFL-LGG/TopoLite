@@ -781,6 +781,26 @@ void PolyMesh<Scalar>::convertTexToEigenMesh(PolyMesh::MatrixX &V, PolyMesh::Mat
 
 }
 
+template<typename Scalar>
+void PolyMesh<Scalar>::convertPosTexToEigenMesh(MatrixX &V, MatrixX &T, MatrixXi &F)
+{
+    Eigen::VectorXi C;
+    convertPosToEigenMesh(V, F, C);
+    T = MatrixX::Zero(V.rows(), 2);
+    if(polyList.empty()) return;
+
+    //update T
+    for(pPolygon poly: polyList)
+    {
+        if(poly->vers.size() <= 2) return;
+        for(int id = 0; id < poly->texs.size(); id++)
+        {
+            int verID = poly->vers[id]->verID;
+            T.row(verID) = poly->texs[id]->texCoord;
+        }
+    }
+}
+
 
 template<typename Scalar>
 shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh() const

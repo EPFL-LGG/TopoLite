@@ -82,23 +82,23 @@ TEST_CASE("AABBTree_Line"){
         vector<shared_ptr<_Polygon<double>>> polyLists;
         polyLists.push_back(poly);
         polyMesh->setPolyLists(polyLists);
-        AABBTree_Line<double>::MatrixX V;
+        AABBTree_Line<double>::MatrixX V, T;
         AABBTree_Line<double>::MatrixXi F;
 
-        Eigen::VectorXi C;
-        polyMesh->convertTexToEigenMesh(V, F, C);
-        aabb_line.init(V, F);
+        polyMesh->convertPosTexToEigenMesh(V, T, F);
+        aabb_line.init(V, T, F);
         Line<double> line;
         line.point1 = Vector3d(0.5, 0.5, 0);
         line.point2 = Vector3d(-1, -1, 0);
         Vector2d tex;
-        aabb_line.findIntersec(line, tex);
+        Vector3d pos;
+        aabb_line.findIntersec(line, tex, pos);
         REQUIRE(tex.x() == Approx(0.0));
         REQUIRE(tex.y() == Approx(0.0));
 
         line.point1 = Vector3d(0.8, 0.8, 0);
         line.point2 = Vector3d(0.7, 0.7, 0);
-        aabb_line.findIntersec(line, tex);
+        aabb_line.findIntersec(line, tex, pos);
         REQUIRE(tex.x() == Approx(0.0));
         REQUIRE(tex.y() == Approx(0.0));
 
@@ -121,37 +121,38 @@ TEST_CASE("AABBTree_Line"){
                 }
 
                 shared_ptr<_Polygon<double>> poly = make_shared<_Polygon<double>>(*base);
+                poly->translatePolygon(Vector3d(id, jd, 0));
                 poly->translatePolygonTex(Vector2d(id, jd));
                 polyLists.push_back(poly);
             }
         }
 
         polyMesh->setPolyLists(polyLists);
-        AABBTree_Line<double>::MatrixX V;
+        polyMesh->update();
+        AABBTree_Line<double>::MatrixX V, T;
         AABBTree_Line<double>::MatrixXi F;
 
-        Eigen::VectorXi C;
-        polyMesh->convertTexToEigenMesh(V, F, C);
-        aabb_line.init(V, F);
-
+        polyMesh->convertPosTexToEigenMesh(V, T, F);
+        aabb_line.init(V, T, F);
 
         Line<double> line;
         line.point1 = Vector3d(1.5, 0.5, 0);
         line.point2 = Vector3d(1.5, 3, 0);
         Vector2d tex;
-        aabb_line.findIntersec(line, tex);
+        Vector3d pos;
+        aabb_line.findIntersec(line, tex, pos);
         REQUIRE(tex.x() == Approx(1.5));
         REQUIRE(tex.y() == Approx(1));
 
         line.point1 = Vector3d(1.5, 1.5, 0);
         line.point2 = Vector3d(1.5, 3, 0);
-        aabb_line.findIntersec(line, tex);
+        aabb_line.findIntersec(line, tex, pos);
         REQUIRE(tex.x() == Approx(1.5));
         REQUIRE(tex.y() == Approx(2));
 
         line.point1 = Vector3d(1.5, 2.5, 0);
         line.point2 = Vector3d(1.5, 3, 0);
-        aabb_line.findIntersec(line, tex);
+        aabb_line.findIntersec(line, tex, pos);
         REQUIRE(tex.x() == Approx(1.5));
         REQUIRE(tex.y() == Approx(3));
     }

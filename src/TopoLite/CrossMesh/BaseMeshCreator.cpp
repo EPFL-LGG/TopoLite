@@ -268,14 +268,11 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
                     //sta3d insde, end_ver3D outside
                     //find intersection with the boundary
                     Line<Scalar> line(sta_pos2D, end_pos2D);
-                    Vector2 dirct = -(end_pos2D - sta_pos2D) / 100;
-                    //Vector2 dirct(0, 0);
                     Vector2 brdy2D; Vector3 brdy3D;
 
                     //has intersection with boundary
                     //and have correspond position on the surface
-                    if(polyMesh.lock()->findTexIntersec(line, brdy2D)
-                       && mapTexPointBackToSurface(brdy2D + dirct, brdy3D))
+                    if(polyMesh.lock()->findBoundaryIntersec(line, brdy2D, brdy3D))
                     {
                         lines3D.push_back(Line<Scalar>(sta_ver3D->pos, brdy3D));
                         lines2D.push_back(Line<Scalar>(sta_pos2D, brdy2D));
@@ -297,14 +294,11 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
                     //sta3d outside, end_ver3D inside
                     //find intersection with the boundary
                     Line<Scalar> line(end_pos2D, sta_pos2D);
-                    Vector2 dirct = -(sta_pos2D - end_pos2D) / 100;
-                    //Vector2 dirct(0, 0);
                     Vector2 brdy2D; Vector3 brdy3D;
 
                     //has intersection with boundary
                     //and have correspond position on the surface
-                    if(polyMesh.lock()->findTexIntersec(line, brdy2D)
-                       && mapTexPointBackToSurface(brdy2D + dirct, brdy3D))
+                    if(polyMesh.lock()->findBoundaryIntersec(line, brdy2D, brdy3D))
                     {
                         lines2D.push_back(Line<Scalar>());
                         lines3D.push_back(Line<Scalar>());

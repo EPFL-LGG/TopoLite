@@ -166,6 +166,8 @@ public:
 
     void convertTexToEigenMesh(MatrixX &V, MatrixXi &F, Eigen::VectorXi &C);
 
+    void convertPosTexToEigenMesh(MatrixX &V, MatrixX &T, MatrixXi &F);
+
     // Auxiliary Data Computation
     Box<Scalar> bbox() const;
 

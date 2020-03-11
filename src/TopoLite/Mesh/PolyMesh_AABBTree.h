@@ -25,7 +25,8 @@ public:
 public:
     struct Node{
         Box<Scalar> box;
-        Line<Scalar> line;
+        Line<Scalar> line2D; //2D texCoords
+        Line<Scalar> line3D; //3D vertices
         weak_ptr<Node> children[2];
     };
 
@@ -33,7 +34,7 @@ public:
     vector<weak_ptr<Node>> roots;
 public:
 
-    void init(MatrixX V, MatrixXi F)
+    void init(MatrixX V, MatrixX T, MatrixXi F)
     {
         vector<vector<int>> loops;
         igl::boundary_loop(F, loops);
@@ -44,12 +45,23 @@ public:
             vector<shared_ptr<Node>> loop_nodes;
             for(int id = 0; id < loop.size(); id++)
             {
-                Vector2 staPt = V.row(loop[id]);
-                Vector2 endPt = V.row(loop[(id + 1) % loop.size()]);
+                //create node
                 shared_ptr<Node> node = make_shared<Node>();
-                node->line.point1 = Vector3(staPt.x(), staPt.y(), 0);
-                node->line.point2 = Vector3(endPt.x(), endPt.y(), 0);
-                node->box = Box<double>(node->line);
+
+                //tex 2D
+                Vector2 staPt2D = T.row(loop[id]);
+                Vector2 endPt2D = T.row(loop[(id + 1) % loop.size()]);
+                node->line2D = Line<Scalar>(staPt2D, endPt2D);
+
+                //pos 3D
+                Vector3 staPt3D = V.row(loop[id]);
+                Vector3 endPt3D = V.row(loop[(id + 1) % loop.size()]);
+                node->line3D = Line<Scalar>(staPt3D, endPt3D);
+
+                //box
+                node->box = Box<double>(node->line2D);
+
+                //add to the loops
                 loop_nodes.push_back(node);
             }
 
@@ -87,17 +99,19 @@ public:
         }
     }
 
-    bool findIntersec(const Line<Scalar> &line, Vector2 &texCoord)
+    bool findIntersec(const Line<Scalar> &line, Vector2 &tex2D, Vector3& pos3D)
     {
         Scalar minDist = -1;
         for(int id = 0; id < roots.size(); id++)
         {
-            Vector2 tex;
-            if(findIntersec(line, tex, roots[id].lock()))
+            Vector2 tmp_tex;
+            Vector3 tmp_pos;
+            if(findIntersec(line, tmp_tex, tmp_pos, roots[id].lock()))
             {
-                Scalar dist = (line.point1.head(2) - tex).norm();
+                Scalar dist = (line.point1.head(2) - tmp_tex).norm();
                 if(minDist == -1 || minDist > dist){
-                    texCoord = tex;
+                    tex2D = tmp_tex;
+                    pos3D = tmp_pos;
                     minDist = dist;
                 }
             }
@@ -111,7 +125,7 @@ public:
         }
     }
 
-    bool findIntersec(const Line<Scalar> &line, Vector2 &pt, shared_ptr<Node> node)
+    bool findIntersec(const Line<Scalar> &line, Vector2 &tex2D, Vector3& pos3D, shared_ptr<Node> node)
     {
         //empty node
         if(node == nullptr){
@@ -122,7 +136,15 @@ public:
         if(node->children[0].lock() == nullptr
            && node->children[1].lock() == nullptr)
         {
-            return checkLineLineIntersec(node->line, line, pt);
+            if(checkLineLineIntersec(node->line2D, line, tex2D))
+            {
+                Scalar ratio = (tex2D - node->line2D.point1.head(2)).norm() / (node->line2D.point2 - node->line2D.point1).norm();
+                pos3D = node->line3D.point1 + ratio * (node->line3D.point2 - node->line3D.point1);
+                return true;
+            }
+            else{
+                return false;
+            }
         }
 
         //not leaves
@@ -135,13 +157,15 @@ public:
             //no intersection with box, continue
             if(checkLineBoxIntersec(line, node->children[id].lock()->box) == false) continue;
 
-            Vector2 intersec;
-            if(findIntersec(line, intersec, node->children[id].lock())){
-                Scalar dist = (line.point1.head(2) - intersec).norm();
+            Vector2 int_tex2D;
+            Vector3 int_pos3D;
+            if(findIntersec(line, int_tex2D, int_pos3D, node->children[id].lock())){
+                Scalar dist = (line.point1.head(2) - int_tex2D).norm();
                 if(minDist == -1 || minDist > dist)
                 {
                     minDist = dist;
-                    pt = intersec;
+                    tex2D = int_tex2D;
+                    pos3D = int_pos3D;
                 }
             }
         }
@@ -256,7 +280,11 @@ public:
     {
         PolyMesh<Scalar>::convertTexToEigenMesh(tV, tF, tC);
         texTree.init(tV, tF);
-        lineTree.init(tV, tF);
+
+        MatrixX V, T;
+        MatrixXi F;
+        PolyMesh<Scalar>::convertPosTexToEigenMesh(V, T, F);
+        lineTree.init(V, T, F);
     }
 
     void buildPosTree(){
@@ -276,8 +304,8 @@ public:
         return nullptr;
     }
 
-    bool findTexIntersec(const Line<Scalar> &line, Vector2 &texCoord){
-        return lineTree.findIntersec(line, texCoord);
+    bool findBoundaryIntersec(const Line<Scalar> &line, Vector2 &tex2D, Vector3 &pos3D){
+        return lineTree.findIntersec(line, tex2D, pos3D);
     }
 
     Vector3d findMeshNearestPoint(Vector3 pt);
