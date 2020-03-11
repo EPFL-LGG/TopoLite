@@ -86,7 +86,7 @@ void CrossMesh<Scalar>::setPolyMesh(const PolyMesh<Scalar> &polyMesh)
 
 template<typename Scalar>
 void CrossMesh<Scalar>::update(){
-    PolyMesh<Scalar>::computeTexList();
+    PolyMesh<Scalar>::computeTextureList();
     PolyMesh<Scalar>::removeDuplicatedVertices();
     createConnectivity();
 }

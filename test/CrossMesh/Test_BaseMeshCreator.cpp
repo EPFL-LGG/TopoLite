@@ -45,7 +45,7 @@ TEST_CASE("BaseMeshCreator")
         // create pattern
         PatternCreator<double> patternCreator(varList);
         //patternCreator.create2DPattern(CROSS_HEXAGON, data.varList->get<int>("patternRadius"), _pattern2D);
-        patternCreator.create2DPattern(CROSS_HEXAGON, 10, _pattern2D);
+        patternCreator.create2DPattern(CROSS_HEXAGON, 30, _pattern2D);
 
         //build baseMeshCreator
         BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D);

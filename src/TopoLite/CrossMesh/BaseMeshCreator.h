@@ -133,7 +133,7 @@ public:
 	 */
 	bool mapTexPointBackToSurface(Vector2 ptTexCoord, Vector3 &ptSurfCoord);
 
-	vector<pPolygon> splitIntoConsecutivePolygons(const vector<Line<Scalar>> &line, const vector<bool>& inside);
+	void splitIntoConsecutivePolygons(const vector<Line<Scalar>> &line, const vector<bool>& inside, tbb::concurrent_vector<pPolygon> &polyList);
 
 
 //

@@ -246,7 +246,7 @@ public:
     {
         PolyMesh<Scalar>::polyList = _mesh.polyList;
         PolyMesh<Scalar>::vertexList = _mesh.vertexList;
-        PolyMesh<Scalar>::texList = _mesh.texList;
+        PolyMesh<Scalar>::textureList = _mesh.textureList;
         PolyMesh<Scalar>::texturedModel = _mesh.texturedModel;
     }
 
