@@ -67,7 +67,6 @@ void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
 template <typename Scalar>
 size_t _Polygon<Scalar>::push_back(Vector3 pt)
 {
-
     pVertex vertex = make_shared<VPoint<Scalar>>(pt);
     vers.push_back(vertex);
     return vers.size();

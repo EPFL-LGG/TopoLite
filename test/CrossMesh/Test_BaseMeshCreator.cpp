@@ -22,6 +22,7 @@ TEST_CASE("BaseMeshCreator")
     std::shared_ptr<CrossMesh<double>> _pattern2D;
 
     XMLIO IO;
+    filesystem::create_directory("Pattern");
 
     SECTION("origin.xml")
     {
@@ -44,7 +45,7 @@ TEST_CASE("BaseMeshCreator")
         // create pattern
         PatternCreator<double> patternCreator(varList);
         //patternCreator.create2DPattern(CROSS_HEXAGON, data.varList->get<int>("patternRadius"), _pattern2D);
-        patternCreator.create2DPattern(CROSS_HEXAGON, 50, _pattern2D);
+        patternCreator.create2DPattern(CROSS_HEXAGON, 10, _pattern2D);
 
         //build baseMeshCreator
         BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D);
@@ -63,6 +64,8 @@ TEST_CASE("BaseMeshCreator")
         {
             baseMeshCreator.computeBaseCrossMesh(interactMat, baseMesh2D, crossMesh);
             crossMesh->writeOBJModel("Pattern/origin.obj");
+            baseMesh2D->writeOBJModel("Pattern/pattern.obj");
+            _polyMesh->getTextureMesh()->writeOBJModel("Pattern/polymesh.obj");
         }
 
         SECTION("getTextureCoord"){
@@ -79,9 +82,7 @@ TEST_CASE("BaseMeshCreator")
                 _pattern2D->vertexList[id]->pos.y() = tex_2DCoord[1];
                 _pattern2D->vertexList[id]->pos.z() = 0;
             }
-
             _pattern2D->writeOBJModel("Pattern/texture.obj");
-            _polyMesh->getTextureMesh()->writeOBJModel("Pattern/polymesh.obj");
         }
     }
 

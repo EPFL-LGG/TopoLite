@@ -64,13 +64,13 @@ public:
 
 public:
 
-	vector<int> map_vertex2D_3D;
+    //map the vertices of pattern2D onto polyMesh
+    //null when the vertices in outside of polyMesh's texture space
+    vector<pVertex> pattern2D_vertices_on_polyMesh;
 
-	vector<int> map_vertex3D_2D;
-
-	vector<int> map_cross2D_3D;
-
-	vector<int> map_cross3D_2D;
+    //a polygon of pattern2D locates on the boundary of polyMesh's texture space
+    //null if not
+    tbb::concurrent_vector<pPolygon> boundary_pattern2D;
 
     wpPolyMeshAABB polyMesh;
 
@@ -132,6 +132,8 @@ public:
 	 * \return: the 3D position of 2D pattern vertices
 	 */
 	bool mapTexPointBackToSurface(Vector2 ptTexCoord, Vector3 &ptSurfCoord);
+
+	vector<pPolygon> splitIntoConsecutivePolygons(const vector<Line<Scalar>> &line, const vector<bool>& inside);
 
 
 //

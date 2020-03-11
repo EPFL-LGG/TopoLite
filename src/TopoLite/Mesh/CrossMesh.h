@@ -66,6 +66,8 @@ public:
 
     void setPolyMesh(const PolyMesh<Scalar> &polyMesh);
 
+    void update();
+
     void setBaseMesh2D(shared_ptr<PolyMesh<Scalar>> _baseMesh2D);
 
     void createConnectivity();

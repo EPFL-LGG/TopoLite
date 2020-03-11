@@ -91,10 +91,17 @@ TEST_CASE("AABBTree_Line"){
         Line<double> line;
         line.point1 = Vector3d(0.5, 0.5, 0);
         line.point2 = Vector3d(-1, -1, 0);
-        Vector2d pt;
-        aabb_line.findIntersec(line, pt);
-        REQUIRE(pt.x() == Approx(0.0));
-        REQUIRE(pt.y() == Approx(0.0));
+        Vector2d tex;
+        aabb_line.findIntersec(line, tex);
+        REQUIRE(tex.x() == Approx(0.0));
+        REQUIRE(tex.y() == Approx(0.0));
+
+        line.point1 = Vector3d(0.8, 0.8, 0);
+        line.point2 = Vector3d(0.7, 0.7, 0);
+        aabb_line.findIntersec(line, tex);
+        REQUIRE(tex.x() == Approx(0.0));
+        REQUIRE(tex.y() == Approx(0.0));
+
     }
 
     SECTION("Square has a square hole"){
@@ -131,21 +138,21 @@ TEST_CASE("AABBTree_Line"){
         Line<double> line;
         line.point1 = Vector3d(1.5, 0.5, 0);
         line.point2 = Vector3d(1.5, 3, 0);
-        Vector2d pt;
-        aabb_line.findIntersec(line, pt);
-        REQUIRE(pt.x() == Approx(1.5));
-        REQUIRE(pt.y() == Approx(1));
+        Vector2d tex;
+        aabb_line.findIntersec(line, tex);
+        REQUIRE(tex.x() == Approx(1.5));
+        REQUIRE(tex.y() == Approx(1));
 
         line.point1 = Vector3d(1.5, 1.5, 0);
         line.point2 = Vector3d(1.5, 3, 0);
-        aabb_line.findIntersec(line, pt);
-        REQUIRE(pt.x() == Approx(1.5));
-        REQUIRE(pt.y() == Approx(2));
+        aabb_line.findIntersec(line, tex);
+        REQUIRE(tex.x() == Approx(1.5));
+        REQUIRE(tex.y() == Approx(2));
 
         line.point1 = Vector3d(1.5, 2.5, 0);
         line.point2 = Vector3d(1.5, 3, 0);
-        aabb_line.findIntersec(line, pt);
-        REQUIRE(pt.x() == Approx(1.5));
-        REQUIRE(pt.y() == Approx(3));
+        aabb_line.findIntersec(line, tex);
+        REQUIRE(tex.x() == Approx(1.5));
+        REQUIRE(tex.y() == Approx(3));
     }
 }

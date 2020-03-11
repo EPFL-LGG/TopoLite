@@ -87,8 +87,8 @@ set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
 include(CTest)
 include(ParseAndAddCatchTests)
 
-file(GLOB testTopoFiles test/Mesh/*.cpp)
-#file(GLOB testTopoFiles test/CrossMesh/*.cpp
+file(GLOB testTopoFiles test/CrossMesh/Test_BaseMeshCreator.cpp)
+#file(GLOB testTopoFiles test/Mesh/Test_PolyMesh_AABBTree.cpp)
 #                        test/IO/*.cpp
 #                        test/Utility/*.cpp
 #                        test/Mesh/*.cpp)

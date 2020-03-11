@@ -150,6 +150,7 @@ template <typename Scalar>
 struct Line
 {
     typedef Matrix<Scalar,3, 1> Vector3;
+    typedef Matrix<Scalar,2, 1> Vector2;
 
     Vector3 point1;
 	Vector3 point2;
@@ -163,6 +164,11 @@ struct Line
 	    point1 = pt1;
 	    point2 = pt2;
 	}
+
+    Line(Vector2 pt1, Vector2 pt2){
+        point1 = Vector3(pt1.x(), pt1.y(), 0);
+        point2 = Vector3(pt2.x(), pt2.y(), 0);
+    }
 };
 
 
