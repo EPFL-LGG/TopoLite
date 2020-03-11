@@ -40,54 +40,55 @@ void PolyMesh<Scalar>::clear()
 
 	vertexList.clear();
 
-	texList.clear();
+	textureList.clear();
 
     texturedModel = false;
 }
 
+/*
+ * Defines vertices for a list of polygons
+ */
 template<typename Scalar>
 void PolyMesh<Scalar>::setPolyLists(vector<pPolygon> _polyList)
 {
-    //clear
     clear();
 
-    //storage
-    for(size_t id = 0; id < _polyList.size(); id++)
-    {
-        polyList.push_back(_polyList[id]);
-    }
+    // create polygon list
 
-    //compute
+    size_t psize = _polyList.size();
+
+    for(size_t id = 0; id < psize; id++)
+        polyList.push_back(_polyList[id]);
+
     texturedModel = false;
 
     computeVertexList();
 
-    computeTexList();
+    computeTextureList();
 
-    return;
 }
 
 template<typename Scalar>
 PolyMesh<Scalar>::PolyMesh(const PolyMesh &_mesh): TopoObject(_mesh)
 {
-    //clear
     clear();
 
-    //storage
-    for(size_t id = 0; id < _mesh.polyList.size(); id++)
+    // create polygon list
+
+    size_t msize = _mesh.polyList.size();
+
+    for(size_t id = 0; id < msize; id++)
     {
         shared_ptr<_Polygon<Scalar>> poly = make_shared<_Polygon<Scalar>>(*_mesh.polyList[id]);
         polyList.push_back(poly);
     }
 
-    //compute
     texturedModel = _mesh.texturedModel;
 
     computeVertexList();
 
-    computeTexList();
+    computeTextureList();
 
-    return;
 }
 
 template<typename Scalar>
@@ -135,6 +136,11 @@ std::pair<Matrix<Scalar, 3, 1>, Scalar> PolyMesh<Scalar>::normalize()
 //                                  Mesh Operations
 //**************************************************************************************//
 
+/*
+ * Defines a box delimited by a given number of polygons
+ * - minPt = point with lowest  individual coordinates
+ * - maxPt = point with highest individual coordinates
+ */
 template<typename Scalar>
 Box<Scalar> PolyMesh<Scalar>::bbox() const
 {
@@ -142,18 +148,16 @@ Box<Scalar> PolyMesh<Scalar>::bbox() const
 	minX = minY = minZ = MAX_FLOAT;
 	maxX = maxY = maxZ = MIN_FLOAT;
 
-	for (size_t i = 0; i < vertexList.size(); i++)
+	for (const auto &v: vertexList)
 	{
-		Vector3 ver = vertexList[i]->pos;
+		if (maxX < v->pos.x())  maxX = v->pos.x();
+		if (minX > v->pos.x())  minX = v->pos.x();
 
-		if (maxX < ver.x())  maxX = ver.x();
-		if (minX > ver.x())  minX = ver.x();
+		if (maxY < v->pos.y())  maxY = v->pos.y();
+		if (minY > v->pos.y())  minY = v->pos.y();
 
-		if (maxY < ver.y())  maxY = ver.y();
-		if (minY > ver.y())  minY = ver.y();
-
-		if (maxZ < ver.z())  maxZ = ver.z();
-		if (minZ > ver.z())  minZ = ver.z();
+		if (maxZ < v->pos.z())  maxZ = v->pos.z();
+		if (minZ > v->pos.z())  minZ = v->pos.z();
 	}
 
 	Box<Scalar> bbox_;
@@ -173,9 +177,9 @@ Box<Scalar> PolyMesh<Scalar>::texBBox() const
     minU = minV = MAX_FLOAT;
     maxU = maxV = MIN_FLOAT;
 
-    for (size_t i = 0; i < texList.size(); i++)
+    for (size_t i = 0; i < textureList.size(); i++)
     {
-        Vector2 texCoord = texList[i]->texCoord;
+        Vector2 texCoord = textureList[i]->texCoord;
 
         if (maxU < texCoord.x())   maxU = texCoord.x();
         if (minU > texCoord.x())   minU = texCoord.x();
@@ -204,9 +208,10 @@ Scalar PolyMesh<Scalar>::volume() const
     return computeVolume(triList);
 }
 
-/////////////////////////////////////////////////////////////////////
-// Compute model volume following Dr Robert Nurnberg's method at:
-// http://wwwf.imperial.ac.uk/~rn/centroid.pdf
+/*
+ * Compute model volume following Dr Robert Nurnberg's method at:
+ * http://wwwf.imperial.ac.uk/~rn/centroid.pdf
+ */
 template<typename Scalar>
 Scalar PolyMesh<Scalar>::computeVolume(vector<pTriangle> triList) const
 {
@@ -240,9 +245,10 @@ Matrix<Scalar, 3, 1> PolyMesh<Scalar>::centroid() const
     return computeCentroid(triList);
 }
 
-/////////////////////////////////////////////////////////////////////
-// Compute model centroid following Dr Robert Nurnberg's method at:
-// http://wwwf.imperial.ac.uk/~rn/centroid.pdf
+/*
+* Compute model centroid following Dr Robert Nurnberg's method at:
+* http://wwwf.imperial.ac.uk/~rn/centroid.pdf
+*/
 template<typename Scalar>
 Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeCentroid(vector<pTriangle> triList) const
 {
@@ -304,7 +310,7 @@ Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeExtremeVertex(Vector3 rayDir) cons
         pointList.push_back(poly->center());
     }
 
-    //Push back edge middle points
+    // Push back edge middle points
     for (size_t i = 0; i < polyList.size(); i++)
     {
         pPolygon poly = polyList[i];
@@ -319,7 +325,7 @@ Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeExtremeVertex(Vector3 rayDir) cons
         }
     }
 
-    //Push back all vertices
+    // Push back all vertices
     for(pVertex vertex: vertexList){
         pointList.push_back(vertex->pos);
     }
@@ -347,7 +353,7 @@ void PolyMesh<Scalar>::computeVertexList()
 {
     vertexList.clear();
 
-    //1) check whether the vertices of all polygons already have vertex index
+    // 1) check whether the vertices of all polygons already have vertex index
     bool hasVerID = true;
     int numVertex = 0;
     for(pPolygon poly: polyList)
@@ -365,7 +371,7 @@ void PolyMesh<Scalar>::computeVertexList()
     }
 
     if(hasVerID){
-        //2.1) if vertices have vertex index
+        // 2.1) if vertices have vertex index
         vertexList.resize(numVertex);
         for(pPolygon poly: polyList) {
             for (pVertex vertex : poly->vers) {
@@ -374,7 +380,7 @@ void PolyMesh<Scalar>::computeVertexList()
         }
     }
     else{
-        //2.2) if vertices do not have vertex index
+        // 2.2) if vertices do not have vertex index
         for(pPolygon poly: polyList) {
             for (pVertex vertex : poly->vers)
             {
@@ -386,11 +392,11 @@ void PolyMesh<Scalar>::computeVertexList()
 }
 
 template<typename Scalar>
-void PolyMesh<Scalar>::computeTexList()
+void PolyMesh<Scalar>::computeTextureList()
 {
-    texList.clear();
+    textureList.clear();
 
-    //1) check whether the vertices of all polygons already have vertex index
+    // 1) check whether the vertices of all polygons already have vertex index
     bool hasTexID = true;
     int numTex = 0;
     for(pPolygon poly: polyList)
@@ -408,21 +414,21 @@ void PolyMesh<Scalar>::computeTexList()
     }
 
     if(hasTexID){
-        //2.1) if vertices have vertex index
-        texList.resize(numTex);
+        // 2.1) if vertices have vertex index
+        textureList.resize(numTex);
         for(pPolygon poly: polyList) {
             for (pVTex tex : poly->texs) {
-                texList[tex->texID] = tex;
+                textureList[tex->texID] = tex;
             }
         }
     }
     else{
-        //2.2) if vertices do not have vertex index
+        // 2.2) if vertices do not have vertex index
         for(pPolygon poly: polyList) {
             for (pVTex tex : poly->texs)
             {
-                tex->texID = texList.size();
-                texList.push_back(tex);
+                tex->texID = textureList.size();
+                textureList.push_back(tex);
             }
         }
     }
@@ -497,7 +503,7 @@ bool PolyMesh<Scalar>::readOBJModel(
                 shared_ptr<VTex<Scalar>> vtex = make_shared<VTex<Scalar>>();
                 vtex->texCoord = Vector2(TC[id][0], TC[id][1]);
                 vtex->texID = id;
-                texList.push_back(vtex);
+                textureList.push_back(vtex);
         }
 
         for(size_t id = 0; id < F.size(); id++)
@@ -506,7 +512,8 @@ bool PolyMesh<Scalar>::readOBJModel(
             for(size_t jd = 0; jd < F[id].size(); jd++)
 			{
 				poly->vers.push_back(vertexList[F[id][jd]]);
-				if(FTC[id].size() > jd) poly->texs.push_back(texList[FTC[id][jd]]); //can have a memory error without the if condition
+				if(FTC[id].size() > jd)
+				    poly->texs.push_back(textureList[FTC[id][jd]]); // can have a memory error without the if condition
 			}
             polyList.push_back(poly);
         }
@@ -518,7 +525,9 @@ bool PolyMesh<Scalar>::readOBJModel(
             texturedModel = textureModel_ = true;
 	    }
 
-	    if(normalized) normalize();
+	    if(normalized)
+	        normalize();
+
         removeDuplicatedVertices();
 		return true;
 	}
@@ -531,7 +540,7 @@ template<typename Scalar>
 void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) const
 {
 	FILE *fp;
-	if ((fp = fopen(objFileName, "w+")) == NULL)
+	if ((fp = fopen(objFileName, "w+")) == nullptr)
 	{
 		printf("Error: file not exists! \n");
 		return;
@@ -539,7 +548,7 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) 
 	else
 	{
 		///////////////////////////////////////////////////////////////////
-		// 1. Check whether vertexList and texList exists
+		// 1. Check whether vertexList and textureList exists
 		if(vertexList.empty()) return;
 
 		///////////////////////////////////////////////////////////////////
@@ -555,10 +564,10 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) 
 		}
 		fprintf(fp, "\n");
 
-        fprintf(fp, "# %d tex points \n", (int)texList.size());
-		for(size_t i = 0; i < texList.size(); i++)
+        fprintf(fp, "# %d tex points \n", (int)textureList.size());
+		for(size_t i = 0; i < textureList.size(); i++)
 		{
-			fprintf(fp, "vt %f %f \n", texList[i]->texCoord.x(), texList[i]->texCoord.y());
+			fprintf(fp, "vt %f %f \n", textureList[i]->texCoord.x(), textureList[i]->texCoord.y());
 		}
 		fprintf(fp, "\n");
 
@@ -579,7 +588,7 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) 
                     int verID = poly->vers[j]->verID;
                     //Since the index in OBJ file starting from 1 instead of 0, we need to add 1 to each index
 
-                    if(texList.empty())
+                    if(textureList.empty())
                         fprintf(fp, " %d", verID + 1);
                     else
                     {
@@ -598,7 +607,7 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) 
                     for(int k = 0; k < 3; k++)
                     {
 						int verID = poly->vers[indices[k]]->verID;
-                        if(texList.empty())
+                        if(textureList.empty())
                             fprintf(fp, " %d", verID + 1);
                         else{
                             int texID = poly->texs[indices[k]]->texID;
@@ -727,11 +736,11 @@ template<typename Scalar>
 void PolyMesh<Scalar>::convertTexToEigenMesh(PolyMesh::MatrixX &V, PolyMesh::MatrixXi &F, Eigen::VectorXi &C)
 {
     //V
-    if(texList.empty()) return;
-    V = MatrixX(texList.size(), 2);
+    if(textureList.empty()) return;
+    V = MatrixX(textureList.size(), 2);
 
-    for(size_t id = 0; id < texList.size(); ++id){
-        V.row(id) = texList[id]->texCoord;
+    for(size_t id = 0; id < textureList.size(); ++id){
+        V.row(id) = textureList[id]->texCoord;
     }
 
     //F
@@ -770,7 +779,6 @@ void PolyMesh<Scalar>::convertTexToEigenMesh(PolyMesh::MatrixX &V, PolyMesh::Mat
         }
     }
 
-    return;
 }
 
 
@@ -791,7 +799,7 @@ shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh() const
         polymesh->polyList.push_back(poly);
     }
 
-    //rebuild the vertexList and texList of the polymesh
+    //rebuild the vertexList and textureList of the polymesh
     polymesh->update();
     return polymesh;
 }

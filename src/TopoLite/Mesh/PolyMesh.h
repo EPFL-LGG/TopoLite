@@ -87,9 +87,10 @@ public:
 public:
 
 	//Computed
+
     vector<pVertex> vertexList;          // Vertex Position of polygonal mesh
 
-    vector<pVTex> texList;               // Tex Coordinate
+    vector<pVTex> textureList;               // Texture Coordinate
 
 public:
     
@@ -112,7 +113,7 @@ public:
 
     void update(){
         removeDuplicatedVertices();
-        computeTexList();
+        computeTextureList();
     }
 
     std::pair<Matrix<Scalar, 3, 1>, Scalar> normalize();
@@ -124,11 +125,11 @@ public:
 
     void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
 
-    // Update vertexList and texList
+    // Update vertexList and textureList
 
     void computeVertexList();
 
-    void computeTexList();
+    void computeTextureList();
 
     // Transform Mesh
     void translateMesh(Vector3 move);
