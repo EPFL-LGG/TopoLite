@@ -1,20 +1,17 @@
 *.DS_Store
 
-cmake_build_debug/
-cmake-build-debug/
-Cmake-build-debug-cmake316/
-Cmake-build-release-cmake316/
-\.idea/
-\build
-\cmake-build-release
-\cmake-build-debug
-\.vs
-Release\*.*
+cmake_*/
+Cmake_*/
+cmake-*/
+.idea/
+build
+.vs
+Release/*.*
 Release
-\out
+out
 
-data\origin_data\PartGeometry\*.*
-data\origin_data\Simulation\*.*
+data/origin_data/PartGeometry/*.*
+data/origin_data/Simulation/*.*
 
 # These are downloaded via Cmake
 

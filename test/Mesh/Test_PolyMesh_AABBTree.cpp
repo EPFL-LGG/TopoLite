@@ -14,13 +14,16 @@ TEST_CASE("PolyMesh_AABBTree")
     InitVarLite(varList.get());
     shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
 
-    SECTION("read obj")
-    {
+    SECTION("readObj + findTexPoint") {
         bool texturedModel;
         polyMesh->readOBJModel("../data/Mesh/primitives/Icosphere.obj", texturedModel, true);
         PolyMesh_AABBTree<double> aabbTree(*polyMesh);
         aabbTree.buildTexTree();
-        aabbTree.findTexPoint(Vector2d(0.2, 0.2));
+        auto res = aabbTree.findTexPoint(Vector2d(0.2, 0.2));
+        auto texPoint = res->texs[0];
+        REQUIRE(res->getPolyType() == POLY_NONE);
+        REQUIRE(texPoint->texCoord == Vector2d(0.208124, 0.214326));
+        REQUIRE(texPoint->texID == 11);
     }
 
     SECTION("one triangle"){
@@ -34,9 +37,9 @@ TEST_CASE("PolyMesh_AABBTree")
 
         PolyMesh_AABBTree<double> aabbTree(*polyMesh);
         aabbTree.buildTexTree();
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0.2, 0.2)) != nullptr);
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0, 0)) == polyMesh->polyList[0]);
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0.6, 0.5)) == nullptr);
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.2, 0.2)) == polyMesh->polyList[0]);  // inside the texture polygone
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.0, 0.0)) == polyMesh->polyList[0]);  // inside the texture polygone
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.6, 0.5)) == nullptr);                // outside
     }
 
     SECTION("two triangles"){
@@ -57,10 +60,11 @@ TEST_CASE("PolyMesh_AABBTree")
 
         PolyMesh_AABBTree<double> aabbTree(*polyMesh);
         aabbTree.buildTexTree();
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0, 0.3)) == polyMesh->polyList[1]);
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0.1, 0)) == polyMesh->polyList[0]);
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0, 0)) != nullptr);
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0.5, 0.5)) != nullptr);
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.0, 0.3)) == polyMesh->polyList[1]);
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.1, 0.0)) == polyMesh->polyList[0]);
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.0, 0.0)) != nullptr);                  // These pts are in p0 and p1
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.5, 0.5)) != nullptr);                  // we don't care which one it is
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.6, 0.5)) == nullptr);                  // outside
     }
 
 }
