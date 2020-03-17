@@ -212,8 +212,11 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
 //                                 Compute Neighbor
 //**************************************************************************************//
 
-/*
- * returns the edgeID shared between two crosses or NOT_FOUND
+/**
+ * @brief get the edgeID shared between two crosses or NOT_FOUND
+ * @tparam Scalar
+ * @param ncross the 2nd cross
+ * @return EdgeID the local index of a polygon vertex
  */
 template<typename Scalar>
 int Cross<Scalar>::getEdgeIDSharedWithCross(const Cross<Scalar> *ncross) {
@@ -231,10 +234,11 @@ int Cross<Scalar>::getEdgeIDSharedWithCross(const Cross<Scalar> *ncross) {
     return NOT_FOUND;
 }
 
-/*
- * returns the local index of a vertex in a polygon
- *
- * ex: for [1,2,4,3] getEdgeIDofGivenVertexID(4) = 2
+/**
+ * @brief get the local index of a vertex in a given polygon
+ * @tparam Scalar
+ * @param vertexID
+ * @return EdgeID the local index of a polygon vertex
  *
  * fixme: edgeID is not a well chosen name. We should think of changing.
  */
@@ -249,9 +253,11 @@ int Cross<Scalar>::getEdgeIDOfGivenVertexID(int vertexID) {
     return NOT_FOUND;
 }
 
-
-/*
- * returns the previous local index of local index
+/**
+ * @brief search for the previous local index of local index
+ * @tparam Scalar
+ * @param edgeID the input local index
+ * @return the previous local index
  *
  * fixme: edgeID is not a well chosen name. We should think of changing.
  */
@@ -261,11 +267,13 @@ int Cross<Scalar>::getPrevEdgeID(int edgeID) {
     return (edgeID - 1 + vers.size()) % vers.size();
 }
 
-
-/*
- * Fills up a vector with the IDs of crosses shared between this cross and another one.
- * A cross is shared if in contact with both other crosses..
- *
+/**
+ * @brief Fills up a vector with the IDs of crosses shared between this cross and another one.
+ *        A cross is shared if in contact with both other crosses.
+ * @tparam Scalar
+ * @param ncross the cross you want to check
+ * @param shared_crossIDs the vector of crossIDs
+ * @return The size this crossIDs vector or NOT_FOUND
  */
 template<typename Scalar>
 int Cross<Scalar>::getCrossIDsSharedWithCross(const Cross<Scalar> *ncross, vector<int> &shared_crossIDs) {
