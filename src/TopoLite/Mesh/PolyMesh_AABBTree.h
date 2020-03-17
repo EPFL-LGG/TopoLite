@@ -1,6 +1,7 @@
 //
 // Created by ziqwang on 09.01.19.
 //
+// About AABB: https://en.wikipedia.org/wiki/Minimum_bounding_box#Axis-aligned_minimum_bounding_box
 
 #ifndef TOPOLOCKCREATOR_QUADTREE_H
 #define TOPOLOCKCREATOR_QUADTREE_H
@@ -25,8 +26,8 @@ public:
 public:
     struct Node{
         Box<Scalar> box;
-        Line<Scalar> line2D; //2D texCoords
-        Line<Scalar> line3D; //3D vertices
+        Line<Scalar> line2D;         ///> 2D texCoords
+        Line<Scalar> line3D;         ///> 3D vertices
         weak_ptr<Node> children[2];
     };
 
@@ -45,23 +46,23 @@ public:
             vector<shared_ptr<Node>> loop_nodes;
             for(int id = 0; id < loop.size(); id++)
             {
-                //create node
+                // create node
                 shared_ptr<Node> node = make_shared<Node>();
 
-                //tex 2D
+                // tex 2D
                 Vector2 staPt2D = T.row(loop[id]);
                 Vector2 endPt2D = T.row(loop[(id + 1) % loop.size()]);
                 node->line2D = Line<Scalar>(staPt2D, endPt2D);
 
-                //pos 3D
+                // pos 3D
                 Vector3 staPt3D = V.row(loop[id]);
                 Vector3 endPt3D = V.row(loop[(id + 1) % loop.size()]);
                 node->line3D = Line<Scalar>(staPt3D, endPt3D);
 
-                //box
+                // box
                 node->box = Box<double>(node->line2D);
 
-                //add to the loops
+                // add to the loops
                 loop_nodes.push_back(node);
             }
 
@@ -69,10 +70,10 @@ public:
             // every two neighboring lines are merged into a big area.
             vector<shared_ptr<Node>> merged_nodes;
             merged_nodes = loop_nodes;
-            //if only one node is left, break
+            // if only one node is left, break
             while(merged_nodes.size() > 1)
             {
-                //merge every two nodes
+                // merge every two nodes
                 vector<shared_ptr<Node>> parent_nodes;
                 for(int id = 0; id < merged_nodes.size() / 2; id++)
                 {
@@ -99,14 +100,23 @@ public:
         }
     }
 
+    /**
+     * @brief Search for an intersection between a given line and the lines defined in AABB tree
+     * @param line
+     * @param tex2D
+     * @param pos3D
+     * @param node
+     * @return true/false if an instersection is found
+     */
     bool findIntersec(const Line<Scalar> &line, Vector2 &tex2D, Vector3& pos3D)
     {
         Scalar minDist = -1;
-        for(int id = 0; id < roots.size(); id++)
+        size_t max_id = roots.size();
+        for(int id = 0; id < max_id; id++)
         {
             Vector2 tmp_tex;
             Vector3 tmp_pos;
-            if(findIntersec(line, tmp_tex, tmp_pos, roots[id].lock()))
+            if(findIntersecFromNode(line, tmp_tex, tmp_pos, roots[id].lock()))
             {
                 Scalar dist = (line.point1.head(2) - tmp_tex).norm();
                 if(minDist == -1 || minDist > dist){
@@ -117,23 +127,26 @@ public:
             }
         }
 
-        if(minDist > 0){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return minDist > 0;
     }
 
-    bool findIntersec(const Line<Scalar> &line, Vector2 &tex2D, Vector3& pos3D, shared_ptr<Node> node)
+    /**
+     * @brief Search for an intersection between a given line and the lines defined in AABB tree from a given node
+     * @param line
+     * @param tex2D
+     * @param pos3D
+     * @param node
+     * @return true/false if an instersection is found
+     */
+    bool findIntersecFromNode(const Line<Scalar> &line, Vector2 &tex2D, Vector3& pos3D, shared_ptr<Node> node)
     {
-        //empty node
+        // empty node
         if(node == nullptr){
             return false;
         }
 
-        //leaves
-        if(node->children[0].lock() == nullptr
+        // leaves
+        if(   node->children[0].lock() == nullptr
            && node->children[1].lock() == nullptr)
         {
             if(checkLineLineIntersec(node->line2D, line, tex2D))
@@ -147,19 +160,19 @@ public:
             }
         }
 
-        //not leaves
+        // not leaves
         Scalar minDist = -1;
         for(size_t id = 0; id < 2; id++)
         {
-            //no children, continue
+            // no children, continue
             if(node->children[id].lock() == nullptr) continue;
 
-            //no intersection with box, continue
+            // no intersection with box, continue
             if(checkLineBoxIntersec(line, node->children[id].lock()->box) == false) continue;
 
             Vector2 int_tex2D;
             Vector3 int_pos3D;
-            if(findIntersec(line, int_tex2D, int_pos3D, node->children[id].lock())){
+            if(findIntersecFromNode(line, int_tex2D, int_pos3D, node->children[id].lock())){
                 Scalar dist = (line.point1.head(2) - int_tex2D).norm();
                 if(minDist == -1 || minDist > dist)
                 {
@@ -169,47 +182,58 @@ public:
                 }
             }
         }
-        if(minDist != -1){
-            return true;
-        }
-        else{
-            return false;
-        }
+        return minDist != -1;
     }
 
+    /**
+     * @brief Find if a 2D line is intersecting with a given box
+     * @param line
+     * @param box
+     * @return
+     */
     bool checkLineBoxIntersec(const Line<Scalar> &line, const Box<Scalar> &box)
     {
-        Vector2 ray = (line.point2 - line.point1).normalized().head(2);
-        if(checkRayBoxIntersec(ray, line.point1.head(2), box)
-           || checkRayBoxIntersec(-ray, line.point2.head(2), box))
-        {
-            return true;
-        }
-        else{
-            return false;
-        }
+        Vector2 r = (line.point2 - line.point1).normalized().head(2);
+        Vector2 origin = line.point1.head(2);
+        return checkRayBoxIntersec( r, origin, box) || checkRayBoxIntersec(-r, origin, box);
     }
 
-    //https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+    /**
+     * @brief Find if there is a ray-box intersection
+     * @param ray
+     * @param origin
+     * @param box
+     * @return
+     *
+     * @see: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+     */
     bool checkRayBoxIntersec(const Vector2 &ray, const Vector2 &origin, const Box<Scalar> &box)
     {
-        Scalar tmin = (box.minPt.x() - origin.x()) / ray.x();
-        Scalar tmax = (box.maxPt.x() - origin.x()) / ray.x();
+        Scalar txmin = (box.minPt.x() - origin.x()) / ray.x();
+        Scalar txmax = (box.maxPt.x() - origin.x()) / ray.x();
 
-        if (tmin > tmax) std::swap(tmin, tmax);
+        if (txmin > txmax) std::swap(txmin, txmax);
 
         Scalar tymin = (box.minPt.y() - origin.y()) / ray.y();
         Scalar tymax = (box.maxPt.y() - origin.y()) / ray.y();
 
         if (tymin > tymax) std::swap(tymin, tymax);
 
-        if ((tmin > tymax) || (tymin > tmax))
+        if ((txmin > tymax) || (tymin > txmax))
             return false;
 
         return true;
     }
 
-    //http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
+    /**
+     * @brief Search for the intersection between two lines
+     * @param l0 line1
+     * @param l1 line2
+     * @param pt intersection coordinates
+     * @return
+     *
+     * @see: http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
+     */
     bool checkLineLineIntersec(const Line<Scalar> &l0, const Line<Scalar> &l1, Vector2 &pt)
     {
         Scalar x1 = l0.point1.x(), x2 = l0.point2.x(), x3 = l1.point1.x(), x4 = l1.point2.x();
@@ -217,15 +241,17 @@ public:
 
         Scalar d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
 
-        // If d is zero, there is no intersection
-        if (d == 0) return false;
+        // [1] - Discard parallel lines.
+        if (d == 0)
+            return false;
 
-        // Get the x and y
-        Scalar pre = (x1*y2 - y1*x2), post = (x3*y4 - y3*x4);
+        // [2] - Get the coordinates of the intersection
+        Scalar pre = (x1*y2 - y1*x2);
+        Scalar post = (x3*y4 - y3*x4);
         Scalar x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
         Scalar y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
 
-        // Check if the x and y coordinates are within both lines
+        // [3] - Check if the x and y coordinates are within both lines
         if ( x < min(x1, x2) || x > max(x1, x2) ||
              x < min(x3, x4) || x > max(x3, x4) )
             return false;
@@ -233,7 +259,7 @@ public:
              y < min(y3, y4) || y > max(y3, y4) )
             return false;
 
-        // Return the point of intersection
+        // load the point of intersection
         pt = Vector2(x, y);
         return true;
     }
@@ -265,6 +291,10 @@ public:
 
 public:
 
+    /**
+     * @brief
+     * @param _mesh
+     */
     PolyMesh_AABBTree(const PolyMesh<Scalar> &_mesh)
     :PolyMesh<Scalar>::PolyMesh(_mesh.getVarList())
     {
@@ -276,6 +306,9 @@ public:
 
 public:
 
+    /**
+     * @brief build a texture tree
+     */
     void buildTexTree()
     {
         PolyMesh<Scalar>::convertTexToEigenMesh(tV, tF, tC);
@@ -287,6 +320,7 @@ public:
         lineTree.init(V, T, F);
     }
 
+    // fixme: Unused function so far
     void buildPosTree(){
         PolyMesh<Scalar>::convertPosToEigenMesh(pV, pF, pC);
         posTree.init(pV, pF);
@@ -294,6 +328,12 @@ public:
 
 public:
 
+    /**
+     * @brief Search if a point represented by a Vector2d belongs to a given texture polygon.
+     *        If the point is on a shared edge between polygons then, one of these polygons is returned
+     * @param pt, is a 2 dimension point
+     * @return a texture polygon or nullptr
+     */
     pPolygon findTexPoint(VectorX pt)
     {
         vector<int> indices = texTree.find(tV, tF, pt.transpose(), false);
@@ -304,6 +344,7 @@ public:
         return nullptr;
     }
 
+    // fixme: Unused function so far
     bool findBoundaryIntersec(const Line<Scalar> &line, Vector2 &tex2D, Vector3 &pos3D){
         return lineTree.findIntersec(line, tex2D, pos3D);
     }
