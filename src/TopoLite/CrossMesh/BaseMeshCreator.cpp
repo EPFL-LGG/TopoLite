@@ -245,9 +245,6 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
                 Vector2 end_pos2D = poly->vers[(jd + 1) % N]->pos.head(2);
                 end_pos2D = getTextureCoord(end_pos2D, textureMat);
 
-//            std::cout << sta_pos2D.x() << "," << sta_pos2D.y() << std::endl;
-//            std::cout << end_pos2D.x() << "," << end_pos2D.y() << std::endl;
-
                 pVertex sta_ver3D = pattern2D_vertices_on_polyMesh[staID];
                 pVertex end_ver3D = pattern2D_vertices_on_polyMesh[endID];
 
@@ -287,8 +284,6 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
                         lines2D.push_back(Line<Scalar>());
                         lines_inside.push_back(false);
                     }
-
-//                std::cout << brdy2D.x() << "," << brdy2D.y() << std::endl;
                 }
                 else{
                     //sta3d outside, end_ver3D inside
@@ -313,11 +308,7 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
                         lines3D.push_back(Line<Scalar>());
                         lines_inside.push_back(false);
                     }
-
-//                std::cout << brdy2D.x() << "," << brdy2D.y() << std::endl;
                 }
-
-//            std::cout << "\n";
             }
 
             splitIntoConsecutivePolygons(lines3D, lines_inside, crossLists);
@@ -329,6 +320,7 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
     //append to crossMesh
     for(pPolygon poly: crossLists){
         pCross cross = make_shared<Cross<Scalar>>(*poly, getVarList());
+        cross->atBoundary = true;
         crossMesh->push_back(cross);
     }
 
@@ -440,8 +432,7 @@ Matrix<Scalar, 4, 4> BaseMeshCreator<Scalar>::computeTextureMat(const pPolyMesh 
     return textureMat.inverse();
 }
 
-
-// able to handle polygonal mesh
+//now able to handle polygonal mesh
 template <typename Scalar>
 bool BaseMeshCreator<Scalar>::mapTexPointBackToSurface(Vector2 ptTexCoord, Vector3 &ptSurfCoord)
 {
@@ -464,43 +455,6 @@ bool BaseMeshCreator<Scalar>::mapTexPointBackToSurface(Vector2 ptTexCoord, Vecto
     }
 
     return false;
-}
-
-template<typename Scalar>
-bool BaseMeshCreator<Scalar>::ComputeBoundaryVertex(double *inverTextureMat, Vector3 sta_pos2D, Vector3 end_pos2D, Vector3 &pos2D, Vector3 &pos3D)
-{
-	Vector3 init_pos3D;
-	{
-		Vector3 texCoord = GetTextureCoord(sta_pos2D, viewSize);
-		MultiplyPoint(texCoord, inverTextureMat, texCoord);
-		ComputeSurfaceCoord(polyMesh.lock(), texCoord, init_pos3D);
-	}
-
-	pos3D = init_pos3D;
-	pos2D = sta_pos2D;
-	while((sta_pos2D - end_pos2D).norm() > 1e-4)
-	{
-		Vector3 mid = (sta_pos2D + end_pos2D) * 0.5f;
-		Vector3 texCoord = GetTextureCoord(mid, viewSize);
-		MultiplyPoint(texCoord, inverTextureMat, texCoord);
-		Vector3 ver3D;
-		bool isSuccess = ComputeSurfaceCoord(polyMesh.lock(), texCoord, ver3D);
-		if(isSuccess)
-		{
-			pos3D = ver3D;
-			pos2D = mid;
-			sta_pos2D = mid;
-		}
-		else{
-			end_pos2D = mid;
-		}
-	}
-	if((init_pos3D - pos3D).norm() < 1e-5){
-		return false;
-	}
-	else{
-		return true;
-	}
 }
 
 template <typename Scalar>

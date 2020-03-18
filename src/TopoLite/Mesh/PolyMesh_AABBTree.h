@@ -69,7 +69,7 @@ public:
             // every two neighboring lines are merged into a big area.
             vector<shared_ptr<Node>> merged_nodes;
             merged_nodes = loop_nodes;
-            //if only one node is left, break
+            //if only one node left, break
             while(merged_nodes.size() > 1)
             {
                 //merge every two nodes
