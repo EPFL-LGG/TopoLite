@@ -201,7 +201,8 @@ struct Plane
 template<typename Scalar>
 Plane<Scalar> & Plane<Scalar>::operator=(const Plane<Scalar> &plane)
 {
-    if( this == &plane ) return *this;
+    if( this == &plane )
+        return *this;
 
     this->point  = plane.point;
     this->normal = plane.normal;
@@ -229,9 +230,12 @@ int Plane<Scalar>::computePtPlnIntersec(Vector3 tagtPt)
     Vector3 vec = tagtPt - point;
     Scalar dotP = normal.dot(vec);
 
-    if ( std::abs(dotP) < FLOAT_ERROR_SMALL)    return POINT_PLANE_INTERSECT;       // Note: may need to tune this small threshold
-    else if ( dotP >  0 )              return POINT_PLANE_POSITIVE_SIDE;
-    else if ( dotP <  0 )              return POINT_PLANE_NEGATIVE_SIDE;
+    if ( std::abs(dotP) < FLOAT_ERROR_SMALL)
+        return POINT_PLANE_INTERSECT;       // Note: may need to tune this small threshold
+    else if ( dotP >  0 )
+        return POINT_PLANE_POSITIVE_SIDE;
+    else if ( dotP <  0 )
+        return POINT_PLANE_NEGATIVE_SIDE;
 
     return POINT_PLANE_UNKWONN;
 }
@@ -334,8 +338,6 @@ Box<Scalar>::Box(const Line<Scalar> &line)
 
     cenPt = (minPt + maxPt)/2;
     size = (maxPt - minPt);
-
-    return;
 }
 
 template<typename Scalar>
@@ -349,8 +351,6 @@ Box<Scalar>::Box(const Box<Scalar> &b0, const Box<Scalar> &b1){
 
     cenPt = (minPt + maxPt)/2;
     size = (maxPt - minPt);
-
-    return;
 }
 
 
