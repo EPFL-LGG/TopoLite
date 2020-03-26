@@ -10,9 +10,7 @@
 *************************************************/
 
 template<typename Scalar>
-ContactGraph<Scalar>::ContactGraph(shared_ptr<InputVarList> varList):TopoObject(varList)
-{
-}
+ContactGraph<Scalar>::ContactGraph(const shared_ptr<InputVarList>& varList):TopoObject(varList) {}
 
 template<typename Scalar>
 ContactGraph<Scalar>::~ContactGraph()

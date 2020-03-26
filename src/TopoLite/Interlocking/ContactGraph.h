@@ -94,7 +94,7 @@ public:
 
 public:
 
-    ContactGraph(shared_ptr<InputVarList> varList);
+    ContactGraph(const shared_ptr<InputVarList>& varList);
 
     ~ContactGraph();
 
