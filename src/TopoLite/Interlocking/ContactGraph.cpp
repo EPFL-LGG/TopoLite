@@ -184,7 +184,6 @@ void ContactGraph<Scalar>::normalize_meshes(vector<pPolyMesh> &meshes) {}
 /**
  * @brief Scale the Mesh into a united box
  * @tparam Scalar
- * @param meshes the vector containing the meshes_input to scale
  * @return maxD
  */
 template<typename Scalar>
@@ -212,8 +211,6 @@ double ContactGraph<Scalar>::scaleMeshIntoUnitedBox() {
 /**
  * @brief @Ziqi Please comment this a bit
  * @tparam Scalar
- * @param meshes
- * @param planes
  * @param setPlanes
  * @param maxD
  * @param eps
@@ -271,7 +268,6 @@ bool ContactGraph<Scalar>::createContactPlanes(std::set<plane_contact, plane_con
 /**
  * @brief
  * @tparam Scalar
- * @param meshes
  * @param atBoundary
  */
 template<typename Scalar>
@@ -287,8 +283,6 @@ void ContactGraph<Scalar>::createNodes(vector<bool> &atBoundary) {
 /**
  * @brief @Ziqi same here please
  * @tparam Scalar
- * @param planeIJ
- * @param atBoundary
  */
 template<typename Scalar>
 void ContactGraph<Scalar>::findAllPairsOfPolygonsContact(vector<bool> &atBoundary) {
@@ -323,8 +317,6 @@ void ContactGraph<Scalar>::findAllPairsOfPolygonsContact(vector<bool> &atBoundar
 /**
  * @brief
  * @tparam Scalar
- * @param planeIJ
- * @param planeIJEdges
  */
 template<typename Scalar>
 void ContactGraph<Scalar>::addContactEdges() {
@@ -344,8 +336,6 @@ void ContactGraph<Scalar>::addContactEdges() {
 /**
  * @brief Parallel compute contacts
  * @tparam Scalar
- * @param planeIJ
- * @param planeIJEdges
  */
 template<typename Scalar>
 void ContactGraph<Scalar>::computeContacts() {
