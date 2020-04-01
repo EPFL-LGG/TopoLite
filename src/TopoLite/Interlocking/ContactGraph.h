@@ -128,9 +128,7 @@ private:
     *             constructFromPolyMesh methods
     *
     *************************************************/
-
-    double scaleMeshIntoUnitedBox();
-
+    
     bool clusterFacesofInputMeshes(Scalar eps);
 
     void listPotentialContacts(vector<bool> &atBoundary);
