@@ -32,7 +32,7 @@ ContactGraph<Scalar>::~ContactGraph() {
 
 
 /**
- * @brief
+ * @brief build the graph from a list of polygonal meshes
  * @tparam Scalar
  * @param meshes
  * @param atBoundary
@@ -40,42 +40,41 @@ ContactGraph<Scalar>::~ContactGraph() {
  * @return
  */
 template<typename Scalar>
-bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &input_meshes,
-                                                   vector<bool> &atBoundary,
-                                                   double eps) {
+bool ContactGraph<Scalar>::buildFromMeshes(vector<pPolyMesh> &input_meshes,
+                                           vector<bool> &atBoundary,
+                                           Scalar eps) {
 
     // [1] - Scale meshes_input into a united box
     meshes_input = input_meshes;
 
-    auto maxD = scaleMeshIntoUnitedBox();
 
-    if (maxD == -1.0)
+    // [2] - cluster the faces of input mesh which are on a same plane
+    contact_faces.clear();
+    if(!clusterFacesofInputMeshes(eps))
         return false;
 
-    // [2] - Create contact planes
-
-    std::set<plane_contact, plane_contact_compare> setPlanes;
-
-    bool res = createContactPlanes( setPlanes, maxD, eps);
-
-    if (!res)
-        return false;
-
-    std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B) {
+    tbb::parallel_sort(contact_faces.begin(), contact_faces.end(), [&](const polygonal_face &A, const polygonal_face &B) {
         return A.groupID < B.groupID;
     });
 
-    //
+    // [3] - find all pairs of potential face contacts
+    contact_pairs.clear();
+    listPotentialContacts(atBoundary);
 
-    createNodes( atBoundary);
-
-    findAllPairsOfPolygonsContact( atBoundary);
-
-    planeIJEdges.resize(planeIJ.size());
-
+    // [4] - compute the contacts
+    contact_graphedges.clear();
     computeContacts();  // note: this function is vectorized with TBB
 
-    addContactEdges();
+    // [5] - add nodes into the graph
+    nodes.clear();
+    buildNodes(atBoundary);
+
+    // [6] - add faces into graph
+    edges.clear();
+    buildEdges();
+
+    // [7] - assign node ID
+    finalize();
 
     return true;
 }
@@ -127,7 +126,7 @@ void ContactGraph<Scalar>::addContact(pContactGraphNode _nodeA, pContactGraphNod
 }
 
 /**
- * @brief
+ * @brief Assign nodeID to the graph. Must be called after updating the graph
  * @tparam Scalar
  */
 template<typename Scalar>
@@ -145,7 +144,7 @@ void ContactGraph<Scalar>::finalize() {
 }
 
 /**
- * @brief
+ * @brief return the all contact polygons as a mesh
  * @tparam Scalar
  * @param mesh
  */
@@ -165,16 +164,6 @@ void ContactGraph<Scalar>::getContactMesh(pPolyMesh &mesh) {
 //    mesh->TranslateMesh(-normalized_trans);
 }
 
-
-/**
- * @brief
- * @tparam Scalar
- * @param meshes
- */
-// TODO: implement or clean this unimplemented function
-template<typename Scalar>
-void ContactGraph<Scalar>::normalize_meshes(vector<pPolyMesh> &meshes) {}
-
 /*************************************************
 *
 *             constructFromPolyMesh methods
@@ -182,96 +171,164 @@ void ContactGraph<Scalar>::normalize_meshes(vector<pPolyMesh> &meshes) {}
 *************************************************/
 
 /**
- * @brief Scale the Mesh into a united box
+ * @brief extract all polygonal faces from the meshes_input and cluster the faces which are on a same plane.
  * @tparam Scalar
- * @return maxD
+ * @param eps
+ * @return
  */
 template<typename Scalar>
-double ContactGraph<Scalar>::scaleMeshIntoUnitedBox() {
-    double maxD = 1;
+bool ContactGraph<Scalar>::clusterFacesofInputMeshes(Scalar eps)
+{
+    std::set<polygonal_face, plane_contact_compare> planes_set;
+    int groupID = 0;
     size_t msize = meshes_input.size();
-    for (size_t id = 0; id < msize; id++) {
+    for (size_t id = 0; id < msize; id++)
+    {
         pPolyMesh poly = meshes_input[id];
         if (poly == nullptr)
-            return -1.0;
-        for (pPolygon face : poly->polyList) {
+            return false;
+
+        for (pPolygon face : poly->polyList)
+        {
+            if (face->vers.size() < 3)
+                continue;
+
             // 1.1) construct plane
-            plane_contact plane;
+            polygonal_face plane;
             Vector3 nrm = face->normal();
             Vector3 center = face->vers[0]->pos;
             plane.nrm = nrm;
 
             plane.D = nrm.dot(center);
-            maxD = (std::max)(maxD, (double) std::abs(plane.D));
-        }
-    }
-    return maxD;
-}
-
-/**
- * @brief @Ziqi Please comment this a bit
- * @tparam Scalar
- * @param setPlanes
- * @param maxD
- * @param eps
- * @return
- */
-template<typename Scalar>
-bool ContactGraph<Scalar>::createContactPlanes(std::set<plane_contact, plane_contact_compare> &setPlanes,
-                                               double maxD, double eps) {
-
-    int groupID = 0;
-    size_t msize = meshes_input.size();
-    for (size_t id = 0; id < msize; id++) {
-        pPolyMesh poly = meshes_input[id];
-        if (poly == nullptr)
-            return false;
-        for (pPolygon face : poly->polyList) {
-            if (face->vers.size() < 3)
-                continue;
-
-            // 1.1) construct plane
-            plane_contact plane;
-            Vector3 nrm = face->normal();
-            Vector3 center = face->vers[0]->pos;
-            plane.nrm = nrm;
-
-            plane.D = nrm.dot(center) / maxD;
             plane.partID = id;
             plane.polygon = face;
             plane.eps = eps;
 
             // 1.2) find groupID
-            typename std::set<plane_contact, plane_contact_compare>::iterator find_it = setPlanes.end();
-            for (int reverse = -1; reverse <= 1; reverse += 2) {
-                plane_contact tmp_plane = plane;
+            typename std::set<polygonal_face, plane_contact_compare>::iterator find_it = planes_set.end();
+            for (int reverse = -1; reverse <= 1; reverse += 2)
+            {
+                polygonal_face tmp_plane = plane;
                 tmp_plane.nrm *= reverse;
                 tmp_plane.D *= reverse;
-                find_it = setPlanes.find(tmp_plane);
-                if (find_it != setPlanes.end()) {
+
+                find_it = planes_set.find(tmp_plane);
+                if (find_it != planes_set.end())
+                {
                     plane.groupID = (*find_it).groupID;
                     break;
                 }
             }
 
-            if (find_it == setPlanes.end()) {
+            if (find_it == planes_set.end())
+            {
                 plane.groupID = groupID++;
-                setPlanes.insert(plane);
+                planes_set.insert(plane);
             }
 
-            planes.push_back(plane);
+            contact_faces.push_back(plane);
         }
     }
     return true;
 }
 
 /**
- * @brief
+ * @brief find all pairs of faces which are on a same plane. Their normals have to be on opposite directions
  * @tparam Scalar
  * @param atBoundary
  */
 template<typename Scalar>
-void ContactGraph<Scalar>::createNodes(vector<bool> &atBoundary) {
+void ContactGraph<Scalar>::listPotentialContacts(vector<bool> &atBoundary)
+{
+    size_t sta = 0, end = 0;
+    while (sta < contact_faces.size())
+    {
+        for (end = sta + 1; end < contact_faces.size(); end++)
+        {
+            if (contact_faces[sta].groupID != contact_faces[end].groupID)
+            {
+                break;
+            }
+        }
+        if (end - sta > 1)
+        {
+            for (int id = sta; id < end; id++) {
+                for (int jd = id + 1; jd < end; jd++)
+                {
+                    int partI = contact_faces[id].partID;
+                    int partJ = contact_faces[jd].partID;
+
+                    Vector3 nrmI = contact_faces[id].nrm.normalized();
+                    Vector3 nrmJ = contact_faces[jd].nrm.normalized();
+
+                    if (partI != partJ
+                        && std::abs(nrmI.dot(nrmJ) + 1) < FLOAT_ERROR_LARGE
+                        && (!atBoundary[partI] || !atBoundary[partJ]))
+                        contact_pairs.push_back(pairIJ(id, jd));
+                }
+            }
+        }
+        sta = end;
+    }
+}
+
+/**
+ * @brief Parallel compute contacts.
+ *        Though faces in the 'contact_pairs' are on the same plane,
+ *        checking whether they are overlap needs the 2D poly-poly intersection tool.
+ * @tparam Scalar
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::computeContacts()
+{
+    size_t psize = contact_pairs.size();
+    contact_graphedges.resize(psize);
+    // for (size_t id = 0; id != planeIJ.size(); ++id) // Sequential loop
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, psize), [&](const tbb::blocked_range<size_t> &r)
+    {
+        for (size_t id = r.begin(); id != r.end(); ++id) {
+
+            int planeI = contact_pairs[id].first;
+            int planeJ = contact_pairs[id].second;
+
+            vector<Vector3> polyI = contact_faces[planeI].polygon.lock()->getVertices();
+            vector<Vector3> polyJ = contact_faces[planeJ].polygon.lock()->getVertices();
+            vector<vector<Vector3>> contactPtLists;
+
+            PolyPolyBoolean<Scalar> ppIntersec(getVarList());
+
+            ppIntersec.computePolygonsIntersection(polyI, polyJ, contactPtLists);
+            if (contactPtLists.empty())
+            {
+                continue;
+            }
+
+            vector<pPolygon> contactPolys;
+            for (vector<Vector3> contactPtList: contactPtLists)
+            {
+                if (contactPtList.size() >= 3) {
+                    pPolygon contactPoly = make_shared<_Polygon<Scalar>>();
+                    contactPoly->setVertices(contactPtList);
+                    contactPolys.push_back(contactPoly);
+                }
+            }
+
+            if (!contactPolys.empty())
+            {
+                contact_graphedges[id] = make_shared<ContactGraphEdge<Scalar>>(contactPolys, contact_faces[planeI].nrm);
+            }
+        }
+    });
+}
+
+/**
+ * @brief add each part as a node into the graph
+ * @tparam Scalar
+ * @param atBoundary
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::buildNodes(vector<bool> &atBoundary)
+{
     for (size_t id = 0; id < meshes_input.size(); id++) {
         Vector3 centroid = meshes_input[id]->centroid();
         Scalar volume = meshes_input[id]->volume();
@@ -281,95 +338,22 @@ void ContactGraph<Scalar>::createNodes(vector<bool> &atBoundary) {
 }
 
 /**
- * @brief @Ziqi same here please
+ * @brief for all pairs of potential contact faces,
+ *        if their contact_graphedges is not empty, then we add this edge into the graph
  * @tparam Scalar
  */
 template<typename Scalar>
-void ContactGraph<Scalar>::findAllPairsOfPolygonsContact(vector<bool> &atBoundary) {
-    int sta = 0, end = 0;
+void ContactGraph<Scalar>::buildEdges() {
 
-    while (sta < planes.size()) {
-        for (end = sta + 1; end < planes.size(); end++) {
-            if (planes[sta].groupID != planes[end].groupID) {
-                break;
-            }
-        }
-        if (end - sta > 1) {
-            for (int id = sta; id < end; id++) {
-                for (int jd = id + 1; jd < end; jd++) {
-                    int partI = planes[id].partID;
-                    int partJ = planes[jd].partID;
-
-                    Vector3 nrmI = planes[id].nrm.normalized();
-                    Vector3 nrmJ = planes[jd].nrm.normalized();
-
-                    if (partI != partJ
-                        && std::abs(nrmI.dot(nrmJ) + 1) < FLOAT_ERROR_LARGE
-                        && (!atBoundary[partI] || !atBoundary[partJ]))
-                        planeIJ.push_back(pairIJ(id, jd));
-                }
-            }
-        }
-        sta = end;
-    }
-}
-
-/**
- * @brief
- * @tparam Scalar
- */
-template<typename Scalar>
-void ContactGraph<Scalar>::addContactEdges() {
-
-    for (size_t id = 0; id < planeIJ.size(); id++) {
-        pContactGraphEdge edge = planeIJEdges[id];
+    for (size_t id = 0; id < contact_pairs.size(); id++)
+    {
+        pContactGraphEdge edge = contact_graphedges[id];
         if (edge != nullptr) {
-            int planeI = planeIJ[id].first;
-            int planeJ = planeIJ[id].second;
-            int partI = planes[planeI].partID;
-            int partJ = planes[planeJ].partID;
+            int planeI = contact_pairs[id].first;
+            int planeJ = contact_pairs[id].second;
+            int partI = contact_faces[planeI].partID;
+            int partJ = contact_faces[planeJ].partID;
             addContact(nodes[partI], nodes[partJ], edge);
         }
     }
-}
-
-/**
- * @brief Parallel compute contacts
- * @tparam Scalar
- */
-template<typename Scalar>
-void ContactGraph<Scalar>::computeContacts() {
-
-    size_t psize = planeIJ.size();
-    // for (size_t id = 0; id != planeIJ.size(); ++id) // Sequential loop
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, psize), [&](const tbb::blocked_range<size_t> &r) {
-        for (size_t id = r.begin(); id != r.end(); ++id) {
-
-            int planeI = planeIJ[id].first;
-            int planeJ = planeIJ[id].second;
-
-            vector<Vector3> polyI = planes[planeI].polygon.lock()->getVertices();
-            vector<Vector3> polyJ = planes[planeJ].polygon.lock()->getVertices();
-            vector<vector<Vector3>> contactPtLists;
-
-            PolyPolyBoolean<Scalar> ppIntersec(getVarList());
-
-            ppIntersec.computePolygonsIntersection(polyI, polyJ, contactPtLists);
-            if (contactPtLists.empty())
-                continue;
-
-            vector<pPolygon> contactPolys;
-            for (vector<Vector3> contactPtList: contactPtLists) {
-                if (contactPtList.size() >= 3) {
-                    pPolygon contactPoly = make_shared<_Polygon<Scalar>>();
-                    contactPoly->setVertices(contactPtList);
-                    contactPolys.push_back(contactPoly);
-                }
-            }
-
-            if (!contactPolys.empty()) {
-                planeIJEdges[id] = make_shared<ContactGraphEdge<Scalar>>(contactPolys, planes[planeI].nrm);
-            }
-        }
-    });
 }

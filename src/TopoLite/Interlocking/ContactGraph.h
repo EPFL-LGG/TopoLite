@@ -22,7 +22,7 @@
 using pairIJ = std::pair<int, int>;
 
 template<typename Scalar>
-class ContactGraph : public TopoObject {
+class ContactGraph : public TopoObject{
 public:
     typedef shared_ptr<ContactGraphNode<Scalar>> pContactGraphNode;
 
@@ -43,8 +43,7 @@ public:
 
 public:
 
-    struct plane_contact {
-
+    struct polygonal_face{
         Matrix<Scalar, 3, 1> nrm;
         double D;
         int partID;
@@ -54,7 +53,7 @@ public:
     };
 
     struct plane_contact_compare {
-        bool operator()(const plane_contact &A, const plane_contact &B) const {
+        bool operator()(const polygonal_face &A, const polygonal_face &B) const {
             double eps = A.eps / 2;
 
             if (A.nrm[0] - B.nrm[0] < -eps)
@@ -90,9 +89,9 @@ public:
 private:
     // Class attributes used in constructFromPolyMesh method - Should not be accessed
     vector<pPolyMesh> meshes_input;
-    vector<plane_contact> planes;
-    vector<pairIJ> planeIJ;
-    vector<pContactGraphEdge> planeIJEdges;
+    vector<polygonal_face> contact_faces;
+    vector<pairIJ> contact_pairs;
+    vector<pContactGraphEdge> contact_graphedges;
 
 public:
 
@@ -102,13 +101,9 @@ public:
 
 public:
 
-    bool constructFromPolyMeshes(vector<pPolyMesh> &meshes,
-                                 vector<bool> &atBoundary,
-                                 double eps = 0.002);
-
-public:
-
-    void normalize_meshes(vector<pPolyMesh> &meshes);
+    bool buildFromMeshes(vector<pPolyMesh> &meshes,
+                         vector<bool> &atBoundary,
+                         Scalar eps = 0.002);
 
 public:
 
@@ -136,20 +131,15 @@ private:
 
     double scaleMeshIntoUnitedBox();
 
-    bool createContactPlanes(std::set<plane_contact, plane_contact_compare> &setPlanes, double maxD, double eps);
+    bool clusterFacesofInputMeshes(Scalar eps);
 
-    void createNodes(vector<bool> &atBoundary);
-
-    void findAllPairsOfPolygonsContact(vector<bool> &atBoundary);
-
-    void addContactEdges();
+    void listPotentialContacts(vector<bool> &atBoundary);
 
     void computeContacts();
-    /*************************************************
-    *
-    *           end of scaleMeshIntoUnitedBox methods
-    *
-    *************************************************/
+
+    void buildNodes(vector<bool> &atBoundary);
+
+    void buildEdges();
 };
 
 #include "ContactGraph.cpp"

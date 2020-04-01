@@ -44,7 +44,7 @@ TEST_CASE("Class ContactGraph")
         atBoundary.push_back(false);
 
         shared_ptr<ContactGraph<double>> graph = make_shared<ContactGraph<double>>(varList);
-        graph->constructFromPolyMeshes(meshes, atBoundary);
+        graph->buildFromMeshes(meshes, atBoundary);
 
         REQUIRE(graph->nodes.size() == 2);
         REQUIRE(graph->edges.size() == 1);
@@ -85,7 +85,7 @@ TEST_CASE("Class ContactGraph")
         atBoundary.push_back(false);
 
         shared_ptr<ContactGraph<double>> graph = make_shared<ContactGraph<double>>(varList);
-        graph->constructFromPolyMeshes(meshes, atBoundary);
+        graph->buildFromMeshes(meshes, atBoundary);
 
         REQUIRE(graph->nodes.size() == 2);
         REQUIRE(graph->edges.size() == 0);
@@ -121,7 +121,7 @@ TEST_CASE("Class ContactGraph")
         atBoundary.push_back(false);
 
         shared_ptr<ContactGraph<double>> graph = make_shared<ContactGraph<double>>(varList);
-        graph->constructFromPolyMeshes(meshes, atBoundary);
+        graph->buildFromMeshes(meshes, atBoundary);
 
         REQUIRE(graph->nodes.size() == 2);
         REQUIRE(graph->edges.size() == 1);
@@ -164,7 +164,7 @@ TEST_CASE("Class ContactGraph")
         atBoundary.push_back(true);
 
         shared_ptr<ContactGraph<double>> graph = make_shared<ContactGraph<double>>(varList);
-        graph->constructFromPolyMeshes(meshes, atBoundary);
+        graph->buildFromMeshes(meshes, atBoundary);
 
         REQUIRE(graph->nodes.size() == 2);
         REQUIRE(graph->edges.size() == 0);
@@ -192,7 +192,7 @@ TEST_CASE("Class ContactGraph")
         atBoundary.push_back(false);
 
         shared_ptr<ContactGraph<double>> graph = make_shared<ContactGraph<double>>(varList);
-        graph->constructFromPolyMeshes(meshes, atBoundary);
+        graph->buildFromMeshes(meshes, atBoundary);
 
         pPolyMesh contactMesh;
         graph->getContactMesh(contactMesh);
