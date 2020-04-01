@@ -50,7 +50,7 @@ TEST_CASE("Class ContactGraph")
         REQUIRE(graph->edges.size() == 1);
 
         _Polygon<double> contactPolygon;
-        for(auto ver: graph->edges[0]->polygons[0]->vers){
+        for(const auto& ver: graph->edges[0]->polygons[0]->vers){
             contactPolygon.push_back(Vector3d(ver->pos[0], ver->pos[1], ver->pos[2]));
         }
         REQUIRE(std::abs(contactPolygon.area() - 1) < 1e-4);
