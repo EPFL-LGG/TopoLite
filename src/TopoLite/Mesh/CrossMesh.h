@@ -42,6 +42,8 @@ public:
 
     typedef shared_ptr<VTex<Scalar>> pVTex;
 
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
+
 private:
 
 	vector<pCross> crossList;                   // Cross list of the mesh
@@ -50,7 +52,7 @@ private:
 
 public:
 
-	shared_ptr<PolyMesh<Scalar>> baseMesh2D;    // the 2D tiling pattern
+    pPolyMesh baseMesh2D;    // the 2D tiling pattern
 
 public:
 
@@ -90,7 +92,7 @@ public:
 
     void set_cross(size_t index, pCross _cross)
     {
-        if(index >= 0 || index < crossList.size())
+        if(index >= 0 && index < crossList.size())
         {
             crossList[index] = _cross;
             PolyMesh<Scalar>::polyList[index] = _cross;
@@ -99,15 +101,38 @@ public:
 
     pCross cross(size_t index)
     {
-        if(index >= 0 || index < crossList.size()){
+        if(index >= 0 && index < crossList.size()){
             return crossList[index];
         }
         return nullptr;
     }
 
+    void erase(size_t index){
+        if(index >= 0 && index < crossList.size()){
+            //erase crossList
+            crossList[index].reset();
+            crossList[index] = nullptr;
+            //erase polyList
+            PolyMesh<Scalar>::polyList[index].reset();
+            PolyMesh<Scalar>::polyList[index] = nullptr;
+        }
+    }
+
+    void erase_nullptr();
+
     size_t size() const{
         return crossList.size();
     }
+
+    const vector<wpCross>& getVertexCrosses(int verID){
+        if(verID >= 0 && verID < vertexCrossList.size()){
+            return vertexCrossList[verID];
+        }
+        static const vector<wpCross> none;
+        return none;
+    }
+
+    pPolyMesh getCrossMeshwithOrientedPointer();
 
 public:
 
@@ -135,6 +160,8 @@ public:
 private:
 
     pCross getNeighbor(pCross cross, pVertex v0, pVertex v1) const;
+
+
 };
 
 #include "CrossMesh.cpp"

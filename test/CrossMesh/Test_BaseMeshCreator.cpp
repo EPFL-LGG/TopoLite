@@ -48,7 +48,7 @@ TEST_CASE("BaseMeshCreator")
         patternCreator.create2DPattern(CROSS_HEXAGON, 30, _pattern2D);
 
         //build baseMeshCreator
-        BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D);
+        BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D, data.varList);
 
         // create internal cross
         shared_ptr<PolyMesh<double>> baseMesh2D;
@@ -62,7 +62,8 @@ TEST_CASE("BaseMeshCreator")
 
         SECTION("baseMeshCreator computeBaseCrossMesh")
         {
-            baseMeshCreator.computeBaseCrossMesh(interactMat, baseMesh2D, crossMesh);
+            data.varList->set("minCrossArea", 0.2f);
+            baseMeshCreator.computeBaseCrossMesh(interactMat, baseMesh2D, crossMesh, false);
             crossMesh->writeOBJModel("Pattern/origin.obj");
             baseMesh2D->writeOBJModel("Pattern/pattern.obj");
             _polyMesh->getTextureMesh()->writeOBJModel("Pattern/polymesh.obj");
@@ -86,4 +87,71 @@ TEST_CASE("BaseMeshCreator")
         }
     }
 
+    SECTION("removeDanglingCross")
+    {
+        _pattern2D = make_shared<CrossMesh<double>>(varList);
+
+        int dXY[4][2] = {{0, 0}, {1, 0}, {1, 1}, {0, 1}};   // 0---3---8
+        int verIDs[4][4] = {{0, 1, 2, 3},                   // | 0 | 3 |
+                            {1, 4, 5, 2},                   // 1---2---7
+                            {2, 5, 6, 7},                   // | 1 | 2 |
+                            {3, 2, 7, 8}};                  // 4---5---6
+
+
+        shared_ptr<Cross<double>> cross;
+        for(int id = 0; id < 4; id++)
+        {
+            cross = make_shared<Cross<double>>(Cross<double>(varList));
+            // vertices position vectors
+            cross->push_back(Vector3d(0 + dXY[id][0], 0 + dXY[id][1], 0));
+            cross->push_back(Vector3d(1 + dXY[id][0], 0 + dXY[id][1], 0));
+            cross->push_back(Vector3d(1 + dXY[id][0], 1 + dXY[id][1], 0));
+            cross->push_back(Vector3d(0 + dXY[id][0], 1 + dXY[id][1], 0));
+            _pattern2D->push_back(cross);
+        }
+
+        //add a dangling cross
+        cross = make_shared<Cross<double>>(Cross<double>(varList));
+        cross->push_back(Vector3d(2, 2, 0));
+        cross->push_back(Vector3d(3, 2, 0));
+        cross->push_back(Vector3d(3, 3, 0));
+        cross->push_back(Vector3d(2, 3, 0));
+        _pattern2D->push_back(cross);
+        cross.reset();
+
+        _pattern2D->update();
+        BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D, varList);
+        baseMeshCreator.removeDanglingCross(_pattern2D);
+        _pattern2D->erase_nullptr();
+
+        //reduce the number of crosses as well as the number of vertices
+        REQUIRE(_pattern2D->size() == 4);
+        REQUIRE(_pattern2D->vertexList.size() == 9);
+    }
+
+    SECTION("recomputeBoundary"){
+        _pattern2D = make_shared<CrossMesh<double>>(varList);
+        shared_ptr<Cross<double>> cross;
+        for(int id = 0; id < 5; id++)
+        {
+            for(int jd = 0; jd < 5; jd++){
+                cross = make_shared<Cross<double>>(Cross<double>(varList));
+                // vertices position vectors
+                cross->push_back(Vector3d(id, jd, 0));
+                cross->push_back(Vector3d(id + 1, jd, 0));
+                cross->push_back(Vector3d(id + 1, jd + 1, 0));
+                cross->push_back(Vector3d(id, jd + 1, 0));
+                _pattern2D->push_back(cross);
+            }
+        }
+        _pattern2D->update();
+
+        REQUIRE(_pattern2D->cross(12)->atBoundary == false);
+
+        varList->set("layerOfBoundary", 2);
+        BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D, varList);
+        baseMeshCreator.recomputeBoundary(_pattern2D);
+        REQUIRE(_pattern2D->cross(12)->atBoundary == false);
+        REQUIRE(_pattern2D->cross(11)->atBoundary == true);
+    }
 }

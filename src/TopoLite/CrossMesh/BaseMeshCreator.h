@@ -62,6 +62,8 @@ public:
 
     typedef Matrix<Scalar, 4, 4> Matrix4;
 
+    typedef std::unordered_map<Cross<Scalar> *, int> mapCrossInt;
+
 public:
 
     //map the vertices of pattern2D onto polyMesh
@@ -81,13 +83,16 @@ public:
 public:
 
     BaseMeshCreator(pPolyMeshAABB _polyMesh,
-                    pCrossMesh _pattern2D);
-
-    BaseMeshCreator(shared_ptr<InputVarList> var);
+                    pCrossMesh _pattern2D,
+                    shared_ptr<InputVarList> varList);
 
     ~BaseMeshCreator();
 
-	// Compute Lifted 3D Mesh 
+
+
+public:
+
+    // Compute Lifted 3D Mesh
 
 	/*!
 	 * \brief: main function for mapping the 2D pattern into 3D surface
@@ -100,7 +105,10 @@ public:
 	 */
 	void computeBaseCrossMesh(Matrix<Scalar, 4, 4> interactMat,
 	                          pPolyMesh &baseMesh2D,
-	                          pCrossMesh &crossMesh);
+	                          pCrossMesh &crossMesh,
+	                          bool previewMode = false);
+
+public:
 
 	void computeInternalCross(Matrix4 textureMat,
 	                          pPolyMesh &baseMesh2D,
@@ -110,16 +118,11 @@ public:
                               pPolyMesh &baseMesh2D,
                               pCrossMesh &crossMesh);
 
-    void ComputePracticalBoundary(pCrossMesh &crossMesh);
+	void removeSmallCrosses(pCrossMesh crossMesh);
 
-//	void ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh crossMesh);
+    void recomputeBoundary(pCrossMesh crossMesh);
 
-	void RemoveDanglingCross(pCrossMesh crossMesh);
-
-	bool ComputeBoundaryVertex(double inverTextureMat[16], Vector3 sta2D, Vector3 end2D, Vector3 &pos2D, Vector3 &pos3D);
-
-
-    Matrix4 computeTextureMat(const pPolyMesh &referenceSurface, Matrix4 interactMat);
+	void removeDanglingCross(pCrossMesh crossMesh);
 
 public:
 	/*!
@@ -135,10 +138,7 @@ public:
 
 	void splitIntoConsecutivePolygons(const vector<Line<Scalar>> &line, const vector<bool>& inside, tbb::concurrent_vector<pPolygon> &polyList);
 
-
-//
-//	// Remove Dangling Polygon
-//	void RemoveDanglingCross(pCrossMesh crossMesh);
+    Matrix4 computeTextureMat(const pPolyMesh &referenceSurface, Matrix4 interactMat);
 };
 
 #include "BaseMeshCreator.cpp"

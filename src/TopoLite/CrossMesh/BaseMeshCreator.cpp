@@ -21,18 +21,11 @@
 
 template <typename Scalar>
 BaseMeshCreator<Scalar>::BaseMeshCreator(pPolyMeshAABB _polyMesh,
-                                         pCrossMesh _pattern2D)
-: TopoObject(_polyMesh?_polyMesh->getVarList():make_shared<InputVarList>())
-{
+                                         pCrossMesh _pattern2D,
+                                         shared_ptr<InputVarList> varList)
+: TopoObject(varList) {
     polyMesh = _polyMesh;
     pattern2D = _pattern2D;
-}
-
-template <typename Scalar>
-BaseMeshCreator<Scalar>::BaseMeshCreator(shared_ptr<InputVarList> var)
-: TopoObject(var)
-{
-
 }
 
 template <typename Scalar>
@@ -48,68 +41,42 @@ BaseMeshCreator<Scalar>::~BaseMeshCreator()
 template <typename Scalar>
 void BaseMeshCreator<Scalar>::computeBaseCrossMesh(Matrix4 interactMat,
                                                    pPolyMesh &baseMesh2D,
-                                                   pCrossMesh &crossMesh)
+                                                   pCrossMesh &crossMesh,
+                                                   bool previewMode)
 {
 	tbb::tick_count sta = tbb::tick_count::now();
+	//bool smooth boundary
+	bool use_smooth_boundary = getVarList()->template get<bool>("smooth_bdry");
 
+	// allocate mesh memory
 	crossMesh = make_shared<CrossMesh<double>>(getVarList());
 	baseMesh2D = make_shared<PolyMesh<double>>(getVarList());
 
+	// compute texture mapping matrix
 	Matrix4 textureMat = computeTextureMat(polyMesh.lock(), interactMat);
-    computeInternalCross(textureMat, baseMesh2D, crossMesh);
 
-	if(getVarList()->template get<bool>("smooth_bdry"))
-	{
-        computeBoundaryCross(textureMat, baseMesh2D, crossMesh);
-		//remove dangling
-		//RemoveDanglingCross(crossMesh);
-    }
-//
-//    if(baseMesh2D){
-//        baseMesh2D->setVarList(getVarList());
-//    }
-//
-//	if(crossMesh){
-//        crossMesh->setVarList(getVarList());
-//        ComputePracticalBoundary(crossMesh);
-//    }
-//
-    // build crossMesh connectivity
+	// compute the inner and boundary cross
+	computeInternalCross(textureMat, baseMesh2D, crossMesh);
+	if(use_smooth_boundary) computeBoundaryCross(textureMat, baseMesh2D, crossMesh);
+
+    // update the vertex ID and build up connectivity of meshes
     crossMesh->update();
     baseMesh2D->update();
+
+    //remove boundary_pattern2D and pattern2D_vertices_on_polyMesh
+    boundary_pattern2D.clear();
+    pattern2D_vertices_on_polyMesh.clear();
+
+    //polish the boundary of the crossMesh
+    if(!previewMode){
+        removeSmallCrosses(crossMesh);
+        removeDanglingCross(crossMesh);
+        crossMesh->erase_nullptr();
+        recomputeBoundary(crossMesh);
+    }
+
 	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 }
-
-template <typename Scalar>
-void BaseMeshCreator<Scalar>::RemoveDanglingCross(pCrossMesh crossMesh)
-{
-	if(crossMesh == nullptr) return;
-	if(crossMesh->crossList.size() < 3) return;
-	for(auto it = crossMesh->crossList.begin(); it != crossMesh->crossList.end();)
-	{
-		pCross cross = *it;
-		if(cross == nullptr) continue;
-		int numNeighbor = 0;
-		pCross ncross = nullptr;
-		for(size_t jd = 0; jd < cross->neighbors.size(); jd++){
-			if(cross->neighbors[jd].lock() == nullptr) continue;
-			numNeighbor ++;
-			ncross = cross->neighbors[jd].lock();
-		}
-		if(numNeighbor == 0){
-			it = crossMesh->crossList.erase(it);
-		}
-		else if(numNeighbor == 1){
-			ncross->neighbors[ncross->GetNeighborEdgeID(cross->crossID)] = pCross();
-			it = crossMesh->crossList.erase(it);
-		}
-		else{
-			it ++;
-		}
-	}
-    crossMesh->updateCrossID();
-}
-
 template <typename Scalar>
 void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
                                                    pPolyMesh &baseMesh2D,
@@ -126,7 +93,7 @@ void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
     tbb::parallel_for(tbb::blocked_range<size_t>(0, pattern2D.lock()->vertexList.size()),[&](const tbb::blocked_range<size_t>& r)
     {
         for (size_t id = r.begin(); id != r.end(); ++id)
-        //for (size_t id = 0; id != pattern2D.lock()->vertexList.size(); ++id)
+            //for (size_t id = 0; id != pattern2D.lock()->vertexList.size(); ++id)
         {
             if (pattern2D.lock()->vertexList[id] == nullptr) continue;
 
@@ -156,11 +123,11 @@ void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
     tbb::concurrent_vector<pCross> internal_cross;
     tbb::concurrent_vector<pPolygon> internal_pattern2D;
 
-	// generating all internal crosses
+    // generating all internal crosses
     tbb::parallel_for(tbb::blocked_range<size_t>(0, pattern2D.lock()->size()),[&](const tbb::blocked_range<size_t>& r)
     {
         for (size_t id = r.begin(); id != r.end(); ++id)
-        //for (size_t id = 0; id != pattern2D.lock()->size(); ++id)
+            //for (size_t id = 0; id != pattern2D.lock()->size(); ++id)
         {
             if(pattern2D.lock()->cross(id) == nullptr) continue;
             pCross poly2D = pattern2D.lock()->cross(id);
@@ -203,7 +170,8 @@ void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
     }
 
     //append all polygons into baseMesh
-    for(pPolygon poly: internal_pattern2D){
+    for(pPolygon poly: internal_pattern2D)
+    {
         pPolygon rescale_poly = make_shared<_Polygon<Scalar>>(*poly);
         for(pVertex vertex : rescale_poly->vers){
             Vector2 textureCoord = getTextureCoord(vertex->pos.head(2), textureMat);
@@ -214,7 +182,6 @@ void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,
         baseMesh2D->polyList.push_back(rescale_poly);
     }
 }
-
 
 template <typename Scalar>
 void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
@@ -326,8 +293,130 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
 
     //append to baseMesh
     baseMesh2D->polyList.insert(baseMesh2D->polyList.end(), poly2DLists.begin(), poly2DLists.end());
-
 }
+
+template<typename Scalar>
+void BaseMeshCreator<Scalar>::removeSmallCrosses(BaseMeshCreator::pCrossMesh crossMesh)
+{
+    Scalar minimum_ratio = getVarList()->template get<float>("minCrossArea");
+
+    //compute the maximum cross Area
+    Scalar maximum_crossArea = tbb::parallel_reduce(
+            tbb::blocked_range<size_t>(0, crossMesh->size()),
+            Scalar(),
+            [&](const tbb::blocked_range<size_t>& r, Scalar maximum)->Scalar {
+                for(size_t id = r.begin(); id != r.end(); ++id)
+                {
+                    Scalar area = crossMesh->cross(id)->area();
+                    maximum = maximum > area ? maximum : area;
+                }
+                return maximum;
+            },
+            [&]( Scalar x, Scalar y )->Scalar {
+                return x > y ? x: y;
+            }
+    );
+
+    for(size_t id = 0; id < crossMesh->size(); id++)
+    {
+        Scalar area = crossMesh->cross(id)->area();
+        if(area < maximum_crossArea * minimum_ratio){
+            crossMesh->erase(id);
+        }
+    }
+}
+
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::removeDanglingCross(pCrossMesh crossMesh)
+{
+	if(crossMesh == nullptr) return;
+    crossMesh->updateCrossID();
+
+	//cluster all groups into connected components
+    mapCrossInt cross_groupID;
+    vector<vector<wpCross>> groupCrosses;
+    for(size_t id = 0; id < crossMesh->size(); id++){
+        pCross cross = crossMesh->cross(id);
+        if(cross != nullptr && cross_groupID.find(cross.get()) == cross_groupID.end())
+        {
+            //add cross into groupCross with ID (groupID)
+            int groupID = groupCrosses.size();
+            groupCrosses.push_back(vector<wpCross>());
+            cross_groupID[cross.get()] = groupID;
+            groupCrosses[groupID].push_back(cross);
+
+            //BFS queue
+            std::queue<wpCross> crossQueue;
+            crossQueue.push(cross);
+            while(!crossQueue.empty())
+            {
+                wpCross u = crossQueue.front(); crossQueue.pop();
+                for(wpCross neighbor: u.lock()->neighbors)
+                {
+                    //if neighbor exists and have not been assigned a ID number
+                    //add it to the queue
+                    if(neighbor.lock() != nullptr && cross_groupID.find(neighbor.lock().get()) == cross_groupID.end()){
+                        crossQueue.push(neighbor.lock());
+                        cross_groupID[neighbor.lock().get()] = groupID;
+                        groupCrosses[groupID].push_back(neighbor.lock());
+                    }
+                }
+            }
+        }
+    }
+
+    //select the biggest group and remove others
+    //Todo: could have other dangling definition, like number of parts in a cluster is less than 5?
+    std::sort(groupCrosses.begin(), groupCrosses.end(), [=](const vector<wpCross> &A, const vector<wpCross> &B){
+        return A.size() > B.size();
+    });
+
+    for(int id = 1; id < groupCrosses.size(); id++){
+        for(wpCross cross: groupCrosses[id]){
+            crossMesh->erase(cross.lock()->crossID);
+        }
+    }
+}
+
+template <typename Scalar>
+void BaseMeshCreator<Scalar>::recomputeBoundary(pCrossMesh crossMesh)
+{
+    int iterate_times = std::max(1, getVarList()->template get<int>("layerOfBoundary"));
+
+    //clear all boundary mark
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, crossMesh->size()), [&](tbb::blocked_range<size_t> &r) {
+        for (size_t id = r.begin(); id != r.end(); id++) {
+            crossMesh->cross(id)->atBoundary = false;
+        }
+    });
+
+    //create iterate_times' layer of boundary crosses
+    for(size_t times = 0; times < iterate_times; times++)
+    {
+        tbb::concurrent_vector<wpCross> boundary_crosses;
+        tbb::parallel_for(tbb::blocked_range<size_t>(0, crossMesh->size()), [&](tbb::blocked_range<size_t> &r){
+            for(size_t id = r.begin(); id != r.end(); id++)
+            {
+                pCross cross = crossMesh->cross(id);
+                for(wpCross neighbor : cross->neighbors)
+                {
+                    if(neighbor.lock() == nullptr || neighbor.lock()->atBoundary){
+                        boundary_crosses.push_back(cross);
+                        break;
+                    }
+                }
+            }
+        });
+
+        for(wpCross cross: boundary_crosses){
+            cross.lock()->atBoundary = true;
+        }
+    }
+}
+
+//**************************************************************************************//
+//                               Utility Function
+//**************************************************************************************//
 
 template <typename Scalar>
 void  BaseMeshCreator<Scalar>::splitIntoConsecutivePolygons(
@@ -457,84 +546,4 @@ bool BaseMeshCreator<Scalar>::mapTexPointBackToSurface(Vector2 ptTexCoord, Vecto
     return false;
 }
 
-template <typename Scalar>
-void BaseMeshCreator<Scalar>::ComputePracticalBoundary(pCrossMesh &crossMesh)
-{
-    vector<wpCross> boundaryCross;
-    crossMesh->UpdateCrossVertexIndex();
-    vector<vector<wpCross>> &vertexCrossList = crossMesh->vertexCrossList;
-
-    for(size_t id = 0; id < crossMesh->crossList.size(); id++)
-    {
-        pCross cross = crossMesh->crossList[id];
-        cross->atBoundary = false;
-    }
-
-    auto setVertexRingBoundary = [&](int verID){
-        if(verID >= 0 && verID < vertexCrossList.size())
-        {
-            for(wpCross cross: vertexCrossList[verID]){
-                if(!cross.lock()->atBoundary){
-                    boundaryCross.push_back(cross);
-                    cross.lock()->atBoundary = true;
-                }
-            }
-        }
-        return;
-    };
-
-    for(size_t id = 0; id < crossMesh->crossList.size(); id++)
-    {
-        pCross cross = crossMesh->crossList[id];
-        for(size_t jd = 0; jd < cross->neighbors.size(); jd ++)
-        {
-            if(cross->neighbors[jd].lock() == nullptr)
-            {
-                int verID = cross->verIDs[jd];
-                setVertexRingBoundary(verID);
-                verID = cross->verIDs[(jd + 1) % cross->verIDs.size()];
-                setVertexRingBoundary(verID);
-            }
-        }
-    }
-
-    float minBoundaryEdge = getVarList()->template get<float>("minBoundaryEdge");
-    for(size_t id = 0; id < boundaryCross.size(); id++)
-    {
-        pCross cross = boundaryCross[id].lock();
-        size_t size = cross->vers.size();
-        for(int jd = 0; jd < size; jd++)
-        {
-            // the neighbor must exists
-            if(!cross->neighbors[jd].lock()) continue;
-
-            float edgeLen = len(cross->vers[(jd + 1) % size].pos - cross->vers[jd].pos);
-            // if the length of the edge is too small, then include one more part
-            if(minBoundaryEdge > edgeLen)
-            {
-                wpCross ncross = cross->neighbors[jd];
-                int shared_id = cross->GetSharedCross(ncross);
-
-                if(shared_id >= 0 && shared_id < crossMesh->crossList.size()){
-                    pCross shared_cross = crossMesh->crossList[shared_id];
-                    shared_cross->atBoundary = true;
-                }
-            }
-        }
-    }
-
-    for(size_t id = 0; id < crossMesh->crossList.size(); id++) {
-        pCross cross = crossMesh->crossList[id];
-        if (cross == nullptr || cross->atBoundary) continue;
-        bool allBoundary = true;
-        for (size_t jd = 0; jd < cross->neighbors.size(); jd++) {
-            wpCross ncross = cross->neighbors[jd];
-            if (ncross.lock() != nullptr && ncross.lock()->atBoundary == false) {
-                allBoundary = false;
-                break;
-            }
-        }
-        cross->atBoundary = allBoundary;
-    }
-}
 

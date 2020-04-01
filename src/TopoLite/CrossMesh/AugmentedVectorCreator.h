@@ -19,22 +19,36 @@
 #include "Mesh/CrossMesh.h"
 #include "Utility/TopoObject.h"
 
-#include <igl/AABB.h>
+#include <tbb/tbb.h>
 #include <utility>
-#include <vector>
-#include <TopoLite/Mesh/HEdgeMesh.h>
+#include <queue>
+#include <unordered_map>
 
 using namespace std;
 
-using pCrossMesh = shared_ptr<CrossMesh>;
-using pHEdgeMesh = shared_ptr<HEdgeMesh>;
-using pPolyMesh = shared_ptr<PolyMesh>;
+
 
 /*!
  * \brief: Create CrossMesh by Input the polygonal mesh and tiltAngle
  */
+
+template<typename Scalar>
 class AugmentedVectorCreator : public TopoObject
 {
+public:
+
+    typedef shared_ptr<CrossMesh<Scalar>> pCrossMesh;
+
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef Matrix<Scalar, 2, 1> Vector2;
+
 public:
 
     explicit AugmentedVectorCreator(shared_ptr<InputVarList> var):TopoObject(std::move(var)){}
@@ -47,7 +61,7 @@ public:
      * \brief Create crossMesh by setting alterative tiltAngle in polyMesh
      * \note This is the main function
      */
-    void CreateAugmentedVector(float tiltAngle, pCrossMesh &crossMesh);
+    void createAugmentedVector(Scalar tiltAngle, pCrossMesh crossMesh);
 
 public:
 
@@ -55,21 +69,21 @@ public:
      * \brief Set initial tilt angle for each cross.
      * \note: the initial tilt angle is 0.
      */
-    static void InitMeshTiltNormals(const pCrossMesh& crossMesh);
+    static void InitMeshTiltNormals(pCrossMesh crossMesh);
 
     /*!
      * \brief Distribute the sign of each tilt angle
     * \todo Only consider one possible distribution of sign for each edge. Other distribution may exist and can improve the structural stability
      */
-    void InitMeshTiltNormalsResolveConflicts(const pCrossMesh& crossMesh, float tiltAngle);
+    void InitMeshTiltNormalsResolveConflicts(pCrossMesh crossMesh, Scalar tiltAngle);
 
+    void UpdateMeshTiltNormals(pCrossMesh crossMesh, Scalar tiltAngle);
 
-    void UpdateMeshTiltNormals(const pCrossMesh& crossMesh, float tiltAngle);
-
-    bool UpdateMeshTiltRange(const pCrossMesh& crossMesh);
+    bool UpdateMeshTiltRange(pCrossMesh crossMesh);
 
 };
 
+#include "AugmentedVectorCreator.cpp"
 #endif
 
 

@@ -2,7 +2,6 @@
 // Created by ziqwang on 10.03.19.
 //
 #include "InputVar.h"
-#include "Utility/HelpDefine.h"
 void InitVar(InputVarList *varList)
 {
     varList->clear();
@@ -62,7 +61,7 @@ void InitVar(InputVarList *varList)
     varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Upper Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
     varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Lower Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
     varList->add((int)15, Vector2f(10, 30), "patternRadius", "Pattern Radius\t:") << "Pattern_Radius" = "Para_Basic";
-    varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Minimum Cross\t:") = "Para_Basic";
+    varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Minimum Cross Area (%)\t:") = "Para_Basic";
     varList->add(0.03f, Vector2f(0, 0.5), "minBoundaryEdge", "Minimum Bdry Edge\t:") = "Para_Basic";
     varList->add(1.0f, Vector2f(0, 1), "textureScaleFactor", "Texture Scale Factor\t:") = "Para_Basic";
     varList->add((int)(10), Vector2f(0, 32), "slopSample", "Slop Sample\t:") = "Para_Basic";
@@ -177,6 +176,7 @@ void InitVarLite(InputVarList *varList)
 {
     InitVar(varList);
     varList->add(true, "showDemo", "") = "";
+    varList->add((int)1, "layerOfBoundary", "") = "";
 
     varList->find("patternRadius")->visible = true;
     varList->find("minCrossArea")->visible = true;

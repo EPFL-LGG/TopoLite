@@ -199,9 +199,67 @@ template<typename Scalar>
 void CrossMesh<Scalar>::updateCrossID()
 {
     for(size_t id = 0; id < crossList.size(); id++){
-        if(crossList[id])
-            crossList[id]->crossID = id;
+        if(crossList[id]) crossList[id]->crossID = id;
     }
+}
+
+template<typename Scalar>
+void CrossMesh<Scalar>::erase_nullptr()
+{
+    //remove crossList
+    for(auto it = crossList.begin(); it != crossList.end();){
+        if(*it == nullptr){
+            it = crossList.erase(it);
+        }
+        else{
+            it ++;
+        }
+    }
+
+    //remove polyList
+    for(auto it = PolyMesh<Scalar>::polyList.begin(); it != PolyMesh<Scalar>::polyList.end();){
+        if(*it == nullptr){
+            it = PolyMesh<Scalar>::polyList.erase(it);
+        }
+        else{
+            it ++;
+        }
+    }
+
+    //remove vertexList and vertexCrossList
+    typename vector<vector<wpCross>>::iterator vcross_it = vertexCrossList.begin();
+    typename vector<pVertex>::iterator vertex_it = vertexList.begin();
+    for(;vcross_it != vertexCrossList.end(); ){
+        for(auto it = vcross_it->begin(); it != vcross_it->end(); ){
+            if(it->lock() == nullptr){
+                vcross_it->erase(it);
+            }
+            else{
+                it ++;
+            }
+        }
+
+        if(vcross_it->empty()){
+            vcross_it = vertexCrossList.erase(vcross_it);
+            vertex_it = vertexList.erase(vertex_it);
+        }
+        else{
+            vcross_it ++;
+            vertex_it ++;
+        }
+    }
+
+    for(int id = 0; id < vertexList.size(); id++){
+        vertexList[id]->verID = id;
+    }
+
+    updateCrossID();
+}
+
+template<typename Scalar>
+typename CrossMesh<Scalar>::pPolyMesh CrossMesh<Scalar>::getCrossMeshwithOrientedPointer()
+{
+
 }
 
 

@@ -87,11 +87,11 @@ set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
 include(CTest)
 include(ParseAndAddCatchTests)
 
-#file(GLOB testTopoFiles test/CrossMesh/Test_BaseMeshCreator.cpp)
-file(GLOB testTopoFiles test/CrossMesh/*.cpp
-                        test/Mesh/*.cpp
-                        test/IO/*.cpp
-                        test/Utility/*.cpp)
+file(GLOB testTopoFiles test/CrossMesh/Test_AugmentedVectorCreator.cpp)
+#file(GLOB testTopoFiles test/CrossMesh/*.cpp
+#                        test/Mesh/*.cpp
+#                        test/IO/*.cpp
+#                        test/Utility/*.cpp)
 #file(GLOB testTopoFiles test/Mesh/*.cpp
 #                        test/Utility/*.cpp)
 

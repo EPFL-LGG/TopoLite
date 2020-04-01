@@ -11,45 +11,21 @@
 //
 ///////////////////////////////////////////////////////////////
 
-#include "Utility/HelpDefine.h"
-#include "Utility/HelpFunc.h"
-#include "Mesh/Cross.h"
-#include "Mesh/CrossMesh.h"
-#include "AugmentedVectorCreator.h"
-
-
-//**************************************************************************************//
-//                                   Standalone functions
-//**************************************************************************************//
-
-void FindARoot(const pCrossMesh &crossMesh, shared_ptr<Cross> &root);
-
-/*
- *  Find a root for Breadth-First Search Traversal
- */
-void FindARoot(const pCrossMesh &crossMesh, shared_ptr<Cross> &root) {
-    for (const auto &item : crossMesh->crossList) {
-        if (!item->atBoundary) {
-            root = item;
-            return;
-        }
-    }
-}
-
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
-AugmentedVectorCreator::~AugmentedVectorCreator() {
+template<typename Scalar>
+AugmentedVectorCreator<Scalar>::~AugmentedVectorCreator() {
 
 }
-
 
 //**************************************************************************************//
 //                           Convert Polygonal Mesh into Cross Mesh
 //**************************************************************************************//
 
-void AugmentedVectorCreator::CreateAugmentedVector(float tiltAngle, pCrossMesh &crossMesh) {
+template<typename Scalar>
+void AugmentedVectorCreator<Scalar>::createAugmentedVector(Scalar tiltAngle, pCrossMesh crossMesh) {
     if (crossMesh) {
         InitMeshTiltNormals(crossMesh);
         InitMeshTiltNormalsResolveConflicts(crossMesh, tiltAngle);
@@ -57,87 +33,79 @@ void AugmentedVectorCreator::CreateAugmentedVector(float tiltAngle, pCrossMesh &
 }
 
 
-void AugmentedVectorCreator::InitMeshTiltNormals(const pCrossMesh& crossMesh) {
-    for (const auto &cross : crossMesh->crossList) {
-        cross->InitTiltNormals();
-    }
+template<typename Scalar>
+void AugmentedVectorCreator<Scalar>::InitMeshTiltNormals(pCrossMesh crossMesh)
+{
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, crossMesh->size()), [&](const tbb::blocked_range<size_t> &r){
+        for(size_t id = r.begin(); id != r.end(); ++id){
+            crossMesh->cross(id)->initTiltNormals();
+        }
+    });
 }
 
 
-void AugmentedVectorCreator::InitMeshTiltNormalsResolveConflicts(const pCrossMesh &crossMesh, float tiltAngle) {
-    vector<pCross> bfsQueue;
+template<typename Scalar>
+void AugmentedVectorCreator<Scalar>::InitMeshTiltNormalsResolveConflicts(pCrossMesh crossMesh, Scalar tiltAngle) {
 
-    if (crossMesh->crossList.empty())
+    if (crossMesh->size() == 0)
+        return;
+
+    // Start at any non-boundary cross
+    wpCross nonboundary_cross;
+    for(size_t id = 0; id < crossMesh->size(); ++id){
+        if(crossMesh->cross(id)->atBoundary == false){
+            nonboundary_cross = crossMesh->cross(id);
+            break;
+        }
+    }
+    //if every cross is at boundary, exist
+    if (nonboundary_cross.lock() == nullptr)
         return;
 
     // Breadth-First Search Traversal
-    //
     // Ref: https://en.wikipedia.org/wiki/Breadth-first_search
+    std::queue<wpCross> bfsQueue;
+    std::unordered_map<Cross<Scalar> *, bool> crossVisited;
+    nonboundary_cross.lock()->updateTiltNormalsRoot(tiltAngle);
 
-    // Start at tree root (or is it an arbitrary root here?)
-
-    shared_ptr<Cross> root;
-
-    FindARoot(crossMesh, root);
-
-    if (root == nullptr)
-        return;
-
-    root->UpdateTiltNormal_Root(tiltAngle);
-    root->isVisited = true;
-    bfsQueue.push_back(root);
+    bfsQueue.push(nonboundary_cross.lock());
+    crossVisited[nonboundary_cross.lock().get()] = true;
 
 
     // Explores all the neighbor nodes at present depth before going to next depth level
-
-    while (!bfsQueue.empty()) {
-        shared_ptr<Cross> currVisit = bfsQueue[0];
-        bfsQueue.erase(bfsQueue.begin());
-
-
-        bool isAllVisited = true;
-
-        for (const auto &cross : crossMesh->crossList) {
-            if (cross == nullptr)
-                continue;
-            if (!cross->isVisited) {
-                isAllVisited = false;
-                break;
-            }
-        }
-
-        // Quit if all crosses have been visited
-
-        if (isAllVisited)
-            break;
+    // here, if user select "ground_touch_brdy", we only update non-boundary cross
+    while (!bfsQueue.empty())
+    {
+        wpCross currVisit = bfsQueue.front();
+        bfsQueue.pop();
 
         // Process the neighbors of current cross
-
-        for (int i = 0; i < currVisit->neighbors.size(); i++) {
-//			printf(" i=%d \n", i);
-            shared_ptr<Cross> nextVisit = currVisit->neighbors[i].lock();
-
-            if (    nextVisit == nullptr
-                ||  nextVisit->isVisited
-                || (nextVisit->atBoundary && getVarList()->get<bool>("ground_touch_bdry")))
+        for (wpCross nextVisit: currVisit.lock()->neighbors)
+        {
+            if (    nextVisit.lock() == nullptr
+                ||  crossVisited.find(nextVisit.lock().get()) != crossVisited.end()
+                || (nextVisit.lock()->atBoundary && getVarList()->template get<bool>("ground_touch_bdry")))
                 continue;
 
-            nextVisit->UpdateTiltNormal(tiltAngle);
-            nextVisit->isVisited = true;
-            bfsQueue.push_back(nextVisit);
+            nextVisit.lock()->updateTiltNormals(tiltAngle);
+            crossVisited[nextVisit.lock().get()] = true;
+            bfsQueue.push(nextVisit.lock());
         }
     }
 
-    if (getVarList()->get<bool>("ground_touch_bdry")) {
-        for (auto &id : crossMesh->crossList) {
-            if (id->atBoundary)
-                id->UpdateTiltNormal(tiltAngle);
+    //update the reset of boundary crosses
+    if (getVarList()->template get<bool>("ground_touch_bdry")) {
+        for (size_t id = 0; id < crossMesh->size(); ++id) {
+            wpCross part = crossMesh->cross(id);
+            if (part.lock()->atBoundary)
+                part.lock()->updateTiltNormals(tiltAngle);
         }
     }
 }
 
 
-void AugmentedVectorCreator::UpdateMeshTiltNormals(const pCrossMesh &crossMesh, float tiltAngle) {
+template<typename Scalar>
+void AugmentedVectorCreator<Scalar>::UpdateMeshTiltNormals(pCrossMesh crossMesh, Scalar tiltAngle) {
 
     if (crossMesh == nullptr)
         return;
@@ -148,7 +116,7 @@ void AugmentedVectorCreator::UpdateMeshTiltNormals(const pCrossMesh &crossMesh, 
             continue;
 
         for (int jd = 0; jd < cross->oriPoints.size(); jd++) {
-            shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
+            shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
             if (cross->neighbors[jd].lock() != nullptr) {
                 if (!cross->neighbors[jd].lock()->atBoundary || !cross->atBoundary) {
                     oriPt->normal = cross->RotateNormal(oriPt->rotation_base,
@@ -162,41 +130,38 @@ void AugmentedVectorCreator::UpdateMeshTiltNormals(const pCrossMesh &crossMesh, 
 }
 
 
-bool AugmentedVectorCreator::UpdateMeshTiltRange(const shared_ptr<CrossMesh> &crossMesh) {
+template<typename Scalar>
+bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {
     if (crossMesh == nullptr)
         return false;
 
-    auto big_zero_eps = getVarList()->get<float>("big_zero_eps");
+    auto big_zero_eps = getVarList()->template get<float>("big_zero_eps");
     for (const auto &cross : crossMesh->crossList) {
         if (cross == nullptr)
             continue;
 
         for (int jd = 0; jd < cross->oriPoints.size(); jd++) {
-            shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
+            shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
             if (oriPt == nullptr)
                 continue;
 
-            Vector3f t = oriPt->rotation_base;
-            t /= len(t);
-            Vector3f e = oriPt->rotation_axis;
-            e /= len(e);
-            Vector3f y = oriPt->rotation_base CROSS oriPt->rotation_axis;
-            y /= len(y);
+            Vector3 t = oriPt->rotation_base.normalized();
+            Vector3 e = oriPt->rotation_axis.normalized();
 
-            if (oriPt->tiltSign == 1)
-                y *= -1;
+            Vector3 y = (oriPt->rotation_base.cross(oriPt->rotation_axis)).normalized();
+            if (oriPt->tiltSign == 1) y *= -1;
 
-            Vector3f p0 = oriPt->point;
+            Vector3 p0 = oriPt->point;
 
             for (auto  &ver : cross->vers) {
-                Vector3f pi = ver.pos;
-                double yPiP0 = (y) DOT (pi - p0);
-                double tPiP0 = (-t) DOT (pi - p0);
+                Vector3 pi = ver.pos;
+                double yPiP0 = (y).dot(pi - p0);
+                double tPiP0 = (-t).dot(pi - p0);
                 if (std::abs(tPiP0) < big_zero_eps && std::abs(yPiP0) < big_zero_eps)
                     continue;
 
                 if (std::abs(tPiP0) < big_zero_eps && yPiP0 > big_zero_eps) {
-                    oriPt->tilt_range = Vector2f(0, 0);
+                    oriPt->tilt_range = Vector2(0, 0);
                     oriPt->sided_range = oriPt->tilt_range;
                     continue;
                 } else {
@@ -221,28 +186,28 @@ bool AugmentedVectorCreator::UpdateMeshTiltRange(const shared_ptr<CrossMesh> &cr
 
     for (const auto &cross : crossMesh->crossList) {
         for (int jd = 0; jd < cross->neighbors.size(); jd++) {
-            shared_ptr<Cross> ncross = cross->neighbors[jd].lock();
+            pCross ncross = cross->neighbors[jd].lock();
 
             if (ncross == nullptr || cross->crossID > ncross->crossID)
                 continue;
 
             int edgeID = ncross->GetNeighborEdgeID(cross->crossID);
-            shared_ptr<OrientPoint> noriPt = ncross->oriPoints[edgeID];
-            shared_ptr<OrientPoint> oriPt = cross->oriPoints[jd];
-            Vector2f range(0, 0);
-            range.x = std::max(oriPt->tilt_range.x, noriPt->tilt_range.x);
-            range.y = std::min(oriPt->tilt_range.y, noriPt->tilt_range.y);
+            shared_ptr<OrientPoint<Scalar>> noriPt = ncross->oriPoints[edgeID];
+            shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
+            Vector2 range(0, 0);
+            range.x() = std::max(oriPt->tilt_range.x(), noriPt->tilt_range.x());
+            range.y() = std::min(oriPt->tilt_range.y(), noriPt->tilt_range.y());
 
             // FIXME: 2 unused variables
             oriPt->tilt_range = range;
             noriPt->tilt_range = range;
 //            std::cout << "Cross:\t" << cross->crossID << ",\t OriID:\t" << jd << ",\t Range:\t[" << range.x << ", " << range.y << "]" << std::endl;
-            if (min_max > range.y) min_max = range.y;
-            if (max_min < range.x) max_min = range.x;
+            if (min_max > range.y()) min_max = range.y();
+            if (max_min < range.x()) max_min = range.x();
         }
     }
     std::cout << "Range:\t[" << max_min << ",\t" << min_max << "]" << std::endl;
 
-    auto tiltangle = getVarList()->get<float>("tiltAngle");
+    Scalar tiltangle = getVarList()->template get<float>("tiltAngle");
     return tiltangle < max_min || tiltangle > min_max ? false : true;
 }
