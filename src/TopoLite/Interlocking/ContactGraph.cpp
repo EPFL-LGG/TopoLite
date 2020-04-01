@@ -3,32 +3,197 @@
 //
 
 
+#include "ContactGraph.h"
+
 /*************************************************
 *
 *                  Basic Operation
 *
 *************************************************/
 
+/**
+ * @brief Class constructor
+ * @tparam Scalar
+ * @param varList
+ */
 template<typename Scalar>
-ContactGraph<Scalar>::ContactGraph(const shared_ptr<InputVarList>& varList):TopoObject(varList) {}
+ContactGraph<Scalar>::ContactGraph(const shared_ptr<InputVarList> &varList):TopoObject(varList) {}
 
+/**
+ * @brief Class destructor
+ * @tparam Scalar
+ */
 template<typename Scalar>
 ContactGraph<Scalar>::~ContactGraph() {
     nodes.clear();
     edges.clear();
+    dynamic_nodes.clear();
 }
 
+
+/**
+ * @brief
+ * @tparam Scalar
+ * @param meshes
+ * @param atBoundary
+ * @param eps
+ * @return
+ */
 template<typename Scalar>
-bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
+bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &input_meshes,
                                                    vector<bool> &atBoundary,
                                                    double eps) {
 
-    // 0) scale the meshes into united box
+    // [1] - Scale meshes_input into a united box
+    meshes_input = input_meshes;
+
+    auto maxD = scaleMeshIntoUnitedBox();
+
+    if (maxD == -1.0)
+        return false;
+
+    // [2] - Create contact planes
+
+    std::set<plane_contact, plane_contact_compare> setPlanes;
+
+    bool res = createContactPlanes( setPlanes, maxD, eps);
+
+    if (!res)
+        return false;
+
+    std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B) {
+        return A.groupID < B.groupID;
+    });
+
+    //
+
+    createNodes( atBoundary);
+
+    findAllPairsOfPolygonsContact( atBoundary);
+
+    planeIJEdges.resize(planeIJ.size());
+
+    computeContacts();  // note: this function is vectorized with TBB
+
+    addContactEdges();
+
+    return true;
+}
+
+/*************************************************
+*
+*                  Graph Operation
+*
+*************************************************/
+/**
+ * @brief
+ * @tparam Scalar
+ * @param _node
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::addNode(pContactGraphNode _node) {
+    _node->staticID = nodes.size();
+
+    nodes.push_back(_node);
+}
+
+/**
+ * @brief
+ * @tparam Scalar
+ * @param _nodeA
+ * @param _nodeB
+ * @param _edge
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::addContact(pContactGraphNode _nodeA, pContactGraphNode _nodeB, pContactGraphEdge _edge) {
+
+    if (_nodeA->isBoundary && _nodeB->isBoundary)
+        return;
+
+    _edge->partIDA = _nodeA->staticID;
+    _edge->partIDB = _nodeB->staticID;
+
+    edges.push_back(_edge);
+
+    pair<wpContactGraphNode, wpContactGraphEdge> contactNeighbor;
+
+    contactNeighbor.first = _nodeB;
+    contactNeighbor.second = _edge;
+    _nodeA->neighbors.push_back(contactNeighbor);
+
+    contactNeighbor.first = _nodeA;
+    contactNeighbor.second = _edge;
+    _nodeB->neighbors.push_back(contactNeighbor);
+}
+
+/**
+ * @brief
+ * @tparam Scalar
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::finalize() {
+    int dynamicID = 0;
+    dynamic_nodes.clear();
+    for (pContactGraphNode node : nodes) {
+        if (!node->isBoundary) {
+            node->dynamicID = dynamicID++;
+            dynamic_nodes.push_back(node);
+        } else {
+            node->dynamicID = -1;
+        }
+    }
+}
+
+/**
+ * @brief
+ * @tparam Scalar
+ * @param mesh
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::getContactMesh(pPolyMesh &mesh) {
+    mesh.reset();
+    mesh = make_shared<PolyMesh<Scalar>>(getVarList());
+    for (pContactGraphEdge edge: edges) {
+        for (pPolygon poly: edge->polygons) {
+            mesh->polyList.push_back(poly);
+        }
+    }
+
+    if (mesh) mesh->removeDuplicatedVertices();
+
+//    mesh->ScaleMesh(1.0 / normalized_scale);
+//    mesh->TranslateMesh(-normalized_trans);
+}
+
+
+/**
+ * @brief
+ * @tparam Scalar
+ * @param meshes
+ */
+// TODO: implement or clean this unimplemented function
+template<typename Scalar>
+void ContactGraph<Scalar>::normalize_meshes(vector<pPolyMesh> &meshes) {}
+
+/*************************************************
+*
+*             constructFromPolyMesh methods
+*
+*************************************************/
+
+/**
+ * @brief Scale the Mesh into a united box
+ * @tparam Scalar
+ * @return maxD
+ */
+template<typename Scalar>
+double ContactGraph<Scalar>::scaleMeshIntoUnitedBox() {
     double maxD = 1;
-    for (size_t id = 0; id < meshes.size(); id++) {
-        pPolyMesh poly = meshes[id];
+    size_t msize = meshes_input.size();
+    for (size_t id = 0; id < msize; id++) {
+        pPolyMesh poly = meshes_input[id];
         if (poly == nullptr)
-            return false;
+            return -1.0;
         for (pPolygon face : poly->polyList) {
             // 1.1) construct plane
             plane_contact plane;
@@ -40,14 +205,25 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
             maxD = (std::max)(maxD, (double) std::abs(plane.D));
         }
     }
+    return maxD;
+}
 
-    // 1) create contact planes
-    vector<plane_contact> planes;
-    std::set<plane_contact, plane_contact_compare> setPlanes;
+/**
+ * @brief @Ziqi Please comment this a bit
+ * @tparam Scalar
+ * @param setPlanes
+ * @param maxD
+ * @param eps
+ * @return
+ */
+template<typename Scalar>
+bool ContactGraph<Scalar>::createContactPlanes(std::set<plane_contact, plane_contact_compare> &setPlanes,
+                                               double maxD, double eps) {
 
     int groupID = 0;
-    for (size_t id = 0; id < meshes.size(); id++) {
-        pPolyMesh poly = meshes[id];
+    size_t msize = meshes_input.size();
+    for (size_t id = 0; id < msize; id++) {
+        pPolyMesh poly = meshes_input[id];
         if (poly == nullptr)
             return false;
         for (pPolygon face : poly->polyList) {
@@ -58,7 +234,7 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
             plane_contact plane;
             Vector3 nrm = face->normal();
             Vector3 center = face->vers[0]->pos;
-            plane.nrm = Vector3(nrm[0], nrm[1], nrm[2]);
+            plane.nrm = nrm;
 
             plane.D = nrm.dot(center) / maxD;
             plane.partID = id;
@@ -86,22 +262,32 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
             planes.push_back(plane);
         }
     }
+    return true;
+}
 
-    std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B) {
-        return A.groupID < B.groupID;
-    });
-
-    // 2) add nodes
-    for (size_t id = 0; id < meshes.size(); id++) {
-        Vector3 centroid = meshes[id]->centroid();
-        Scalar volume = meshes[id]->volume();
+/**
+ * @brief
+ * @tparam Scalar
+ * @param atBoundary
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::createNodes(vector<bool> &atBoundary) {
+    for (size_t id = 0; id < meshes_input.size(); id++) {
+        Vector3 centroid = meshes_input[id]->centroid();
+        Scalar volume = meshes_input[id]->volume();
         pContactGraphNode node = make_shared<ContactGraphNode<Scalar>>(atBoundary[id], centroid, centroid, volume);
         addNode(node);
     }
+}
 
-    // 3) find all pairs of contact polygon
+/**
+ * @brief @Ziqi same here please
+ * @tparam Scalar
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::findAllPairsOfPolygonsContact(vector<bool> &atBoundary) {
     int sta = 0, end = 0;
-    vector<pairIJ> planeIJ;
+
     while (sta < planes.size()) {
         for (end = sta + 1; end < planes.size(); end++) {
             if (planes[sta].groupID != planes[end].groupID) {
@@ -126,16 +312,38 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
         }
         sta = end;
     }
+}
 
+/**
+ * @brief
+ * @tparam Scalar
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::addContactEdges() {
 
-    // 4) parallel compute contacts
-    vector<pContactGraphEdge> planeIJEdges;
-    planeIJEdges.resize(planeIJ.size());
+    for (size_t id = 0; id < planeIJ.size(); id++) {
+        pContactGraphEdge edge = planeIJEdges[id];
+        if (edge != nullptr) {
+            int planeI = planeIJ[id].first;
+            int planeJ = planeIJ[id].second;
+            int partI = planes[planeI].partID;
+            int partJ = planes[planeJ].partID;
+            addContact(nodes[partI], nodes[partJ], edge);
+        }
+    }
+}
 
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, planeIJ.size()), [&](const tbb::blocked_range<size_t> &r) {
-        for (size_t id = r.begin(); id != r.end(); ++id)
-            // for (size_t id = 0; id != planeIJ.size(); ++id)
-        {
+/**
+ * @brief Parallel compute contacts
+ * @tparam Scalar
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::computeContacts() {
+
+    size_t psize = planeIJ.size();
+    // for (size_t id = 0; id != planeIJ.size(); ++id) // Sequential loop
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, psize), [&](const tbb::blocked_range<size_t> &r) {
+        for (size_t id = r.begin(); id != r.end(); ++id) {
 
             int planeI = planeIJ[id].first;
             int planeJ = planeIJ[id].second;
@@ -164,82 +372,4 @@ bool ContactGraph<Scalar>::constructFromPolyMeshes(vector<pPolyMesh> &meshes,
             }
         }
     });
-
-    // 5) add contact edges
-    for (size_t id = 0; id < planeIJ.size(); id++) {
-        pContactGraphEdge edge = planeIJEdges[id];
-        if (edge != nullptr) {
-            int planeI = planeIJ[id].first;
-            int planeJ = planeIJ[id].second;
-            int partI = planes[planeI].partID;
-            int partJ = planes[planeJ].partID;
-            addContact(nodes[partI], nodes[partJ], edge);
-        }
-    }
-
-    return true;
-}
-
-/*************************************************
-*
-*                  Graph Operation
-*
-*************************************************/
-template<typename Scalar>
-void ContactGraph<Scalar>::addNode(pContactGraphNode _node) {
-    _node->staticID = nodes.size();
-
-    nodes.push_back(_node);
-}
-
-template<typename Scalar>
-void ContactGraph<Scalar>::addContact(pContactGraphNode _nodeA, pContactGraphNode _nodeB, pContactGraphEdge _edge) {
-
-    if (_nodeA->isBoundary && _nodeB->isBoundary)
-        return;
-
-    _edge->partIDA = _nodeA->staticID;
-    _edge->partIDB = _nodeB->staticID;
-
-    edges.push_back(_edge);
-
-    pair<wpContactGraphNode, wpContactGraphEdge> contactNeighbor;
-
-    contactNeighbor.first = _nodeB;
-    contactNeighbor.second = _edge;
-    _nodeA->neighbors.push_back(contactNeighbor);
-
-    contactNeighbor.first = _nodeA;
-    contactNeighbor.second = _edge;
-    _nodeB->neighbors.push_back(contactNeighbor);
-}
-
-template<typename Scalar>
-void ContactGraph<Scalar>::finalize() {
-    int dynamicID = 0;
-    dynamic_nodes.clear();
-    for (pContactGraphNode node : nodes) {
-        if (!node->isBoundary) {
-            node->dynamicID = dynamicID++;
-            dynamic_nodes.push_back(node);
-        } else {
-            node->dynamicID = -1;
-        }
-    }
-}
-
-template<typename Scalar>
-void ContactGraph<Scalar>::getContactMesh(pPolyMesh &mesh) {
-    mesh.reset();
-    mesh = make_shared<PolyMesh<Scalar>>(getVarList());
-    for (pContactGraphEdge edge: edges) {
-        for (pPolygon poly: edge->polygons) {
-            mesh->polyList.push_back(poly);
-        }
-    }
-
-    if (mesh) mesh->removeDuplicatedVertices();
-
-//    mesh->ScaleMesh(1.0 / normalized_scale);
-//    mesh->TranslateMesh(-normalized_trans);
 }

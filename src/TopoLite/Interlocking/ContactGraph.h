@@ -22,8 +22,7 @@
 using pairIJ = std::pair<int, int>;
 
 template<typename Scalar>
-class ContactGraph : public TopoObject
-{
+class ContactGraph : public TopoObject {
 public:
     typedef shared_ptr<ContactGraphNode<Scalar>> pContactGraphNode;
 
@@ -44,8 +43,7 @@ public:
 
 public:
 
-    struct plane_contact
-    {
+    struct plane_contact {
 
         Matrix<Scalar, 3, 1> nrm;
         double D;
@@ -55,10 +53,8 @@ public:
         double eps;
     };
 
-    struct plane_contact_compare
-    {
-        bool operator()(const plane_contact& A, const plane_contact& B) const
-        {
+    struct plane_contact_compare {
+        bool operator()(const plane_contact &A, const plane_contact &B) const {
             double eps = A.eps / 2;
 
             if (A.nrm[0] - B.nrm[0] < -eps)
@@ -86,23 +82,29 @@ public:
     };
 
 public:
-
     vector<pContactGraphNode> nodes;
     vector<pContactGraphEdge> edges;
     //automatic generate
     vector<wpContactGraphNode> dynamic_nodes;
 
+private:
+    // Class attributes used in constructFromPolyMesh method - Should not be accessed
+    vector<pPolyMesh> meshes_input;
+    vector<plane_contact> planes;
+    vector<pairIJ> planeIJ;
+    vector<pContactGraphEdge> planeIJEdges;
+
 public:
 
-    ContactGraph(const shared_ptr<InputVarList>& varList);
+    explicit ContactGraph(const shared_ptr<InputVarList> &varList);
 
     ~ContactGraph();
 
 public:
 
-    bool constructFromPolyMeshes(   vector<pPolyMesh> &meshes,
-                                    vector<bool> &atBoundary,
-                                    double eps = 0.002);
+    bool constructFromPolyMeshes(vector<pPolyMesh> &meshes,
+                                 vector<bool> &atBoundary,
+                                 double eps = 0.002);
 
 public:
 
@@ -111,7 +113,9 @@ public:
 public:
 
     /*************************************************
-    *                  Basic Operation
+    *
+    *                  Graph Operation
+    *
     *************************************************/
 
     void addNode(pContactGraphNode _node);
@@ -120,9 +124,32 @@ public:
 
     void finalize();
 
-public:
-
     void getContactMesh(pPolyMesh &mesh);
+
+private:
+
+    /*************************************************
+    *
+    *             constructFromPolyMesh methods
+    *
+    *************************************************/
+
+    double scaleMeshIntoUnitedBox();
+
+    bool createContactPlanes(std::set<plane_contact, plane_contact_compare> &setPlanes, double maxD, double eps);
+
+    void createNodes(vector<bool> &atBoundary);
+
+    void findAllPairsOfPolygonsContact(vector<bool> &atBoundary);
+
+    void addContactEdges();
+
+    void computeContacts();
+    /*************************************************
+    *
+    *           end of scaleMeshIntoUnitedBox methods
+    *
+    *************************************************/
 };
 
 #include "ContactGraph.cpp"
