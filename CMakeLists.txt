@@ -113,4 +113,7 @@ if(HAVE_NANOGUI)
     add_executable(TopoGUI src/TopoLite/GUI/guiMain.cpp)
     target_link_libraries(TopoGUI nanogui)
     target_include_directories(TopoGUI PUBLIC SYSTEM ${NANOGUI_INCLUDE_DIRS})
+    target_compile_definitions(TopoGUI PUBLIC ${NANOGUI_EXTRA_DEFS})
+
+    file(COPY ${NANOGUI_DIR}/resources/icons DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()

@@ -28,5 +28,6 @@ if(NOT NANOGUI_FOUND)
         "${NANOGUI_DIR}/ext/nanovg/src"
         "${NANOGUI_DIR}/ext/glfw/include")
     include_directories(${NANOGUI_INCLUDE_DIRS})
+    add_definitions(${NANOGUI_EXTRA_DEFS})
 
 endif(NOT NANOGUI_FOUND)

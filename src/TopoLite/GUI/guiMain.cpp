@@ -11,8 +11,6 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#define NANOGUI_USE_METAL
-
 #include <nanogui/opengl.h>
 #include <nanogui/screen.h>
 #include <nanogui/window.h>
