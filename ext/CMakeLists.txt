@@ -29,6 +29,12 @@ include(libigl)
 set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 
+#NANOGUI
+if(HAVE_NANOGUI)
+    find_package(NanoGUI)
+    set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} PARENT_SCOPE)
+endif()
+
 #if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
 #set_target_properties(ShapeOp  PROPERTIES
 #        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"

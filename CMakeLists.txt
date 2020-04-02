@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(TopoLite)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
@@ -11,6 +11,9 @@ add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 #####      Compiler flags           #####
 #####                               #####
 #########################################
+
+option(HAVE_NANOGUI "Compile the gui" ON)
+option(HAVE_TEST "Compile the united test" ON)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -81,24 +84,33 @@ target_include_directories(TpCorelib PUBLIC SYSTEM
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
 
-set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
-                        ${CMAKE_CURRENT_SOURCE_DIR}/ext/Catch2/contrib)
 
-include(CTest)
-include(ParseAndAddCatchTests)
+if(HAVE_TEST)
+    set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
+            ${CMAKE_CURRENT_SOURCE_DIR}/ext/Catch2/contrib)
 
-file(GLOB testTopoFiles test/Interlocking/Test_ContactGraph.cpp)
-#file(GLOB testTopoFiles test/CrossMesh/*.cpp
-#                        test/Mesh/*.cpp
-#                        test/IO/*.cpp
-#                        test/Utility/*.cpp)
-#file(GLOB testTopoFiles test/Mesh/*.cpp
-#                        test/Utility/*.cpp)
+    include(CTest)
+    include(ParseAndAddCatchTests)
 
-set(testTopoFiles ${testTopoFiles} test/Test_Main.cpp)
+    file(GLOB testTopoFiles test/Interlocking/Test_ContactGraph.cpp)
+    #file(GLOB testTopoFiles test/CrossMesh/*.cpp
+    #                        test/Mesh/*.cpp
+    #                        test/IO/*.cpp
+    #                        test/Utility/*.cpp)
+    #file(GLOB testTopoFiles test/Mesh/*.cpp
+    #                        test/Utility/*.cpp)
 
-add_executable(testTopo ${testTopoFiles})
+    set(testTopoFiles ${testTopoFiles} test/Test_Main.cpp)
 
-target_link_libraries(testTopo PUBLIC Catch2::Catch2)
-target_link_libraries(testTopo PUBLIC TpCorelib)
-ParseAndAddCatchTests(testTopo)
+    add_executable(testTopo ${testTopoFiles})
+
+    target_link_libraries(testTopo PUBLIC Catch2::Catch2)
+    target_link_libraries(testTopo PUBLIC TpCorelib)
+    ParseAndAddCatchTests(testTopo)
+endif()
+
+if(HAVE_NANOGUI)
+    add_executable(TopoGUI src/TopoLite/GUI/guiMain.cpp)
+    target_link_libraries(TopoGUI nanogui)
+    target_include_directories(TopoGUI PUBLIC SYSTEM ${NANOGUI_INCLUDE_DIRS})
+endif()
