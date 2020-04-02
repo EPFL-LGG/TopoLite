@@ -349,6 +349,7 @@ public:
         return lineTree.findIntersec(line, tex2D, pos3D);
     }
 
+    // todo: implement this
     Vector3d findMeshNearestPoint(Vector3 pt);
 
 };
