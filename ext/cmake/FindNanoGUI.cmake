@@ -19,7 +19,6 @@ if(NOT NANOGUI_FOUND)
 
     add_subdirectory("${NANOGUI_DIR}" "nanogui")
 
-
     # For reliability of parallel build, make the NanoGUI targets dependencies
     set_property(TARGET glfw glfw_objects bin2c nanogui PROPERTY FOLDER "dependencies")
 
