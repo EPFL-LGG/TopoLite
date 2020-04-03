@@ -56,10 +56,22 @@ public:
            object management.
         */
 
-        m_render_pass = new nanogui::RenderPass({ this });
+        nanogui::ref<nanogui::Texture> depth_stencil = new nanogui::Texture(
+                    nanogui::Texture::PixelFormat::DepthStencil,
+                    nanogui::Texture::ComponentFormat::Float32,
+                    framebuffer_size(),
+                    nanogui::Texture::InterpolationMode::Bilinear,
+                    nanogui::Texture::InterpolationMode::Bilinear,
+                    nanogui::Texture::WrapMode::ClampToEdge,
+                    1,
+                    nanogui::Texture::TextureFlags::RenderTarget
+            );
+
+        m_render_pass = new nanogui::RenderPass({ this }, depth_stencil);
         m_render_pass->set_clear_color(0, nanogui::Color(0.9f, 0.9f, 0.9f, 1.f));
-        m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Back);
+        m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
         m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);
+
         m_shader = new nanogui::Shader(
                 m_render_pass,
 
@@ -71,16 +83,26 @@ public:
             #version 330
             uniform mat4 mvp;
             in vec3 position;
+            in vec3 barycentric;
+            out vec3 bary;
             void main() {
+                bary = barycentric;
                 gl_Position = mvp * vec4(position, 1.0);
-            })",
 
+            })",
             /* Fragment shader */
             R"(#version 330
             out vec4 color;
-            uniform float intensity;
+            in vec3 bary;
+
+            float edgeFactor(vec3 vBC){
+                vec3 d = fwidth(vBC);
+                vec3 a3 = smoothstep(vec3(0.0), d * 3, vBC);
+                return min(min(a3.x, a3.y), a3.z);
+            }
+
             void main() {
-                color = vec4(vec3(intensity), 1.0);
+                color = vec4(mix(vec3(0.0), vec3(1), edgeFactor(bary)), 1.0);
             })"
 #elif defined(NANOGUI_USE_GLES)
         R"(/* Vertex shader */
@@ -128,14 +150,13 @@ public:
                 return min(min(a3.x, a3.y), a3.z);
             }
 
-            fragment float4 fragment_main(const constant float &intensity,
-                                          VertexOut in [[stage_in]]) {
+            fragment float4 fragment_main(VertexOut in [[stage_in]]) {
                 return float4(mix(float3(0.0), float3(1), edgeFactor(in.bary)), 1.0);
             })"
 #endif
         );
 
-        float positions[3*12] = {
+        float positions[3 * 9] = {
                 0, 0, 0,
                 1, 0, 0,
                 0, 0, 1,
@@ -145,15 +166,9 @@ public:
                 0, 0, 0,
                 0, 1, 0,
                 1, 0, 0,
-                0, 0, 1,
-                1, 0, 0,
-                0, 1, 0,
         };
 
-        float barycentric[3 * 12] = {
-                1, 0, 0,
-                0, 1, 0,
-                0, 0, 1,
+        float barycentric[3 * 9] = {
                 1, 0, 0,
                 0, 1, 0,
                 0, 0, 1,
@@ -165,9 +180,8 @@ public:
                 0, 0, 1,
         };
 
-        m_shader->set_buffer("position", nanogui::VariableType::Float32, {12, 3}, positions);
-        m_shader->set_buffer("barycentric", nanogui::VariableType::Float32, {12, 3}, barycentric);
-        m_shader->set_uniform("intensity", 0.5f);
+        m_shader->set_buffer("position", nanogui::VariableType::Float32, {9, 3}, positions);
+        m_shader->set_buffer("barycentric", nanogui::VariableType::Float32, {9, 3}, barycentric);
     }
 
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers) {
@@ -277,7 +291,7 @@ public:
         m_shader->set_uniform("mvp", toNanoguiMatrix(mvp));
         m_render_pass->begin();
         m_shader->begin();
-            m_shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, 12 * 3, false);
+            m_shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, 9 * 3, false);
         m_shader->end();
         m_render_pass->end();
     }
