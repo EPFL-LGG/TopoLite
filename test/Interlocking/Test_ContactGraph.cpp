@@ -11,6 +11,18 @@ using pPolygon = shared_ptr<_Polygon<double>>;
 using Eigen::Vector3d;
 
 
+_Polygon<double> buildContactPolygon(_Polygon<double>contactPolygon, const shared_ptr<ContactGraph<double>>& graph) {
+    for (const auto& edge: graph->edges) {
+        for (const auto& polygon: edge->polygons) {
+            for (const auto &ver: graph->edges[0]->polygons[0]->vers) {
+                contactPolygon.push_back(Vector3d(ver->pos[0], ver->pos[1], ver->pos[2]));
+            }
+        }
+    }
+    return contactPolygon;
+}
+
+
 TEST_CASE("Class ContactGraph") {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     InitVarLite(varList.get());
@@ -56,12 +68,12 @@ TEST_CASE("Class ContactGraph") {
         REQUIRE(graph->nodes.size() == 2);
         REQUIRE(graph->edges.size() == 1);
 
+        // Construct the contactPolygon from the contactGraph
         _Polygon<double> contactPolygon;
-        for (const auto &ver: graph->edges[0]->polygons[0]->vers) {
-            contactPolygon.push_back(Vector3d(ver->pos[0], ver->pos[1], ver->pos[2]));
-        }
-        Approx area = Approx(1).epsilon(1e-5);
-        REQUIRE(contactPolygon.area() == area);
+        contactPolygon = buildContactPolygon(contactPolygon,  graph);
+
+        Approx expected_area = Approx(1).epsilon(1e-5);
+        REQUIRE(contactPolygon.area() == expected_area);
     }
 
     SECTION("load three squares A,B,C. A's normal is [0,0,1], B's normal is [0,0,-1], C's normal is [0,0,-1]") {
@@ -102,6 +114,14 @@ TEST_CASE("Class ContactGraph") {
         REQUIRE(graph->nodes.size() == 3);
         REQUIRE(graph->edges.size() == 2);
 
+
+        // Construct the contactPolygon from the contactGraph
+        _Polygon<double> contactPolygon;
+        contactPolygon = buildContactPolygon(contactPolygon,  graph);
+
+        Approx expected_area = Approx(2).epsilon(1e-5);
+        REQUIRE(contactPolygon.area() == expected_area);
+
     }
 
     SECTION("load three squares A,B,C. A's normal is [0,0,1], B's normal is [0,0,1], C's normal is [0,0,-1]") {
@@ -141,6 +161,13 @@ TEST_CASE("Class ContactGraph") {
 
         REQUIRE(graph->nodes.size() == 3);
         REQUIRE(graph->edges.size() == 1);
+
+        // Construct the contactPolygon from the contactGraph
+        _Polygon<double> contactPolygon;
+        contactPolygon = buildContactPolygon(contactPolygon,  graph);
+
+        Approx expected_area = Approx(1).epsilon(1e-5);
+        REQUIRE(contactPolygon.area() == expected_area);
     }
 
     SECTION("load three squares A,B,C. A's normal is [0,0,1], B's normal is [0,0,1], C's normal is [0,0,1]") {
@@ -185,8 +212,8 @@ TEST_CASE("Class ContactGraph") {
     SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,1] but centor at Z:-0.0004") {
 
         pPolygon pB = make_shared<_Polygon<double>>();
-        pB->push_back(Vector3d(1, 1, -0.0004));
-        pB->push_back(Vector3d(1, 3, -0.0004));
+        pB->push_back(Vector3d(0, 1, -0.0004));
+        pB->push_back(Vector3d(0, 3, -0.0004));
         pB->push_back(Vector3d(3, 3, -0.0004));
         pB->push_back(Vector3d(3, 1, -0.0004));
 
@@ -210,13 +237,12 @@ TEST_CASE("Class ContactGraph") {
         REQUIRE(graph->nodes.size() == 2);
         REQUIRE(graph->edges.size() == 1);
 
+        // Construct the contactPolygon from the contactGraph
         _Polygon<double> contactPolygon;
+        contactPolygon = buildContactPolygon(contactPolygon,  graph);
 
-        for (const auto& ver: graph->edges[0]->polygons[0]->vers) {
-            contactPolygon.push_back(Vector3d(ver->pos[0], ver->pos[1], ver->pos[2]));
-        }
-        Approx area = Approx(1).epsilon(1e-5);
-        REQUIRE(contactPolygon.area() == area);
+        Approx expected_area = Approx(2).epsilon(1e-5);
+        REQUIRE(contactPolygon.area() == expected_area);
     }
 
     SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,-1] but centor at Z:-0.0004") {
@@ -247,7 +273,6 @@ TEST_CASE("Class ContactGraph") {
         REQUIRE(graph->nodes.size() == 2);
         REQUIRE(graph->edges.empty());
 
-        _Polygon<double> contactPolygon;
     }
 
     SECTION("both A B at boundary") {
