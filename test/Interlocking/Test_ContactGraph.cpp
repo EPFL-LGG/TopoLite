@@ -210,10 +210,11 @@ TEST_CASE("Class ContactGraph") {
     }
 
     SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,1] but centor at Z:-0.0004") {
+        // In this case z is smaller than the tolerance factor, so we consider the two polygons to be in contact
 
         pPolygon pB = make_shared<_Polygon<double>>();
-        pB->push_back(Vector3d(0, 1, -0.0004));
-        pB->push_back(Vector3d(0, 3, -0.0004));
+        pB->push_back(Vector3d(1, 1, -0.0004));
+        pB->push_back(Vector3d(1, 3, -0.0004));
         pB->push_back(Vector3d(3, 3, -0.0004));
         pB->push_back(Vector3d(3, 1, -0.0004));
 
@@ -241,11 +242,12 @@ TEST_CASE("Class ContactGraph") {
         _Polygon<double> contactPolygon;
         contactPolygon = buildContactPolygon(contactPolygon,  graph);
 
-        Approx expected_area = Approx(2).epsilon(1e-5);
+        Approx expected_area = Approx(1).epsilon(1e-5);
         REQUIRE(contactPolygon.area() == expected_area);
     }
 
     SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,-1] but centor at Z:-0.0004") {
+        // In this case z is smaller than the tolerance factor but normals are opposed -> not in contact
 
         pPolygon pB = make_shared<_Polygon<double>>();
         pB->push_back(Vector3d(1, 1, -0.0004));
