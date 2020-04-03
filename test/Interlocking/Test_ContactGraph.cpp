@@ -10,21 +10,6 @@ using pPolyMesh = shared_ptr<PolyMesh<double>>;
 using pPolygon = shared_ptr<_Polygon<double>>;
 using Eigen::Vector3d;
 
-// TODO: @robin move this in utilities + replace all comparisons in other test
-/**
- * @brief A good way of comparing floats in C/C++
- *        With this definition, you don't need to rescale epsilon for each comparison as you would normaly do with abs(a-b) <= epsilon
- * @param a
- * @param b
- * @param epsilon
- * @return
- *
- * See: “Donald Knuth - The Art of Computer Programming, Volume II: Seminumerical Algorithms (Addison-Wesley, 1969)”
- */
-template <typename Scalar>
-bool approximatelyEqual(Scalar a, Scalar b, Scalar epsilon) {
-    return (std::abs(a - b) <= (std::max(std::abs(a), std::abs(b)) * epsilon));
-}
 
 TEST_CASE("Class ContactGraph") {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
@@ -75,7 +60,8 @@ TEST_CASE("Class ContactGraph") {
         for (const auto &ver: graph->edges[0]->polygons[0]->vers) {
             contactPolygon.push_back(Vector3d(ver->pos[0], ver->pos[1], ver->pos[2]));
         }
-        REQUIRE(approximatelyEqual<double>(contactPolygon.area(), 1, 1e-5));
+        Approx area = Approx(1).epsilon(1e-5);
+        REQUIRE(contactPolygon.area() == area);
     }
 
     SECTION("load three squares A,B,C. A's normal is [0,0,1], B's normal is [0,0,-1], C's normal is [0,0,-1]") {
@@ -229,7 +215,8 @@ TEST_CASE("Class ContactGraph") {
         for (const auto& ver: graph->edges[0]->polygons[0]->vers) {
             contactPolygon.push_back(Vector3d(ver->pos[0], ver->pos[1], ver->pos[2]));
         }
-        REQUIRE(approximatelyEqual<double>(contactPolygon.area(), 1, 1e-5));
+        Approx area = Approx(1).epsilon(1e-5);
+        REQUIRE(contactPolygon.area() == area);
     }
 
     SECTION("load two square A,B. A's normal is [0,0,1], B's normal is [0,0,-1] but centor at Z:-0.0004") {
@@ -261,11 +248,6 @@ TEST_CASE("Class ContactGraph") {
         REQUIRE(graph->edges.empty());
 
         _Polygon<double> contactPolygon;
-        //A and B are not in contact so we should have the following code.
-//        for (const auto& ver: graph->edges[0]->polygons[0]->vers) {
-//            contactPolygon.push_back(Vector3d(ver->pos[0], ver->pos[1], ver->pos[2]));
-//        }
-//        REQUIRE(approximatelyEqual<double>(contactPolygon.area(), 1, 1e-5));
     }
 
     SECTION("both A B at boundary") {
