@@ -7,6 +7,12 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 include(TopoliteDownloadExternal)
 
+# COIN-OR CLP
+if(NOT TARGET clp::clp AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+    topolite_download_clp()
+    add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
+endif()
+
 # Catch2
 if(NOT TARGET catch2::catch2 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     topolite_download_catch()
