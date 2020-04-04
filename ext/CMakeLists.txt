@@ -45,8 +45,10 @@ endif()
 
 # TBB
 # Handled in cmake/TopoliteDependencies.cmake
-
 set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
+
+# CLP
+set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src)
 
 #Pybind11
 
@@ -80,5 +82,8 @@ set(ext_lib pugixml
             ShapeOp
             tbb
             tbb_static
+            lib_Osi
+            lib_Clp
+            lib_CoinUtils
             ${Boost_LIBRARIES}
             PARENT_SCOPE)

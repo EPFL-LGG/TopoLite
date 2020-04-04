@@ -48,7 +48,7 @@
 
 class ExampleApplication : public nanogui::Screen {
 public:
-    ExampleApplication() : Screen(nanogui::Vector2i(1024, 768), "TopoLite GUI")
+    ExampleApplication() : Screen(nanogui::Vector2i(1024, 768), "TopoLite GUI", false)
     {
         inc_ref();
         nanogui::Window *window = new nanogui::Window(this, "Menu");

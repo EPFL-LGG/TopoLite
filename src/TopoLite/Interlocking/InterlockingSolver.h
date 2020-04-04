@@ -15,31 +15,40 @@ using std::map;
 using std::vector;
 using std::shared_ptr;
 
-using EigenSpMat = Eigen::SparseMatrix<double, Eigen::ColMajor>;
-using EigenTriple = Eigen::Triplet<double>;
-using stdvec_Vector3d = std::vector<Eigen::Vector3d,Eigen::aligned_allocator<Eigen::Vector3d>>;
 
-struct InterlockingData{
-    stdvec_Vector3d traslation;
-    stdvec_Vector3d rotation;
-    vector<int> partID;
-};
-
-struct EquilibriumData{
-    stdvec_Vector3d force;
-    stdvec_Vector3d torque;
-    stdvec_Vector3d contact_points;
-    vector<pairIJ> partIJ;
-};
-
+template<typename Scalar>
 class InterlockingSolver: public TopoObject{
 public:
 
-    shared_ptr<ContactGraph> graph;
+    typedef Matrix<double, 3, 1> Vector3;
+    typedef Matrix<double, 1, 2> RowVector2;
+    typedef Matrix<double, 1, 4> RowVector4;
+    typedef Eigen::SparseMatrix<double, Eigen::ColMajor>  EigenSpMat;
+    typedef Eigen::Triplet<double>  EigenTriple;
+    typedef std::vector<Vector3,Eigen::aligned_allocator<Vector3>> stdvec_Vector3d;
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
 
 public:
 
-    InterlockingSolver(shared_ptr<ContactGraph> _graph, shared_ptr<InputVarList> varList):TopoObject(varList)
+    struct InterlockingData{
+        stdvec_Vector3d traslation;
+        stdvec_Vector3d rotation;
+        vector<int> partID;
+    };
+    struct EquilibriumData{
+        stdvec_Vector3d force;
+        stdvec_Vector3d torque;
+        stdvec_Vector3d contact_points;
+        vector<pairIJ> partIJ;
+    };
+
+public:
+
+    shared_ptr<ContactGraph<Scalar>> graph;
+
+public:
+
+    InterlockingSolver(shared_ptr<ContactGraph<Scalar>> _graph, shared_ptr<InputVarList> varList):TopoObject(varList)
     {
         graph = _graph;
     }
@@ -51,17 +60,17 @@ protected:
     *      Building block for the Interlocking Matrix
     *************************************************/
 
-    void get_force_from_norm_fric(Eigen::Vector3d    n,    Eigen::Vector3d   u,  Eigen::Vector3d   v,
-                                  Eigen::RowVector2d    &fkx, Eigen::RowVector2d &fky, Eigen::RowVector2d &fkz);
+    void get_force_from_norm_fric(Vector3    n,    Vector3   u,  Vector3   v,
+                                  RowVector2    &fkx, RowVector2 &fky, RowVector2 &fkz);
 
-    void get_force_from_norm_fric(Eigen::Vector3d    n,    Eigen::Vector3d   u,  Eigen::Vector3d   v,
-                                  Eigen::RowVector4d    &fkx, Eigen::RowVector4d &fky, Eigen::RowVector4d &fkz);
+    void get_force_from_norm_fric(Vector3    n,    Vector3   u,  Vector3   v,
+                                  RowVector4    &fkx, RowVector4 &fky, RowVector4 &fkz);
 
-    void get_moment_from_norm_fric_vertex(Eigen::Vector3d n,   Eigen::Vector3d u,   Eigen::Vector3d v, Eigen::Vector3d r,
-                                          Eigen::RowVector2d &mx, Eigen::RowVector2d &my, Eigen::RowVector2d &mz);
+    void get_moment_from_norm_fric_vertex(Vector3 n,   Vector3 u,   Vector3 v, Vector3 r,
+                                          RowVector2 &mx, RowVector2 &my, RowVector2 &mz);
 
-    void get_moment_from_norm_fric_vertex(Eigen::Vector3d n,   Eigen::Vector3d u,   Eigen::Vector3d v, Eigen::Vector3d r,
-                                          Eigen::RowVector4d &mx, Eigen::RowVector4d &my, Eigen::RowVector4d &mz);
+    void get_moment_from_norm_fric_vertex(Vector3 n,   Vector3 u,   Vector3 v, Vector3 r,
+                                          RowVector4 &mx, RowVector4 &my, RowVector4 &mz);
 
     void get_A_j_k(int partID, int edgeID, Eigen::MatrixXd &Ajk, bool withFriction = false);
 
@@ -73,7 +82,7 @@ public:
 
     void computeEquilibriumMatrix(Eigen::MatrixXd &mat, bool withFriction = false);
 
-    double computeEquilibriumMatrixConditonalNumber();
+    Scalar computeEquilibriumMatrixConditonalNumber();
 
     void computeTranslationalInterlockingMatrix(vector<EigenTriple> &tri, Eigen::Vector2i &size);
 
@@ -95,8 +104,9 @@ public:
 
     virtual bool isRotationalInterlocking(shared_ptr<InterlockingData> data){ return  true;}
 
-    virtual bool isEquilibrium(EigenPoint gravity, shared_ptr<EquilibriumData> data){ return  true;}
+    virtual bool isEquilibrium(Vector3 gravity, shared_ptr<EquilibriumData> data){ return  true;}
 };
 
+#include "InterlockingSolver.cpp"
 
 #endif //TOPOLITE_INTERLOCKINGSOLVER_H

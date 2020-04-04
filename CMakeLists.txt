@@ -94,7 +94,7 @@ if(HAVE_TEST)
     include(CTest)
     include(ParseAndAddCatchTests)
 
-    file(GLOB testTopoFiles test/Interlocking/Test_ContactGraph.cpp)
+    file(GLOB testTopoFiles test/Interlocking/Test_InterlockingSolver_Clp.cpp)
     #file(GLOB testTopoFiles test/CrossMesh/*.cpp
     #                        test/Mesh/*.cpp
     #                        test/IO/*.cpp
