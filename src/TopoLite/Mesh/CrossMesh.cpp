@@ -256,12 +256,6 @@ void CrossMesh<Scalar>::erase_nullptr()
     updateCrossID();
 }
 
-template<typename Scalar>
-typename CrossMesh<Scalar>::pPolyMesh CrossMesh<Scalar>::getCrossMeshwithOrientedPointer()
-{
-
-}
-
 
 
 

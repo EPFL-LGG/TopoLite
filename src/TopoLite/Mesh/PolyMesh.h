@@ -179,6 +179,8 @@ public:
 
     Vector3 lowestPt() const;
 
+    size_t size(){return polyList.size();}
+
 private:
 
     Scalar computeVolume(vector<pTriangle> triList) const;

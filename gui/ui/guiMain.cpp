@@ -41,149 +41,46 @@
 #include <iostream>
 #include <memory>
 #include <stb_image.h>
+
+#include "../Mesh/gui_PolyMesh.h"
+#include "CrossMesh/PatternCreator.h"
+
 class ExampleApplication : public nanogui::Screen {
 public:
-    ExampleApplication() : Screen(nanogui::Vector2i(1024, 768), "NanoGUI Test") {
+    ExampleApplication() : Screen(nanogui::Vector2i(1024, 768), "NanoGUI Test")
+    {
         inc_ref();
+        nanogui::Window *window = new nanogui::Window(this, "Button demo");
+        window->set_position(nanogui::Vector2i(15, 15));
+        window->set_layout(new nanogui::GroupLayout());
+
+        new nanogui::Label(window, "Slider and text box", "sans-bold");
+
+        Widget *panel = new Widget(window);
+        panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
+                                                 nanogui::Alignment::Middle, 0, 20));
+
+        nanogui::Slider *slider = new nanogui::Slider(panel);
+        slider->set_value(0);
+        slider->set_fixed_width(200);
+        slider->set_callback([&](float value) {
+            this->num_faces_invisible = (int)value;
+        });
+
         perform_layout();
-
         refresh_trackball_center();
-        /* All NanoGUI widgets are initialized at this point. Now
-           create shaders to draw the main window contents.
 
-           NanoGUI comes with a simple wrapper around OpenGL 3, which
-           eliminates most of the tedious and error-prone shader and buffer
-           object management.
-        */
+        init_render_pass();
+        init_mesh();
 
-        nanogui::ref<nanogui::Texture> depth_stencil = new nanogui::Texture(
-                    nanogui::Texture::PixelFormat::DepthStencil,
-                    nanogui::Texture::ComponentFormat::Float32,
-                    framebuffer_size(),
-                    nanogui::Texture::InterpolationMode::Bilinear,
-                    nanogui::Texture::InterpolationMode::Bilinear,
-                    nanogui::Texture::WrapMode::ClampToEdge,
-                    1,
-                    nanogui::Texture::TextureFlags::RenderTarget
-            );
-
-        m_render_pass = new nanogui::RenderPass({ this }, depth_stencil);
-        m_render_pass->set_clear_color(0, nanogui::Color(0.9f, 0.9f, 0.9f, 1.f));
-        m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
-        m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);
-
-        m_shader = new nanogui::Shader(
-                m_render_pass,
-
-                /* An identifying name */
-                "a_simple_shader",
-
-#if defined(NANOGUI_USE_OPENGL)
-        R"(/* Vertex shader */
-            #version 330
-            uniform mat4 mvp;
-            in vec3 position;
-            in vec3 barycentric;
-            out vec3 bary;
-            void main() {
-                bary = barycentric;
-                gl_Position = mvp * vec4(position, 1.0);
-
-            })",
-            /* Fragment shader */
-            R"(#version 330
-            out vec4 color;
-            in vec3 bary;
-
-            float edgeFactor(vec3 vBC){
-                vec3 d = fwidth(vBC);
-                vec3 a3 = smoothstep(vec3(0.0), d * 3, vBC);
-                return min(min(a3.x, a3.y), a3.z);
-            }
-
-            void main() {
-                color = vec4(mix(vec3(0.0), vec3(1), edgeFactor(bary)), 1.0);
-            })"
-#elif defined(NANOGUI_USE_GLES)
-        R"(/* Vertex shader */
-            precision highp float;
-            uniform mat4 mvp;
-            attribute vec3 position;
-            void main() {
-                gl_Position = mvp * vec4(position, 1.0);
-            })",
-
-            /* Fragment shader */
-            R"(precision highp float;
-            uniform float intensity;
-            void main() {
-                gl_FragColor = vec4(vec3(intensity), 1.0);
-            })"
-#elif defined(NANOGUI_USE_METAL)
-        R"(using namespace metal;
-            struct VertexOut {
-                float4 position [[position]];
-                float3 bary;
-            };
-
-            vertex VertexOut vertex_main(const device packed_float3 *position,
-                                         constant float4x4 &mvp,
-                                         const device packed_float3 *barycentric,
-                                         uint id [[vertex_id]]) {
-                VertexOut vert;
-                vert.position = mvp * float4(position[id], 1.f);
-                vert.bary = barycentric[id];
-                return vert;
-            })",
-
-            /* Fragment shader */
-            R"(using namespace metal;
-
-            struct VertexOut {
-                float4 position [[position]];
-                float3 bary;
-            };
-
-            float edgeFactor(float3 vBC){
-                float3 d = fwidth(vBC);
-                float3 a3 = smoothstep(float3(0.0), d * 3, vBC);
-                return min(min(a3.x, a3.y), a3.z);
-            }
-
-            fragment float4 fragment_main(VertexOut in [[stage_in]]) {
-                return float4(mix(float3(0.0), float3(1), edgeFactor(in.bary)), 1.0);
-            })"
-#endif
-        );
-
-        float positions[3 * 9] = {
-                0, 0, 0,
-                1, 0, 0,
-                0, 0, 1,
-                0, 0, 0,
-                0, 0, 1,
-                0, 1, 0,
-                0, 0, 0,
-                0, 1, 0,
-                1, 0, 0,
-        };
-
-        float barycentric[3 * 9] = {
-                1, 0, 0,
-                0, 1, 0,
-                0, 0, 1,
-                1, 0, 0,
-                0, 1, 0,
-                0, 0, 1,
-                1, 0, 0,
-                0, 1, 0,
-                0, 0, 1,
-        };
-
-        m_shader->set_buffer("position", nanogui::VariableType::Float32, {9, 3}, positions);
-        m_shader->set_buffer("barycentric", nanogui::VariableType::Float32, {9, 3}, barycentric);
+        slider->set_range({0, gui_polyMesh->positions.size() / 3});
     }
 
+    /********************************************************************************************
+     *
+     *                              Key Board and Mouse
+     *
+     ********************************************************************************************/
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers) {
         if (Screen::keyboard_event(key, scancode, action, modifiers))
             return true;
@@ -218,7 +115,7 @@ public:
     }
 
     virtual bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel,
-                                  int button, int modifiers) {
+                                    int button, int modifiers) {
         if (!Screen::mouse_motion_event(p, rel, button, modifiers)) {
             if (camera_.arcball.motion(Eigen::Vector2i(p.x(), p.y()))) {
                 //
@@ -231,7 +128,7 @@ public:
                         Eigen::Vector3f(p.x(), m_size.y() - p.y(), zval),
                         view * model, proj, m_size);
                 Eigen::Vector3f pos0 = unproject(Eigen::Vector3f(translateStart_.x(), m_size.y() -
-                                                             translateStart_.y(), zval), view * model, proj, m_size);
+                                                                                      translateStart_.y(), zval), view * model, proj, m_size);
                 camera_.modelTranslation = camera_.modelTranslation_start + (pos1 - pos0);
             }
         }
@@ -266,10 +163,11 @@ public:
         camera_.modelTranslation = -Eigen::Vector3f(0, 0, 0);
     }
 
-    virtual void draw(NVGcontext *ctx) {
-        /* Draw the user interface */
-        Screen::draw(ctx);
-    }
+    /********************************************************************************************
+    *
+    *                              Shader and Render Pass
+    *
+    ********************************************************************************************/
 
     nanogui::Matrix4f toNanoguiMatrix(Eigen::Matrix4f mat){
         nanogui::Matrix4f nanomat;
@@ -281,6 +179,45 @@ public:
         return nanomat;
     }
 
+    void init_mesh()
+    {
+        shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+        InitVarLite(varList.get());
+
+        shared_ptr<PolyMesh<double>> polyMesh = std::make_shared<PolyMesh<double>>(varList);
+        bool textureModel;
+        polyMesh->readOBJModel("data/TopoInterlock/XML/origin_data/origin_CrossMesh.obj", textureModel, true);
+        gui_polyMesh = make_shared<gui_PolyMesh<double>>(*polyMesh, true, m_render_pass);
+
+//        PatternCreator<double> patternCreator(varList);
+//        PatternCreator<double>::pCrossMesh crossMesh;
+//        patternCreator.create2DPattern(CROSS_SQUARE, 10, crossMesh);
+//        gui_polyMesh = make_shared<gui_PolyMesh<double>>(*(PolyMesh<double> *)crossMesh.get(), true, m_render_pass);
+    }
+
+    void init_render_pass(){
+        nanogui::ref<nanogui::Texture> depth_stencil = new nanogui::Texture(
+                nanogui::Texture::PixelFormat::DepthStencil,
+                nanogui::Texture::ComponentFormat::Float32,
+                framebuffer_size(),
+                nanogui::Texture::InterpolationMode::Bilinear,
+                nanogui::Texture::InterpolationMode::Bilinear,
+                nanogui::Texture::WrapMode::ClampToEdge,
+                1,
+                nanogui::Texture::TextureFlags::RenderTarget
+        );
+
+        m_render_pass = new nanogui::RenderPass({ this }, depth_stencil);
+        m_render_pass->set_clear_color(0, nanogui::Color(0.9f, 0.9f, 0.9f, 1.f));
+        m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
+        m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);
+    }
+
+    virtual void draw(NVGcontext *ctx) {
+        /* Draw the user interface */
+        Screen::draw(ctx);
+    }
+
     virtual void draw_contents() {
         Eigen::Matrix4f model, view, proj;
         computeCameraMatrices(model, view, proj);
@@ -288,18 +225,22 @@ public:
         Eigen::Matrix4f mvp = proj * view * model;
 
         /* MVP uniforms */
-        m_shader->set_uniform("mvp", toNanoguiMatrix(mvp));
+        gui_polyMesh->shader->set_uniform("mvp", toNanoguiMatrix(mvp));
         m_render_pass->begin();
-        m_shader->begin();
-            m_shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, 9 * 3, false);
-        m_shader->end();
+        gui_polyMesh->shader->begin();
+        gui_polyMesh->shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, gui_polyMesh->positions.size() / 3 - num_faces_invisible, false);
+        gui_polyMesh->shader->end();
         m_render_pass->end();
     }
+
 private:
-    nanogui::ref<nanogui::Shader> m_shader;
-
+    //shader and render pass
+    shared_ptr<gui_PolyMesh<double>> gui_polyMesh;
     nanogui::ref<nanogui::RenderPass> m_render_pass;
+    int num_faces_invisible = 0;
 
+private:
+    //camera
     struct CameraParameters {
         Arcball arcball;
         float zoom = 1.0f, viewAngle = 60.0f;
@@ -312,9 +253,7 @@ private:
         Eigen::Vector3f modelTranslation = Eigen::Vector3f::Zero();
         Eigen::Vector3f modelTranslation_start = Eigen::Vector3f::Zero();
         float modelZoom = 1.0f;
-    };
-
-    CameraParameters camera_;
+    } camera_;
     bool translate_ = false;
     Eigen::Vector2i translateStart_ = Eigen::Vector2i(0, 0);
 };

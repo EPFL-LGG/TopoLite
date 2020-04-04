@@ -18,8 +18,6 @@
 #include "TopoLite/Mesh/PolyMesh.h"
 #include "Cross.h"
 
-
-
 template<typename Scalar>
 class CrossMesh : private PolyMesh<Scalar>
 {
@@ -132,7 +130,7 @@ public:
         return none;
     }
 
-    pPolyMesh getCrossMeshwithOrientedPointer();
+    pPolyMesh getPolyMesh();
 
 public:
 
