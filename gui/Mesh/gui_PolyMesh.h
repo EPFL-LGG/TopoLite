@@ -31,6 +31,8 @@ public:
 
     vector<float> barycentric;
 
+    vector<int> face_index_in_position;
+
 public:
     gui_PolyMesh(const PolyMesh<Scalar> &polyMesh,
                  bool _wire,
@@ -95,7 +97,7 @@ public:
                 positions.push_back(center.y());
                 positions.push_back(center.z());
 
-                barycentric.push_back(0);
+                barycentric.push_back(1);
                 barycentric.push_back(0);
                 barycentric.push_back(0);
 
@@ -105,8 +107,10 @@ public:
 
                 barycentric.push_back(0.5);
                 barycentric.push_back(0.5);
-                barycentric.push_back(1);
+                barycentric.push_back(10);
             }
+
+            face_index_in_position.push_back(positions.size());
         }
         shader->set_buffer("position", nanogui::VariableType::Float32, {positions.size() / 3, 3},  &positions[0]);
         shader->set_buffer("barycentric", nanogui::VariableType::Float32, {barycentric.size() / 3, 3}, &barycentric[0]);

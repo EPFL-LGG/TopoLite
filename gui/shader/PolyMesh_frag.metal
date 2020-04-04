@@ -13,5 +13,10 @@ float edgeFactor(float3 vBC){
 
 fragment float4 fragment_main(VertexOut in [[stage_in]])
 {
-    return float4(mix(float3(0.0), float3(1), edgeFactor(in.bary)), 1.0);
+    if(in.bary[2] < 0.5){
+        return float4(mix(float3(0.0), float3(1), edgeFactor(in.bary)), 1.0);
+    }
+    else{
+        return float4(1.0);
+    }
 }

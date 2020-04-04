@@ -41,20 +41,21 @@
 #include <iostream>
 #include <memory>
 #include <stb_image.h>
+#include <cmath>
 
 #include "../Mesh/gui_PolyMesh.h"
 #include "CrossMesh/PatternCreator.h"
 
 class ExampleApplication : public nanogui::Screen {
 public:
-    ExampleApplication() : Screen(nanogui::Vector2i(1024, 768), "NanoGUI Test")
+    ExampleApplication() : Screen(nanogui::Vector2i(1024, 768), "TopoLite GUI")
     {
         inc_ref();
-        nanogui::Window *window = new nanogui::Window(this, "Button demo");
+        nanogui::Window *window = new nanogui::Window(this, "Menu");
         window->set_position(nanogui::Vector2i(15, 15));
         window->set_layout(new nanogui::GroupLayout());
 
-        new nanogui::Label(window, "Slider and text box", "sans-bold");
+        new nanogui::Label(window, "Invisible Faces Num:", "sans-bold");
 
         Widget *panel = new Widget(window);
         panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
@@ -62,7 +63,7 @@ public:
 
         nanogui::Slider *slider = new nanogui::Slider(panel);
         slider->set_value(0);
-        slider->set_fixed_width(200);
+        slider->set_fixed_width(150);
         slider->set_callback([&](float value) {
             this->num_faces_invisible = (int)value;
         });
@@ -73,7 +74,7 @@ public:
         init_render_pass();
         init_mesh();
 
-        slider->set_range({0, gui_polyMesh->positions.size() / 3});
+        slider->set_range({0, gui_polyMesh->size()});
     }
 
     /********************************************************************************************
@@ -159,7 +160,7 @@ public:
         // Re-center the mesh
         camera_.arcball = Arcball();
         camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
-        camera_.modelZoom = 1;
+        camera_.modelZoom = 2;
         camera_.modelTranslation = -Eigen::Vector3f(0, 0, 0);
     }
 
@@ -225,10 +226,12 @@ public:
         Eigen::Matrix4f mvp = proj * view * model;
 
         /* MVP uniforms */
+        int face_index = std::max((int)gui_polyMesh->size() - num_faces_invisible - 1, (int)0);
+
         gui_polyMesh->shader->set_uniform("mvp", toNanoguiMatrix(mvp));
         m_render_pass->begin();
         gui_polyMesh->shader->begin();
-        gui_polyMesh->shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, gui_polyMesh->positions.size() / 3 - num_faces_invisible, false);
+        gui_polyMesh->shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, gui_polyMesh->face_index_in_position[face_index] / 3, false);
         gui_polyMesh->shader->end();
         m_render_pass->end();
     }
