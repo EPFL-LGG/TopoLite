@@ -21,7 +21,7 @@ endif()
 
 # set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
-# Handles GCC and CLANG - Note that GCC on macOS is actually CLANG
+# Handles GCC and CLANG - Note that GCC on macOS is actually an alias to LLVM CLANG
 
 if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     message("Compiling ${CMAKE_CXX_COMPILER_ID}")
@@ -31,6 +31,8 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     message("Compiling with ${CMAKE_CXX_COMPILER_ID} GCC")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+    # NANOGUI uses Metal, not supported by GCC
+    option(HAVE_NANOGUI "Compile the gui" OFF)
 endif()
 
 
