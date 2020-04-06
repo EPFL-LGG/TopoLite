@@ -18,7 +18,7 @@ TEST_CASE("Test_XMLIO"){
 
     SECTION("XMLReader_GUISettings")
     {
-        filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        Wenzel::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         REQUIRE(IO.xmldoc.load_file(xmlFileName.str().c_str()));
         XMLData data;
@@ -31,7 +31,7 @@ TEST_CASE("Test_XMLIO"){
 
     SECTION("XMLReader")
     {
-        filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        Wenzel::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         XMLData data;
         IO.XMLReader(xmlFileName.str(), data);

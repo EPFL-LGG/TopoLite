@@ -3,7 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
-#include "Interlocking/InterlockingSolver_AffineScaling.h"
+#include "Interlocking/InterlockingSolver_Clp.h"
 #include "IO/XMLIO.h"
 
 
@@ -16,10 +16,10 @@ TEST_CASE("Solve Interlocking")
 
     bool textureModel;
     //Parts
-    for(int id = 0; id <= 60; id++){
+    for(int id = 1; id <= 79; id++){
         char number[50];
         sprintf(number, "%02d.obj", id);
-        std::string part_filename = "data/TopoInterlock/XML/origin_data/PartGeometry/Part_";
+        std::string part_filename = "data/Voxel/puz/Part";
         part_filename += number;
         shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
         polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
@@ -28,8 +28,12 @@ TEST_CASE("Solve Interlocking")
     }
 
     //Boundary
+    for(int id = 0; id <= 0; id++)
     {
-        std::string part_filename = "data/TopoInterlock/XML/origin_data/PartGeometry/Boundary.obj";
+        char number[50];
+        sprintf(number, "%02d.obj", id);
+        std::string part_filename = "data/Voxel/puz/Part";
+        part_filename += number;
         shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
         polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
         meshList.push_back(polyMesh);
@@ -39,7 +43,7 @@ TEST_CASE("Solve Interlocking")
     shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
     graph->buildFromMeshes(meshList, atboundary);
 
-    InterlockingSolver_AffineScaling solver(graph, varList);
+    InterlockingSolver_Clp<double> solver(graph, varList);
     shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-    std::cout << solver.isRotationalInterlocking(interlockData) << std::endl;
+    solver.isRotationalInterlocking(interlockData);
 }

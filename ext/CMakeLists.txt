@@ -4,8 +4,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 #EIGEN
 set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
 
-#Cpp Subprocess
-set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
+##Cpp Subprocess
+#set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
 
 #Filesystem
 set(FILESYSTEM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/filesystem)
@@ -48,7 +48,10 @@ endif()
 set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
 
 # CLP
-set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src)
+set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
+                    ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src/OsiClp
+                    ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/CoinUtils/src
+                    ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
 
 #Pybind11
 
@@ -73,6 +76,7 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
                 ${FILESYSTEM_INCLUDE_DIR}
+                ${CLP_INCLUDE_DIR}
                 PARENT_SCOPE)
 
 set(ext_lib pugixml

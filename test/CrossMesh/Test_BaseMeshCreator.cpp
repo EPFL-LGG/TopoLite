@@ -22,18 +22,18 @@ TEST_CASE("BaseMeshCreator")
     std::shared_ptr<CrossMesh<double>> _pattern2D;
 
     XMLIO IO;
-    filesystem::create_directory("Pattern");
+    Wenzel::filesystem::create_directory("Pattern");
 
     SECTION("origin.xml")
     {
         // read xml
-        filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        Wenzel::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         XMLData data;
         IO.XMLReader(xmlFileName.str(), data);
 
         // read polyMesh
-        filesystem::path surface_objfile(UNITTEST_DATAPATH);
+        Wenzel::filesystem::path surface_objfile(UNITTEST_DATAPATH);
         surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
 
         bool texturedModel;

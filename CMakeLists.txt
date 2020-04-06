@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.11)
 project(TopoLite)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
@@ -12,7 +11,7 @@ add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 #####                               #####
 #########################################
 
-option(HAVE_NANOGUI "Compile the gui" ON)
+option(HAVE_NANOGUI "Compile the gui" OFF)
 option(HAVE_TEST "Compile the united test" ON)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -35,8 +34,16 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     option(HAVE_NANOGUI "Compile the gui" OFF)
 endif()
 
+# Some systems may not support C++17,
+# Unless we use NANOGUI, we lower the C++ standard to meet the system requirement
+if(HAVE_NANOGUI)
+    set(CMAKE_CXX_STANDARD 17)
+else()
+    set(CMAKE_CXX_STANDARD 11)
+endif()
 
-#3rd party library
+
+    #3rd party library
 #if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
 #    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
 #	if(MSVC)
@@ -86,37 +93,5 @@ target_include_directories(TpCorelib PUBLIC SYSTEM
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
 
-
-if(HAVE_TEST)
-    set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
-            ${CMAKE_CURRENT_SOURCE_DIR}/ext/Catch2/contrib)
-
-    include(CTest)
-    include(ParseAndAddCatchTests)
-
-    file(GLOB testTopoFiles test/Interlocking/Test_InterlockingSolver_Clp.cpp)
-    #file(GLOB testTopoFiles test/CrossMesh/*.cpp
-    #                        test/Mesh/*.cpp
-    #                        test/IO/*.cpp
-    #                        test/Utility/*.cpp)
-    #file(GLOB testTopoFiles test/Mesh/*.cpp
-    #                        test/Utility/*.cpp)
-
-    set(testTopoFiles ${testTopoFiles} test/Test_Main.cpp)
-
-    add_executable(testTopo ${testTopoFiles})
-
-    target_link_libraries(testTopo PUBLIC Catch2::Catch2)
-    target_link_libraries(testTopo PUBLIC TpCorelib)
-    ParseAndAddCatchTests(testTopo)
-endif()
-
-if(HAVE_NANOGUI)
-    add_executable(TopoGUI gui/ui/guiMain.cpp)
-    target_link_libraries(TopoGUI nanogui)
-    target_link_libraries(TopoGUI TpCorelib)
-    target_include_directories(TopoGUI PUBLIC SYSTEM ${NANOGUI_INCLUDE_DIRS})
-    target_compile_definitions(TopoGUI PUBLIC ${NANOGUI_EXTRA_DEFS})
-    file(COPY gui/shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    file(COPY data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-endif()
+add_subdirectory(test)
+add_subdirectory(gui)

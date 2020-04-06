@@ -126,8 +126,8 @@ TEST_CASE("PolyMesh - Cube") {
     SECTION("read polyhedron") {
         bool texturedModel;
 
-        filesystem::path dataFolder(UNITTEST_DATAPATH);
-        filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
+        Wenzel::filesystem::path dataFolder(UNITTEST_DATAPATH);
+        Wenzel::filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
 
         polyMesh.readOBJModel(filepath.str().c_str(), texturedModel, true);
         REQUIRE(texturedModel == true);
@@ -136,7 +136,7 @@ TEST_CASE("PolyMesh - Cube") {
         polyMesh.translateMesh(Vector3d(1, 1, 1));
         polyMesh.scaleMesh(Vector3d(2, 2, 2));
 
-        filesystem::path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
+        Wenzel::filesystem::path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
         polyMesh.getTextureMesh()->writeOBJModel(outputfile.str().c_str(), false);
 
         SECTION("Test copy and construct function") {

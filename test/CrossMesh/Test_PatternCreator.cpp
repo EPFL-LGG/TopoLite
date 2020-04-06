@@ -13,7 +13,7 @@ TEST_CASE("PatternCreator")
     PatternCreator<double> patternCreator(varList);
     PatternCreator<double>::pCrossMesh crossMesh;
 
-    filesystem::create_directory("Pattern");
+    Wenzel::filesystem::create_directory("Pattern");
 
     SECTION("CROSS_SQUARE"){
         patternCreator.create2DPattern(CROSS_SQUARE, 10, crossMesh);

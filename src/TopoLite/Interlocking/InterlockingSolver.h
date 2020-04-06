@@ -35,6 +35,7 @@ public:
         stdvec_Vector3d rotation;
         vector<int> partID;
     };
+
     struct EquilibriumData{
         stdvec_Vector3d force;
         stdvec_Vector3d torque;
