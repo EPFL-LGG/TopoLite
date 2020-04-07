@@ -49,9 +49,9 @@ set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
 
 # CLP
 set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
-                    ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src/OsiClp
-                    ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/CoinUtils/src
-                    ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
+        ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src/OsiClp
+        ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/CoinUtils/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
 
 #Pybind11
 
