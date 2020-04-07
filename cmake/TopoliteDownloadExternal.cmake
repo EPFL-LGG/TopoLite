@@ -79,3 +79,9 @@ function(topolite_download_shapeop)
 endfunction()
 
 # pugixml
+function(topolite_download_pugixml)
+    topolite_download_project(pugixml
+            GIT_REPOSITORY     https://github.com/KIKI007/pugixml.git
+            GIT_TAG            5e64076af9691ce8100aedf7a61cb338f2596151
+            )
+endfunction()

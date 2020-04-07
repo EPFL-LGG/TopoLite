@@ -22,4 +22,5 @@ ext/.cache
 ext/shapeop
 ext/libigl
 ext/filesystem
-ext/eigen	
+ext/eigen
+ext/pugixml

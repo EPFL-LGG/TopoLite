@@ -8,7 +8,6 @@ list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 include(TopoliteDownloadExternal)
 
 # Eigen
-
 if(NOT TARGET Eigen3::Eigen AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     topolite_download_eigen()
 endif()
@@ -32,14 +31,19 @@ if(NOT TARGET filesystem::filesystem AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOUR
     add_subdirectory(${TOPOLITE_EXTERNAL}/filesystem)
 endif()
 
-# Libigl
+# libigl
 if(NOT TARGET igl::core AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     topolite_download_libigl()
 endif()
 
-# ShapeOp
+# shapeop
 if(NOT TARGET ShapeOp AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     topolite_download_shapeop()
+endif()
+
+# pugixml
+if(NOT TARGET pugixml AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+    topolite_download_pugixml()
 endif()
 
 
