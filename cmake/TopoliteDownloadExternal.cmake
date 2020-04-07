@@ -85,3 +85,11 @@ function(topolite_download_pugixml)
             GIT_TAG            5e64076af9691ce8100aedf7a61cb338f2596151
             )
 endfunction()
+
+# pybind11
+function(topolite_download_pybind11)
+    topolite_download_project(pybind11
+            GIT_REPOSITORY     https://github.com/pybind/pybind11.git
+            GIT_TAG            023487164915c5b62e16a9b4e0b37cb01cd5500a
+            )
+endfunction()

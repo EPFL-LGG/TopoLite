@@ -51,7 +51,6 @@ set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
 
 #Pybind11
-
 if(USE_PYTHON_PLUGIN)
     #Pybind11
     if(WIN32)

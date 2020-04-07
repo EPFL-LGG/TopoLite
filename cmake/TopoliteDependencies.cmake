@@ -46,6 +46,11 @@ if(NOT TARGET pugixml AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     topolite_download_pugixml()
 endif()
 
+# pybind11
+if(NOT TARGET pybind11::pybind11 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+    topolite_download_pybind11()
+endif()
+
 
 # TBB library
 if(NOT TARGET tbb)
