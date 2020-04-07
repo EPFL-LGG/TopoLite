@@ -312,11 +312,11 @@ TEST_CASE("Class ContactGraph") {
         A = make_shared<PolyMesh<double>>(varList);
         B = make_shared<PolyMesh<double>>(varList);
 
-        string strA = "../data/Mesh/contact_scaling_bug/01.obj";
+        string strA = "data/Mesh/contact_scaling_bug/01.obj";
         bool texturedModel;
         A->readOBJModel(strA.c_str(), texturedModel, false);
 
-        string strB = "../data/Mesh/contact_scaling_bug/02.obj";
+        string strB = "data/Mesh/contact_scaling_bug/02.obj";
         B->readOBJModel(strB.c_str(), texturedModel, false);
 
         vector<pPolyMesh> meshes;

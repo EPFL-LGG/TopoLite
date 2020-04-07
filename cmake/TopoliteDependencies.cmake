@@ -51,6 +51,10 @@ if(NOT TARGET pybind11::pybind11 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_D
     topolite_download_pybind11()
 endif()
 
+# nanogui
+if(NOT TARGET nanogui AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+    topolite_download_nanogui()
+endif()
 
 # TBB library
 if(NOT TARGET tbb)

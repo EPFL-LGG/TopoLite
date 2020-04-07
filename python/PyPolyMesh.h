@@ -4,8 +4,8 @@
 
 #ifndef TOPOLITE_PYPOLYMESH_H
 #define TOPOLITE_PYPOLYMESH_H
+
 #include "Mesh/PolyMesh.h"
-#include "Mesh/MeshConverter.h"
 #include "Utility/TopoObject.h"
 
 #include "PyParamList.h"
@@ -19,8 +19,14 @@ using namespace pybind11::literals; // to bring in the `_a` literal
 
 class PyPolyMesh{
 public:
+    typedef shared_ptr<PolyMesh<double>> pPolyMesh;
+    typedef shared_ptr<_Polygon<double>> pPolygon;
+    typedef shared_ptr<VPoint<double>> pVertex;
+    typedef Matrix<double, 3 ,1> Vector3;
 
-    shared_ptr<PolyMesh> mesh_;
+public:
+
+    pPolyMesh mesh_;
 
     bool atBoundary_;
 
@@ -36,17 +42,16 @@ public:
     }
 
     PyPolyMesh(pPolyMesh polymesh, bool atBoundary){
-        mesh_ = make_shared<PolyMesh>(*polymesh);
+        mesh_ = make_shared<PolyMesh<double>>(*polymesh);
         atBoundary_ = false;
     }
 
 public:
 
-    void convert2PolyMesh(double eps)
+    void mergeFaces(double eps)
     {
         if(mesh_ == nullptr) return;
-        MeshConverter converter(mesh_->getVarList());
-        converter.Convert2PolyMesh(mesh_, eps);
+        mesh_->mergeFaces();
     }
 
     py::object getCompasMesh()
@@ -58,15 +63,16 @@ public:
 
         for(size_t id = 0; id < mesh_->vertexList.size(); id++){
             py::list v;
-            v.append(mesh_->vertexList[id].x);
-            v.append(mesh_->vertexList[id].y);
-            v.append(mesh_->vertexList[id].z);
+            v.append(mesh_->vertexList[id]->pos.x());
+            v.append(mesh_->vertexList[id]->pos.y());
+            v.append(mesh_->vertexList[id]->pos.z());
             vs.append(v);
         }
+
         for(size_t id = 0; id < mesh_->polyList.size(); id++){
             py::list f;
-            for(size_t jd = 0; jd < mesh_->polyList[id]->verIDs.size(); jd++){
-                f.append(mesh_->polyList[id]->verIDs[jd]);
+            for(size_t jd = 0; jd < mesh_->polyList[id]->vers.size(); jd++){
+                f.append(mesh_->polyList[id]->vers[jd]->verID);
             }
             fs.append(f);
         }
@@ -88,28 +94,29 @@ private:
         py::list vs = vfs[0];
         py::list fs = vfs[1];
 
-        mesh_ = make_shared<PolyMesh>(varList.data_);
-        mesh_->vertexList.resize(py::len(vs));
+        mesh_ = make_shared<PolyMesh<double>>(varList.data_);
 
         for(int id = 0; id < py::len(vs); id++){
             py::list v = vs[id];
             //py::print(v);
-            Vector3f pt;
+            Vector3 pt;
             for(int kd = 0; kd < 3; kd++){
                 pt[kd] = py::float_(v[kd]);
             }
-            mesh_->vertexList[id] = pt;
+            mesh_->vertexList.push_back(make_shared<VPoint<double>>(pt));
         }
 
         for(int id = 0; id < py::len(fs); id++)
         {
             py::list f = fs[id];
             //py::print(f);
-            shared_ptr<_Polygon> poly = make_shared<_Polygon>();
-            for(int kd = 0; kd < len(f); kd++){
+            pPolygon poly = make_shared<_Polygon<double>>();
+            for(int kd = 0; kd < len(f); kd++)
+            {
                 int vid = py::int_(f[kd]);
-                poly->verIDs.push_back(vid);
-                poly->vers.push_back(mesh_->vertexList[vid]);
+                pVertex ver = mesh_->vertexList[vid];
+                ver->verID = vid;
+                poly->vers.push_back(ver);
             }
             mesh_->polyList.push_back(poly);
         }

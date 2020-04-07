@@ -3,10 +3,24 @@
 //
 
 
+#include "InterlockingSolver_Clp.h"
+#include "tbb/tbb.h"
+
 template<typename Scalar>
 bool InterlockingSolver_Clp<Scalar>::isTranslationalInterlocking(InterlockingSolver_Clp::pInterlockingData data)
 {
-    return true;
+    vector<EigenTriple> tris;
+    Eigen::Vector2i size;
+
+    InterlockingSolver<Scalar>::computeTranslationalInterlockingMatrix(tris, size);
+    int num_row = size[0];
+    int num_col = size[1];
+
+    for(size_t id = 0; id < num_row; id++){
+        tris.push_back(EigenTriple(id, num_col + id, -1));
+    }
+
+    return solve(data, tris, num_row, num_col);
 }
 
 template<typename Scalar>
@@ -15,20 +29,42 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
     Eigen::Vector2i size;
 
     InterlockingSolver<Scalar>::computeRotationalInterlockingMatrix(tris, size);
-    std::cout << size.transpose() << std::endl;
-
     int num_row = size[0];
     int num_col = size[1];
-    int num_col_with_auxiliary = num_row + num_col;
 
     for(size_t id = 0; id < num_row; id++){
         tris.push_back(EigenTriple(id, num_col + id, -1));
     }
 
+    return solve(data, tris, num_row, num_col);
+}
+
+template<typename Scalar>
+bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlockingData data,
+                                                vector<EigenTriple> &tris,
+                                                int num_row,
+                                                int num_col)
+{
+
+    //Problem definition
+    //tris is equal to a sparse matrix A, which size is [num_row x (num_row + num_col)]
+    //our variables are [x, t].
+    //x: (size: num_col) is the instant translational and rotational velocity.
+    //t: (size: num_row) is the auxiliary variable.
+    //the optimization is formulated as:
+    //              min \sum_{i = 0}^{num_row} -t_i
+    //  s.t.            [x, t]A >= 0
+    //                  1 >= t >= -1
+    //                    x \in R
+    // Ideally if the structure is interlocking, the objective value should be zero.
+    // In practice, due to numerical error, we have to allow a small tolerance for the objective value.
+
+
+    int num_col_with_auxiliary = num_row + num_col;
     EigenSpMat spatMat(num_row, num_col_with_auxiliary);
     spatMat.setFromTriplets(tris.begin(), tris.end());
 
-    ClpSimplex model;
+    ClpSimplex model(true);
     CoinPackedMatrix matrix(true, num_row, num_col_with_auxiliary, spatMat.nonZeros(), spatMat.valuePtr(), spatMat.innerIndexPtr(), spatMat.outerIndexPtr(), spatMat.innerNonZeroPtr());
 
     double* objective = new double[num_col_with_auxiliary];
@@ -36,6 +72,7 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
     double* rowUpper = new double[num_row];
     double* colLower = new double[num_col_with_auxiliary];
     double* colUpper = new double[num_col_with_auxiliary];
+
     //objects
     for(size_t id = 0; id < num_col_with_auxiliary; id++)
     {
@@ -52,28 +89,41 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
     }
     for(size_t id = 0; id < num_col_with_auxiliary; id++) {
         if(id < num_col) colUpper[id] = COIN_DBL_MAX;
-        else colUpper[id] = 10;
+        else colUpper[id] = 1;
     }
+
+    CoinMessageHandler handler;
+    handler.setLogLevel(0); //set loglevel to zero will silence the solver
+    model.passInMessageHandler(& handler);
+    model.newLanguage(CoinMessages::us_en);
 
     // load problem
     model.loadProblem(matrix, colLower, colUpper, objective, rowLower, rowUpper);
+
+    // set tolerance
+    // a experiment discovery: if the structure is interlocking,
+    // the maximum "t" (the auxiliary variables) is around tolerance * 10
+    // the average of the "t" is around tolerance * 5.
+    // it is very useful to use these number to check whether structure is interlocking or not.
+    // model.setPrimalTolerance(1e-5);
+
     // Solve
-    model.setPrimalTolerance(1e-7);
     model.primal();
+
     // Solution
     const double target_obj_value = model.rawObjectiveValue();
-    std::cout << target_obj_value << std::endl;
     double *solution = model.primalColumnSolution();
-    for(int id = 0; id < num_col_with_auxiliary; id++){
-        if(id < num_col) {
-            std::cout << solution[id] << std::endl;
-        }
+    double max_sol = 0;
+    for(int id = num_col; id < num_col_with_auxiliary; id++){
+        max_sol = std::max(solution[id], max_sol);
     }
-    if(target_obj_value < 1e-7) {
+
+    std::cout << "max_t:\t" << std::abs(max_sol) << std::endl;
+    std::cout << "average_t:\t" << std::abs(target_obj_value) / num_row << std::endl;
+    if(std::abs(target_obj_value) / num_row < 1e-6) {
         return true;
     }
     else{
         return false;
     }
-
 }

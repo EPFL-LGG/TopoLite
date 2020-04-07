@@ -11,8 +11,10 @@ add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 #####                               #####
 #########################################
 
-option(HAVE_NANOGUI "Compile the gui" OFF)
-option(HAVE_TEST "Compile the united test" ON)
+option(HAVE_NANOGUI "Compile the gui"               OFF)
+option(HAVE_TEST    "Compile the united test"       ON)
+option(HAVE_PYBIND   "Compile the python binding"   ON)
+
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -95,3 +97,4 @@ target_link_libraries(TpCorelib PUBLIC ${ext_lib})
 
 add_subdirectory(test)
 add_subdirectory(gui)
+add_subdirectory(python)

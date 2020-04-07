@@ -17,7 +17,7 @@ TEST_CASE("PolyMesh_AABBTree - Test findTexPoint")
     SECTION("findTexPoint after object read") {
         // This case is more difficult to understand/read as the data inputs are complicated
         bool texturedModel;
-        polyMesh->readOBJModel("../data/Mesh/primitives/Icosphere.obj", texturedModel, true);
+        polyMesh->readOBJModel("data/Mesh/primitives/Icosphere.obj", texturedModel, true);
         PolyMesh_AABBTree<double> aabbTree(*polyMesh);
         aabbTree.buildTexTree();
 

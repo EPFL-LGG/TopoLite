@@ -52,8 +52,11 @@ public:
         double eps;
     };
 
-    struct plane_contact_compare {
-        bool operator()(const polygonal_face &A, const polygonal_face &B) const {
+    struct plane_contact_compare
+    {
+    public:
+        bool operator()(const polygonal_face &A, const polygonal_face &B) const
+        {
             double eps = A.eps / 2;
 
             if (A.nrm[0] - B.nrm[0] < -eps)

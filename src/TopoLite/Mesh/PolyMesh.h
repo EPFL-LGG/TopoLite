@@ -17,8 +17,10 @@
 
 #include "TopoLite/Utility/GeometricPrimitives.h"
 #include "TopoLite/Utility/TopoObject.h"
+#include "TopoLite/Utility/PolyPolyBoolean.h"
 #include "Polygon.h"
 #include <Eigen/Dense>
+
 using Eigen::Matrix;
 
 template<typename Scalar>
@@ -27,6 +29,8 @@ class PolyMesh : public TopoObject
 public:
 
     using pPolygon = shared_ptr<_Polygon<Scalar>> ;
+
+    using wpPolygon = weak_ptr<_Polygon<Scalar>> ;
 
     using pTriangle = shared_ptr<Triangle<Scalar>> ;
 
@@ -123,7 +127,15 @@ public:
     // Read OBJ File
     bool readOBJModel(  const char *fileName, bool &textureModel_, bool normalized);
 
+    bool readOBJ(       const std::string obj_file_name,
+                        vector<vector<double>> &V,
+                        vector<vector<double>> &TC,
+                        vector<vector<int>> &F,
+                        vector<vector<int>> &FTC);
+
     void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
+
+    void mergeFaces(double eps = 1e-3);
 
     // Update vertexList and textureList
 
