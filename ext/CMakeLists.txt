@@ -1,23 +1,20 @@
 cmake_minimum_required(VERSION 3.1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-#EIGEN
-set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
+# eigen
+set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen)
 
-##Cpp Subprocess
-#set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
-
-#Filesystem
+# filesystem
 set(FILESYSTEM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/filesystem)
 
-#PUGIXML
+# pugixml
 option(BUILD_SHARED_LIBS OFF)
 find_package(PUGIXML REQUIRED)
 
-#QuickHull
+# quickhull
 find_package(QuickHull)
 
-#Clipper
+# clipper
 find_package(Clipper)
 
 #LIBIGL

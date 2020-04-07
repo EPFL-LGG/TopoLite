@@ -21,4 +21,5 @@ ext/clp
 ext/.cache
 ext/shapeop
 ext/libigl
-ext/filesystem	
+ext/filesystem
+ext/eigen	

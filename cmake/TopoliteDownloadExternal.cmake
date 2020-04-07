@@ -22,6 +22,14 @@ function(topolite_download_project name)
 endfunction()
 
 ################################################################################
+## Eigen
+function(topolite_download_eigen)
+    topolite_download_project(eigen
+            GIT_REPOSITORY https://github.com/eigenteam/eigen-git-mirror.git
+            GIT_TAG        3.3.7
+            )
+endfunction()
+
 ## Catch2
 function(topolite_download_catch)
     topolite_download_project(catch2
