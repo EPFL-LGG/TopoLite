@@ -63,11 +63,9 @@ endif()
 
 # Download and define targets for third-party dependencies
 
-# Catch2 and TBB are handled in the following CMAKE module
-
 include(TopoliteDependencies)
 
-# The rest of dep. are located here:
+# Add deps directory
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 
