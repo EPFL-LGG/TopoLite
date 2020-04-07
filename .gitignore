@@ -19,3 +19,6 @@ ext/tbb
 ext/Catch2
 ext/clp
 ext/.cache
+ext/shapeop
+ext/libigl
+ext/filesystem	

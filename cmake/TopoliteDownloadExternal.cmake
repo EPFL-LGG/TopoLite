@@ -53,3 +53,21 @@ function(topolite_download_filesystem)
             GIT_TAG            984cf9bd716c38c18c73525b7b7aa87ae45ecb77
             )
 endfunction()
+
+## libigl
+function(topolite_download_libigl)
+    topolite_download_project(libigl
+            GIT_REPOSITORY     https://github.com/libigl/libigl.git
+            GIT_TAG            87b54fc4dcc5aea182dd842a55ac75536fb69e1a
+            )
+endfunction()
+
+## ShapeOp
+function(topolite_download_shapeop)
+    topolite_download_project(shapeop
+            GIT_REPOSITORY     https://github.com/EPFL-LGG/ShapeOp.git
+            GIT_TAG            6319182302de443f9d837dd3f9cd365f6a812907
+            )
+endfunction()
+
+# pugixml

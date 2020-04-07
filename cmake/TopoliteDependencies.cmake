@@ -8,7 +8,7 @@ list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 include(TopoliteDownloadExternal)
 
 # COIN-OR CLP
-if(NOT TARGET clp::clp AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET lib_Clp AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     topolite_download_clp()
     add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
 endif()
@@ -20,8 +20,25 @@ if(NOT TARGET catch2::catch2 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
     list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/catch2/contrib)
 endif()
 
+# Filesystem
+if(NOT TARGET filesystem::filesystem AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+    topolite_download_filesystem()
+    add_subdirectory(${TOPOLITE_EXTERNAL}/filesystem)
+endif()
+
+# Libigl
+if(NOT TARGET igl::core AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+    topolite_download_libigl()
+endif()
+
+# ShapeOp
+if(NOT TARGET ShapeOp AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+    topolite_download_shapeop()
+endif()
+
+
 # TBB library
-if(NOT TARGET tbb::tbb)
+if(NOT TARGET tbb)
     set(TBB_BUILD_STATIC            ON  CACHE BOOL " " FORCE)
     set(TBB_BUILD_SHARED            OFF CACHE BOOL " " FORCE)
     set(TBB_BUILD_TBBMALLOC         ON  CACHE BOOL " " FORCE) # needed for CGAL's parallel mesher
