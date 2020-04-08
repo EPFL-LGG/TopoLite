@@ -51,7 +51,7 @@ set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
 
 #Pybind11
-if(USE_PYTHON_PLUGIN)
+if(HAVE_PYBIND)
     #Pybind11
     if(WIN32)
         set(PYTHON_EXECUTABLE $ENV{USERPROFILE}/anaconda3/python.exe)

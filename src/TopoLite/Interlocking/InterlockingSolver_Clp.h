@@ -27,6 +27,8 @@ public:
     bool isTranslationalInterlocking(pInterlockingData data);
 
     bool isRotationalInterlocking(pInterlockingData data);
+
+    bool solve(pInterlockingData data, vector<EigenTriple> &tris, int num_row, int num_col);
 };
 
 #include "InterlockingSolver_Clp.cpp"

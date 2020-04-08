@@ -180,6 +180,7 @@ template<typename Scalar>
 bool ContactGraph<Scalar>::clusterFacesofInputMeshes(Scalar eps)
 {
     std::set<polygonal_face, plane_contact_compare> planes_set;
+
     int groupID = 0;
     size_t msize = meshes_input.size();
     for (size_t id = 0; id < msize; id++)
@@ -263,8 +264,10 @@ void ContactGraph<Scalar>::listPotentialContacts(vector<bool> &atBoundary)
 
                     if (partI != partJ
                         && std::abs(nrmI.dot(nrmJ) + 1) < FLOAT_ERROR_LARGE
-                        && (!atBoundary[partI] || !atBoundary[partJ]))
+                        && (!atBoundary[partI] || !atBoundary[partJ])){
                         contact_pairs.push_back(pairIJ(id, jd));
+                    }
+
                 }
             }
         }
@@ -283,10 +286,10 @@ void ContactGraph<Scalar>::computeContacts()
 {
     size_t psize = contact_pairs.size();
     contact_graphedges.resize(psize);
-    // for (size_t id = 0; id != planeIJ.size(); ++id) // Sequential loop
-    tbb::parallel_for(tbb::blocked_range<size_t>(0, psize), [&](const tbb::blocked_range<size_t> &r)
+     for (size_t id = 0; id < psize; ++id) // Sequential loop
+    //tbb::parallel_for(tbb::blocked_range<size_t>(0, psize), [&](const tbb::blocked_range<size_t> &r)
     {
-        for (size_t id = r.begin(); id != r.end(); ++id) {
+        //for (size_t id = r.begin(); id != r.end(); ++id) {
 
             int planeI = contact_pairs[id].first;
             int planeJ = contact_pairs[id].second;
@@ -318,7 +321,7 @@ void ContactGraph<Scalar>::computeContacts()
                 contact_graphedges[id] = make_shared<ContactGraphEdge<Scalar>>(contactPolys, contact_faces[planeI].nrm);
             }
         }
-    });
+    //});
 }
 
 /**

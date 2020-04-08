@@ -5,12 +5,9 @@
 #ifndef TOPOLITE_PYCONTACTGRAPH_H
 #define TOPOLITE_PYCONTACTGRAPH_H
 
-
-#include "Mesh/MeshConverter.h"
 #include "Interlocking/ContactGraph.h"
 
 #include "PyParamList.h"
-#include "PyTopoCreator.h"
 #include "PyPolyMesh.h"
 
 #include "igl/writeOBJ.h"
@@ -23,17 +20,22 @@ namespace py = pybind11;
 using namespace pybind11::literals; // to bring in the `_a` literal
 
 class PyContactGraph{
+public:
+
+    typedef shared_ptr<ContactGraph<double>> pContactGraph;
+
+    typedef shared_ptr<PolyMesh<double>> pPolyMesh;
 
 public:
 
-    shared_ptr<ContactGraph> graph;
+    pContactGraph graph;
 
 public:
 
     PyContactGraph(const vector<PyPolyMesh> &pyPolymeshes, float contact_eps)
     {
         if(pyPolymeshes.empty() || pyPolymeshes.front().mesh_ == nullptr) return;
-        graph = make_shared<ContactGraph>(pyPolymeshes.front().mesh_->getVarList());
+        graph = make_shared<ContactGraph<double>>(pyPolymeshes.front().mesh_->getVarList());
 
         vector<pPolyMesh> meshes;
         vector<bool> atBoundary;
@@ -44,7 +46,7 @@ public:
             atBoundary.push_back(pyPolymeshes[id].atBoundary_);
         }
 
-        graph->constructFromPolyMeshes(meshes, atBoundary, contact_eps);
+        graph->buildFromMeshes(meshes, atBoundary, contact_eps);
         graph->finalize();
     }
 

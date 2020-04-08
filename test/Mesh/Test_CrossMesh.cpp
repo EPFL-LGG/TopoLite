@@ -15,7 +15,7 @@ TEST_CASE("CrossMesh")
     SECTION("read polyhedron")
     {
         bool texturedModel;
-        polyMesh.readOBJModel("../data/Mesh/primitives/Icosphere.obj", texturedModel, true);
+        polyMesh.readOBJModel("data/Mesh/primitives/Icosphere.obj", texturedModel, true);
         CrossMesh<double> crossMesh(polyMesh);
         REQUIRE(crossMesh.getVertices().size() == polyMesh.vertexList.size());
         REQUIRE(Approx(crossMesh.volume()) == polyMesh.volume());

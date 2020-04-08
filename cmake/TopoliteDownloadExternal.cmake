@@ -58,7 +58,7 @@ endfunction()
 function(topolite_download_filesystem)
     topolite_download_project(filesystem
             GIT_REPOSITORY     https://github.com/KIKI007/filesystem.git
-            GIT_TAG            984cf9bd716c38c18c73525b7b7aa87ae45ecb77
+            GIT_TAG            90fb57f9698bce2961d3a23bc6c957abddaeff68
             )
 endfunction()
 
@@ -74,7 +74,7 @@ endfunction()
 function(topolite_download_shapeop)
     topolite_download_project(shapeop
             GIT_REPOSITORY     https://github.com/EPFL-LGG/ShapeOp.git
-            GIT_TAG            6319182302de443f9d837dd3f9cd365f6a812907
+            GIT_TAG            9a79b808c5e4144b8b6f0f429df7273f61e95547
             )
 endfunction()
 
@@ -93,3 +93,12 @@ function(topolite_download_pybind11)
             GIT_TAG            023487164915c5b62e16a9b4e0b37cb01cd5500a
             )
 endfunction()
+
+# nanogui
+function(topolite_download_nanogui)
+    topolite_download_project(nanogui
+            GIT_REPOSITORY     https://github.com/mitsuba-renderer/nanogui.git
+            GIT_TAG            741f3323c73891f62c71427c1fd766b8a32035f5
+            )
+endfunction()
+
