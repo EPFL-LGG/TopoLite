@@ -18,6 +18,8 @@
 #include "igl/readOBJ.h"
 #include "Polygon.h"
 #include "PolyMesh.h"
+#include <unordered_map>
+#include <queue>
 
 
 #include <set>
@@ -627,122 +629,132 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) 
 template <typename Scalar>
 void PolyMesh<Scalar>::mergeFaces(double eps)
 {
-    struct plane_contact
-    {
-        Vector3 nrm;
-        double D;
-        int groupID;
-        wpPolygon polygon;
-        double eps;
+    this->removeDuplicatedVertices(eps);
+    vector<vector<wpPolygon>> vertexFaces(vertexList.size());
+    for(pPolygon poly: polyList){
+        for(pVertex vertex: poly->vers){
+            vertexFaces[vertex->verID].push_back(poly);
+        }
+    }
+
+    auto find_vertex_localID = [=](pVertex vertex, pPolygon poly) -> int{
+        for(int id = 0; id < poly->vers.size(); id++){
+            if(poly->vers[id] == vertex){
+                return id;
+            }
+        }
+        return -1;
     };
 
-    struct plane_contact_compare
-    {
-        bool operator()(const plane_contact& A, const plane_contact& B) const
+    auto find_neighbor = [=](pPolygon face) -> vector<wpPolygon>{
+        std::unordered_map<pPolygon, bool> visited;
+        vector<wpPolygon> neighbors;
+        visited[face] = true;
+        for(int id = 0; id < face->vers.size(); id++)
         {
-            double eps = A.eps / 2;
-
-            for(int id = 0; id < 3; id++){
-                if (A.nrm[id] - B.nrm[id] < -eps)
-                    return true;
-                if (A.nrm[id] - B.nrm[id] > eps)
-                    return false;
+            pVertex vertex = face->vers[id];
+            pVertex next_vertex = face->vers[(id + 1) % face->vers.size()];
+            for(wpPolygon neighbor: vertexFaces[vertex->verID])
+            {
+                if(visited.find(neighbor.lock()) == visited.end()){
+                    int neighbor_size = neighbor.lock()->vers.size();
+                    int neighbor_vertex_localID = find_vertex_localID(vertex, neighbor.lock());
+                    int neighbor_prev_vertex_localID = (neighbor_vertex_localID - 1 + neighbor_size) % neighbor_size;
+                    pVertex neighbor_pre_vertex = neighbor.lock()->vers[neighbor_prev_vertex_localID];
+                    if(next_vertex == neighbor_pre_vertex){
+                        neighbors.push_back(neighbor);
+                        visited[neighbor.lock()] = true;
+                    }
+                }
             }
-
-            if (A.D - B.D < -eps)
-                return true;
-            if (A.D - B.D > eps)
-                return false;
-
-            return false;
         }
+        return neighbors;
     };
 
-    vector<plane_contact> planes;
-    std::set<plane_contact, plane_contact_compare> setPlanes;
+    auto find_next_vertex = [=](pVertex vertex, std::unordered_map<pPolygon, bool> face_in_merge) -> pVertex{
 
-    //0) scale the meshes into united box
-    double maxD = 1;
-    for (pPolygon face : this->polyList) {
-        //1.1) construct plane
-        plane_contact plane;
-        Vector3 nrm = face->normal();
-        Vector3 center = face->vers[0]->pos;
-        plane.nrm = nrm;
-
-        plane.D = nrm.dot(center);
-        maxD = std::max(maxD, std::abs(plane.D));
-    }
-
-    int groupID = 0;
-    for (pPolygon face : this->polyList)
-    {
-        //1.1) construct plane
-        plane_contact plane;
-        Vector3 nrm = face->normal();
-        Vector3 center = face->center();
-        plane.nrm = nrm;
-
-        plane.D = (nrm.dot(center)) / maxD;
-        plane.polygon = face;
-        plane.eps = eps;
-
-        //1.2) find groupID
-        auto find_it = setPlanes.find(plane);
-
-        if(find_it == setPlanes.end()){
-            plane.groupID = groupID ++;
-            setPlanes.insert(plane);
-        }
-        else{
-            plane.groupID = find_it->groupID;
-        }
-
-        planes.push_back(plane);
-    }
-
-    std::sort(planes.begin(), planes.end(), [&](const plane_contact &A, const plane_contact &B){
-        return A.groupID < B.groupID;
-    });
-
-    int sta = 0, end = 0;
-    vector<pPolygon> polygons;
-    while(sta < planes.size())
-    {
-        for(end = sta + 1; end < planes.size(); end++)
-        {
-            if(planes[sta].groupID != planes[end].groupID)
-            {
-                break;
+        std::unordered_map<pPolygon, bool> visited;
+        for(wpPolygon poly: vertexFaces[vertex->verID]){
+            if(face_in_merge.find(poly.lock()) != face_in_merge.end()){
+                visited[poly.lock()] = true;
             }
         }
 
-        if (end - sta > 1)
-        {
-            vector<vector<Vector3>> allFaces;
-            for (int kd = sta; kd < end; kd++)
-            {
-                if(planes[kd].polygon.lock())
-                    allFaces.push_back(planes[kd].polygon.lock()->getVertices());
+        for(wpPolygon poly: vertexFaces[vertex->verID]){
+            if(face_in_merge.find(poly.lock()) == face_in_merge.end()) continue;
+            int vertex_localID = find_vertex_localID(vertex, poly.lock());
+            int next_localID = (vertex_localID + 1) % poly.lock()->size();
+            pVertex next_vertex = poly.lock()->vers[next_localID];
+
+            bool is_next_vertex_valid = true;
+            for(wpPolygon next_poly: vertexFaces[next_vertex->verID]){
+                if(next_poly.lock() != poly.lock() && visited.find(next_poly.lock()) != visited.end()){
+                    is_next_vertex_valid = false;
+                    break;
+                }
             }
-            vector<vector<Vector3>> mergeFaces;
-            PolyPolyBoolean<Scalar> polyBoolean(getVarList());
-            polyBoolean.computePolygonsUnion(allFaces, mergeFaces);
-            for(size_t kd = 0; kd < mergeFaces.size(); kd++){
-                pPolygon poly = make_shared<_Polygon<Scalar>>();
-                poly->setVertices(mergeFaces[kd]);
-                polygons.push_back(poly);
+
+            if(is_next_vertex_valid){
+                return next_vertex;
             }
         }
-        else{
-            polygons.push_back(planes[sta].polygon.lock());
+
+        return nullptr;
+    };
+
+    std::unordered_map<pPolygon, bool> visited;
+    vector<pPolygon> new_faces;
+
+    for(pPolygon face: polyList){
+        if(visited.find(face) == visited.end()){
+
+            vector<pPolygon> merged_faces;
+            merged_faces.push_back(face);
+            std::queue<pPolygon> queue_faces;
+
+            queue_faces.push(face);
+            visited[face] = true;
+
+            std::unordered_map<pPolygon, bool> localvisited = visited;
+            while(!queue_faces.empty()){
+                pPolygon u = queue_faces.front(); queue_faces.pop();
+                vector<wpPolygon> neighbors = find_neighbor(u);
+                Vector3 u_normal = u->normal();
+                for(wpPolygon neighbor: neighbors){
+                    if(localvisited.find(neighbor.lock()) == localvisited.end()){
+                        Vector3 neighbor_normal = neighbor.lock()->normal();
+                        if(std::abs(u_normal.cross(neighbor_normal).norm()) < eps){
+                            merged_faces.push_back(neighbor.lock());
+                            queue_faces.push(neighbor.lock());
+                        }
+                        localvisited[neighbor.lock()] = true;
+                    }
+                }
+            }
+
+            std::unordered_map<pPolygon, bool> faces_in_merge;
+            for(pPolygon face: merged_faces){
+                visited[face] = true;
+                faces_in_merge[face] = true;
+            }
+
+            if(merged_faces.size() > 1){
+                pVertex vertex = merged_faces[0]->vers[0];
+                pPolygon new_poly = make_shared<_Polygon<Scalar>>();
+                do{
+                    new_poly->vers.push_back(vertex);
+                    vertex = find_next_vertex(vertex, faces_in_merge);
+                }while(vertex != merged_faces[0]->vers[0]);
+                new_faces.push_back(new_poly);
+            }
+            else{
+                new_faces.push_back(merged_faces[0]);
+            }
         }
-        sta = end;
     }
 
-    this->clear();
-    this->setPolyLists(polygons);
-    this->removeDuplicatedVertices();
+    polyList = new_faces;
+
 }
 
 template<typename Scalar>

@@ -346,8 +346,6 @@ void InterlockingSolver<Scalar>::appendMergeConstraints(vector<EigenTriple> &tri
     return;
 }
 
-
-
 template<typename Scalar>
 void InterlockingSolver<Scalar>::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool withFriction) {
     if (!withFriction)

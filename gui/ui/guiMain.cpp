@@ -42,6 +42,7 @@
 #include <memory>
 #include <stb_image.h>
 #include <cmath>
+#include <filesystem>
 
 #include "../Mesh/gui_PolyMesh.h"
 #include "../Mesh/gui_PolyMeshLists.h"
@@ -298,6 +299,7 @@ public:
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
             bool textureModel;
             if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
+                polyMesh->mergeFaces(1e-3);
                 meshLists.push_back(polyMesh);
                 atboundary.push_back(false);
                 colors.push_back(nanogui::Color(255, 255, 255, 255));
@@ -311,10 +313,13 @@ public:
             part_filename += number;
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
             bool textureModel;
-            if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
-                meshLists.push_back(polyMesh);
-                atboundary.push_back(false);
-                colors.push_back(nanogui::Color(255, 255, 255, 255));
+            if(std::filesystem::is_regular_file(part_filename.c_str())){
+                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
+                    polyMesh->mergeFaces(1e-3);
+                    meshLists.push_back(polyMesh);
+                    atboundary.push_back(false);
+                    colors.push_back(nanogui::Color(255, 255, 255, 255));
+                }
             }
         }
 
