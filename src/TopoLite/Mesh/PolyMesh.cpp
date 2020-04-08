@@ -15,6 +15,7 @@
 #include "Utility/math3D.h"
 
 #include "igl/boundary_loop.h"
+#include "igl/readOBJ.h"
 #include "Polygon.h"
 #include "PolyMesh.h"
 
@@ -478,12 +479,12 @@ bool PolyMesh<Scalar>::readOBJModel(
         bool &textureModel_,
         bool normalized)
 {
-	vector<vector<double>> V, TC;
-	vector<vector<int>> F, FTC;
+	vector<vector<double>> V, TC, N;
+	vector<vector<int>> F, FTC, FTN;
 
 	clear();
 
-	if(readOBJ(fileName, V, TC, F, FTC))
+	if(igl::readOBJ(fileName, V, TC, N,F, FTC, FTN))
 	{
 	    clear();
 
@@ -532,170 +533,6 @@ bool PolyMesh<Scalar>::readOBJModel(
 	else {
 	    return false;
 	}
-}
-
-template<typename Scalar>
-bool PolyMesh<Scalar>::readOBJ(       const std::string obj_file_name,
-                    vector<vector<double>> &V,
-                    vector<vector<double>> &TC,
-                    vector<vector<int>> &F,
-                    vector<vector<int>> &FTC){
-    FILE * obj_file = fopen(obj_file_name.c_str(),"r");
-    if(NULL==obj_file)
-    {
-        fprintf(stderr,"IOError: %s could not be opened...\n",
-                obj_file_name.c_str());
-        return false;
-    }
-
-    // File open was successful so clear outputs
-    V.clear();
-    TC.clear();
-    F.clear();
-    FTC.clear();
-
-    // variables and constants to assist parsing the .obj file
-    // Constant strings to compare against
-    std::string v("v");
-    std::string vt("vt");
-    std::string f("f");
-    std::string tic_tac_toe("#");
-#ifndef IGL_LINE_MAX
-#  define IGL_LINE_MAX 2048
-#endif
-
-    char line[IGL_LINE_MAX];
-    int line_no = 1;
-    while (fgets(line, IGL_LINE_MAX, obj_file) != NULL)
-    {
-        char type[IGL_LINE_MAX];
-        // Read first word containing type
-        if(sscanf(line, "%s",type) == 1)
-        {
-            // Get pointer to rest of line right after type
-            char * l = &line[strlen(type)];
-            if(type == v)
-            {
-                std::istringstream ls(&line[1]);
-                std::vector<Scalar > vertex{ std::istream_iterator<Scalar >(ls), std::istream_iterator<Scalar >() };
-
-                if (vertex.size() < 3)
-                {
-                    fprintf(stderr,
-                            "Error: readOBJ() vertex on line %d should have at least 3 coordinates",
-                            line_no);
-                    fclose(obj_file);
-                    return false;
-                }
-
-                V.push_back(vertex);
-            }else if(type == vt)
-            {
-                double x[3];
-                int count =
-                        sscanf(l,"%lf %lf %lf\n",&x[0],&x[1],&x[2]);
-                if(count != 2 && count != 3)
-                {
-                    fprintf(stderr,
-                            "Error: readOBJ() texture coords on line %d should have 2 "
-                            "or 3 coordinates (%d)",
-                            line_no,count);
-                    fclose(obj_file);
-                    return false;
-                }
-                std::vector<Scalar > tex(count);
-                for(int i = 0;i<count;i++)
-                {
-                    tex[i] = x[i];
-                }
-                TC.push_back(tex);
-            }else if(type == f)
-            {
-                const auto & shift = [&V](const int i)->int
-                {
-                    return i<0 ? i+V.size() : i-1;
-                };
-                const auto & shift_t = [&TC](const int i)->int
-                {
-                    return i<0 ? i+TC.size() : i-1;
-                };
-                std::vector<int > f;
-                std::vector<int > ftc;
-                std::vector<int > fn;
-                // Read each "word" after type
-                char word[IGL_LINE_MAX];
-                int offset;
-                while(sscanf(l,"%s%n",word,&offset) == 1)
-                {
-                    // adjust offset
-                    l += offset;
-                    // Process word
-                    long int i,it,in;
-                    if(sscanf(word,"%ld/%ld/%ld",&i,&it,&in) == 3)
-                    {
-                        f.push_back(shift(i));
-                        ftc.push_back(shift_t(it));
-                    }else if(sscanf(word,"%ld/%ld",&i,&it) == 2)
-                    {
-                        f.push_back(shift(i));
-                        ftc.push_back(shift_t(it));
-                    }else if(sscanf(word,"%ld//%ld",&i,&in) == 2)
-                    {
-                        f.push_back(shift(i));
-                    }else if(sscanf(word,"%ld",&i) == 1)
-                    {
-                        f.push_back(shift(i));
-                    }else
-                    {
-                        fprintf(stderr,
-                                "Error: readOBJ() face on line %d has invalid element format\n",
-                                line_no);
-                        fclose(obj_file);
-                        return false;
-                    }
-                }
-                if(
-                        (f.size()>0 && ftc.size() == 0) ||
-                        (f.size()>0 && ftc.size() == 0) ||
-                        (f.size()>0 && ftc.size() == f.size()) ||
-                        (f.size()>0 && ftc.size() == f.size()))
-                {
-                    // No matter what add each type to lists so that lists are the
-                    // correct lengths
-                    F.push_back(f);
-                    FTC.push_back(ftc);
-                }else
-                {
-                    fprintf(stderr,
-                            "Error: readOBJ() face on line %d has invalid format\n", line_no);
-                    fclose(obj_file);
-                    return false;
-                }
-            }else if(strlen(type) >= 1 && (type[0] == '#' ||
-                                           type[0] == 'g'  ||
-                                           type[0] == 's'  ||
-                                           strcmp("usemtl",type)==0 ||
-                                           strcmp("mtllib",type)==0))
-            {
-                //ignore comments or other shit
-            }else
-            {
-                //ignore any other lines
-                fprintf(stderr,
-                        "Warning: readOBJ() ignored non-comment line %d:\n  %s",
-                        line_no,
-                        line);
-            }
-        }else
-        {
-            // ignore empty line
-        }
-        line_no++;
-    }
-    fclose(obj_file);
-    assert(F.size() == FTC.size());
-
-    return true;
 }
 
 template<typename Scalar>

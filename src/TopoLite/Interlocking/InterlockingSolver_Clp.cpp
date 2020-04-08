@@ -48,12 +48,12 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
 
     //Problem definition
     //tris is equal to a sparse matrix A, which size is [num_row x (num_row + num_col)]
-    //our variables are [x, t].
+    //our variables are [x, t], a row vector.
     //x: (size: num_col) is the instant translational and rotational velocity.
     //t: (size: num_row) is the auxiliary variable.
     //the optimization is formulated as:
     //              min \sum_{i = 0}^{num_row} -t_i
-    //  s.t.            [x, t]A >= 0
+    //  s.t.            A[x, t] >= 0
     //                  1 >= t >= -1
     //                    x \in R
     // Ideally if the structure is interlocking, the objective value should be zero.
@@ -105,7 +105,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     // the maximum "t" (the auxiliary variables) is around tolerance * 10
     // the average of the "t" is around tolerance * 5.
     // it is very useful to use these number to check whether structure is interlocking or not.
-    // model.setPrimalTolerance(1e-5);
+    model.setPrimalTolerance(1e-8);
 
     // Solve
     model.primal();
@@ -120,7 +120,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
 
     std::cout << "max_t:\t" << std::abs(max_sol) << std::endl;
     std::cout << "average_t:\t" << std::abs(target_obj_value) / num_row << std::endl;
-    if(std::abs(target_obj_value) / num_row < 1e-6) {
+    if(max_sol < 5e-6) {
         return true;
     }
     else{
