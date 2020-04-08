@@ -4,8 +4,7 @@
 
 #include <catch2/catch.hpp>
 #include "Mesh/PolyMesh.h"
-#include "filesystem/path.h"
-#include "filesystem/resolver.h"
+#include <filesystem>
 
 TEST_CASE("PolyMesh - Four Quad with index as input") {
     // Setup
@@ -126,18 +125,18 @@ TEST_CASE("PolyMesh - Cube") {
     SECTION("read polyhedron") {
         bool texturedModel;
 
-        Wenzel::filesystem::path dataFolder(UNITTEST_DATAPATH);
-        Wenzel::filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
+        std::filesystem::path dataFolder(UNITTEST_DATAPATH);
+        std::filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
 
-        polyMesh.readOBJModel(filepath.str().c_str(), texturedModel, true);
+        polyMesh.readOBJModel(filepath.c_str(), texturedModel, true);
         REQUIRE(texturedModel == true);
 
         polyMesh.rotateMesh(Vector3d(0, 0, 0), Vector3d(0, 0, 1), 10);
         polyMesh.translateMesh(Vector3d(1, 1, 1));
         polyMesh.scaleMesh(Vector3d(2, 2, 2));
 
-        Wenzel::filesystem::path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
-        polyMesh.getTextureMesh()->writeOBJModel(outputfile.str().c_str(), false);
+        std::filesystem::path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
+        polyMesh.getTextureMesh()->writeOBJModel(outputfile.c_str(), false);
 
         SECTION("Test copy and construct function") {
             PolyMesh<double> newmesh = polyMesh;

@@ -4,7 +4,7 @@
 
 #include "CrossMesh/PatternCreator.h"
 #include <catch2/catch.hpp>
-#include <filesystem/path.h>
+#include <filesystem>
 TEST_CASE("PatternCreator")
 {
     shared_ptr<InputVarList> varList;
@@ -13,7 +13,7 @@ TEST_CASE("PatternCreator")
     PatternCreator<double> patternCreator(varList);
     PatternCreator<double>::pCrossMesh crossMesh;
 
-    Wenzel::filesystem::create_directory("Pattern");
+    std::filesystem::create_directory("Pattern");
 
     SECTION("CROSS_SQUARE"){
         patternCreator.create2DPattern(CROSS_SQUARE, 10, crossMesh);

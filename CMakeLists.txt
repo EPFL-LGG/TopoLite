@@ -4,6 +4,7 @@ project(TopoLite)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
+set(CMAKE_CXX_STANDARD 17)
 
 #########################################
 #####                               #####
@@ -12,8 +13,8 @@ add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
 #########################################
 
 option(HAVE_NANOGUI     "Compile the gui"                               ON)
-option(HAVE_TEST        "Compile the united test"                       OFF)
-option(HAVE_PYBIND      "Compile the python binding"                    OFF)
+option(HAVE_TEST        "Compile the united test"                       ON)
+option(HAVE_PYBIND      "Compile the python binding"                    ON)
 option(HAVE_IPOPT       "Compile the nonlinear optimization solver"     OFF)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -35,15 +36,6 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     # NANOGUI uses Metal, not supported by GCC
     option(HAVE_NANOGUI "Compile the gui" OFF)
 endif()
-
-# Some systems may not support C++17,
-# Unless we use NANOGUI, we lower the C++ standard to meet the system requirement
-if(HAVE_NANOGUI)
-    set(CMAKE_CXX_STANDARD 17)
-else()
-    set(CMAKE_CXX_STANDARD 11)
-endif()
-
 
     #3rd party library
 #if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)

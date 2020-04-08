@@ -4,8 +4,7 @@
 
 #include <catch2/catch.hpp>
 #include "IO/XMLIO.h"
-#include "filesystem/path.h"
-#include "filesystem/resolver.h"
+#include <filesystem>
 
 TEST_CASE("Test_XMLIO"){
     XMLIO IO;
@@ -18,9 +17,9 @@ TEST_CASE("Test_XMLIO"){
 
     SECTION("XMLReader_GUISettings")
     {
-        Wenzel::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
-        REQUIRE(IO.xmldoc.load_file(xmlFileName.str().c_str()));
+        REQUIRE(IO.xmldoc.load_file(xmlFileName.c_str()));
         XMLData data;
         data.varList = make_shared<InputVarList>();
         InitVar(data.varList.get());
@@ -31,10 +30,10 @@ TEST_CASE("Test_XMLIO"){
 
     SECTION("XMLReader")
     {
-        Wenzel::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         XMLData data;
-        IO.XMLReader(xmlFileName.str(), data);
+        IO.XMLReader(xmlFileName.c_str(), data);
         REQUIRE(data.interactMatrix[0] == 2.344562);
     }
 }

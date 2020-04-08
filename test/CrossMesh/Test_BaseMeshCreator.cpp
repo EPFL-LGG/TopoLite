@@ -7,8 +7,7 @@
 #include "Mesh/PolyMesh.h"
 #include "Mesh/CrossMesh.h"
 #include "Mesh/PolyMesh_AABBTree.h"
-#include "filesystem/path.h"
-#include "filesystem/resolver.h"
+#include <filesystem>
 #include "IO/XMLIO.h"
 #include "CrossMesh/PatternCreator.h"
 
@@ -22,23 +21,23 @@ TEST_CASE("BaseMeshCreator")
     std::shared_ptr<CrossMesh<double>> _pattern2D;
 
     XMLIO IO;
-    Wenzel::filesystem::create_directory("Pattern");
+    std::filesystem::create_directory("Pattern");
 
     SECTION("origin.xml")
     {
         // read xml
-        Wenzel::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         XMLData data;
-        IO.XMLReader(xmlFileName.str(), data);
+        IO.XMLReader(xmlFileName.c_str(), data);
 
         // read polyMesh
-        Wenzel::filesystem::path surface_objfile(UNITTEST_DATAPATH);
+        std::filesystem::path surface_objfile(UNITTEST_DATAPATH);
         surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
 
         bool texturedModel;
         _polyMesh = make_shared<PolyMesh_AABBTree<double>>(data.varList);
-        _polyMesh->readOBJModel(surface_objfile.str().c_str(), texturedModel, true);
+        _polyMesh->readOBJModel(surface_objfile.c_str(), texturedModel, true);
 
         _polyMesh->buildTexTree();
 

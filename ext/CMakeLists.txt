@@ -8,7 +8,6 @@ set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen)
 set(FILESYSTEM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/filesystem)
 
 # pugixml
-option(BUILD_SHARED_LIBS OFF)
 find_package(PUGIXML REQUIRED)
 
 # quickhull
@@ -71,7 +70,6 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
-                ${FILESYSTEM_INCLUDE_DIR}
                 ${CLP_INCLUDE_DIR}
                 PARENT_SCOPE)
 

@@ -31,12 +31,6 @@ if(NOT TARGET catch2::catch2)
     list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/catch2/contrib)
 endif()
 
-# Filesystem
-if(NOT TARGET filesystem::filesystem)
-    topolite_download_filesystem()
-    add_subdirectory(${TOPOLITE_EXTERNAL}/filesystem)
-endif()
-
 # libigl
 if(NOT TARGET igl::core)
     topolite_download_libigl()
