@@ -31,6 +31,8 @@ public:
 
     vector<float> barycentric;
 
+    vector<float> color;
+
     vector<int> face_index_in_position;
 
 public:
@@ -114,9 +116,8 @@ public:
         }
         shader->set_buffer("position", nanogui::VariableType::Float32, {positions.size() / 3, 3},  &positions[0]);
         shader->set_buffer("barycentric", nanogui::VariableType::Float32, {barycentric.size() / 3, 3}, &barycentric[0]);
+        shader->set_uniform("wireframe", wireframe);
     }
-
-
 
 };
 

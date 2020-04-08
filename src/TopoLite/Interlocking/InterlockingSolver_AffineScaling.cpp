@@ -7,13 +7,13 @@
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 template<typename Scalar>
-bool InterlockingSolver_AffineScaling<Scalar>::isTranslationalInterlocking(pInterlockingData data)
+bool InterlockingSolver_AffineScaling<Scalar>::isTranslationalInterlocking(pInterlockingData &data)
 {
     return false;
 }
 
 template<typename Scalar>
-bool InterlockingSolver_AffineScaling<Scalar>::isRotationalInterlocking(pInterlockingData data)
+bool InterlockingSolver_AffineScaling<Scalar>::isRotationalInterlocking(pInterlockingData &data)
 {
     MatrixXd mat;
     InterlockingSolver<Scalar>::computeRotationalInterlockingMatrixDense(mat);

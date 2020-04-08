@@ -25,21 +25,21 @@ public:
     typedef Matrix<double, 1, 4> RowVector4;
     typedef Eigen::SparseMatrix<double, Eigen::ColMajor>  EigenSpMat;
     typedef Eigen::Triplet<double>  EigenTriple;
-    typedef std::vector<Vector3,Eigen::aligned_allocator<Vector3>> stdvec_Vector3d;
+    typedef std::vector<Vector3,Eigen::aligned_allocator<Vector3>> stdvec_Vector3;
     typedef shared_ptr<VPoint<Scalar>> pVertex;
 
 public:
 
     struct InterlockingData{
-        stdvec_Vector3d traslation;
-        stdvec_Vector3d rotation;
-        vector<int> partID;
+        stdvec_Vector3 traslation;
+        stdvec_Vector3 rotation;
+        stdvec_Vector3 center;
     };
 
     struct EquilibriumData{
-        stdvec_Vector3d force;
-        stdvec_Vector3d torque;
-        stdvec_Vector3d contact_points;
+        stdvec_Vector3 force;
+        stdvec_Vector3 torque;
+        stdvec_Vector3 contact_points;
         vector<pairIJ> partIJ;
     };
 
@@ -101,11 +101,11 @@ public:
     *           Interlocking Test
     *************************************************/
 
-    virtual bool isTranslationalInterlocking(shared_ptr<InterlockingData> data){ return  true;}
+    virtual bool isTranslationalInterlocking(shared_ptr<InterlockingData> &data){ return  true;}
 
-    virtual bool isRotationalInterlocking(shared_ptr<InterlockingData> data){ return  true;}
+    virtual bool isRotationalInterlocking(shared_ptr<InterlockingData> &data){ return  true;}
 
-    virtual bool isEquilibrium(Vector3 gravity, shared_ptr<EquilibriumData> data){ return  true;}
+    virtual bool isEquilibrium(Vector3 gravity, shared_ptr<EquilibriumData> &data){ return  true;}
 };
 
 #include "InterlockingSolver.cpp"

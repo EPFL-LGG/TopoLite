@@ -22,9 +22,9 @@ public:
     }
 
 public:
-    bool isTranslationalInterlocking(pInterlockingData data);
+    bool isTranslationalInterlocking(pInterlockingData &data);
 
-    bool isRotationalInterlocking(pInterlockingData data);
+    bool isRotationalInterlocking(pInterlockingData &data);
 };
 
 #include "InterlockingSolver_AffineScaling.cpp"

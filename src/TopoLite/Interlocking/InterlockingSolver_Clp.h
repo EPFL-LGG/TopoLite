@@ -16,6 +16,10 @@ public:
     typedef Eigen::SparseMatrix<Scalar, Eigen::ColMajor>  EigenSpMat;
     typedef Eigen::Triplet<Scalar>  EigenTriple;
     typedef shared_ptr<ContactGraph<Scalar>> pContactGraph;
+    typedef shared_ptr<ContactGraphNode<Scalar>> pContactGraphNode;
+    using InterlockingSolver<Scalar>::graph;
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
 public:
     InterlockingSolver_Clp(pContactGraph _graph, shared_ptr<InputVarList> varList)
     : InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList)
@@ -24,11 +28,15 @@ public:
     }
 
 public:
-    bool isTranslationalInterlocking(pInterlockingData data);
+    bool isTranslationalInterlocking(pInterlockingData &data);
 
-    bool isRotationalInterlocking(pInterlockingData data);
+    bool isRotationalInterlocking(pInterlockingData &data);
 
-    bool solve(pInterlockingData data, vector<EigenTriple> &tris, int num_row, int num_col);
+    bool solve(pInterlockingData &data,
+            vector<EigenTriple> &tris,
+            bool rotationalInterlockingCheck,
+            int num_row,
+            int num_col);
 };
 
 #include "InterlockingSolver_Clp.cpp"

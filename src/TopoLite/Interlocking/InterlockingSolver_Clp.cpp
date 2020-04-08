@@ -7,7 +7,7 @@
 #include "tbb/tbb.h"
 
 template<typename Scalar>
-bool InterlockingSolver_Clp<Scalar>::isTranslationalInterlocking(InterlockingSolver_Clp::pInterlockingData data)
+bool InterlockingSolver_Clp<Scalar>::isTranslationalInterlocking(InterlockingSolver_Clp::pInterlockingData& data)
 {
     vector<EigenTriple> tris;
     Eigen::Vector2i size;
@@ -20,11 +20,11 @@ bool InterlockingSolver_Clp<Scalar>::isTranslationalInterlocking(InterlockingSol
         tris.push_back(EigenTriple(id, num_col + id, -1));
     }
 
-    return solve(data, tris, num_row, num_col);
+    return solve(data, tris, false, num_row, num_col);
 }
 
 template<typename Scalar>
-bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver_Clp::pInterlockingData data) {
+bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver_Clp::pInterlockingData& data) {
     vector<EigenTriple> tris;
     Eigen::Vector2i size;
 
@@ -36,12 +36,13 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
         tris.push_back(EigenTriple(id, num_col + id, -1));
     }
 
-    return solve(data, tris, num_row, num_col);
+    return solve(data, tris, true, num_row, num_col);
 }
 
 template<typename Scalar>
-bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlockingData data,
+bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlockingData& data,
                                                 vector<EigenTriple> &tris,
+                                                bool rotationalInterlockingCheck,
                                                 int num_row,
                                                 int num_col)
 {
@@ -116,6 +117,34 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     double max_sol = 0;
     for(int id = num_col; id < num_col_with_auxiliary; id++){
         max_sol = std::max(solution[id], max_sol);
+    }
+
+    data = make_shared<typename InterlockingSolver<Scalar>::InterlockingData>();
+
+    for(pContactGraphNode node: graph->nodes){
+        Vector3 trans(0, 0, 0);
+        Vector3 rotate(0, 0, 0);
+        Vector3 center(0, 0, 0);
+        if(node->dynamicID != -1) {
+            if (rotationalInterlockingCheck) {
+                trans = Vector3(solution[node->dynamicID * 6],
+                        solution[node->dynamicID * 6 + 1],
+                        solution[node->dynamicID * 6 + 2]);
+                rotate = Vector3(solution[node->dynamicID * 6 + 3],
+                        solution[node->dynamicID * 6 + 4],
+                        solution[node->dynamicID * 6 + 5]);
+            }
+            else{
+                trans = Vector3(solution[node->dynamicID * 3],
+                        solution[node->dynamicID * 3 + 1],
+                        solution[node->dynamicID * 3 + 2]);
+            }
+            center = node->centroid;
+        }
+        data->traslation.push_back(trans);
+        data->rotation.push_back(rotate);
+        data->center.push_back(center);
+//        std::cout << node->dynamicID << ":\t" << trans.transpose() << ", " << rotate.transpose() << std::endl;
     }
 
     std::cout << "max_t:\t" << std::abs(max_sol) << std::endl;
