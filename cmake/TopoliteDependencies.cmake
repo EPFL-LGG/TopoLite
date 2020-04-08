@@ -18,6 +18,12 @@ if(NOT TARGET lib_Clp)
     add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
 endif()
 
+# COIN-OR IPOPT
+if(NOT TARGET lib_Ipopt)
+    topolite_download_Ipopt()
+    add_subdirectory(${TOPOLITE_EXTERNAL}/ipopt)
+endif()
+
 # Catch2
 if(NOT TARGET catch2::catch2)
     topolite_download_catch()

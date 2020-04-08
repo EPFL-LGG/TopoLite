@@ -54,6 +54,15 @@ function(topolite_download_clp)
             )
 endfunction()
 
+
+## IPOPT
+function(topolite_download_ipopt)
+    topolite_download_project(ipopt
+            GIT_REPOSITORY https://github.com/robin-forks/COIN-OR_Ipopt
+            GIT_TAG        93a11d6ac0abec421849247c0a869083888518bd
+            )
+endfunction()
+
 ## filesystem
 function(topolite_download_filesystem)
     topolite_download_project(filesystem
