@@ -92,6 +92,8 @@ target_include_directories(TpCorelib PUBLIC SYSTEM
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite)
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
+set(TPCORELIB_EXTRA_INCLUDE ${ext_include} PARENT_SCOPE)
+
 
 add_subdirectory(test)
 add_subdirectory(gui)

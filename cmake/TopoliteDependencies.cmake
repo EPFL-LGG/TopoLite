@@ -7,52 +7,53 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 list(REMOVE_DUPLICATES CMAKE_MODULE_PATH)
 include(TopoliteDownloadExternal)
 
+
 # Eigen
-if(NOT TARGET Eigen3::Eigen AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET Eigen3::Eigen)
     topolite_download_eigen()
 endif()
 
 # COIN-OR CLP
-if(NOT TARGET lib_Clp AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET lib_Clp)
     topolite_download_clp()
     add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
 endif()
 
 # Catch2
-if(NOT TARGET catch2::catch2 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET catch2::catch2)
     topolite_download_catch()
     add_subdirectory(${TOPOLITE_EXTERNAL}/catch2)
     list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/catch2/contrib)
 endif()
 
 # Filesystem
-if(NOT TARGET filesystem::filesystem AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET filesystem::filesystem)
     topolite_download_filesystem()
     add_subdirectory(${TOPOLITE_EXTERNAL}/filesystem)
 endif()
 
 # libigl
-if(NOT TARGET igl::core AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET igl::core)
     topolite_download_libigl()
 endif()
 
 # shapeop
-if(NOT TARGET ShapeOp AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET ShapeOp)
     topolite_download_shapeop()
 endif()
 
 # pugixml
-if(NOT TARGET pugixml AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET pugixml)
     topolite_download_pugixml()
 endif()
 
 # pybind11
-if(NOT TARGET pybind11::pybind11 AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET pybind11::pybind11 AND HAVE_PYBIND)
     topolite_download_pybind11()
 endif()
 
 # nanogui
-if(NOT TARGET nanogui AND (CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR))
+if(NOT TARGET nanogui AND HAVE_NANOGUI)
     topolite_download_nanogui()
 endif()
 
