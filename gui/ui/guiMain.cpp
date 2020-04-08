@@ -102,10 +102,10 @@ public:
                                                  nanogui::Alignment::Middle, 0, 20));
 
         nanogui::Slider *slider = new nanogui::Slider(panel);
-        slider->set_value(0.01f);
+        slider->set_value(0.001f);
         slider->set_fixed_width(100);
-        slider->set_range({0.001f, 0.1f});
-        animation_speed = 0.01f;
+        slider->set_range({0.001f, 0.01f});
+        animation_speed = 0.001f;
 
         text_box_speed = new nanogui::TextBox(panel);
         text_box_speed->set_fixed_size(nanogui::Vector2i(60, 25));
@@ -121,16 +121,16 @@ public:
         panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
                                                  nanogui::Alignment::Middle, 0, 20));
 
-        slider = new nanogui::Slider(panel);
-        slider->set_value(0);
-        slider->set_fixed_width(100);
-        slider->set_range({0.0f, 0.01f});
+        timeline_slider = new nanogui::Slider(panel);
+        timeline_slider->set_value(0);
+        timeline_slider->set_fixed_width(100);
+        timeline_slider->set_range({0.0f, 0.05f});
 
         text_box_timeline = new nanogui::TextBox(panel);
         text_box_timeline->set_fixed_size(nanogui::Vector2i(60, 25));
         text_box_timeline->set_value("0");
 
-        slider->set_callback([&](float value) {
+        timeline_slider->set_callback([&](float value) {
             text_box_timeline->set_value(std::to_string(value));
             if(polyMeshLists) polyMeshLists->simtime = value;
         });
@@ -392,7 +392,14 @@ public:
         Eigen::Matrix4f mvp = proj * view * model;
         polyMeshLists->mvp = mvp;
 
-        //polyMeshLists->updateTime((float)glfwGetTime(), animation_speed);
+        polyMeshLists->updateTime((float)glfwGetTime(), animation_speed);
+        timeline_slider->set_value(polyMeshLists->simtime);
+        text_box_timeline->set_value(std::to_string(polyMeshLists->simtime));
+        if(prev_animate_state == gui_PolyMeshLists<double>::Pause){
+            timeline_slider->set_enabled(true);
+        }else{
+            timeline_slider->set_enabled(false);
+        }
 
 
         /* MVP uniforms */
@@ -414,6 +421,7 @@ private:
 
     nanogui::ToolButton *play, *pause, *stop;
     nanogui::TextBox *text_box_speed, *text_box_timeline;
+    nanogui::Slider *timeline_slider;
     gui_PolyMeshLists<double>::AnimationState prev_animate_state;
     float animation_speed = 0.1;
 
