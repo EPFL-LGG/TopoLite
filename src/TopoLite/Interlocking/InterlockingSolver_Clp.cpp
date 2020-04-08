@@ -13,14 +13,12 @@ bool InterlockingSolver_Clp<Scalar>::isTranslationalInterlocking(InterlockingSol
     Eigen::Vector2i size;
 
     InterlockingSolver<Scalar>::computeTranslationalInterlockingMatrix(tris, size);
-    int num_row = size[0];
-    int num_col = size[1];
 
-    for(size_t id = 0; id < num_row; id++){
-        tris.push_back(EigenTriple(id, num_col + id, -1));
-    }
+    int num_var = size[1];
+    InterlockingSolver<Scalar>::appendAuxiliaryVariables(tris, size);
+    InterlockingSolver<Scalar>::appendMergeConstraints(tris, size, false);
 
-    return solve(data, tris, false, num_row, num_col);
+    return solve(data, tris, false, size[0], size[1], num_var);
 }
 
 template<typename Scalar>
@@ -29,14 +27,12 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
     Eigen::Vector2i size;
 
     InterlockingSolver<Scalar>::computeRotationalInterlockingMatrix(tris, size);
-    int num_row = size[0];
-    int num_col = size[1];
 
-    for(size_t id = 0; id < num_row; id++){
-        tris.push_back(EigenTriple(id, num_col + id, -1));
-    }
+    int num_var = size[1];
+    InterlockingSolver<Scalar>::appendAuxiliaryVariables(tris, size);
+    InterlockingSolver<Scalar>::appendMergeConstraints(tris, size, true);
 
-    return solve(data, tris, true, num_row, num_col);
+    return solve(data, tris, false, size[0], size[1], num_var);
 }
 
 template<typename Scalar>
@@ -44,14 +40,15 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
                                                 vector<EigenTriple> &tris,
                                                 bool rotationalInterlockingCheck,
                                                 int num_row,
-                                                int num_col)
+                                                int num_col,
+                                                int num_var)
 {
 
     //Problem definition
-    //tris is equal to a sparse matrix A, which size is [num_row x (num_row + num_col)]
+    //tris is equal to a sparse matrix A, which size is [num_row x num_col]
     //our variables are [x, t], a row vector.
-    //x: (size: num_col) is the instant translational and rotational velocity.
-    //t: (size: num_row) is the auxiliary variable.
+    //x: (size: num_var) is the instant translational and rotational velocity.
+    //t: (size: num_col - num_var) is the auxiliary variable.
     //the optimization is formulated as:
     //              min \sum_{i = 0}^{num_row} -t_i
     //  s.t.            A[x, t] >= 0
@@ -61,35 +58,34 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     // In practice, due to numerical error, we have to allow a small tolerance for the objective value.
 
 
-    int num_col_with_auxiliary = num_row + num_col;
-    EigenSpMat spatMat(num_row, num_col_with_auxiliary);
+    EigenSpMat spatMat(num_row, num_col);
     spatMat.setFromTriplets(tris.begin(), tris.end());
 
     ClpSimplex model(true);
-    CoinPackedMatrix matrix(true, num_row, num_col_with_auxiliary, spatMat.nonZeros(), spatMat.valuePtr(), spatMat.innerIndexPtr(), spatMat.outerIndexPtr(), spatMat.innerNonZeroPtr());
+    CoinPackedMatrix matrix(true, num_row, num_col, spatMat.nonZeros(), spatMat.valuePtr(), spatMat.innerIndexPtr(), spatMat.outerIndexPtr(), spatMat.innerNonZeroPtr());
 
-    double* objective = new double[num_col_with_auxiliary];
+    double* objective = new double[num_col];
     double* rowLower = new double[num_row];
     double* rowUpper = new double[num_row];
-    double* colLower = new double[num_col_with_auxiliary];
-    double* colUpper = new double[num_col_with_auxiliary];
+    double* colLower = new double[num_col];
+    double* colUpper = new double[num_col];
 
     //objects
-    for(size_t id = 0; id < num_col_with_auxiliary; id++)
+    for(size_t id = 0; id < num_col; id++)
     {
-        if(id < num_col) objective[id] = 0;
+        if(id < num_var) objective[id] = 0;
         else objective[id] = -1;
     }
 
     //bound
     for(size_t id = 0; id < num_row; id++) rowLower[id] = 0;
     for(size_t id = 0; id < num_row; id++) rowUpper[id] = COIN_DBL_MAX;
-    for(size_t id = 0; id < num_col_with_auxiliary; id++) {
-        if(id < num_col) colLower[id] = -COIN_DBL_MAX;
+    for(size_t id = 0; id < num_col; id++) {
+        if(id < num_var) colLower[id] = -COIN_DBL_MAX;
         else colLower[id] = 0;
     }
-    for(size_t id = 0; id < num_col_with_auxiliary; id++) {
-        if(id < num_col) colUpper[id] = COIN_DBL_MAX;
+    for(size_t id = 0; id < num_col; id++) {
+        if(id < num_var) colUpper[id] = COIN_DBL_MAX;
         else colUpper[id] = 1;
     }
 
@@ -115,7 +111,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     const double target_obj_value = model.rawObjectiveValue();
     double *solution = model.primalColumnSolution();
     double max_sol = 0;
-    for(int id = num_col; id < num_col_with_auxiliary; id++){
+    for(int id = num_var; id < num_col; id++){
         max_sol = std::max(solution[id], max_sol);
     }
 

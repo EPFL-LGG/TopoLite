@@ -29,23 +29,38 @@ TEST_CASE("Bunny Example")
         atboundary.push_back(false);
     }
 
-    SECTION("fix key and second part"){
-        // set the first and second part to be on the boundires
-        // then the structure is interlocking
-        atboundary[0] = true;
-        atboundary[1] = true;
+//    SECTION("fix key and second part"){
+//        // set the first and second part to be on the boundires
+//        // then the structure is interlocking
+//        atboundary[0] = true;
+//        atboundary[1] = true;
+//
+//        // construct the contact graph
+//        shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
+//        graph->buildFromMeshes(meshList, atboundary, 1e-3);
+//
+//        // solve the interlocking problem by using CLP library
+//        InterlockingSolver_Clp<double> solver(graph, varList);
+//        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+//        REQUIRE(solver.isRotationalInterlocking(interlockData) == true);
+//    }
+//
+//    SECTION("fix key"){
+//        // if only set the key to be fixed
+//        // the reset parts could move together, therefore the structure is not interlocking
+//        atboundary[0] = true;
+//
+//        // construct the contact graph
+//        shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
+//        graph->buildFromMeshes(meshList, atboundary);
+//
+//        // solve the interlocking problem by using CLP library
+//        InterlockingSolver_Clp<double> solver(graph, varList);
+//        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+//        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
+//    }
 
-        // construct the contact graph
-        shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
-        graph->buildFromMeshes(meshList, atboundary, 1e-3);
-
-        // solve the interlocking problem by using CLP library
-        InterlockingSolver_Clp<double> solver(graph, varList);
-        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-        REQUIRE(solver.isRotationalInterlocking(interlockData) == true);
-    }
-
-    SECTION("fix key"){
+    SECTION("fix key and merge key and second part"){
         // if only set the key to be fixed
         // the reset parts could move together, therefore the structure is not interlocking
         atboundary[0] = true;
@@ -54,9 +69,12 @@ TEST_CASE("Bunny Example")
         shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
         graph->buildFromMeshes(meshList, atboundary);
 
+        //merge
+        graph->mergeNode(graph->nodes[0], graph->nodes[1]);
+
         // solve the interlocking problem by using CLP library
         InterlockingSolver_Clp<double> solver(graph, varList);
         shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
+        REQUIRE(solver.isRotationalInterlocking(interlockData) == true);
     }
 }

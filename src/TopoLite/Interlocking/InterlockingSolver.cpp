@@ -2,6 +2,8 @@
 // Created by ziqwang on 2019-12-10.
 //
 
+#include "InterlockingSolver.h"
+
 /*************************************************
 *
 *      Building block for the Interlocking Matrix
@@ -157,7 +159,6 @@ void InterlockingSolver<Scalar>::get_A_j_k(int partID, int edgeID, Eigen::Matrix
         }
     }
 
-
     return;
 }
 
@@ -293,6 +294,59 @@ void InterlockingSolver<Scalar>::computeRotationalInterlockingMatrixSparse(Eigen
 }
 
 
+template<typename Scalar>
+void InterlockingSolver<Scalar>::appendAuxiliaryVariables(vector<EigenTriple> &tri, Eigen::Vector2i &size)
+{
+    int num_row = size[0];
+    int num_col = size[1];
+
+    for(size_t id = 0; id < num_row; id++){
+        tri.push_back(EigenTriple(id, num_col + id, -1));
+    }
+    size[1] += num_row;
+    return;
+}
+
+template<typename Scalar>
+void InterlockingSolver<Scalar>::appendMergeConstraints(vector<EigenTriple> &tri, Eigen::Vector2i &size, bool isRotation)
+{
+    int dimension = (isRotation ? 6 : 3);
+    for(int id = 0;id < graph->merged_nodes.size(); id++)
+    {
+        wpContactGraphNode A = graph->merged_nodes[id].first;
+        wpContactGraphNode B = graph->merged_nodes[id].second;
+        int iA = A.lock()->dynamicID;
+        int iB = B.lock()->dynamicID;
+        if(iA != -1 && iB != -1)
+        {
+            for(int index = 0; index < dimension; index++)
+            {
+                tri.push_back(EigenTriple(size[0] + id * dimension * 2 + index, dimension * iA + index, 1));
+                tri.push_back(EigenTriple(size[0] + id * dimension * 2 + index, dimension * iB + index, -1));
+
+                tri.push_back(EigenTriple(size[0] + id * dimension * 2 + index + 1, dimension * iA + index, -1));
+                tri.push_back(EigenTriple(size[0] + id * dimension * 2 + index + 1, dimension * iB + index, 1));
+            }
+        }
+        else{
+            for(int index = 0; index < dimension; index++){
+                if(iA != -1) {
+                    tri.push_back(EigenTriple(size[0] + id * dimension * 2 + index, dimension * iA + index, 1));
+                    tri.push_back(EigenTriple(size[0] + id * dimension * 2 + index + 1, dimension * iA + index, -1));
+                }
+                if(iB != -1){
+                    tri.push_back(EigenTriple(size[0] + id * dimension + index, dimension * iB + index, 1));
+                    tri.push_back(EigenTriple(size[0] + id * dimension * 2 + index + 1, dimension * iB + index, -1));
+
+                }
+            }
+        }
+    }
+    size[0] += graph->merged_nodes.size() * dimension * 2;
+    return;
+}
+
+
 
 template<typename Scalar>
 void InterlockingSolver<Scalar>::computeEquilibriumMatrix(Eigen::MatrixXd &Aeq,  bool withFriction) {
@@ -392,4 +446,5 @@ Scalar InterlockingSolver<Scalar>::computeEquilibriumMatrixConditonalNumber()
     }
 
 }
+
 

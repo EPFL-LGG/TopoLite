@@ -126,6 +126,16 @@ void ContactGraph<Scalar>::addContact(pContactGraphNode _nodeA, pContactGraphNod
 }
 
 /**
+ * @brief merging nodeA and nodeB. they should move together.
+ * @tparam Scalar
+ * @param _nodeA,_nodeB
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::mergeNode(ContactGraph::pContactGraphNode _nodeA, ContactGraph::pContactGraphNode _nodeB) {
+    merged_nodes.push_back({_nodeA, _nodeB});
+}
+
+/**
  * @brief Assign nodeID to the graph. Must be called after updating the graph
  * @tparam Scalar
  */
@@ -142,6 +152,9 @@ void ContactGraph<Scalar>::finalize() {
         }
     }
 }
+
+
+
 
 /**
  * @brief return the all contact polygons as a mesh
@@ -163,6 +176,9 @@ void ContactGraph<Scalar>::getContactMesh(pPolyMesh &mesh) {
 //    mesh->ScaleMesh(1.0 / normalized_scale);
 //    mesh->TranslateMesh(-normalized_trans);
 }
+
+
+
 
 /*************************************************
 *
@@ -360,3 +376,5 @@ void ContactGraph<Scalar>::buildEdges() {
         }
     }
 }
+
+

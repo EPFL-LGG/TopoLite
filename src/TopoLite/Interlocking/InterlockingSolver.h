@@ -27,6 +27,7 @@ public:
     typedef Eigen::Triplet<double>  EigenTriple;
     typedef std::vector<Vector3,Eigen::aligned_allocator<Vector3>> stdvec_Vector3;
     typedef shared_ptr<VPoint<Scalar>> pVertex;
+    typedef weak_ptr<ContactGraphNode<Scalar>> wpContactGraphNode;
 
 public:
 
@@ -94,6 +95,10 @@ public:
     void computeTranslationalInterlockingMatrixDense(Eigen::MatrixXd &mat);
 
     void computeRotationalInterlockingMatrixSparse(EigenSpMat &mat);
+
+    void appendAuxiliaryVariables(vector<EigenTriple> &tri, Eigen::Vector2i &size);
+
+    void appendMergeConstraints(vector<EigenTriple> &tri, Eigen::Vector2i &size, bool isRotation);
 
 public:
 

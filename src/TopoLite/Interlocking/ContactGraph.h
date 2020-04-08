@@ -40,7 +40,6 @@ public:
 
     typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
 
-
 public:
 
     struct polygonal_face{
@@ -86,6 +85,8 @@ public:
 public:
     vector<pContactGraphNode> nodes;
     vector<pContactGraphEdge> edges;
+    vector<std::pair<wpContactGraphNode, wpContactGraphNode>> merged_nodes;
+
     //automatic generate
     vector<wpContactGraphNode> dynamic_nodes;
 
@@ -119,6 +120,8 @@ public:
     void addNode(pContactGraphNode _node);
 
     void addContact(pContactGraphNode _nodeA, pContactGraphNode _nodeB, pContactGraphEdge _edge);
+
+    void mergeNode(pContactGraphNode _nodeA, pContactGraphNode _nodeB);
 
     void finalize();
 

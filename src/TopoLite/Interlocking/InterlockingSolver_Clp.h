@@ -36,7 +36,8 @@ public:
             vector<EigenTriple> &tris,
             bool rotationalInterlockingCheck,
             int num_row,
-            int num_col);
+            int num_col,
+            int num_var);
 };
 
 #include "InterlockingSolver_Clp.cpp"
