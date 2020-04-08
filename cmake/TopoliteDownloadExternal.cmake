@@ -50,7 +50,7 @@ endfunction()
 function(topolite_download_clp)
     topolite_download_project(clp
             GIT_REPOSITORY https://github.com/robin-forks/COIN-OR-osi-clp.git
-            GIT_TAG        cc27768b2ab4caec068ab0158881a76294c2a711
+            GIT_TAG        06d1160bc73e36a19f41e8abe5f590532166f734            # v1.0.0
             )
 endfunction()
 
@@ -59,7 +59,7 @@ endfunction()
 function(topolite_download_ipopt)
     topolite_download_project(ipopt
             GIT_REPOSITORY https://github.com/robin-forks/COIN-OR_Ipopt
-            GIT_TAG        93a11d6ac0abec421849247c0a869083888518bd
+            GIT_TAG        33425c1b8f6c5695ca2fa0337ad71e417a149998         # v1.0.0
             )
 endfunction()
 
