@@ -188,54 +188,85 @@ public:
     *
     ********************************************************************************************/
 
+
+
     void init_mesh()
     {
         shared_ptr<InputVarList> varList = make_shared<InputVarList>();
         InitVarLite(varList.get());
-
-        //Read all Parts
         vector<shared_ptr<PolyMesh<double>>> meshLists;
-        vector<bool> atboundary;
         vector<nanogui::Color> colors;
+        vector<bool> atboundary;
+        
+        {
+            std::string file_name[3] = {"piece0.obj", "piece1.obj", "piece4.obj"};
+            bool textureModel;
+            for(int id = 0; id < 3; id++){
+                char number[50];
+                std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
+                part_filename += file_name[id];
+                shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+                polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+                meshLists.push_back(polyMesh);
+                atboundary.push_back(false);
+            }
+            atboundary[0] = true;
+            atboundary[1] = true;
+        }
+
 
         {
-            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Boundary.obj";
-            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            bool textureModel;
-            if(std::filesystem::is_regular_file(part_filename.c_str())){
-                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
-                    polyMesh->mergeFaces(1e-3);
-                    meshLists.push_back(polyMesh);
-                    atboundary.push_back(false);
-                    colors.push_back(nanogui::Color(100, 100 ,100 ,255));
-                }
-            }
+            //        //Read all Parts
+//        vector<shared_ptr<PolyMesh<double>>> meshLists;
+//        vector<bool> atboundary;
+//        vector<nanogui::Color> colors;
+//
+//        {
+//            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Boundary.obj";
+//            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+//            bool textureModel;
+//            if(std::filesystem::is_regular_file(part_filename.c_str())){
+//                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
+//                    polyMesh->mergeFaces(1e-3);
+//                    meshLists.push_back(polyMesh);
+//                    atboundary.push_back(false);
+//                }
+//            }
+//        }
+//
+//        for(int id = 0; id <= 42; id++){
+//            char number[50];
+//            sprintf(number, "%02d.obj", id);
+//            //sprintf(number, "%d.obj", id);
+//            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Part_";
+//            //std::string part_filename = "data/Mesh/Ania_200127_betweenbars/piece";
+//            part_filename += number;
+//            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+//            bool textureModel;
+//            if(std::filesystem::is_regular_file(part_filename.c_str())){
+//                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
+//                    polyMesh->mergeFaces(1e-3);
+//                    meshLists.push_back(polyMesh);
+//                    atboundary.push_back(false);
+//                }
+//            }
+//        }
+//
+//        atboundary[0] = true;
         }
 
-        for(int id = 0; id <= 42; id++){
-            char number[50];
-            sprintf(number, "%02d.obj", id);
-            //sprintf(number, "%d.obj", id);
-            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Part_";
-            //std::string part_filename = "data/Mesh/Ania_200127_betweenbars/piece";
-            part_filename += number;
-            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            bool textureModel;
-            if(std::filesystem::is_regular_file(part_filename.c_str())){
-                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
-                    polyMesh->mergeFaces(1e-3);
-                    meshLists.push_back(polyMesh);
-                    atboundary.push_back(false);
-                    colors.push_back(nanogui::Color(255, 255 ,255 ,255));
-                }
+        for(int id = 0; id < atboundary.size(); id++){
+            if(atboundary[id]){
+                colors.push_back(nanogui::Color(100, 100 ,100 ,255));
+            }
+            else{
+                colors.push_back(nanogui::Color(255, 255 ,255 ,255));
             }
         }
-
-        atboundary[0] = true;
 
         // construct the contact graph
         graph = make_shared<ContactGraph<double>>(varList);
-        graph->buildFromMeshes(meshLists, atboundary, 1e-2);
+        graph->buildFromMeshes(meshLists, atboundary, 1e-3);
         // solve the interlocking problem by using CLP library
         InterlockingSolver_Clp<double> solver(graph, varList);
         shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
@@ -250,7 +281,7 @@ public:
 
         for(int id = 0; id < polyMeshLists->ani_translation.size(); id++){
             polyMeshLists->ani_translation[id] = interlockData->traslation[id] / max_trans_length;
-            polyMeshLists->ani_rotation[id] = -interlockData->rotation[id] / max_trans_length;
+            polyMeshLists->ani_rotation[id] = interlockData->rotation[id] / max_trans_length;
             polyMeshLists->ani_center[id] = interlockData->center[id];
         }
 

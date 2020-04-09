@@ -28,9 +28,16 @@ public:
     }
 
 public:
+
+
     bool isTranslationalInterlocking(pInterlockingData &data);
 
     bool isRotationalInterlocking(pInterlockingData &data);
+
+    bool checkSpecialCase(pInterlockingData &data,
+                          vector<EigenTriple> copy_tris,
+                          bool rotationalInterlockingCheck,
+                          Eigen::Vector2i copy_size);
 
     bool solve(pInterlockingData &data,
             vector<EigenTriple> &tris,
@@ -38,6 +45,8 @@ public:
             int num_row,
             int num_col,
             int num_var);
+
+    void unpackSolution(InterlockingSolver_Clp::pInterlockingData& data, bool rotationalInterlockingCheck, const double *solution, int num_var);
 };
 
 #include "InterlockingSolver_Clp.cpp"

@@ -11,10 +11,8 @@ import puzIO
 import puzOBJ
 import timeit
 
-print(os.path.realpath(__file__))
 dir_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(dir_path +  '/../../cmake-build-release/python')
-print(sys.path)
 
 from pyTopo import *
 
@@ -60,7 +58,7 @@ if __name__ == "__main__":
     for partID in range(1, int(np.amax(puzMat)) + 1):
         vfs = puzOBJ.compute_puz_partOBJ(puzMat, partID)
         compas_mesh = Mesh.from_vertices_and_faces(vfs["vertices"], vfs["faces"])
-        if partID < 3:
+        if partID < 2:
             poly_mesh = PyPolyMesh(compas_mesh, True, varList)
             meshes.append(poly_mesh)
         else:
@@ -69,13 +67,15 @@ if __name__ == "__main__":
         poly_mesh.getCompasMesh().to_obj(dir_path + "/../../data/Voxel/bunny/part_{}.obj".format(partID))
         
     graph = PyContactGraph(meshes, 0.001)
+
     outputContacts(graph, dir_path + "/../../data/Voxel/bunny/contact_remesh.obj")
 
     check = PyInterlockCheck(graph, PyInterlockCheck.CLP)
 
     start = timeit.default_timer()
     # Your statements here
-    print(check.checkInterlocking(True))
+    a = check.checkInterlocking(PyInterlockCheck.Translational)
+    print(a)
     stop = timeit.default_timer()
     print('Time: ', stop - start)
 

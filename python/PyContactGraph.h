@@ -23,7 +23,7 @@ class PyContactGraph{
 public:
 
     typedef shared_ptr<ContactGraph<double>> pContactGraph;
-
+    typedef shared_ptr<ContactGraphNode<double>> pContactGraphNode;
     typedef shared_ptr<PolyMesh<double>> pPolyMesh;
 
 public:
@@ -61,6 +61,17 @@ public:
             graph->getContactMesh(pyPolyMesh.mesh_);
         }
         return pyPolyMesh;
+    }
+
+    bool mergeParts(int partI, int partJ){
+        if(partI >= 0 && partI < graph->nodes.size() && partJ >= 0 && partJ < graph->nodes.size()){
+            pContactGraphNode nodeI, nodeJ;
+            nodeI = graph->nodes[partI];
+            nodeJ = graph->nodes[partJ];
+            graph->mergeNode(nodeI, nodeJ);
+            return false;
+        }
+        return false;
     }
 
     int numContacts()

@@ -22,9 +22,12 @@ public:
         AFFINE_SCALING = 1,
     };
 
-    shared_ptr<InterlockingSolver<double>> solver;
-    OptSolverType type;
+    enum InterlockType{
+        Translational = 0,
+        Rotational = 1,
+    };
 
+    shared_ptr<InterlockingSolver<double>> solver;
 
 public:
 
@@ -41,7 +44,6 @@ public:
                 solver = make_shared<InterlockingSolver<double>>(pygraph.graph, pygraph.graph->getVarList());
                 break;
         }
-        type = solver_type;
     }
 
 public:
@@ -59,16 +61,52 @@ public:
         return mat;
     }
 
-    bool checkInterlocking(bool Rotation = true){
+    py::object checkInterlocking(InterlockType interlock_type){
+        py::dict result;
         if(solver)
         {
             shared_ptr<InterlockingSolver<double>::InterlockingData> data;
-            if(Rotation)
-                return solver->isRotationalInterlocking(data);
+            bool is_interlocking = false;
+            if(interlock_type == Rotational)
+                is_interlocking = solver->isRotationalInterlocking(data);
             else
-                return solver->isTranslationalInterlocking(data);
+                is_interlocking = solver->isTranslationalInterlocking(data);
+
+            py::list py_trans, py_rot,py_center;
+
+            if(is_interlocking)
+            {
+                result = py::dict("is_interlocking"_a = true);
+            }
+            else{
+
+                for(int id = 0;id < data->traslation.size(); id++){
+                    py::list vec;
+                    vec.append(data->traslation[id].x());vec.append(data->traslation[id].y());vec.append(data->traslation[id].z());
+                    py_trans.append(vec);
+                }
+
+                if(interlock_type == Rotational)
+                {
+                    for(int id = 0;id < data->rotation.size(); id++){
+                        py::list vec;
+                        vec.append(data->rotation[id].x());vec.append(data->rotation[id].y());vec.append(data->rotation[id].z());
+                        py_rot.append(vec);
+                    }
+
+                    for(int id = 0;id < data->center.size(); id++){
+                        py::list vec;
+                        vec.append(data->center[id].x());vec.append(data->center[id].y());vec.append(data->center[id].z());
+                        py_center.append(vec);
+                    }
+                    result = py::dict("is_interlocking"_a = false, "translation"_a = py_trans, "rotation"_a = py_rot, "rotation_center"_a = py_center);
+                }
+                else{
+                    result = py::dict("is_interlocking"_a = false, "translation"_a = py_trans);
+                }
+            }
         }
-        return false;
+        return result;
     }
 };
 

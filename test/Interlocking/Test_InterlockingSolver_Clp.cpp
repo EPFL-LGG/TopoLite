@@ -5,7 +5,9 @@
 #include <catch2/catch.hpp>
 #include "Interlocking/InterlockingSolver_Clp.h"
 #include "IO/XMLIO.h"
-
+#include <iostream>
+#include <Eigen/Dense>
+#include <Eigen/SparseQR>
 
 TEST_CASE("Bunny Example")
 {
@@ -60,21 +62,56 @@ TEST_CASE("Bunny Example")
 //        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
 //    }
 
-    SECTION("fix key and merge key and second part"){
-        // if only set the key to be fixed
-        // the reset parts could move together, therefore the structure is not interlocking
-        atboundary[0] = true;
+//    SECTION("fix key and merge key and second part"){
+//        // if only set the key to be fixed
+//        // the reset parts could move together, therefore the structure is not interlocking
+//        atboundary[0] = true;
+//
+//        // construct the contact graph
+//        shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
+//        graph->buildFromMeshes(meshList, atboundary);
+//
+//        //merge
+//        graph->mergeNode(graph->nodes[0], graph->nodes[1]);
+//
+//        // solve the interlocking problem by using CLP library
+//        InterlockingSolver_Clp<double> solver(graph, varList);
+//        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+//        REQUIRE(solver.isRotationalInterlocking(interlockData) == true);
+//    }
+}
 
-        // construct the contact graph
-        shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
-        graph->buildFromMeshes(meshList, atboundary);
+TEST_CASE("Special Case"){
+    //Read all Parts
 
-        //merge
-        graph->mergeNode(graph->nodes[0], graph->nodes[1]);
+    std::string file_name[3] = {"piece0.obj", "piece1.obj", "piece4.obj"};
+    vector<shared_ptr<PolyMesh<double>>> meshList;
+    vector<bool> atboundary;
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+    InitVarLite(varList.get());
+    bool textureModel;
 
-        // solve the interlocking problem by using CLP library
-        InterlockingSolver_Clp<double> solver(graph, varList);
-        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-        REQUIRE(solver.isRotationalInterlocking(interlockData) == true);
+
+    for(int id = 0; id < 3; id++){
+        char number[50];
+        std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
+        part_filename += file_name[id];
+        shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+        meshList.push_back(polyMesh);
+        atboundary.push_back(false);
     }
+
+    atboundary[0] = true;
+    atboundary[1] = true;
+
+    shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
+    graph->buildFromMeshes(meshList, atboundary, 1e-3);
+
+    // solve the interlocking problem by using CLP library
+    InterlockingSolver_Clp<double> solver(graph, varList);
+    shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+    REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
+
+
 }

@@ -37,7 +37,8 @@ PYBIND11_MODULE(pyTopo, m)
     py::class_<PyContactGraph>(m, "PyContactGraph")
             .def(py::init<const vector<PyPolyMesh> &, float>())
             .def("getContacts", &PyContactGraph::getContacts)
-            .def("numContacts", &PyContactGraph::numContacts);
+            .def("numContacts", &PyContactGraph::numContacts)
+            .def("mergeParts", &PyContactGraph::mergeParts);
 
     py::class_<PyInterlockCheck> interlockCheck(m, "PyInterlockCheck");
 
@@ -47,6 +48,10 @@ PYBIND11_MODULE(pyTopo, m)
 
     py::enum_<PyInterlockCheck::OptSolverType>(interlockCheck, "OptSolverType")
             .value("CLP", PyInterlockCheck::OptSolverType::CLP)
-            .value("AFFINE_SCALING", PyInterlockCheck::OptSolverType::AFFINE_SCALING)
+            .export_values();
+
+    py::enum_<PyInterlockCheck::InterlockType>(interlockCheck, "InterlockType")
+            .value("Rotational", PyInterlockCheck::InterlockType::Rotational)
+            .value("Translational", PyInterlockCheck::InterlockType::Translational)
             .export_values();
 }
