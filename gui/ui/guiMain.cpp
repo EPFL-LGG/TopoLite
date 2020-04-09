@@ -44,17 +44,17 @@
 #include <cmath>
 #include <filesystem>
 
-#include "../Mesh/gui_PolyMesh.h"
-#include "../Mesh/gui_PolyMeshLists.h"
+#include "../RenderObject/gui_SceneObject.h"
+#include "../RenderObject/gui_PolyMeshLists.h"
+
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_Clp.h"
-#include "CrossMesh/PatternCreator.h"
+#include "gui_ArcballScene.h"
 
-class ExampleApplication : public nanogui::Screen {
+class TopoLiteApplication : public gui_ArcballScene{
 public:
-    ExampleApplication() : Screen(nanogui::Vector2i(1024, 768), "TopoLite GUI", false)
+    TopoLiteApplication() : gui_ArcballScene()
     {
-        inc_ref();
         nanogui::Window *window = new nanogui::Window(this, "Menu");
         window->set_position(nanogui::Vector2i(15, 15));
         window->set_layout(new nanogui::GroupLayout());
@@ -63,9 +63,21 @@ public:
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            if(polyMeshLists != nullptr){
-                polyMeshLists->wireframe = check;
-            }
+            scene.objects[0]->update_attr("show_wireframe", check);
+            return check;
+        });
+
+        checkbox = new nanogui::CheckBox(window, "faces");
+        checkbox->set_checked(true);
+        checkbox->set_callback([&](bool check){
+            scene.objects[0]->update_attr("show_face", check);
+            return check;
+        });
+
+        checkbox = new nanogui::CheckBox(window, "contact");
+        checkbox->set_checked(true);
+        checkbox->set_callback([&](bool check){
+            scene.objects[1]->visible = check;
             return check;
         });
 
@@ -80,20 +92,20 @@ public:
         stop = new nanogui::ToolButton(tools, FA_STOP);
 
         play->set_callback([&](){
-            prev_animate_state = gui_PolyMeshLists<double>::Run;
-            if(polyMeshLists) polyMeshLists->state = prev_animate_state;
+            prev_animate_state = Run;
+            scene.update_state(prev_animate_state);
             return true;
         });
 
         pause->set_callback([&](){
-            prev_animate_state = gui_PolyMeshLists<double>::Pause;
-            if(polyMeshLists) polyMeshLists->state = prev_animate_state;
+            prev_animate_state = Pause;
+            scene.update_state(prev_animate_state);
             return true;
         });
 
         stop->set_callback([&](){
-            prev_animate_state = gui_PolyMeshLists<double>::Stop;
-            if(polyMeshLists) polyMeshLists->state = prev_animate_state;
+            prev_animate_state = Stop;
+            scene.update_state(prev_animate_state);
             return true;
         });
 
@@ -133,14 +145,12 @@ public:
 
         timeline_slider->set_callback([&](float value) {
             text_box_timeline->set_value(float_to_string(value, 3));
-            if(polyMeshLists) polyMeshLists->simtime = value / maximum_time_one_unit;
+            scene.update_simtime(value / maximum_time_one_unit);
         });
-
 
         perform_layout();
         refresh_trackball_center();
 
-        init_render_pass();
         init_mesh();
     }
 
@@ -149,133 +159,27 @@ public:
      *                              Key Board and Mouse
      *
      ********************************************************************************************/
-    virtual bool keyboard_event(int key, int scancode, int action, int modifiers) {
-        if (Screen::keyboard_event(key, scancode, action, modifiers))
-            return true;
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-            set_visible(false);
-            return true;
+    virtual bool keyboard_event(int key, int scancode, int action, int modifiers)
+    {
+        if(gui_ArcballScene::keyboard_event(key, scancode, action, modifiers)){
+           return true;
         }
-        if(key == GLFW_KEY_1){
-            camera_.arcball = Arcball();
-            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
-            camera_.modelZoom = 2;
-            camera_.eye = Eigen::Vector3f(0, 0, 5);
-            camera_.center = polyMeshLists ? polyMeshLists->mesh_center : Eigen::Vector3f(0, 0, 0);
-            camera_.up = Eigen::Vector3f(0, 1, 0);
-        }
-        if(key == GLFW_KEY_2){
-            camera_.arcball = Arcball();
-            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
-            camera_.modelZoom = 2;
-            camera_.eye = Eigen::Vector3f(0, -5, 0);
-            camera_.center = polyMeshLists ? polyMeshLists->mesh_center : Eigen::Vector3f(0, 0, 0);
-            camera_.up = Eigen::Vector3f(0, 0, 1);
-        }
-        if(key == GLFW_KEY_3){
-            camera_.arcball = Arcball();
-            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
-            camera_.modelZoom = 2;
-            camera_.eye = Eigen::Vector3f(5, 0, 0);
-            camera_.center = polyMeshLists ? polyMeshLists->mesh_center : Eigen::Vector3f(0, 0, 0);
-            camera_.up = Eigen::Vector3f(0, 0, 1);
-        }
+
         if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE){
-            if(prev_animate_state == gui_PolyMeshLists<double>::Run){
-                prev_animate_state = gui_PolyMeshLists<double>::Pause;
+            if(prev_animate_state == Run){
+                prev_animate_state = Pause;
                 pause->set_pushed(true);
                 play->set_pushed(false);
-                if(polyMeshLists) polyMeshLists->state = prev_animate_state;
+                scene.update_state(prev_animate_state);
             }
-            else if(prev_animate_state != gui_PolyMeshLists<double>::Run){
-                prev_animate_state = gui_PolyMeshLists<double>::Run;
+            else if(prev_animate_state != Run){
+                prev_animate_state = Run;
                 play->set_pushed(true);
                 pause->set_pushed(false);
-                if(polyMeshLists) polyMeshLists->state = prev_animate_state;
+                scene.update_state(prev_animate_state);
             }
         }
         return false;
-    }
-
-    virtual bool scroll_event(const nanogui::Vector2i &p, const nanogui::Vector2f &rel) {
-        if (!Screen::scroll_event(p, rel)) {
-            camera_.zoom = std::max(0.1, camera_.zoom * (rel.y() > 0 ? 1.1 : 0.9));
-        }
-        return true;
-    }
-
-    void computeCameraMatrices(Eigen::Matrix4f &model,
-                               Eigen::Matrix4f &view,
-                               Eigen::Matrix4f &proj){
-
-        view = lookAt(camera_.eye, camera_.center, camera_.up);
-
-        float fH = std::tan(camera_.viewAngle / 360.0f * M_PI) * camera_.dnear;
-        float fW = fH * (float) m_size.x() / (float) m_size.y();
-
-        proj = frustum(-fW, fW, -fH, fH, camera_.dnear, camera_.dfar);
-        model = camera_.arcball.matrix();
-
-        model = scale(model, Eigen::Vector3f::Constant(camera_.zoom * camera_.modelZoom));
-        model = translate(model, camera_.modelTranslation);
-    }
-
-    virtual bool mouse_motion_event(const nanogui::Vector2i &p, const nanogui::Vector2i &rel,
-                                    int button, int modifiers) {
-        if (!Screen::mouse_motion_event(p, rel, button, modifiers)) {
-            if (camera_.arcball.motion(Eigen::Vector2i(p.x(), p.y()))) {
-                //
-            } else if (translate_) {
-                Eigen::Matrix4f model, view, proj;
-                computeCameraMatrices(model, view, proj);
-
-                Eigen::Vector3f mesh_center(0, 0, 0);
-                if(polyMeshLists) mesh_center = polyMeshLists->mesh_center;
-
-                float zval = project(mesh_center, view * model, proj, m_size).z();
-                Eigen::Vector3f pos1 = unproject(
-                        Eigen::Vector3f(p.x(), m_size.y() - p.y(), zval),
-                        view * model, proj, m_size);
-                Eigen::Vector3f pos0 = unproject(Eigen::Vector3f(translateStart_.x(), m_size.y() -
-                                                                                      translateStart_.y(), zval), view * model, proj, m_size);
-                camera_.modelTranslation = camera_.modelTranslation_start + (pos1 - pos0);
-            }
-        }
-        return true;
-    }
-
-    virtual bool mouse_button_event(const nanogui::Vector2i &p, int button, bool down, int modifiers) {
-        if (!Screen::mouse_button_event(p, button, down, modifiers)) {
-            if (button == GLFW_MOUSE_BUTTON_1 && modifiers == 0) {
-                camera_.arcball.button(Eigen::Vector2i(p.x(), p.y()), down);
-            } else if (button == GLFW_MOUSE_BUTTON_2 ||
-                       (button == GLFW_MOUSE_BUTTON_1 && modifiers == GLFW_MOD_SHIFT)) {
-                camera_.modelTranslation_start = camera_.modelTranslation;
-                translate_ = true;
-                translateStart_ = Eigen::Vector2i(p.x(), p.y());
-            }
-        }
-        if (button == GLFW_MOUSE_BUTTON_1 && !down) {
-            camera_.arcball.button(Eigen::Vector2i(p.x(), p.y()), false);
-        }
-        if (!down) {
-            translate_ = false;
-        }
-        return true;
-    }
-
-    void refresh_trackball_center() {
-
-        // Re-center the mesh
-        camera_.arcball = Arcball();
-        camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
-        camera_.modelZoom = 2;
-        if(polyMeshLists != nullptr) {
-            camera_.modelTranslation = -polyMeshLists->mesh_center;
-        }
-        else{
-            camera_.modelTranslation = Eigen::Vector3f(0, 0, 0);
-        }
     }
 
     /********************************************************************************************
@@ -294,12 +198,26 @@ public:
         vector<bool> atboundary;
         vector<nanogui::Color> colors;
 
-        for(int id = 0; id <= 80; id++){
+        {
+            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Boundary.obj";
+            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+            bool textureModel;
+            if(std::filesystem::is_regular_file(part_filename.c_str())){
+                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
+                    polyMesh->mergeFaces(1e-3);
+                    meshLists.push_back(polyMesh);
+                    atboundary.push_back(false);
+                    colors.push_back(nanogui::Color(100, 100 ,100 ,255));
+                }
+            }
+        }
+
+        for(int id = 0; id <= 42; id++){
             char number[50];
-            //sprintf(number, "%02d.obj", id);
-            sprintf(number, "%d.obj", id);
-            //std::string part_filename = "data/TopoInterlock/XML/SphereA80_Quad_T0.08_data/PartGeometry/Part_";
-            std::string part_filename = "data/Voxel/bunny/part_";
+            sprintf(number, "%02d.obj", id);
+            //sprintf(number, "%d.obj", id);
+            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Part_";
+            //std::string part_filename = "data/Mesh/Ania_200127_betweenbars/piece";
             part_filename += number;
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
             bool textureModel;
@@ -308,51 +226,49 @@ public:
                     polyMesh->mergeFaces(1e-3);
                     meshLists.push_back(polyMesh);
                     atboundary.push_back(false);
+                    colors.push_back(nanogui::Color(255, 255 ,255 ,255));
                 }
             }
         }
 
-
         atboundary[0] = true;
 
         // construct the contact graph
-        shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
-        graph->buildFromMeshes(meshLists, atboundary, 1e-3);
+        graph = make_shared<ContactGraph<double>>(varList);
+        graph->buildFromMeshes(meshLists, atboundary, 1e-2);
         // solve the interlocking problem by using CLP library
         InterlockingSolver_Clp<double> solver(graph, varList);
         shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-        solver.isTranslationalInterlocking(interlockData);
+        solver.isRotationalInterlocking(interlockData);
 
-        polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, true, m_render_pass);
+        shared_ptr<gui_PolyMeshLists<double>> polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, m_render_pass);
 
-        double max_trans_length = 0;
-        for(int id = 0; id < polyMeshLists->object_translation.size(); id++){
+        double max_trans_length = 1;
+        for(int id = 0; id < polyMeshLists->object_center.size(); id++){
             max_trans_length = std::max(max_trans_length, interlockData->traslation[id].norm());
         }
 
-        for(int id = 0; id < polyMeshLists->object_translation.size(); id++){
-            polyMeshLists->object_translation[id] = interlockData->traslation[id] / max_trans_length;
+        for(int id = 0; id < polyMeshLists->ani_translation.size(); id++){
+            polyMeshLists->ani_translation[id] = interlockData->traslation[id] / max_trans_length;
+            polyMeshLists->ani_rotation[id] = -interlockData->rotation[id] / max_trans_length;
+            polyMeshLists->ani_center[id] = interlockData->center[id];
         }
 
         polyMeshLists->update_buffer();
-    }
+        scene.objects.push_back(polyMeshLists);
 
-    void init_render_pass(){
-        nanogui::ref<nanogui::Texture> depth_stencil = new nanogui::Texture(
-                nanogui::Texture::PixelFormat::DepthStencil,
-                nanogui::Texture::ComponentFormat::Float32,
-                framebuffer_size(),
-                nanogui::Texture::InterpolationMode::Bilinear,
-                nanogui::Texture::InterpolationMode::Bilinear,
-                nanogui::Texture::WrapMode::ClampToEdge,
-                1,
-                nanogui::Texture::TextureFlags::RenderTarget
-        );
+        {
+            colors.clear();
+            colors.push_back(nanogui::Color(255, 0, 0, 255));
+            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+            graph->getContactMesh(polyMesh);
+            polyMesh->mergeFaces(1e-3);
+            meshLists.clear();
+            meshLists.push_back(polyMesh);
+            polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, m_render_pass);
+            scene.objects.push_back(polyMeshLists);
+        }
 
-        m_render_pass = new nanogui::RenderPass({ this }, depth_stencil);
-        m_render_pass->set_clear_color(0, nanogui::Color(0.9f, 0.9f, 0.9f, 1.f));
-        m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
-        m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);
     }
 
     virtual void draw(NVGcontext *ctx) {
@@ -360,93 +276,49 @@ public:
         Screen::draw(ctx);
     }
 
-    std::string float_to_string(float a_value, int n){
-        std::ostringstream out;
-        out.precision(n);
-        out << std::fixed << a_value;
-        return out.str();
-    }
-
     virtual void draw_contents() {
         Eigen::Matrix4f model, view, proj;
         computeCameraMatrices(model, view, proj);
 
-        if(polyMeshLists == nullptr) return;
-
         if(!play->pushed() && !pause->pushed() && !stop->pushed()){
-            if(prev_animate_state == gui_PolyMeshLists<double>::Run){
-                polyMeshLists->state = gui_PolyMeshLists<double>::Stop;
+            if(prev_animate_state == Run){
+                scene.update_state(Stop);
             }
-            if(prev_animate_state == gui_PolyMeshLists<double>::Pause){
-                polyMeshLists->state = gui_PolyMeshLists<double>::Run;
+            if(prev_animate_state == Pause){
+                scene.update_state(Run);
                 play->set_pushed(true);
             }
-            prev_animate_state = polyMeshLists->state;
+            scene.update_state(prev_animate_state);
         }
 
         Eigen::Matrix4f mvp = proj * view * model;
-        polyMeshLists->mvp = mvp;
+        scene.update_mvp(mvp);
 
+        scene.update_time((float)glfwGetTime(), animation_speed);
 
-        polyMeshLists->updateTime((float)glfwGetTime(), animation_speed);
-
-        if(timeline_slider->value() > maximum_time_one_unit && polyMeshLists->state == gui_PolyMeshLists<double>::Run){
-            polyMeshLists->state = gui_PolyMeshLists<double>::Pause;
+        if(timeline_slider->value() > maximum_time_one_unit && Run){
+            scene.update_state(Pause);
             pause->set_pushed(true);
             play->set_pushed(false);
-            prev_animate_state = polyMeshLists->state;
+            prev_animate_state = Pause;
         }
 
-
-        timeline_slider->set_value(polyMeshLists->simtime * maximum_time_one_unit);
-        text_box_timeline->set_value(float_to_string(polyMeshLists->simtime * maximum_time_one_unit, 3) );
-
-
+        timeline_slider->set_value(scene.simtime * maximum_time_one_unit);
+        text_box_timeline->set_value(float_to_string(scene.simtime * maximum_time_one_unit, 3) );
 
         /* MVP uniforms */
-        polyMeshLists->updateUniforms();
-        m_render_pass->begin();
-        polyMeshLists->shader->begin();
-        polyMeshLists->shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, polyMeshLists->positions.size() / 3, false);
-        polyMeshLists->shader->end();
-        m_render_pass->end();
+       scene.draw();
     }
 
 private:
-    //shader and render pass
-    shared_ptr<gui_PolyMeshLists<double>> polyMeshLists;
-    nanogui::ref<nanogui::RenderPass> m_render_pass;
-    int num_faces_invisible = 0;
-
-private:
-
+    shared_ptr<ContactGraph<double>>graph;
     nanogui::ToolButton *play, *pause, *stop;
     nanogui::TextBox *text_box_speed, *text_box_timeline;
     nanogui::Slider *timeline_slider, *speed_slider;
-    gui_PolyMeshLists<double>::AnimationState prev_animate_state;
+    AnimationState prev_animate_state;
     float animation_speed = 0.1;
     float minimum_time_one_unit = 3;
     float maximum_time_one_unit = 20;
-
-private:
-    //camera
-    struct CameraParameters {
-        Arcball arcball;
-        float zoom = 1.0f, viewAngle = 60.0f;
-        float dnear = 0.1f, dfar = 100.0f;
-        Eigen::Vector3f eye = Eigen::Vector3f(0.0f, 0.0f, 5.0f);
-        // Eigen::Vector3f eye = Eigen::Vector3f(0.0f, 5.0f, 0.0f);
-        Eigen::Vector3f center = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
-        Eigen::Vector3f up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
-        // Eigen::Vector3f up = Eigen::Vector3f(0.0f, 0.0f, -1.0f);
-        Eigen::Vector3f modelTranslation = Eigen::Vector3f::Zero();
-        Eigen::Vector3f modelTranslation_start = Eigen::Vector3f::Zero();
-        float modelZoom = 1.0f;
-    } camera_;
-
-    bool translate_ = false;
-    Eigen::Vector2i translateStart_ = Eigen::Vector2i(0, 0);
-
 };
 
 int main(int /* argc */, char ** /* argv */) {
@@ -454,7 +326,7 @@ int main(int /* argc */, char ** /* argv */) {
         nanogui::init();
 
         /* scoped variables */ {
-            nanogui::ref<ExampleApplication> app = new ExampleApplication();
+            nanogui::ref<TopoLiteApplication> app = new TopoLiteApplication();
             app->dec_ref();
             app->draw_all();
             app->set_visible(true);

@@ -32,7 +32,7 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
     InterlockingSolver<Scalar>::appendAuxiliaryVariables(tris, size);
     InterlockingSolver<Scalar>::appendMergeConstraints(tris, size, true);
 
-    return solve(data, tris, false, size[0], size[1], num_var);
+    return solve(data, tris, true, size[0], size[1], num_var);
 }
 
 template<typename Scalar>
@@ -102,7 +102,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     // the maximum "t" (the auxiliary variables) is around tolerance * 10
     // the average of the "t" is around tolerance * 5.
     // it is very useful to use these number to check whether structure is interlocking or not.
-    model.setPrimalTolerance(1e-8);
+    model.setPrimalTolerance(1e-12);
 
     // Solve
     model.primal();
@@ -120,7 +120,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     for(pContactGraphNode node: graph->nodes){
         Vector3 trans(0, 0, 0);
         Vector3 rotate(0, 0, 0);
-        Vector3 center(0, 0, 0);
+        Vector3 center = node->centroid;
         if(node->dynamicID != -1) {
             if (rotationalInterlockingCheck) {
                 trans = Vector3(solution[node->dynamicID * 6],
@@ -135,12 +135,12 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
                         solution[node->dynamicID * 3 + 1],
                         solution[node->dynamicID * 3 + 2]);
             }
-            center = node->centroid;
         }
+
         data->traslation.push_back(trans);
         data->rotation.push_back(rotate);
         data->center.push_back(center);
-//        std::cout << node->dynamicID << ":\t" << trans.transpose() << ", " << rotate.transpose() << std::endl;
+        std::cout << node->dynamicID << ":\t" << trans.transpose() << ", " << rotate.transpose() << std::endl;
     }
 
     std::cout << "max_t:\t" << std::abs(max_sol) << std::endl;

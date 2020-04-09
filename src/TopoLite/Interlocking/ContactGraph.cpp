@@ -167,7 +167,11 @@ void ContactGraph<Scalar>::getContactMesh(pPolyMesh &mesh) {
     mesh = make_shared<PolyMesh<Scalar>>(getVarList());
     for (pContactGraphEdge edge: edges) {
         for (pPolygon poly: edge->polygons) {
-            mesh->polyList.push_back(poly);
+            pPolygon copy_poly = make_shared<_Polygon<Scalar>>(*poly);
+            if(edge->partIDA > edge->partIDB){
+                copy_poly->reverseVertices();
+            }
+            mesh->polyList.push_back(copy_poly);
         }
     }
 
