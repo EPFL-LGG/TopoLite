@@ -102,18 +102,18 @@ public:
         panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
                                                  nanogui::Alignment::Middle, 0, 20));
 
-        nanogui::Slider *slider = new nanogui::Slider(panel);
-        slider->set_value(0.001f);
-        slider->set_fixed_width(100);
-        slider->set_range({0.001f, 0.01f});
-        animation_speed = 0.001f;
+        speed_slider = new nanogui::Slider(panel);
+        speed_slider->set_value(1 / minimum_time_one_unit);
+        speed_slider->set_fixed_width(100);
+        speed_slider->set_range({1 / maximum_time_one_unit, 1 / minimum_time_one_unit});
+        animation_speed = 1 / minimum_time_one_unit;
 
         text_box_speed = new nanogui::TextBox(panel);
         text_box_speed->set_fixed_size(nanogui::Vector2i(60, 25));
-        text_box_speed->set_value("0.01f");
+        text_box_speed->set_value(float_to_string(1 / minimum_time_one_unit, 3));
 
-        slider->set_callback([&](float value) {
-            text_box_speed->set_value(std::to_string(value));
+        speed_slider->set_callback([&](float value) {
+            text_box_speed->set_value(float_to_string(value, 3));
             animation_speed = value;
         });
 
@@ -125,15 +125,15 @@ public:
         timeline_slider = new nanogui::Slider(panel);
         timeline_slider->set_value(0);
         timeline_slider->set_fixed_width(100);
-        timeline_slider->set_range({0.0f, 0.05f});
+        timeline_slider->set_range({0.0f, maximum_time_one_unit});
 
         text_box_timeline = new nanogui::TextBox(panel);
         text_box_timeline->set_fixed_size(nanogui::Vector2i(60, 25));
         text_box_timeline->set_value("0");
 
         timeline_slider->set_callback([&](float value) {
-            text_box_timeline->set_value(std::to_string(value));
-            if(polyMeshLists) polyMeshLists->simtime = value;
+            text_box_timeline->set_value(float_to_string(value, 3));
+            if(polyMeshLists) polyMeshLists->simtime = value / maximum_time_one_unit;
         });
 
 
@@ -294,22 +294,12 @@ public:
         vector<bool> atboundary;
         vector<nanogui::Color> colors;
 
-        {
-            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Quad_T0.08_data/PartGeometry/Boundary.obj";
-            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            bool textureModel;
-            if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
-                polyMesh->mergeFaces(1e-3);
-                meshLists.push_back(polyMesh);
-                atboundary.push_back(false);
-                colors.push_back(nanogui::Color(255, 255, 255, 255));
-            }
-        }
-
-        for(int id = 0; id <= 77; id++){
+        for(int id = 0; id <= 80; id++){
             char number[50];
-            sprintf(number, "%02d.obj", id);
-            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Quad_T0.08_data/PartGeometry/Part_";
+            //sprintf(number, "%02d.obj", id);
+            sprintf(number, "%d.obj", id);
+            //std::string part_filename = "data/TopoInterlock/XML/SphereA80_Quad_T0.08_data/PartGeometry/Part_";
+            std::string part_filename = "data/Voxel/bunny/part_";
             part_filename += number;
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
             bool textureModel;
@@ -318,15 +308,12 @@ public:
                     polyMesh->mergeFaces(1e-3);
                     meshLists.push_back(polyMesh);
                     atboundary.push_back(false);
-                    colors.push_back(nanogui::Color(255, 255, 255, 255));
                 }
             }
         }
 
 
         atboundary[0] = true;
-        colors[0] = nanogui::Color(0, 0, 0, 0);
-        //atboundary[1] = true;
 
         // construct the contact graph
         shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
@@ -338,20 +325,16 @@ public:
 
         polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, true, m_render_pass);
 
+        double max_trans_length = 0;
         for(int id = 0; id < polyMeshLists->object_translation.size(); id++){
-            polyMeshLists->object_translation[id] = interlockData->traslation[id];
+            max_trans_length = std::max(max_trans_length, interlockData->traslation[id].norm());
         }
+
+        for(int id = 0; id < polyMeshLists->object_translation.size(); id++){
+            polyMeshLists->object_translation[id] = interlockData->traslation[id] / max_trans_length;
+        }
+
         polyMeshLists->update_buffer();
-
-//        shared_ptr<PolyMesh<double>> polyMesh = std::make_shared<PolyMesh<double>>(varList);
-//        bool textureModel;
-//        polyMesh->readOBJModel("data/TopoInterlock/XML/origin_data/origin_CrossMesh.obj", textureModel, true);
-//        gui_polyMesh = make_shared<gui_PolyMesh<double>>(*polyMesh, true, m_render_pass);
-
-//        PatternCreator<double> patternCreator(varList);
-//        PatternCreator<double>::pCrossMesh crossMesh;
-//        patternCreator.create2DPattern(CROSS_SQUARE, 10, crossMesh);
-//        gui_polyMesh = make_shared<gui_PolyMesh<double>>(*(PolyMesh<double> *)crossMesh.get(), true, m_render_pass);
     }
 
     void init_render_pass(){
@@ -377,6 +360,13 @@ public:
         Screen::draw(ctx);
     }
 
+    std::string float_to_string(float a_value, int n){
+        std::ostringstream out;
+        out.precision(n);
+        out << std::fixed << a_value;
+        return out.str();
+    }
+
     virtual void draw_contents() {
         Eigen::Matrix4f model, view, proj;
         computeCameraMatrices(model, view, proj);
@@ -397,14 +387,20 @@ public:
         Eigen::Matrix4f mvp = proj * view * model;
         polyMeshLists->mvp = mvp;
 
+
         polyMeshLists->updateTime((float)glfwGetTime(), animation_speed);
-        timeline_slider->set_value(polyMeshLists->simtime);
-        text_box_timeline->set_value(std::to_string(polyMeshLists->simtime));
-        if(prev_animate_state == gui_PolyMeshLists<double>::Pause){
-            timeline_slider->set_enabled(true);
-        }else{
-            timeline_slider->set_enabled(false);
+
+        if(timeline_slider->value() > maximum_time_one_unit && polyMeshLists->state == gui_PolyMeshLists<double>::Run){
+            polyMeshLists->state = gui_PolyMeshLists<double>::Pause;
+            pause->set_pushed(true);
+            play->set_pushed(false);
+            prev_animate_state = polyMeshLists->state;
         }
+
+
+        timeline_slider->set_value(polyMeshLists->simtime * maximum_time_one_unit);
+        text_box_timeline->set_value(float_to_string(polyMeshLists->simtime * maximum_time_one_unit, 3) );
+
 
 
         /* MVP uniforms */
@@ -426,9 +422,11 @@ private:
 
     nanogui::ToolButton *play, *pause, *stop;
     nanogui::TextBox *text_box_speed, *text_box_timeline;
-    nanogui::Slider *timeline_slider;
+    nanogui::Slider *timeline_slider, *speed_slider;
     gui_PolyMeshLists<double>::AnimationState prev_animate_state;
     float animation_speed = 0.1;
+    float minimum_time_one_unit = 3;
+    float maximum_time_one_unit = 20;
 
 private:
     //camera

@@ -74,6 +74,9 @@ public:
 
 	vector<pVTex> texs;          // Tex coordinates
 
+    //boundary edge
+    vector<bool> edge_at_boundary;
+
 private:
 
     PolygonType polyType;                        // Polygon type (number of edges, shape, orientation); note: this variable is used for generating 2D tiling tessellation
@@ -147,6 +150,14 @@ public:
         if(texs.empty()) return Vector2(0, 0);
         index = index % texs.size();
         return texs.at(index)->texCoord;
+    }
+
+    bool at_boundary(int edge_index){
+        if(edge_index >= 0 && edge_index < edge_at_boundary.size()){
+            return edge_at_boundary[edge_index];
+        }
+        //also consider it as a boundary edge if there is no edge_at_boundary variables
+        return true;
     }
 
     bool checkEquality(const _Polygon &poly) const;

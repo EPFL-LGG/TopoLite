@@ -154,13 +154,14 @@ public:
                     positions.push_back(face_center.y());
                     positions.push_back(face_center.z());
 
+
                     barycentric.push_back(1);
                     barycentric.push_back(0);
-                    barycentric.push_back(0);
+                    barycentric.push_back(polygon->at_boundary(id) ? 0 : 10);
 
                     barycentric.push_back(0);
                     barycentric.push_back(1);
-                    barycentric.push_back(0);
+                    barycentric.push_back(polygon->at_boundary(id) ? 0 : 10);
 
                     barycentric.push_back(0.5);
                     barycentric.push_back(0.5);

@@ -671,39 +671,28 @@ void PolyMesh<Scalar>::mergeFaces(double eps)
         return neighbors;
     };
 
-    auto find_next_vertex = [=](pVertex vertex, std::unordered_map<pPolygon, bool> face_in_merge) -> pVertex{
+    auto check_edge_at_boundary = [=](pVertex vertex, pPolygon poly, std::unordered_map<pPolygon, bool> face_in_merge) -> bool{
 
         std::unordered_map<pPolygon, bool> visited;
-        for(wpPolygon poly: vertexFaces[vertex->verID]){
-            if(face_in_merge.find(poly.lock()) != face_in_merge.end()){
-                visited[poly.lock()] = true;
+        for(wpPolygon face: vertexFaces[vertex->verID]){
+            if(face_in_merge.find(face.lock()) != face_in_merge.end()){
+                visited[face.lock()] = true;
             }
         }
 
-        for(wpPolygon poly: vertexFaces[vertex->verID]){
-            if(face_in_merge.find(poly.lock()) == face_in_merge.end()) continue;
-            int vertex_localID = find_vertex_localID(vertex, poly.lock());
-            int next_localID = (vertex_localID + 1) % poly.lock()->size();
-            pVertex next_vertex = poly.lock()->vers[next_localID];
+        int vertex_localID = find_vertex_localID(vertex, poly);
+        int next_localID = (vertex_localID + 1) % poly->size();
+        pVertex next_vertex = poly->vers[next_localID];
 
-            bool is_next_vertex_valid = true;
-            for(wpPolygon next_poly: vertexFaces[next_vertex->verID]){
-                if(next_poly.lock() != poly.lock() && visited.find(next_poly.lock()) != visited.end()){
-                    is_next_vertex_valid = false;
-                    break;
-                }
-            }
-
-            if(is_next_vertex_valid){
-                return next_vertex;
+        for(wpPolygon next_poly: vertexFaces[next_vertex->verID]){
+            if(next_poly.lock() != poly && visited.find(next_poly.lock()) != visited.end()){
+                return false;
             }
         }
-
-        return nullptr;
+        return true;
     };
 
     std::unordered_map<pPolygon, bool> visited;
-    vector<pPolygon> new_faces;
 
     for(pPolygon face: polyList){
         if(visited.find(face) == visited.end()){
@@ -723,7 +712,8 @@ void PolyMesh<Scalar>::mergeFaces(double eps)
                 for(wpPolygon neighbor: neighbors){
                     if(localvisited.find(neighbor.lock()) == localvisited.end()){
                         Vector3 neighbor_normal = neighbor.lock()->normal();
-                        if(std::abs(u_normal.cross(neighbor_normal).norm()) < eps){
+                        if(std::abs(u_normal.cross(neighbor_normal).norm()) < eps
+                        && u_normal.dot(neighbor_normal) >= 0){
                             merged_faces.push_back(neighbor.lock());
                             queue_faces.push(neighbor.lock());
                         }
@@ -736,24 +726,18 @@ void PolyMesh<Scalar>::mergeFaces(double eps)
             for(pPolygon face: merged_faces){
                 visited[face] = true;
                 faces_in_merge[face] = true;
+                face->edge_at_boundary.clear();
             }
 
-            if(merged_faces.size() > 1){
-                pVertex vertex = merged_faces[0]->vers[0];
-                pPolygon new_poly = make_shared<_Polygon<Scalar>>();
-                do{
-                    new_poly->vers.push_back(vertex);
-                    vertex = find_next_vertex(vertex, faces_in_merge);
-                }while(vertex != merged_faces[0]->vers[0]);
-                new_faces.push_back(new_poly);
-            }
-            else{
-                new_faces.push_back(merged_faces[0]);
+            for(pPolygon face: merged_faces)
+            {
+                for(pVertex vertex: face->vers)
+                {
+                    face->edge_at_boundary.push_back(check_edge_at_boundary(vertex, face, faces_in_merge));
+                }
             }
         }
     }
-
-    polyList = new_faces;
 
 }
 
