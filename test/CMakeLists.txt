@@ -6,12 +6,15 @@ if(HAVE_TEST)
     include(CTest)
     include(ParseAndAddCatchTests)
 
-    file(GLOB testTopoFiles Interlocking/Test_InterlockingSolver_Clp.cpp)
-    #file(GLOB testTopoFiles Interlocking/*.cpp
-#                            CrossMesh/*.cpp
-#                            Mesh/*.cpp
-#                            IO/*.cpp
-#                            Utility/*.cpp)
+    #file(GLOB testTopoFiles Interlocking/Test_InterlockingSolver_Clp.cpp)
+
+    file(GLOB testTopoFiles
+            Interlocking/*.cpp
+            CrossMesh/*.cpp
+            Mesh/*.cpp
+            IO/*.cpp
+            Utility/*.cpp
+            )
 
     set(testTopoFiles ${testTopoFiles} Test_Main.cpp)
 
