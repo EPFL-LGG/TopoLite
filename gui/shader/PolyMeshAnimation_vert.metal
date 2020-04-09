@@ -10,14 +10,23 @@ vertex VertexOut vertex_main(const device packed_float3 *position,
                              const device packed_float3 *barycentric,
                              const device packed_float3 *color,
                              const device packed_float3 *translation,
+                             const device int    *objectindex,
                              constant float &simtime,
                              uint id [[vertex_id]])
 {
     VertexOut vert;
+
+    //translational vector
+    float3 trans = float3(translation[objectindex[id]]) * simtime;
+
+    //color
+    vert.color = color[objectindex[id]];
+
+    //vertex coordinates
     float3 pos = float3(position[id]);
-    float3 trans = float3(translation[id]) * simtime;
     vert.position = mvp * float4(pos + trans, 1.f);
+
+    //barycentric coordinates
     vert.bary = barycentric[id];
-    vert.color = color[id];
     return vert;
 }

@@ -52,7 +52,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     //the optimization is formulated as:
     //              min \sum_{i = 0}^{num_row} -t_i
     //  s.t.            A[x, t] >= 0
-    //                  1 >= t >= -1
+    //                  1 >= t >= 0
     //                    x \in R
     // Ideally if the structure is interlocking, the objective value should be zero.
     // In practice, due to numerical error, we have to allow a small tolerance for the objective value.
@@ -79,7 +79,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
 
     //bound
     for(size_t id = 0; id < num_row; id++) rowLower[id] = 0;
-    for(size_t id = 0; id < num_row; id++) rowUpper[id] = COIN_DBL_MAX;
+    for(size_t id = 0; id < num_row; id++) rowUpper[id] = 0;
     for(size_t id = 0; id < num_col; id++) {
         if(id < num_var) colLower[id] = -COIN_DBL_MAX;
         else colLower[id] = 0;

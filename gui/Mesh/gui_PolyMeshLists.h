@@ -21,6 +21,8 @@ public:
     vector<wpPolyMesh> meshLists;
     vector<nanogui::Color> object_colors;
     vector<Vector3> object_translation;
+    vector<Vector3> object_center;
+    vector<Vector3> object_rotation;
     Eigen::Vector3f mesh_center;
 public:
     enum AnimationState{
@@ -40,6 +42,9 @@ public:  //buffers
     vector<float> barycentric;
     vector<float> colors;
     vector<float> translation;
+    vector<float> rotation;
+    vector<float> center;
+    vector<int> objectindex;
 
 public: // uniform
     Eigen::Matrix4f mvp;
@@ -126,6 +131,20 @@ public:
         colors.clear();
         translation.clear();
 
+        for(size_t mID = 0; mID < meshLists.size(); mID++){
+            nanogui::Color mesh_color = object_colors[mID];
+            Vector3 mesh_translation = object_translation[mID];
+            // colors
+            for(int kd = 0; kd < 3; kd++){
+                colors.push_back(mesh_color[kd]);
+            }
+            // animation
+            for(int kd = 0; kd < 3; kd++){
+                translation.push_back(mesh_translation[kd]);
+            }
+        }
+
+
         for(size_t mID = 0; mID < meshLists.size(); mID++)
         {
             wpPolyMesh mesh = meshLists[mID];
@@ -154,7 +173,6 @@ public:
                     positions.push_back(face_center.y());
                     positions.push_back(face_center.z());
 
-
                     barycentric.push_back(1);
                     barycentric.push_back(0);
                     barycentric.push_back(polygon->at_boundary(id) ? 0 : 10);
@@ -167,14 +185,8 @@ public:
                     barycentric.push_back(0.5);
                     barycentric.push_back(10);
 
-                    // colors
-                    for(int kd = 0; kd < 9; kd++){
-                        colors.push_back(mesh_color[kd % 3]);
-                    }
-
-                    // animation
-                    for(int kd = 0; kd < 9; kd++){
-                        translation.push_back(mesh_translation[kd %3]);
+                    for(int kd = 0; kd < 3; kd++){
+                        objectindex.push_back(mID);
                     }
                 }
             }
@@ -185,6 +197,8 @@ public:
         shader->set_buffer("barycentric", nanogui::VariableType::Float32, {barycentric.size() / 3, 3}, &barycentric[0]);
         shader->set_buffer("color", nanogui::VariableType::Float32, {colors.size() / 3, 3}, &colors[0]);
         shader->set_buffer("translation", nanogui::VariableType::Float32, {translation.size() / 3, 3}, &translation[0]);
+        shader->set_buffer("objectindex", nanogui::VariableType::Int32, {objectindex.size(), 1}, &objectindex[0]);
+
     }
 
     nanogui::Matrix4f toNanoguiMatrix(Eigen::Matrix4f mat){
