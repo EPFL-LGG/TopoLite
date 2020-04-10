@@ -12,7 +12,6 @@
 ///////////////////////////////////////////////////////////////
 
 #include "Utility/HelpDefine.h"
-#include "Utility/math3D.h"
 
 #include "igl/boundary_loop.h"
 #include "igl/readOBJ.h"

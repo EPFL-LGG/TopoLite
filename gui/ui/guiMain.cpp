@@ -11,7 +11,7 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include "Arcball.h"
+#include "gui_Arcball.h"
 
 #include <nanogui/opengl.h>
 #include <nanogui/screen.h>
@@ -50,6 +50,7 @@
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_Clp.h"
 #include "gui_ArcballScene.h"
+#include "gui_LoadScene.h"
 
 class TopoLiteApplication : public gui_ArcballScene{
 public:
@@ -75,7 +76,7 @@ public:
         });
 
         checkbox = new nanogui::CheckBox(window, "contact");
-        checkbox->set_checked(true);
+        checkbox->set_checked(false);
         checkbox->set_callback([&](bool check){
             scene.objects[1]->visible = check;
             return check;
@@ -189,72 +190,10 @@ public:
     ********************************************************************************************/
 
 
-
-    void init_mesh()
-    {
-        shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-        InitVarLite(varList.get());
-        vector<shared_ptr<PolyMesh<double>>> meshLists;
-        vector<nanogui::Color> colors;
-        vector<bool> atboundary;
-        
-        {
-            std::string file_name[3] = {"piece0.obj", "piece1.obj", "piece4.obj"};
-            bool textureModel;
-            for(int id = 0; id < 3; id++){
-                char number[50];
-                std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
-                part_filename += file_name[id];
-                shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-                polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
-                meshLists.push_back(polyMesh);
-                atboundary.push_back(false);
-            }
-            atboundary[0] = true;
-            atboundary[1] = true;
-        }
-
-
-        {
-            //        //Read all Parts
-//        vector<shared_ptr<PolyMesh<double>>> meshLists;
-//        vector<bool> atboundary;
-//        vector<nanogui::Color> colors;
-//
-//        {
-//            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Boundary.obj";
-//            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-//            bool textureModel;
-//            if(std::filesystem::is_regular_file(part_filename.c_str())){
-//                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
-//                    polyMesh->mergeFaces(1e-3);
-//                    meshLists.push_back(polyMesh);
-//                    atboundary.push_back(false);
-//                }
-//            }
-//        }
-//
-//        for(int id = 0; id <= 42; id++){
-//            char number[50];
-//            sprintf(number, "%02d.obj", id);
-//            //sprintf(number, "%d.obj", id);
-//            std::string part_filename = "data/TopoInterlock/XML/SphereA80_Hex_T40.0_data/PartGeometry/Part_";
-//            //std::string part_filename = "data/Mesh/Ania_200127_betweenbars/piece";
-//            part_filename += number;
-//            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-//            bool textureModel;
-//            if(std::filesystem::is_regular_file(part_filename.c_str())){
-//                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
-//                    polyMesh->mergeFaces(1e-3);
-//                    meshLists.push_back(polyMesh);
-//                    atboundary.push_back(false);
-//                }
-//            }
-//        }
-//
-//        atboundary[0] = true;
-        }
-
+    void init_mesh(shared_ptr<InputVarList> varList,
+                   vector<shared_ptr<PolyMesh<double>>> &meshLists,
+                   vector<nanogui::Color> &colors,
+                   vector<bool> &atboundary){
         for(int id = 0; id < atboundary.size(); id++){
             if(atboundary[id]){
                 colors.push_back(nanogui::Color(100, 100 ,100 ,255));
@@ -274,16 +213,18 @@ public:
 
         shared_ptr<gui_PolyMeshLists<double>> polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, m_render_pass);
 
-        double max_trans_length = 1;
-        for(int id = 0; id < polyMeshLists->object_center.size(); id++){
-            max_trans_length = std::max(max_trans_length, interlockData->traslation[id].norm());
+        double max_length = 5;
+        for(int id = 0; id < polyMeshLists->ani_translation.size(); id++){
+            max_length = std::max(max_length, interlockData->traslation[id].norm());
+            max_length = std::max(max_length, interlockData->rotation[id].norm());
         }
 
         for(int id = 0; id < polyMeshLists->ani_translation.size(); id++){
-            polyMeshLists->ani_translation[id] = interlockData->traslation[id] / max_trans_length;
-            polyMeshLists->ani_rotation[id] = interlockData->rotation[id] / max_trans_length;
+            polyMeshLists->ani_translation[id] = interlockData->traslation[id] / max_length;
+            polyMeshLists->ani_rotation[id] = interlockData->rotation[id] / max_length;
             polyMeshLists->ani_center[id] = interlockData->center[id];
         }
+
 
         polyMeshLists->update_buffer();
         scene.objects.push_back(polyMeshLists);
@@ -298,8 +239,19 @@ public:
             meshLists.push_back(polyMesh);
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, m_render_pass);
             scene.objects.push_back(polyMeshLists);
+            polyMeshLists->visible = false;
         }
+    }
 
+    void init_mesh()
+    {
+        shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+        InitVarLite(varList.get());
+        vector<shared_ptr<PolyMesh<double>>> meshLists;
+        vector<nanogui::Color> colors;
+        vector<bool> atboundary;
+        load_SphereA80(varList, meshLists, colors, atboundary);
+        init_mesh(varList, meshLists, colors, atboundary);
     }
 
     virtual void draw(NVGcontext *ctx) {

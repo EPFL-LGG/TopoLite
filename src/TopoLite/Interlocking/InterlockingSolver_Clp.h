@@ -46,6 +46,30 @@ public:
             int num_col,
             int num_var);
 
+    bool solveSimplex(pInterlockingData &data,
+               bool rotationalInterlockingCheck,
+               int num_row,
+               int num_col,
+               int num_var,
+               const CoinPackedMatrix& matrix,
+               const double *colLower,
+               const double *colUpper,
+               const double *objective,
+               const double *rowLower,
+               const double *rowUpper);
+
+    bool solveBarrier(pInterlockingData &data,
+                      bool rotationalInterlockingCheck,
+                      int num_row,
+                      int num_col,
+                      int num_var,
+                      const CoinPackedMatrix& matrix,
+                      const double *colLower,
+                      const double *colUpper,
+                      const double *objective,
+                      const double *rowLower,
+                      const double *rowUpper);
+
     void unpackSolution(InterlockingSolver_Clp::pInterlockingData& data, bool rotationalInterlockingCheck, const double *solution, int num_var);
 };
 

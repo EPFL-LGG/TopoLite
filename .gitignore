@@ -26,3 +26,5 @@ ext/filesystem
 ext/eigen
 ext/pugixml
 ext/pybind11
+
+Xcode/*

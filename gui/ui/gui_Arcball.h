@@ -2,8 +2,8 @@
 // Created by ziqwang on 03.04.20.
 //
 
-#ifndef TOPOLITE_ARCBALL_H
-#define TOPOLITE_ARCBALL_H
+#ifndef TOPOLITE_GUI_ARCBALL_H
+#define TOPOLITE_GUI_ARCBALL_H
 #include <Eigen/Dense>
 #include <nanogui/vector.h>
 
@@ -12,14 +12,14 @@
  *
  * \brief Arcball helper class to interactively rotate objects on-screen.
  */
-struct Arcball {
-    Arcball(float speedFactor = 2.0f)
+struct gui_Arcball {
+    gui_Arcball(float speedFactor = 2.0f)
             : mActive(false), mLastPos(Eigen::Vector2i::Zero()), mSize(Eigen::Vector2i::Zero()),
               mQuat(Eigen::Quaternionf::Identity()),
               mIncr(Eigen::Quaternionf::Identity()),
               mSpeedFactor(speedFactor) { }
 
-    Arcball(const Eigen::Quaternionf &quat)
+    gui_Arcball(const Eigen::Quaternionf &quat)
             : mActive(false), mLastPos(Eigen::Vector2i::Zero()), mSize(Eigen::Vector2i::Zero()),
               mQuat(quat),
               mIncr(Eigen::Quaternionf::Identity()),
@@ -197,4 +197,4 @@ Eigen::Matrix4f translate(const Eigen::Matrix4f &m, const Eigen::Vector3f &v) {
 }
 
 
-#endif //TOPOLITE_ARCBALL_H
+#endif //TOPOLITE_GUI_ARCBALL_H

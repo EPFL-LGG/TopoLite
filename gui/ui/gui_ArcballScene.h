@@ -58,7 +58,7 @@ public:
             return true;
         }
         if(key == GLFW_KEY_1){
-            camera_.arcball = Arcball();
+            camera_.arcball = gui_Arcball();
             camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
             camera_.modelZoom = 2;
             camera_.eye = Eigen::Vector3f(0, 0, 5);
@@ -67,7 +67,7 @@ public:
             return true;
         }
         if(key == GLFW_KEY_2){
-            camera_.arcball = Arcball();
+            camera_.arcball = gui_Arcball();
             camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
             camera_.modelZoom = 2;
             camera_.eye = Eigen::Vector3f(0, -5, 0);
@@ -76,7 +76,7 @@ public:
             return true;
         }
         if(key == GLFW_KEY_3){
-            camera_.arcball = Arcball();
+            camera_.arcball = gui_Arcball();
             camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
             camera_.modelZoom = 2;
             camera_.eye = Eigen::Vector3f(5, 0, 0);
@@ -156,7 +156,7 @@ public:
     void refresh_trackball_center() {
 
         // Re-center the mesh
-        camera_.arcball = Arcball();
+        camera_.arcball = gui_Arcball();
         camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
         camera_.modelZoom = 2;
         camera_.modelTranslation = -scene.focus();
@@ -197,7 +197,7 @@ public:
 private:
     //camera
     struct CameraParameters {
-        Arcball arcball;
+        gui_Arcball arcball;
         float zoom = 1.0f, viewAngle = 60.0f;
         float dnear = 0.1f, dfar = 100.0f;
         Eigen::Vector3f eye = Eigen::Vector3f(0.0f, 0.0f, 5.0f);

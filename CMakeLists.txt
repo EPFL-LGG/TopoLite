@@ -70,10 +70,7 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
-file(GLOB TpCoreFiles
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/XMLIO.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/InputVar.cpp)
-
+add_subdirectory(src)
 add_library(TpCorelib STATIC ${TpCoreFiles})
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})

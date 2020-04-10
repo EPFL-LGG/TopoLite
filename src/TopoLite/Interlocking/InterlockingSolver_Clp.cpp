@@ -7,6 +7,9 @@
 #include "tbb/tbb.h"
 #include <Eigen/SparseQR>
 
+#include "ClpInterior.hpp"
+#include "ClpSimplex.hpp"
+#include "ClpCholeskyDense.hpp"
 
 
 template<typename Scalar>
@@ -101,7 +104,7 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     EigenSpMat spatMat(num_row, num_col);
     spatMat.setFromTriplets(tris.begin(), tris.end());
 
-    ClpSimplex model(true);
+
     CoinPackedMatrix matrix(true, num_row, num_col, spatMat.nonZeros(), spatMat.valuePtr(), spatMat.innerIndexPtr(), spatMat.outerIndexPtr(), spatMat.innerNonZeroPtr());
 
     double* objective = new double[num_col];
@@ -121,35 +124,96 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
     for(size_t id = 0; id < num_row; id++) rowLower[id] = 0;
     for(size_t id = 0; id < num_row; id++) rowUpper[id] = COIN_DBL_MAX;
     for(size_t id = 0; id < num_col; id++) {
-        if(id < num_var) colLower[id] = -COIN_DBL_MAX;
+        if(id < num_var) colLower[id] = -10;
         else colLower[id] = 0;
     }
     for(size_t id = 0; id < num_col; id++) {
-        if(id < num_var) colUpper[id] = COIN_DBL_MAX;
+        if(id < num_var) colUpper[id] = 10;
         else colUpper[id] = 1;
     }
 
+    return solveBarrier(data, rotationalInterlockingCheck, num_row, num_col, num_row, matrix, colLower, colUpper, objective, rowLower, rowUpper);
+}
+template<typename Scalar>
+bool InterlockingSolver_Clp<Scalar>::solveSimplex(pInterlockingData &data,
+                                                  bool rotationalInterlockingCheck,
+                                                  int num_row,
+                                                  int num_col,
+                                                  int num_var,
+                                                  const CoinPackedMatrix& matrix,
+                                                  const double *colLower,
+                                                  const double *colUpper,
+                                                  const double *objective,
+                                                  const double *rowLower,
+                                                  const double *rowUpper){
+        ClpSimplex model(true);
+        CoinMessageHandler handler;
+        handler.setLogLevel(0); //set loglevel to zero will silence the solver
+        model.passInMessageHandler(& handler);
+        model.newLanguage(CoinMessages::us_en);
+
+        // load problem
+        model.loadProblem(matrix, colLower, colUpper, objective, rowLower, rowUpper);
+
+        // set tolerance
+        // a experiment discovery: if the structure is interlocking,
+        // the maximum "t" (the auxiliary variables) is around tolerance * 10
+        // the average of the "t" is around tolerance * 5.
+        // it is very useful to use these number to check whether structure is interlocking or not.
+        model.setPrimalTolerance(1e-8);
+        // Solve
+        // model.primal();
+
+        // Solution
+        const double target_obj_value = model.rawObjectiveValue();
+        double *solution = model.primalColumnSolution();
+        double max_sol = 0;
+        for(int id = num_var; id < num_col; id++){
+            max_sol = std::max(solution[id], max_sol);
+        }
+
+        unpackSolution(data, rotationalInterlockingCheck, solution, num_var);
+
+        std::cout << "max_t:\t" << std::abs(max_sol) << std::endl;
+        std::cout << "average_t:\t" << std::abs(target_obj_value) / num_row << std::endl;
+        if(max_sol < 5e-6) {
+            return true;
+        }
+        else{
+            return false;
+        }
+}
+
+template<typename Scalar>
+bool InterlockingSolver_Clp<Scalar>::solveBarrier(pInterlockingData &data,
+                                                  bool rotationalInterlockingCheck,
+                                                  int num_row,
+                                                  int num_col,
+                                                  int num_var,
+                                                  const CoinPackedMatrix& matrix,
+                                                  const double *colLower,
+                                                  const double *colUpper,
+                                                  const double *objective,
+                                                  const double *rowLower,
+                                                  const double *rowUpper){
+    ClpInterior  int_model;
+    ClpCholeskyDense * cholesky = new ClpCholeskyDense();
+
     CoinMessageHandler handler;
     handler.setLogLevel(0); //set loglevel to zero will silence the solver
-    model.passInMessageHandler(& handler);
-    model.newLanguage(CoinMessages::us_en);
+    int_model.passInMessageHandler(& handler);
+    int_model.newLanguage(CoinMessages::us_en);
 
-    // load problem
-    model.loadProblem(matrix, colLower, colUpper, objective, rowLower, rowUpper);
+    int_model.loadProblem(matrix, colLower, colUpper, objective, rowLower, rowUpper);
+    int_model.setCholesky(cholesky);
 
-    // set tolerance
-    // a experiment discovery: if the structure is interlocking,
-    // the maximum "t" (the auxiliary variables) is around tolerance * 10
-    // the average of the "t" is around tolerance * 5.
-    // it is very useful to use these number to check whether structure is interlocking or not.
-    model.setPrimalTolerance(1e-9);
+    int_model.setPrimalTolerance(1e-8);
 
-    // Solve
-    model.primal();
+    int_model.primalDual();
 
     // Solution
-    const double target_obj_value = model.rawObjectiveValue();
-    double *solution = model.primalColumnSolution();
+    const double target_obj_value = int_model.rawObjectiveValue();
+    double *solution = int_model.primalColumnSolution();
     double max_sol = 0;
     for(int id = num_var; id < num_col; id++){
         max_sol = std::max(solution[id], max_sol);
@@ -197,5 +261,7 @@ void InterlockingSolver_Clp<Scalar>::unpackSolution(    InterlockingSolver_Clp::
         data->traslation.push_back(trans);
         data->rotation.push_back(rotate);
         data->center.push_back(center);
+
+//        std::cout << node->staticID << ":" << trans.transpose() << ", " << rotate.transpose() << std::endl;
     }
 }
