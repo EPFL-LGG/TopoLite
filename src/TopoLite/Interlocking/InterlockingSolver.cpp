@@ -180,7 +180,8 @@ void InterlockingSolver<Scalar>::computeTranslationalInterlockingMatrix(vector<E
 
         int iB = graph->nodes[edge->partIDB]->dynamicID;
 
-        for (Vector3 nrm : edge->normals) {
+        Vector3 nrm = edge->normal;
+        for (size_t id = 0; id < edge->size(); id++) {
             if (iA != -1) {
                 tri.push_back(EigenTriple(rowID, 3 * iA, -nrm[0]));
                 tri.push_back(EigenTriple(rowID, 3 * iA + 1, -nrm[1]));
@@ -214,10 +215,10 @@ void InterlockingSolver<Scalar>::computeRotationalInterlockingMatrix(vector<Eige
         Vector3 ctA = nodeA->centroid;
         Vector3 ctB = nodeB->centroid;
 
-        for(size_t id = 0; id < edge->normals.size(); id++)
+        Vector3 nrm = edge->normal;
+        for(size_t id = 0; id < edge->size(); id++)
         {
             shared_ptr<_Polygon<Scalar>> poly = edge->polygons[id];
-            Vector3 nrm = edge->normals[id];
             for(pVertex ver: poly->vers)
             {
                 Vector3 pt = ver->pos;

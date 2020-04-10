@@ -38,6 +38,7 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
 
     InterlockingSolver<Scalar>::computeRotationalInterlockingMatrix(tris, size);
 
+//    std::cout << "special case" << std::endl;
     if(!checkSpecialCase(data, tris, true, size)){
         return false;
     }
@@ -46,6 +47,7 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
     InterlockingSolver<Scalar>::appendAuxiliaryVariables(tris, size);
     InterlockingSolver<Scalar>::appendMergeConstraints(tris, size, true);
 
+//    std::cout << "solve" << std::endl;
     return solve(data, tris, true, size[0], size[1], num_var);
 }
 
@@ -122,17 +124,17 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
 
     //bound
     for(size_t id = 0; id < num_row; id++) rowLower[id] = 0;
-    for(size_t id = 0; id < num_row; id++) rowUpper[id] = COIN_DBL_MAX;
+    for(size_t id = 0; id < num_row; id++) rowUpper[id] = 0;
     for(size_t id = 0; id < num_col; id++) {
-        if(id < num_var) colLower[id] = -10;
+        if(id < num_var) colLower[id] = -COIN_DBL_MAX;
         else colLower[id] = 0;
     }
     for(size_t id = 0; id < num_col; id++) {
-        if(id < num_var) colUpper[id] = 10;
+        if(id < num_var) colUpper[id] = COIN_DBL_MAX;
         else colUpper[id] = 1;
     }
 
-    return solveBarrier(data, rotationalInterlockingCheck, num_row, num_col, num_row, matrix, colLower, colUpper, objective, rowLower, rowUpper);
+    return solveSimplex(data, rotationalInterlockingCheck, num_row, num_col, num_var, matrix, colLower, colUpper, objective, rowLower, rowUpper);
 }
 template<typename Scalar>
 bool InterlockingSolver_Clp<Scalar>::solveSimplex(pInterlockingData &data,
@@ -146,6 +148,7 @@ bool InterlockingSolver_Clp<Scalar>::solveSimplex(pInterlockingData &data,
                                                   const double *objective,
                                                   const double *rowLower,
                                                   const double *rowUpper){
+
         ClpSimplex model(true);
         CoinMessageHandler handler;
         handler.setLogLevel(0); //set loglevel to zero will silence the solver
@@ -160,9 +163,9 @@ bool InterlockingSolver_Clp<Scalar>::solveSimplex(pInterlockingData &data,
         // the maximum "t" (the auxiliary variables) is around tolerance * 10
         // the average of the "t" is around tolerance * 5.
         // it is very useful to use these number to check whether structure is interlocking or not.
-        model.setPrimalTolerance(1e-8);
+        model.setPrimalTolerance(1e-9);
         // Solve
-        // model.primal();
+         model.primal();
 
         // Solution
         const double target_obj_value = model.rawObjectiveValue();
@@ -196,6 +199,7 @@ bool InterlockingSolver_Clp<Scalar>::solveBarrier(pInterlockingData &data,
                                                   const double *objective,
                                                   const double *rowLower,
                                                   const double *rowUpper){
+
     ClpInterior  int_model;
     ClpCholeskyDense * cholesky = new ClpCholeskyDense();
 
@@ -207,7 +211,7 @@ bool InterlockingSolver_Clp<Scalar>::solveBarrier(pInterlockingData &data,
     int_model.loadProblem(matrix, colLower, colUpper, objective, rowLower, rowUpper);
     int_model.setCholesky(cholesky);
 
-    int_model.setPrimalTolerance(1e-8);
+//    int_model.setPrimalTolerance(1e-8);
 
     int_model.primalDual();
 

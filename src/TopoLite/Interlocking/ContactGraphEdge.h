@@ -23,40 +23,33 @@ public:
 
 public:
     vector<pPolygon> polygons;  // a list which polygons are simple and closed (better to be convex)
-    vector<Vector3> normals; // contact normal from partIDA to partIDB
+    Vector3 normal; // contact normal from partIDA to partIDB
 
 public:
 
     ContactGraphEdge(pPolygon &_polygon, Vector3 &_normal)
     {
         polygons.push_back(_polygon);
-        normals.push_back(_normal);
+        normal= _normal;
     }
 
-    ContactGraphEdge(vector<pPolygon> &_polygons, vector<Vector3> &_normals)
-    {
-        polygons = _polygons;
-        normals = _normals;
-    }
 
-    ContactGraphEdge(vector<pPolygon> &_polygons, Vector3 &_normals)
+    ContactGraphEdge(vector<pPolygon> &_polygons, Vector3 &_normal)
     {
         polygons = _polygons;
-        for(size_t id = 0; id < polygons.size(); id++){
-            normals.push_back(_normals);
-        }
+        normal= _normal;
     }
 
     /*!
      * \return the contact normal starts from partID
      */
-    Vector3 getContactNormal(int partID, int polyID){
+    Vector3 getContactNormal(int partID){
         if(partIDA == partID)
         {
-            return normals[polyID];
+            return normal;
         }
         else if(partIDB == partID){
-            return normals[polyID] * (-1.0f);
+            return normal * (-1.0f);
         }
         return Vector3(0, 0, 0);
     }
@@ -79,6 +72,24 @@ public:
         for(pPolygon poly : polygons)
             num_vks += poly.size();
         return num_vks;
+    }
+
+    size_t size(){
+        return polygons.size();
+    }
+
+    bool check_on_same_plane(shared_ptr<ContactGraphEdge<Scalar>> e){
+        //always suppose partIDA < partIDB
+
+        if(partIDA != e->partIDA || partIDB != e->partIDB){
+            return false;
+        }
+
+        if(normal.cross(e->normal).norm() < FLOAT_ERROR_LARGE && normal.dot(e->normal) >= 0){
+            return true;
+        }
+
+        return false;
     }
 
 public: //Automatic Generate

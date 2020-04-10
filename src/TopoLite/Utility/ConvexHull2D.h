@@ -35,6 +35,8 @@ public:
     // Chain Hull Algorithm
     void compute(const ListVector3 &in, ListVector3 &out);
 
+    void compute(const ListVector3 &in, Vector3 normal, ListVector3 &out);
+
 private:
 
     Scalar cross(const Vector3 &O, const Vector3 &A, const Vector3 &B);

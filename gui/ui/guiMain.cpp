@@ -194,12 +194,15 @@ public:
                    vector<shared_ptr<PolyMesh<double>>> &meshLists,
                    vector<nanogui::Color> &colors,
                    vector<bool> &atboundary){
-        for(int id = 0; id < atboundary.size(); id++){
-            if(atboundary[id]){
-                colors.push_back(nanogui::Color(100, 100 ,100 ,255));
-            }
-            else{
-                colors.push_back(nanogui::Color(255, 255 ,255 ,255));
+
+        if(colors.empty()){
+            for(int id = 0; id < atboundary.size(); id++){
+                if(atboundary[id]){
+                    colors.push_back(nanogui::Color(100, 100 ,100 ,255));
+                }
+                else{
+                    colors.push_back(nanogui::Color(255, 255 ,255 ,255));
+                }
             }
         }
 
@@ -234,7 +237,7 @@ public:
             colors.push_back(nanogui::Color(255, 0, 0, 255));
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
             graph->getContactMesh(polyMesh);
-            polyMesh->mergeFaces(1e-3);
+//            polyMesh->mergeFaces(1e-3);
             meshLists.clear();
             meshLists.push_back(polyMesh);
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, m_render_pass);
@@ -250,7 +253,7 @@ public:
         vector<shared_ptr<PolyMesh<double>>> meshLists;
         vector<nanogui::Color> colors;
         vector<bool> atboundary;
-        load_SphereA80(varList, meshLists, colors, atboundary);
+        load_bunny(varList, meshLists, colors, atboundary);
         init_mesh(varList, meshLists, colors, atboundary);
     }
 

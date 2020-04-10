@@ -4,6 +4,7 @@
 
 
 #include "ContactGraph.h"
+#include "Utility/ConvexHull2D.h"
 
 /*************************************************
 *
@@ -37,12 +38,14 @@ ContactGraph<Scalar>::~ContactGraph() {
  * @param meshes
  * @param atBoundary
  * @param eps
+ * @param simplify : merges faces which on a same plane by its convexhull
  * @return
  */
 template<typename Scalar>
 bool ContactGraph<Scalar>::buildFromMeshes(vector<pPolyMesh> &input_meshes,
                                            vector<bool> &atBoundary,
-                                           Scalar eps) {
+                                           Scalar eps,
+                                           bool simplify) {
 
     // [1] - Scale meshes_input into a united box
     meshes_input = input_meshes;
@@ -75,6 +78,10 @@ bool ContactGraph<Scalar>::buildFromMeshes(vector<pPolyMesh> &input_meshes,
 
     // [7] - assign node ID
     finalize();
+    contact_edges = edges;
+
+    // [8] - simplify contacts
+    if(simplify) simplifyEdges();
 
     return true;
 }
@@ -165,7 +172,7 @@ template<typename Scalar>
 void ContactGraph<Scalar>::getContactMesh(pPolyMesh &mesh) {
     mesh.reset();
     mesh = make_shared<PolyMesh<Scalar>>(getVarList());
-    for (pContactGraphEdge edge: edges) {
+    for (pContactGraphEdge edge: contact_edges) {
         for (pPolygon poly: edge->polygons) {
             pPolygon copy_poly = make_shared<_Polygon<Scalar>>(*poly);
             if(edge->partIDA > edge->partIDB){
@@ -285,7 +292,7 @@ void ContactGraph<Scalar>::listPotentialContacts(vector<bool> &atBoundary)
                     if (partI != partJ
                         && std::abs(nrmI.dot(nrmJ) + 1) < FLOAT_ERROR_LARGE
                         && (!atBoundary[partI] || !atBoundary[partJ])){
-                        contact_pairs.push_back(pairIJ(id, jd));
+                        contact_pairs.push_back(partI < partJ ? pairIJ(id, jd) : pairIJ(jd, id));
                     }
 
                 }
@@ -306,16 +313,18 @@ void ContactGraph<Scalar>::computeContacts()
 {
     size_t psize = contact_pairs.size();
     contact_graphedges.resize(psize);
-     for (size_t id = 0; id < psize; ++id) // Sequential loop
-    //tbb::parallel_for(tbb::blocked_range<size_t>(0, psize), [&](const tbb::blocked_range<size_t> &r)
+    //for (size_t id = 0; id < psize; ++id) // Sequential loop
+    tbb::parallel_for(tbb::blocked_range<size_t>(0, psize), [&](const tbb::blocked_range<size_t> &r)
     {
-        //for (size_t id = r.begin(); id != r.end(); ++id) {
+        for (size_t id = r.begin(); id != r.end(); ++id) {
+
 
             int planeI = contact_pairs[id].first;
             int planeJ = contact_pairs[id].second;
 
             vector<Vector3> polyI = contact_faces[planeI].polygon.lock()->getVertices();
             vector<Vector3> polyJ = contact_faces[planeJ].polygon.lock()->getVertices();
+
             vector<vector<Vector3>> contactPtLists;
 
             PolyPolyBoolean<Scalar> ppIntersec(getVarList());
@@ -341,7 +350,7 @@ void ContactGraph<Scalar>::computeContacts()
                 contact_graphedges[id] = make_shared<ContactGraphEdge<Scalar>>(contactPolys, contact_faces[planeI].nrm);
             }
         }
-    //});
+    });
 }
 
 /**
@@ -381,4 +390,84 @@ void ContactGraph<Scalar>::buildEdges() {
     }
 }
 
+/**
+ * @brief simplified the contact between two nodes, only compute their convex-hull
+ * @tparam Scalar
+ */
+template<typename Scalar>
+void ContactGraph<Scalar>::simplifyEdges()
+{
+    std::sort(contact_edges.begin(), contact_edges.end(), [&](pContactGraphEdge e0, pContactGraphEdge e1){
+        if(e0->partIDA < e1->partIDA)
+            return true;
+        if(e0->partIDA > e1->partIDA)
+            return false;
 
+        if(e0->partIDB < e1->partIDB)
+            return true;
+        if(e0->partIDB > e1->partIDB)
+            return false;
+
+        if (e0->normal[0] - e1->normal[0] < -FLOAT_ERROR_LARGE)
+            return true;
+        if (e0->normal[0] - e1->normal[0] > FLOAT_ERROR_LARGE)
+            return false;
+
+        if (e0->normal[1] - e1->normal[1] < -FLOAT_ERROR_LARGE)
+            return true;
+        if (e0->normal[1] - e1->normal[1] > FLOAT_ERROR_LARGE)
+            return false;
+
+        if (e0->normal[2] - e1->normal[2] < -FLOAT_ERROR_LARGE)
+            return true;
+        if (e0->normal[2] - e1->normal[2] > FLOAT_ERROR_LARGE)
+            return false;
+
+        return false;
+    });
+
+
+    edges.clear();
+    size_t sta = 0, end = 0;
+
+    while (sta < contact_edges.size()) {
+        for (end = sta + 1; end < contact_edges.size(); end++) {
+            if(!contact_edges[sta]->check_on_same_plane(contact_edges[end])){
+                break;
+            }
+        }
+
+        pContactGraphEdge edge;
+        if(end > sta + 1)
+        {
+            vector<Vector3> corner_points;
+            for(int id = sta; id < end; id++)
+            {
+                for(pPolygon poly: contact_edges[id]->polygons){
+                    vector<Vector3> poly_points = poly->getVertices();
+                    corner_points.insert(corner_points.end(), poly_points.begin(), poly_points.end());
+                }
+            }
+
+            Vector3 normal = contact_edges[sta]->normal, x_axis, y_axis;
+
+            vector<Vector3> convexhull_points;
+            ConvexHull2D<double> convexhull_solver;
+            convexhull_solver.compute(corner_points, normal, convexhull_points);
+
+            pPolygon convexhull_poly = make_shared<_Polygon<Scalar>>();
+            convexhull_poly->setVertices(convexhull_points);
+
+            edge = make_shared<ContactGraphEdge<Scalar>>(convexhull_poly , contact_edges[sta]->normal);
+        }
+        else{
+            edge = make_shared<ContactGraphEdge<Scalar>>(contact_edges[sta]->polygons, contact_edges[sta]->normal);
+        }
+
+        edge->partIDA = contact_edges[sta]->partIDA;
+        edge->partIDB = contact_edges[sta]->partIDB;
+        edges.push_back(edge);
+        sta = end;
+    }
+
+}

@@ -58,6 +58,39 @@ void ConvexHull2D<Scalar>::compute(const ListVector3 &in, ListVector3 &out)
 	reverse(out.begin(), out.end());
 }
 
+template<typename Scalar>
+void ConvexHull2D<Scalar>::compute(const ListVector3 &in, Vector3 normal, ListVector3 &out){
+
+    Vector3 center(0, 0, 0);
+    for(Vector3 pt: in){
+        center += pt;
+    }
+    center /= in.size();
+
+    Vector3 x_axis, y_axis;
+    x_axis = normal.cross(Vector3(1, 0, 0));
+    if(x_axis.norm() < FLOAT_ERROR_LARGE)
+        x_axis = normal.cross(Vector3(0, 1, 0));
+    x_axis.normalize();
+
+    y_axis = normal.cross(x_axis);
+    y_axis.normalize();
+
+    ListVector3 in2D;
+    for(Vector3 pt: in){
+        in2D.push_back(Vector3((pt - center).dot(x_axis), (pt - center).dot(y_axis), 0));
+    }
+
+    compute(in2D, out);
+
+    for(Vector3 &pt: out){
+        pt = pt[0] * x_axis + pt[1] * y_axis + center;
+    }
+
+    return;
+}
+
+
 
 
 // 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.

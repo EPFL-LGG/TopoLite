@@ -69,7 +69,26 @@ void load_ania(shared_ptr<InputVarList> varList,
     }
 }
 
+void load_bunny(shared_ptr<InputVarList> varList,
+                vector<shared_ptr<PolyMesh<double>>> &meshLists,
+                vector<nanogui::Color> &colors,
+                vector<bool> &atboundary){
+    //Read all Parts
+    bool textureModel;
+    for(int id = 1; id <= 80; id++){
+        char number[50];
+        sprintf(number, "%d.obj", id);
+        std::string part_filename = "data/Voxel/bunny/part_";
+        part_filename += number;
+        shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
 
+        meshLists.push_back(polyMesh);
+        atboundary.push_back(false);
+    }
+
+    atboundary[0] = true;
+}
 
 
 #endif //TOPOLITE_GUI_LOADSCENE_H

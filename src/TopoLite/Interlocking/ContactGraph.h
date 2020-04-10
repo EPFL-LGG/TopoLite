@@ -85,6 +85,7 @@ public:
 public:
     vector<pContactGraphNode> nodes;
     vector<pContactGraphEdge> edges;
+    vector<pContactGraphEdge> contact_edges;
     vector<std::pair<wpContactGraphNode, wpContactGraphNode>> merged_nodes;
 
     //automatic generate
@@ -107,7 +108,8 @@ public:
 
     bool buildFromMeshes(vector<pPolyMesh> &meshes,
                          vector<bool> &atBoundary,
-                         Scalar eps = 0.002);
+                         Scalar eps = 0.002,
+                         bool simplify = true);
 
 public:
 
@@ -144,6 +146,8 @@ private:
     void buildNodes(vector<bool> &atBoundary);
 
     void buildEdges();
+
+    void simplifyEdges();
 };
 
 #include "ContactGraph.cpp"
