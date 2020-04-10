@@ -35,7 +35,7 @@ PYBIND11_MODULE(pyTopo, m)
             .def("getCompasMesh", &PyPolyMesh::getCompasMesh);
 
     py::class_<PyContactGraph>(m, "PyContactGraph")
-            .def(py::init<const vector<PyPolyMesh> &, float>())
+            .def(py::init<const vector<PyPolyMesh> &, float, bool>())
             .def("getContacts", &PyContactGraph::getContacts)
             .def("numContacts", &PyContactGraph::numContacts)
             .def("mergeParts", &PyContactGraph::mergeParts);

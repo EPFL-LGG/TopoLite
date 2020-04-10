@@ -38,14 +38,14 @@ ContactGraph<Scalar>::~ContactGraph() {
  * @param meshes
  * @param atBoundary
  * @param eps
- * @param simplify : merges faces which on a same plane by its convexhull
+ * @param convexhull : merges faces which on a same plane by its convexhull
  * @return
  */
 template<typename Scalar>
 bool ContactGraph<Scalar>::buildFromMeshes(vector<pPolyMesh> &input_meshes,
                                            vector<bool> &atBoundary,
                                            Scalar eps,
-                                           bool simplify) {
+                                           bool convexhull) {
 
     // [1] - Scale meshes_input into a united box
     meshes_input = input_meshes;
@@ -81,7 +81,7 @@ bool ContactGraph<Scalar>::buildFromMeshes(vector<pPolyMesh> &input_meshes,
     contact_edges = edges;
 
     // [8] - simplify contacts
-    if(simplify) simplifyEdges();
+    if(convexhull) convexhullEdges();
 
     return true;
 }
@@ -395,7 +395,7 @@ void ContactGraph<Scalar>::buildEdges() {
  * @tparam Scalar
  */
 template<typename Scalar>
-void ContactGraph<Scalar>::simplifyEdges()
+void ContactGraph<Scalar>::convexhullEdges()
 {
     std::sort(contact_edges.begin(), contact_edges.end(), [&](pContactGraphEdge e0, pContactGraphEdge e1){
         if(e0->partIDA < e1->partIDA)

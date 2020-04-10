@@ -109,7 +109,7 @@ public:
     bool buildFromMeshes(vector<pPolyMesh> &meshes,
                          vector<bool> &atBoundary,
                          Scalar eps = 0.002,
-                         bool simplify = true);
+                         bool convexhull = true);
 
 public:
 
@@ -147,7 +147,7 @@ private:
 
     void buildEdges();
 
-    void simplifyEdges();
+    void convexhullEdges();
 };
 
 #include "ContactGraph.cpp"

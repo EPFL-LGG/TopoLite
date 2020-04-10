@@ -32,7 +32,7 @@ public:
 
 public:
 
-    PyContactGraph(const vector<PyPolyMesh> &pyPolymeshes, float contact_eps)
+    PyContactGraph(const vector<PyPolyMesh> &pyPolymeshes, float contact_eps, bool convexhull)
     {
         if(pyPolymeshes.empty() || pyPolymeshes.front().mesh_ == nullptr) return;
         graph = make_shared<ContactGraph<double>>(pyPolymeshes.front().mesh_->getVarList());
@@ -46,7 +46,7 @@ public:
             atBoundary.push_back(pyPolymeshes[id].atBoundary_);
         }
 
-        graph->buildFromMeshes(meshes, atBoundary, contact_eps);
+        graph->buildFromMeshes(meshes, atBoundary, contact_eps, convexhull);
         graph->finalize();
     }
 
