@@ -50,7 +50,7 @@ void load_ania(shared_ptr<InputVarList> varList,
                vector<bool> &atboundary)
 {
     {
-        std::string file_name[5] = {"piece0.obj", "piece1.obj", "piece2.obj", "piece3.obj", "piece4_tri.obj"};
+        std::string file_name[5] = { "piece4_tri.obj", "piece0.obj", "piece1.obj", "piece3.obj", "piece2.obj"};
         bool textureModel;
         for(int id = 0; id < 5; id++){
             char number[50];
@@ -62,10 +62,11 @@ void load_ania(shared_ptr<InputVarList> varList,
             meshLists.push_back(polyMesh);
             atboundary.push_back(false);
         }
-        atboundary[0] = true;
+        atboundary[0] = false;
         atboundary[1] = true;
         atboundary[2] = true;
         atboundary[3] = true;
+        atboundary[4] = true;
     }
 }
 

@@ -18,8 +18,9 @@ using namespace pybind11::literals; // to bring in the `_a` literal
 class PyInterlockCheck {
 public:
     enum OptSolverType{
-        CLP = 0,
-        AFFINE_SCALING = 1,
+        CLP_SIMPLEX = 0,
+        CLP_BARRIER = 1,
+        AFFINE_SCALING = 2,
     };
 
     enum InterlockType{
@@ -34,8 +35,11 @@ public:
     PyInterlockCheck(const PyContactGraph &pygraph, OptSolverType solver_type)
     {
         switch (solver_type){
-            case CLP:
-                solver = make_shared<InterlockingSolver_Clp<double>>(pygraph.graph, pygraph.graph->getVarList());
+            case CLP_SIMPLEX:
+                solver = make_shared<InterlockingSolver_Clp<double>>(pygraph.graph, pygraph.graph->getVarList(), SIMPLEX);
+                break;
+            case CLP_BARRIER:
+                solver = make_shared<InterlockingSolver_Clp<double>>(pygraph.graph, pygraph.graph->getVarList(), BARRIER);
                 break;
             case AFFINE_SCALING:
                 solver = make_shared<InterlockingSolver_AffineScaling<double>>(pygraph.graph, pygraph.graph->getVarList());

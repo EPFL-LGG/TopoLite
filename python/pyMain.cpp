@@ -47,7 +47,8 @@ PYBIND11_MODULE(pyTopo, m)
                     .def("checkInterlocking", &PyInterlockCheck::checkInterlocking);
 
     py::enum_<PyInterlockCheck::OptSolverType>(interlockCheck, "OptSolverType")
-            .value("CLP", PyInterlockCheck::OptSolverType::CLP)
+            .value("CLP_SIMPLEX", PyInterlockCheck::OptSolverType::CLP_SIMPLEX)
+            .value("CLP_BARRIER", PyInterlockCheck::OptSolverType::CLP_BARRIER)
             .export_values();
 
     py::enum_<PyInterlockCheck::InterlockType>(interlockCheck, "InterlockType")

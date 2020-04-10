@@ -134,7 +134,12 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
         else colUpper[id] = 1;
     }
 
-    return solveSimplex(data, rotationalInterlockingCheck, num_row, num_col, num_var, matrix, colLower, colUpper, objective, rowLower, rowUpper);
+    if(type == SIMPLEX){
+        return solveSimplex(data, rotationalInterlockingCheck, num_row, num_col, num_var, matrix, colLower, colUpper, objective, rowLower, rowUpper);
+    }
+    else{
+        return solveBarrier(data, rotationalInterlockingCheck, num_row, num_col, num_var, matrix, colLower, colUpper, objective, rowLower, rowUpper);
+    }
 }
 template<typename Scalar>
 bool InterlockingSolver_Clp<Scalar>::solveSimplex(pInterlockingData &data,

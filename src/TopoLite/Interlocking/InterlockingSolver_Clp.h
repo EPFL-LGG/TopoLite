@@ -9,6 +9,11 @@
 #include "ClpSimplex.hpp"
 #include "CoinHelperFunctions.hpp"
 
+enum CLP_SOLVER_TYPE{
+    SIMPLEX,
+    BARRIER
+};
+
 template <typename Scalar>
 class InterlockingSolver_Clp : public InterlockingSolver<Scalar>{
 public:
@@ -20,9 +25,11 @@ public:
     using InterlockingSolver<Scalar>::graph;
     typedef Matrix<Scalar, 3, 1> Vector3;
 
+    CLP_SOLVER_TYPE type;
+
 public:
-    InterlockingSolver_Clp(pContactGraph _graph, shared_ptr<InputVarList> varList)
-    : InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList)
+    InterlockingSolver_Clp(pContactGraph _graph, shared_ptr<InputVarList> varList, CLP_SOLVER_TYPE _type = SIMPLEX)
+    : InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList), type(_type)
     {
 
     }
