@@ -81,7 +81,49 @@ TEST_CASE("Bunny Example")
     }
 }
 
-TEST_CASE("Special Case"){
+
+TEST_CASE("Ania Example"){
+    std::string file_name[5] = { "piece4_tri.obj", "piece0.obj", "piece1.obj", "piece3.obj", "piece2.obj"};
+
+    vector<shared_ptr<PolyMesh<double>>> meshList;
+    vector<bool> atboundary;
+    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+    InitVarLite(varList.get());
+    bool textureModel;
+
+
+    for(int id = 0; id < 5; id++){
+        char number[50];
+        std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
+        part_filename += file_name[id];
+        shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+        meshList.push_back(polyMesh);
+        atboundary.push_back(true);
+    }
+
+    atboundary[0] = false;
+
+    shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
+    graph->buildFromMeshes(meshList, atboundary, 1e-3);
+
+    SECTION("Simplex Method"){
+        // solve the interlocking problem by using CLP library
+        InterlockingSolver_Clp<double> solver(graph, varList, SIMPLEX);
+        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
+    }
+
+    SECTION("Barrier Method"){
+        // solve the interlocking problem by using CLP library
+        InterlockingSolver_Clp<double> solver(graph, varList, BARRIER);
+        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
+    }
+
+}
+
+TEST_CASE("Ania Example: Special Case"){
     //Read all Parts
 
     std::string file_name[3] = {"piece0.obj", "piece1.obj", "piece4.obj"};
@@ -112,6 +154,4 @@ TEST_CASE("Special Case"){
     InterlockingSolver_Clp<double> solver(graph, varList);
     shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
     REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
-
-
 }

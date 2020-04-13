@@ -175,6 +175,8 @@ bool InterlockingSolver_Clp<Scalar>::solveSimplex(pInterlockingData &data,
         // Solution
         const double target_obj_value = model.rawObjectiveValue();
         double *solution = model.primalColumnSolution();
+        double *row_solution = model.primalRowSolution();
+
         double max_sol = 0;
         for(int id = num_var; id < num_col; id++){
             max_sol = std::max(solution[id], max_sol);
@@ -182,8 +184,14 @@ bool InterlockingSolver_Clp<Scalar>::solveSimplex(pInterlockingData &data,
 
         unpackSolution(data, rotationalInterlockingCheck, solution, num_var);
 
-        std::cout << "max_t:\t" << std::abs(max_sol) << std::endl;
-        std::cout << "average_t:\t" << std::abs(target_obj_value) / num_row << std::endl;
+        double min_row_sol = MAX_FLOAT;
+        for(int id = 0; id < num_row; id++){
+            min_row_sol = std::min(row_solution[id], min_row_sol);
+        }
+
+        std::cout << "min_row:\t" << min_row_sol; //should be around zero
+        std::cout << ",\tmax_t:\t" << std::abs(max_sol); //interlocking if max_t is around zero
+        std::cout << ",\taverage_t:\t" << std::abs(target_obj_value) / num_row << std::endl;//interlocking if average_t is around zero
         if(max_sol < 5e-6) {
             return true;
         }
@@ -216,7 +224,7 @@ bool InterlockingSolver_Clp<Scalar>::solveBarrier(pInterlockingData &data,
     int_model.loadProblem(matrix, colLower, colUpper, objective, rowLower, rowUpper);
     int_model.setCholesky(cholesky);
 
-//    int_model.setPrimalTolerance(1e-8);
+    int_model.setPrimalTolerance(1e-8);
 
     int_model.primalDual();
 
@@ -230,8 +238,18 @@ bool InterlockingSolver_Clp<Scalar>::solveBarrier(pInterlockingData &data,
 
     unpackSolution(data, rotationalInterlockingCheck, solution, num_var);
 
-    std::cout << "max_t:\t" << std::abs(max_sol) << std::endl;
-    std::cout << "average_t:\t" << std::abs(target_obj_value) / num_row << std::endl;
+    //verify solution
+
+    double *row_solution = int_model.primalRowSolution();
+
+    double min_row_sol = MAX_FLOAT;
+    for(int id = 0; id < num_row; id++){
+        min_row_sol = std::min(row_solution[id], min_row_sol);
+    }
+
+    std::cout << "min_row:\t" << min_row_sol; //should be around zero
+    std::cout << ",\tmax_t:\t" << std::abs(max_sol); //interlocking if max_t is around zero
+    std::cout << ",\taverage_t:\t" << std::abs(target_obj_value) / num_row << std::endl;//interlocking if average_t is around zero
     if(max_sol < 5e-6) {
         return true;
     }

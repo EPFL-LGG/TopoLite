@@ -12,6 +12,7 @@ float edgeFactor(float3 vBC){
     return min(min(a3.x, a3.y), a3.z);
 }
 
+
 fragment float4 fragment_main(  constant bool &show_wireframe,
                                 constant bool &show_face,
                                 VertexOut in [[stage_in]])

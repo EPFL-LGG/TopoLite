@@ -206,11 +206,15 @@ public:
             }
         }
 
+        for(shared_ptr<PolyMesh<double>> mesh: meshLists){
+            mesh->mergeFaces();
+        }
+
         // construct the contact graph
         graph = make_shared<ContactGraph<double>>(varList);
         graph->buildFromMeshes(meshLists, atboundary, 1e-3);
         // solve the interlocking problem by using CLP library
-        InterlockingSolver_Clp<double> solver(graph, varList);
+        InterlockingSolver_Clp<double> solver(graph, varList, BARRIER);
         shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
         solver.isRotationalInterlocking(interlockData);
 
