@@ -45,7 +45,10 @@ public:  //buffers
 
 public: // uniform
     using gui_RenderObject<Scalar>::varList;
-    using gui_RenderObject<Scalar>::mvp;
+    using gui_RenderObject<Scalar>::proj;
+    using gui_RenderObject<Scalar>::model;
+    using gui_RenderObject<Scalar>::view;
+    using gui_RenderObject<Scalar>::eye;
     using gui_RenderObject<Scalar>::simtime;
 
 public:
@@ -126,7 +129,7 @@ public:
     void update_buffer(){
         //init buffer_positions
         int num_vertices = 0;
-        object_center = Eigen::Vector3f(0, 0, 0);
+        object_center = Eigen::Vector3d(0, 0, 0);
         buffer_positions.clear();
         buffer_barycentric.clear();
 
@@ -147,14 +150,12 @@ public:
         for(size_t mID = 0; mID < meshLists.size(); mID++)
         {
             wpPolyMesh mesh = meshLists[mID];
-            nanogui::Color mesh_color = object_colors[mID];
-            Vector3 mesh_buffer_translation = ani_translation[mID];
             for(pPolygon polygon: mesh.lock()->polyList)
             {
                 Vector3 face_center = polygon->center();
                 for(size_t id = 0; id < polygon->vers.size(); id++)
                 {
-                    object_center = object_center + Eigen::Vector3f(polygon->vers[id]->pos.x(), polygon->vers[id]->pos.y(), polygon->vers[id]->pos.z());
+                    object_center = object_center + polygon->vers[id]->pos;
                     num_vertices ++;
 
                     Vector3 sta = polygon->vers[id]->pos;
@@ -207,7 +208,7 @@ public:
     void update_uniform(){
         shader->set_uniform("show_wireframe", varList->template get<bool>("show_wireframe"));
         shader->set_uniform("show_face", varList->template get<bool>("show_face"));
-        shader->set_uniform("mvp", gui_RenderObject<Scalar>::toNanoguiMatrix(mvp));
+        shader->set_uniform("mvp", this->toNanoguiMatrix(proj * view * model));
         shader->set_uniform("simtime", simtime);
     }
 };

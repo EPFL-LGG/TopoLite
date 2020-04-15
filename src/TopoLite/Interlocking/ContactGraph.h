@@ -147,7 +147,7 @@ private:
 
     void buildEdges();
 
-    void convexhullEdges();
+    void computeConvexHullofEdgePolygons();
 };
 
 #include "ContactGraph.cpp"

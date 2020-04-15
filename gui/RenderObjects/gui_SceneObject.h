@@ -18,11 +18,12 @@ public:
     nanogui::ref<nanogui::RenderPass> render_pass;
     AnimationState state;
     float simtime;
+
 public:
 
     Eigen::Vector3f focus(){
         if(objects.size() >= 1){
-            return objects[0]->object_center;
+            return Eigen::Vector3f(objects[0]->object_center.x(), objects[0]->object_center.y(), objects[0]->object_center.z());
         }
         else{
             return Eigen::Vector3f(0, 0, 0);
@@ -50,9 +51,27 @@ public:
         state = _state;
     }
 
-    void update_mvp(Eigen::Matrix4f mvp){
+    void update_proj(Eigen::Matrix4f proj){
         for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
-            object->mvp = mvp;
+            object->proj = proj;
+        }
+    }
+
+    void update_model(Eigen::Matrix4f model){
+        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+            object->model = model;
+        }
+    }
+
+    void update_view(Eigen::Matrix4f view){
+        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+            object->view = view;
+        }
+    }
+
+    void update_eye(Eigen::Vector3f eye){
+        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+            object->eye = eye;
         }
     }
 

@@ -130,7 +130,12 @@ public:
         return none;
     }
 
-    pPolyMesh getPolyMesh();
+    pPolyMesh getPolyMesh() const{
+        pPolyMesh polymesh = make_shared<PolyMesh<Scalar>>(*(PolyMesh<Scalar> *) this);
+        for(int id = 0; id < PolyMesh<Scalar>::polyList.size(); id++){
+        }
+        return polymesh;
+    }
 
 public:
 

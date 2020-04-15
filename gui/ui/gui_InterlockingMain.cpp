@@ -44,11 +44,9 @@
 #include <cmath>
 #include <filesystem>
 
-#include "../RenderObject/gui_SceneObject.h"
-#include "../RenderObject/gui_PolyMeshLists.h"
+#include "gui_SceneObject.h"
+#include "gui_PolyMeshLists.h"
 
-#include "Interlocking/ContactGraph.h"
-#include "Interlocking/InterlockingSolver_Clp.h"
 #include "gui_ArcballScene.h"
 #include "gui_LoadScene.h"
 
@@ -64,21 +62,21 @@ public:
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            scene.objects[0]->update_attr("show_wireframe", check);
+            scene->objects[0]->update_attr("show_wireframe", check);
             return check;
         });
 
         checkbox = new nanogui::CheckBox(window, "faces");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            scene.objects[0]->update_attr("show_face", check);
+            scene->objects[0]->update_attr("show_face", check);
             return check;
         });
 
         checkbox = new nanogui::CheckBox(window, "contact");
         checkbox->set_checked(false);
         checkbox->set_callback([&](bool check){
-            scene.objects[1]->visible = check;
+            scene->objects[1]->visible = check;
             return check;
         });
 
@@ -94,19 +92,19 @@ public:
 
         play->set_callback([&](){
             prev_animate_state = Run;
-            scene.update_state(prev_animate_state);
+            scene->update_state(prev_animate_state);
             return true;
         });
 
         pause->set_callback([&](){
             prev_animate_state = Pause;
-            scene.update_state(prev_animate_state);
+            scene->update_state(prev_animate_state);
             return true;
         });
 
         stop->set_callback([&](){
             prev_animate_state = Stop;
-            scene.update_state(prev_animate_state);
+            scene->update_state(prev_animate_state);
             return true;
         });
 
@@ -146,7 +144,7 @@ public:
 
         timeline_slider->set_callback([&](float value) {
             text_box_timeline->set_value(float_to_string(value, 3));
-            scene.update_simtime(value / maximum_time_one_unit);
+            scene->update_simtime(value / maximum_time_one_unit);
         });
 
         perform_layout();
@@ -171,15 +169,16 @@ public:
                 prev_animate_state = Pause;
                 pause->set_pushed(true);
                 play->set_pushed(false);
-                scene.update_state(prev_animate_state);
+                scene->update_state(prev_animate_state);
             }
             else if(prev_animate_state != Run){
                 prev_animate_state = Run;
                 play->set_pushed(true);
                 pause->set_pushed(false);
-                scene.update_state(prev_animate_state);
+                scene->update_state(prev_animate_state);
             }
         }
+
         return false;
     }
 
@@ -190,74 +189,10 @@ public:
     ********************************************************************************************/
 
 
-    void init_mesh(shared_ptr<InputVarList> varList,
-                   vector<shared_ptr<PolyMesh<double>>> &meshLists,
-                   vector<nanogui::Color> &colors,
-                   vector<bool> &atboundary){
-
-        if(colors.empty()){
-            for(int id = 0; id < atboundary.size(); id++){
-                if(atboundary[id]){
-                    colors.push_back(nanogui::Color(100, 100 ,100 ,255));
-                }
-                else{
-                    colors.push_back(nanogui::Color(255, 255 ,255 ,255));
-                }
-            }
-        }
-
-        for(shared_ptr<PolyMesh<double>> mesh: meshLists){
-            mesh->mergeFaces();
-        }
-
-        // construct the contact graph
-        graph = make_shared<ContactGraph<double>>(varList);
-        graph->buildFromMeshes(meshLists, atboundary, 1e-3);
-        // solve the interlocking problem by using CLP library
-        InterlockingSolver_Clp<double> solver(graph, varList, BARRIER);
-        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-        solver.isRotationalInterlocking(interlockData);
-
-        shared_ptr<gui_PolyMeshLists<double>> polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, m_render_pass);
-
-        double max_length = 5;
-        for(int id = 0; id < polyMeshLists->ani_translation.size(); id++){
-            max_length = std::max(max_length, interlockData->traslation[id].norm());
-            max_length = std::max(max_length, interlockData->rotation[id].norm());
-        }
-
-        for(int id = 0; id < polyMeshLists->ani_translation.size(); id++){
-            polyMeshLists->ani_translation[id] = interlockData->traslation[id] / max_length;
-            polyMeshLists->ani_rotation[id] = interlockData->rotation[id] / max_length;
-            polyMeshLists->ani_center[id] = interlockData->center[id];
-        }
-
-
-        polyMeshLists->update_buffer();
-        scene.objects.push_back(polyMeshLists);
-
-        {
-            colors.clear();
-            colors.push_back(nanogui::Color(255, 0, 0, 255));
-            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            graph->getContactMesh(polyMesh);
-            meshLists.clear();
-            meshLists.push_back(polyMesh);
-            polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, m_render_pass);
-            scene.objects.push_back(polyMeshLists);
-            polyMeshLists->visible = false;
-        }
-    }
-
     void init_mesh()
     {
-        shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-        InitVarLite(varList.get());
-        vector<shared_ptr<PolyMesh<double>>> meshLists;
-        vector<nanogui::Color> colors;
-        vector<bool> atboundary;
-        load_ania(varList, meshLists, colors, atboundary);
-        init_mesh(varList, meshLists, colors, atboundary);
+        gui_LoadScene loader(scene);
+        loader.loadAnia();
     }
 
     virtual void draw(NVGcontext *ctx) {
@@ -266,44 +201,39 @@ public:
     }
 
     virtual void draw_contents() {
-        Eigen::Matrix4f model, view, proj;
-        computeCameraMatrices(model, view, proj);
-
         if(!play->pushed() && !pause->pushed() && !stop->pushed()){
             if(prev_animate_state == Run){
-                scene.update_state(Stop);
+                scene->update_state(Stop);
             }
             if(prev_animate_state == Pause){
-                scene.update_state(Run);
+                scene->update_state(Run);
                 play->set_pushed(true);
             }
-            scene.update_state(prev_animate_state);
+            scene->update_state(prev_animate_state);
         }
 
-        Eigen::Matrix4f mvp = proj * view * model;
-        scene.update_mvp(mvp);
+        scene->update_time((float)glfwGetTime(), animation_speed);
 
-        scene.update_time((float)glfwGetTime(), animation_speed);
 
         if(timeline_slider->value() > maximum_time_one_unit && Run){
-            scene.update_state(Pause);
+            scene->update_state(Pause);
             pause->set_pushed(true);
             play->set_pushed(false);
             prev_animate_state = Pause;
         }
 
-        timeline_slider->set_value(scene.simtime * maximum_time_one_unit);
-        text_box_timeline->set_value(float_to_string(scene.simtime * maximum_time_one_unit, 3) );
+        timeline_slider->set_value(scene->simtime * maximum_time_one_unit);
+        text_box_timeline->set_value(float_to_string(scene->simtime * maximum_time_one_unit, 3) );
 
-        /* MVP uniforms */
-       scene.draw();
+        gui_ArcballScene::draw_contents();
     }
-
 private:
-    shared_ptr<ContactGraph<double>>graph;
     nanogui::ToolButton *play, *pause, *stop;
     nanogui::TextBox *text_box_speed, *text_box_timeline;
     nanogui::Slider *timeline_slider, *speed_slider;
+
+public:
+    //animation
     AnimationState prev_animate_state;
     float animation_speed = 0.1;
     float minimum_time_one_unit = 3;

@@ -36,12 +36,16 @@
 #include <cmath>
 #include <filesystem>
 
+#include "gui_Arcball.h"
+#include "gui_SceneObject.h"
+
 
 class gui_ArcballScene : public nanogui::Screen {
 public:
     gui_ArcballScene() : Screen(nanogui::Vector2i(1024, 768), "TopoLite GUI", false)
     {
         inc_ref();
+        scene = make_shared<gui_SceneObject<double>>();
         init_render_pass();
     }
 
@@ -62,7 +66,7 @@ public:
             camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
             camera_.modelZoom = 2;
             camera_.eye = Eigen::Vector3f(0, 0, 5);
-            camera_.center = scene.focus();
+            camera_.center = scene->focus();
             camera_.up = Eigen::Vector3f(0, 1, 0);
             return true;
         }
@@ -71,7 +75,7 @@ public:
             camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
             camera_.modelZoom = 2;
             camera_.eye = Eigen::Vector3f(0, -5, 0);
-            camera_.center = scene.focus();
+            camera_.center = scene->focus();
             camera_.up = Eigen::Vector3f(0, 0, 1);
             return true;
         }
@@ -80,10 +84,11 @@ public:
             camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
             camera_.modelZoom = 2;
             camera_.eye = Eigen::Vector3f(5, 0, 0);
-            camera_.center = scene.focus();
+            camera_.center = scene->focus();
             camera_.up = Eigen::Vector3f(0, 0, 1);
             return true;
         }
+
         return false;
     }
 
@@ -119,7 +124,7 @@ public:
                 Eigen::Matrix4f model, view, proj;
                 computeCameraMatrices(model, view, proj);
 
-                Eigen::Vector3f mesh_center = scene.focus();
+                Eigen::Vector3f mesh_center = scene->focus();
 
                 float zval = project(mesh_center, view * model, proj, m_size).z();
                 Eigen::Vector3f pos1 = unproject(
@@ -159,7 +164,7 @@ public:
         camera_.arcball = gui_Arcball();
         camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
         camera_.modelZoom = 2;
-        camera_.modelTranslation = -scene.focus();
+        camera_.modelTranslation = -scene->focus();
     }
 
     void init_render_pass(){
@@ -179,7 +184,7 @@ public:
         m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
         m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);
 
-        scene.render_pass = m_render_pass;
+        scene->render_pass = m_render_pass;
     }
 
     std::string float_to_string(float a_value, int n){
@@ -189,9 +194,22 @@ public:
         return out.str();
     }
 
+    virtual void draw_contents() {
+        Eigen::Matrix4f model, view, proj;
+        computeCameraMatrices(model, view, proj);
+
+        scene->update_proj(proj);
+        scene->update_view(view);
+        scene->update_model(model);
+        scene->update_eye(camera_.eye);
+
+        /* MVP uniforms */
+        scene->draw();
+    }
+
 public:
     //shader and render pass
-    gui_SceneObject<double> scene;
+    shared_ptr<gui_SceneObject<double>> scene;
     nanogui::ref<nanogui::RenderPass> m_render_pass;
 
 private:
@@ -212,6 +230,8 @@ private:
 
     bool translate_ = false;
     Eigen::Vector2i translateStart_ = Eigen::Vector2i(0, 0);
+
+
 };
 
 

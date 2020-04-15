@@ -81,7 +81,7 @@ bool ContactGraph<Scalar>::buildFromMeshes(vector<pPolyMesh> &input_meshes,
     contact_edges = edges;
 
     // [8] - simplify contacts
-    if(convexhull) convexhullEdges();
+    if(convexhull) computeConvexHullofEdgePolygons();
 
     return true;
 }
@@ -395,7 +395,7 @@ void ContactGraph<Scalar>::buildEdges() {
  * @tparam Scalar
  */
 template<typename Scalar>
-void ContactGraph<Scalar>::convexhullEdges()
+void ContactGraph<Scalar>::computeConvexHullofEdgePolygons()
 {
     std::sort(contact_edges.begin(), contact_edges.end(), [&](pContactGraphEdge e0, pContactGraphEdge e1){
         if(e0->partIDA < e1->partIDA)

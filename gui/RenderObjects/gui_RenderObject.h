@@ -6,6 +6,7 @@
 #define TOPOLITE_GUI_RENDEROBJECT_H
 #include <vector>
 #include "TopoLite/IO/InputVar.h"
+#include "nanogui/vector.h"
 using std::vector;
 
 enum AnimationState{
@@ -19,7 +20,7 @@ class gui_RenderObject{
 
 public:
     vector<nanogui::Color> object_colors;
-    Eigen::Vector3f object_center;
+    Eigen::Vector3d object_center;
 
 public: //shader and render pass
     nanogui::ref<nanogui::RenderPass> render_pass;
@@ -34,7 +35,11 @@ public:  //buffers
     vector<float> buffer_colors;
 
 public: // uniform
-    Eigen::Matrix4f mvp;
+    Eigen::Matrix4f proj;
+    Eigen::Matrix4f model;
+    Eigen::Matrix4f view;
+    Eigen::Vector3f eye;
+
     float simtime;
     bool visible;
 
@@ -45,7 +50,10 @@ public:
     gui_RenderObject(nanogui::ref<nanogui::RenderPass> _render_pass){
         simtime = prev_time = 0;
         state = Stop;
-        mvp = Eigen::Matrix4f::Identity();
+        model = Eigen::Matrix4f::Identity();
+        view = Eigen::Matrix4f::Identity();
+        proj = Eigen::Matrix4f::Identity();
+        eye = Eigen::Vector3f::Zero();
         render_pass = _render_pass;
         visible = true;
         varList = make_shared<InputVarList>();
@@ -88,6 +96,10 @@ public:
             }
         }
         return nanomat;
+    }
+
+    nanogui::Vector3f toNanoguiVector(Eigen::Vector3f vec){
+        return nanogui::Vector3f(vec.x(), vec.y(), vec.z());
     }
 
     template<typename AttrType>
