@@ -1,6 +1,8 @@
 //
 // Created by ziqwang on 2020-02-03.
 //
+// bug: we keep this here for now but it is not working.
+//
 
 #include "InterlockingSolver_AffineScaling.h"
 

@@ -32,9 +32,9 @@ public:
 public:
 
     struct InterlockingData{
-        stdvec_Vector3 traslation;
-        stdvec_Vector3 rotation;
-        stdvec_Vector3 center;
+        stdvec_Vector3 traslation;  // translation velocity
+        stdvec_Vector3 rotation;    // rotation velocity
+        stdvec_Vector3 center;      // rotational center
     };
 
     struct EquilibriumData{
@@ -88,9 +88,9 @@ public:
 
     void computeTranslationalInterlockingMatrix(vector<EigenTriple> &tri, Eigen::Vector2i &size);
 
-    void computeRotationalInterlockingMatrix(vector<EigenTriple> &tri, Eigen::Vector2i &size);
+    void computeRotationalInterlockingMatrix(vector<EigenTriple> &tri, Eigen::Vector2i &size);      // used to compute A
 
-    void computeRotationalInterlockingMatrixDense(Eigen::MatrixXd &mat);
+    void computeRotationalInterlockingMatrixDense(Eigen::MatrixXd &mat);                            // used to compute A
 
     void computeTranslationalInterlockingMatrixDense(Eigen::MatrixXd &mat);
 

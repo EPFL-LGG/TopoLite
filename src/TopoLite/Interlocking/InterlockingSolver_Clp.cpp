@@ -43,6 +43,7 @@ bool InterlockingSolver_Clp<Scalar>::isRotationalInterlocking(InterlockingSolver
         return false;
     }
 
+    // Ignore this for lpopt - Enlarging the matrix
     int num_var = size[1];
     InterlockingSolver<Scalar>::appendAuxiliaryVariables(tris, size);
     InterlockingSolver<Scalar>::appendMergeConstraints(tris, size, true);
@@ -81,12 +82,11 @@ bool InterlockingSolver_Clp<Scalar>::checkSpecialCase(  pInterlockingData &data,
 }
 
 template<typename Scalar>
-bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlockingData& data,
-                                                vector<EigenTriple> &tris,
-                                                bool rotationalInterlockingCheck,
-                                                int num_row,
-                                                int num_col,
-                                                int num_var)
+bool InterlockingSolver_Clp<Scalar>::solve(InterlockingSolver_Clp::pInterlockingData& data, vector<EigenTriple> &tris,
+                                           bool rotationalInterlockingCheck,
+                                           int num_row,
+                                           int num_col,
+                                           int num_var)
 {
 
     //Problem definition
@@ -108,6 +108,8 @@ bool InterlockingSolver_Clp<Scalar>::solve(     InterlockingSolver_Clp::pInterlo
 
 
     CoinPackedMatrix matrix(true, num_row, num_col, spatMat.nonZeros(), spatMat.valuePtr(), spatMat.innerIndexPtr(), spatMat.outerIndexPtr(), spatMat.innerNonZeroPtr());
+
+    // boundaries for rows and colums values
 
     double* objective = new double[num_col];
     double* rowLower = new double[num_row];
