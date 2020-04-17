@@ -8,6 +8,8 @@
 
 #include "Interlocking/InterlockingSolver_Clp.h"
 #include "IO/XMLIO.h"
+#include "ClpSimplex.hpp"
+
 
 typedef Eigen::SparseMatrix<double> SpMat;
 typedef Eigen::Triplet<double> T;
@@ -44,28 +46,46 @@ TEST_CASE("Simple case - SolveSimplex") {
 
     // boundaries for rows and columns values
 
-    auto *objective(new double[num_var]);
-    auto *constraintLower(new double[num_row]);
-    auto *constraintUpper(new double[num_row]);
-    auto *varLower(new double[num_var]);
-    auto *varUpper(new double[num_var]);
+    auto *objective(new double[num_var]);           // objective function params
+    auto *constraintLower(new double[num_row]);     // E1...E3 lower bounds
+    auto *constraintUpper(new double[num_row]);     // E1...E3 upper bounds
+    auto *varLower(new double[num_var]);            // E4
+    auto *varUpper(new double[num_var]);            // E4
 
+    // E4
     for (size_t id = 0; id < num_var; id++) {
         varLower[id] = 0;
         varUpper[id] = COIN_DBL_MAX;
     }
 
+    // Objective func + Ei for i in [1,2,3]
+    printf("Definition of the problem\n");
     for (size_t id = 0; id < num_row; id++) {
         constraintLower[id] = -COIN_DBL_MAX;
         constraintUpper[id] = rhs[id];
         objective[id] = objective_function[id];
-//        cout << id << " " << rhs[id] << endl;
+        printf("%zu %E %E %E \n", id, constraintLower[id], constraintUpper[id], objective[id]);
     }
 
-    solver.solveSimplex(data, false, num_row, num_col, num_var, matrix,
-                        varLower, varUpper,
-                        objective,
-                        constraintLower, constraintUpper);
+    printf("Optimization - start\n");
+    ClpSimplex model;
+    CoinMessageHandler handler;
+    handler.setLogLevel(4);
+    model.passInMessageHandler(&handler);
+    model.newLanguage(CoinMessages::us_en);
+    model.loadProblem(matrix, varLower, varUpper, objective, constraintLower, constraintUpper);
+    model.setPrimalTolerance(1e-5);
+    model.primal();
+    // Get the solution
+    const double obj_solution = model.rawObjectiveValue();
+    double *solution = model.primalColumnSolution();
+    double *row_solution = model.primalRowSolution();
 
-    printf("Hello");
+    for (size_t id = 0; id <num_var; id++)
+        printf("x[%zu] = %E\n", id+1, solution[id]);
+    for (size_t id = 0; id < num_row; id++)
+        printf("E[%zu] = %E\n", id+1, row_solution[id]);
+
+
+    printf("Optimization - done");
 }
