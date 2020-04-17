@@ -63,7 +63,7 @@ TEST_CASE("Simple case - SolveSimplex") {
     for (size_t id = 0; id < num_row; id++) {
         constraintLower[id] = -COIN_DBL_MAX;
         constraintUpper[id] = rhs[id];
-        objective[id] = objective_function[id];
+        objective[id] = -objective_function[id];
         printf("%zu %E %E %E \n", id, constraintLower[id], constraintUpper[id], objective[id]);
     }
 
