@@ -296,12 +296,8 @@ public:
      * @param _mesh
      */
     PolyMesh_AABBTree(const PolyMesh<Scalar> &_mesh)
-    :PolyMesh<Scalar>::PolyMesh(_mesh.getVarList())
+    :PolyMesh<Scalar>::PolyMesh(_mesh)
     {
-        PolyMesh<Scalar>::polyList = _mesh.polyList;
-        PolyMesh<Scalar>::vertexList = _mesh.vertexList;
-        PolyMesh<Scalar>::textureList = _mesh.textureList;
-        PolyMesh<Scalar>::texturedModel = _mesh.texturedModel;
     }
 
 public:

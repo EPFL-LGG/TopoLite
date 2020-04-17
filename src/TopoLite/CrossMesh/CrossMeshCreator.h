@@ -15,26 +15,58 @@
 #ifndef _MODEL_H
 #define _MODEL_H
 
-#include "TopoLite/Utility/vec.h"
 #include "TopoLite/Utility/TopoObject.h"
 #include "TopoLite/Mesh/CrossMesh.h"
-
 #include "TopoLite/Mesh/PolyMesh_AABBTree.h"
-#include "igl/AABB.h"
+#include "BaseMeshCreator.h"
+#include "AugmentedVectorCreator.h"
 #include "Eigen/Dense"
 #include <vector>
-
-using pCrossMesh = shared_ptr<CrossMesh>;
-
+#include "igl/lscm.h"
 
 /*!
  * CrossMesh = BaseMesh + AugmentedVector
  */
+template <typename Scalar>
 class CrossMeshCreator : public TopoObject
 {
 public:
 
-	pPolyMesh referenceSurface;      //<! Polygonal mesh of the reference surface model
+    typedef shared_ptr<PolyMesh_AABBTree<Scalar>> pPolyMeshAABB;
+
+    typedef weak_ptr<PolyMesh_AABBTree<Scalar>> wpPolyMeshAABB;
+
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
+
+    typedef weak_ptr<PolyMesh<Scalar>> wpPolyMesh;
+
+    typedef shared_ptr<CrossMesh<Scalar>> pCrossMesh;
+
+    typedef weak_ptr<CrossMesh<Scalar>> wpCrossMesh;
+
+    typedef shared_ptr<_Polygon<Scalar>> pPolygon;
+
+    typedef weak_ptr<_Polygon<Scalar>> wpPolygon;
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef Matrix<Scalar, 2, 1> Vector2;
+
+    typedef shared_ptr<VTex<Scalar>> pVTex;
+
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
+
+    typedef Matrix<Scalar, 4, 4> Matrix4;
+
+    typedef std::unordered_map<Cross<Scalar> *, int> mapCrossInt;
+
+public:
+
+	pPolyMeshAABB referenceSurface;      //<! Polygonal mesh of the reference surface model
 
 	pCrossMesh crossMesh;           //<! Cross mesh
 
@@ -42,18 +74,7 @@ public:
 
 public:
 
-    double textureNormalizeMat[16];          //<! Transform the texture coordinates to be within [0, 1]
-
-    shared_ptr<QuadTree> quadTree;
-
-	shared_ptr<igl::AABB<Eigen::MatrixXd,3>> aabbTree;
-
-	shared_ptr<Eigen::MatrixXd> aabbV;
-
-	shared_ptr<Eigen::MatrixXi> aabbF;
-
 	int default_patternRadius;
-
 	int default_patternID;
 
 public:
@@ -61,7 +82,7 @@ public:
     CrossMeshCreator(shared_ptr<InputVarList> var);
 	~CrossMeshCreator();
 
-	void ClearModel();
+	void clear();
 
 	/*!
 	 * \brief: load a .obj model from file
@@ -84,32 +105,17 @@ public:
 	 * \param patternRadius: how many polygons the pattern has (the size the of the pattern)
 	 * \param interactMatrix: User interaction of the pattern (scale, rotate, translate)
 	 */
-    bool CreateCrossMesh(   bool previewMode,
-	                        double interactMatrix[]);
+    bool createCrossMesh(   bool previewMode,
+                            Matrix4 textureMat);
 
-    bool UpdateTiltRange();
+    bool updateTiltRange();
 
-public:
+private:
 
-    /*!
-    * \brief: For correct texture scale
-    */
-    void ComputeTextureNormalizeMatrix();
-
-    /*!
-     * \brief: Compute the correct texture
-     */
-    void ComputeTextureMatrix(double interactMatrix[], double textureMatrix[16]);
-
-
-public:
-
-	void OverwriteTexture();
-
-	void CreateQuadTree();
-
-	void CreateAABBTree();
+	void recomputeTexture();
 };
+
+#include "CrossMeshCreator.cpp"
 
 #endif
 

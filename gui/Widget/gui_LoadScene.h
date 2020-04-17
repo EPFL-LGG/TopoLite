@@ -13,6 +13,9 @@
 #include "Mesh/CrossMesh.h"
 #include "CrossMesh/AugmentedVectorCreator.h"
 #include "CrossMesh/BaseMeshCreator.h"
+#include "IO/XMLIO.h"
+#include "CrossMesh/PatternCreator.h"
+#include "CrossMesh/CrossMeshCreator.h"
 using std::weak_ptr;
 class gui_LoadScene
 {
@@ -259,6 +262,67 @@ public:
         linegroups.push_back(lg);
 
         shared_ptr<gui_Lines<double>> LinesObject = make_shared<gui_Lines<double>>(linegroups, 0.03, scene.lock()->render_pass);
+        scene.lock()->objects.push_back(LinesObject);
+        LinesObject->visible = true;
+    }
+
+    void loadminimalsurface(){
+        shared_ptr<InputVarList> varList;
+        varList = make_shared<InputVarList>();
+        InitVarLite(varList.get());
+
+        std::shared_ptr<PolyMesh_AABBTree<double>> _polyMesh;
+        std::shared_ptr<CrossMesh<double>> _pattern2D;
+
+        XMLIO IO;
+
+        // read xml
+        std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
+        XMLData data;
+        IO.XMLReader(xmlFileName.c_str(), data);
+
+        // read polyMesh
+        std::filesystem::path surface_objfile(UNITTEST_DATAPATH);
+        surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
+
+        bool texturedModel;
+        _polyMesh = make_shared<PolyMesh_AABBTree<double>>(data.varList);
+        _polyMesh->readOBJModel(surface_objfile.c_str(), texturedModel, true);
+
+        _polyMesh->buildTexTree();
+        data.varList->set("minCrossArea", 0.2f);
+
+        Eigen::Matrix4d interactMat;
+        interactMat << data.interactMatrix[0], data.interactMatrix[4], data.interactMatrix[8], data.interactMatrix[12],
+                data.interactMatrix[1], data.interactMatrix[5], data.interactMatrix[9], data.interactMatrix[13],
+                data.interactMatrix[2], data.interactMatrix[6], data.interactMatrix[10], data.interactMatrix[14],
+                data.interactMatrix[3], data.interactMatrix[7], data.interactMatrix[11], data.interactMatrix[15];
+
+
+        vector<nanogui::Color> colors;
+        colors.push_back(nanogui::Color(200, 200 ,200, 255));
+
+        CrossMeshCreator crossMeshCreator();
+
+        meshLists.push_back(crossMesh->getPolyMesh());
+
+        shared_ptr<gui_PolyMeshLists<double>> polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, scene.lock()->render_pass);
+        scene.lock()->objects.push_back(polyMeshLists);
+
+        vector<gui_LinesGroup<double>> linegroups;
+        gui_LinesGroup<double> lg;
+        lg.color = nanogui::Color(200, 100, 0, 255);
+        for(int id = 0; id < crossMesh->size(); id++){
+            shared_ptr<Cross<double>> cross = crossMesh->cross(id);
+            for(int jd = 0; jd < cross->size(); jd++){
+                shared_ptr<OrientPoint<double>> ori = cross->ori(jd);
+                lg.lines.push_back(Line<double>(ori->point, ori->point + ori->normal * 0.03));
+            }
+        }
+        linegroups.push_back(lg);
+
+        shared_ptr<gui_Lines<double>> LinesObject = make_shared<gui_Lines<double>>(linegroups, 0.01, scene.lock()->render_pass);
         scene.lock()->objects.push_back(LinesObject);
         LinesObject->visible = true;
     }

@@ -46,6 +46,44 @@ void PolyMesh<Scalar>::clear()
 }
 
 /*
+ * Construct From a Eigen Mesh
+ */
+
+template<typename Scalar>
+void PolyMesh<Scalar>::fromEigenMesh(const MatrixX &V, const MatrixX &T, const MatrixXi &F){
+    clear();
+
+    size_t psize = F.rows();
+
+    //add vertex
+    for(int id = 0; id < V.rows(); id++){
+        pVertex vertex = make_shared<VPoint>(V.row(id));
+        vertex->verID = id;
+        vertexList.push_back(vertex);
+    }
+
+    //add tex
+    for(int id = 0; id < T.rows(); id++){
+        pVTex tex = make_shared<VTex>(T.row(id));
+        tex->texID = id;
+        textureList.push_back(tex);
+    }
+
+    //add polygons
+    for(int id = 0; id < F.rows(); id++){
+        pPolygon polygon = make_shared<_Polygon<Scalar>>();
+        for(int jd = 0; jd < 3; jd++){
+            polygon->vers.push_back(vertexList[F(id, jd)]);
+            polygon->texs.push_back(textureList[F(id, jd)]);
+        }
+    }
+
+    texturedModel = true;
+    return;
+}
+
+
+/*
  * Defines vertices for a list of polygons
  */
 template<typename Scalar>
