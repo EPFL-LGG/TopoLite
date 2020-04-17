@@ -87,7 +87,7 @@ public:
     void init_mesh()
     {
         gui_LoadScene loader(scene);
-        loader.loadAugmentationVector();
+        loader.loadminimalsurface();
         refresh_trackball_center();
     }
 

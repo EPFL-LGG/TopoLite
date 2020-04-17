@@ -13,13 +13,13 @@
 #include "Utility/HelpDefine.h"
 #include "Cross.h"
 
+
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
 template<typename Scalar>
 Cross<Scalar>::Cross(std::shared_ptr<InputVarList> var) : TopoObject(var) {
-    isVisited = false;
     crossID = -1;
 }
 
@@ -36,7 +36,6 @@ Cross<Scalar>::Cross(const Cross &_cross) : _Polygon<Scalar>(_cross), TopoObject
     // copy data
     crossID = _cross.crossID;
     atBoundary = _cross.atBoundary;
-    isVisited = _cross.isVisited;
 
     for (size_t id = 0; id < _cross.oriPoints.size(); id++) {
         shared_ptr<OrientPoint<Scalar>> oript = make_shared<OrientPoint<Scalar>>(*_cross.oriPoints[id]);
@@ -134,7 +133,7 @@ void Cross<Scalar>::updateTiltNormalsRoot(float tiltAngle) {
 }
 
 template<typename Scalar>
-void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
+void Cross<Scalar>::updateTiltNormals(float tiltAngle, const std::unordered_map<Cross<Scalar> *, bool>& crossVisited) {
     const vector<pVertex> &vers = _Polygon<Scalar>::vers;
     Vector3 center = _Polygon<Scalar>::center();
     Vector3 normal = _Polygon<Scalar>::normal();
@@ -157,7 +156,7 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle) {
         if (neighbors.size() <= i)
             break;
         pCross neighbor = neighbors[i].lock();
-        if (neighbor == nullptr or neighbor->isVisited == false)
+        if (neighbor == nullptr or crossVisited.find(neighbor.get()) == crossVisited.end())
             continue;
 
         // 2) reverse the tilt sign of its neighbor

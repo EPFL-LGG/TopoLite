@@ -34,67 +34,7 @@
 //                      Generate Texture Mesh
 //**************************************************************************************//
 
-void MeshConverter::generateTexture(const PolyMesh *polyMesh, shared_ptr<PolyMesh> &out)
-{
-    Convert2TriMesh(polyMesh, out);
-    out->removeDuplicatedVertices();
-    Eigen::MatrixXd V(out->vertexList.size(), 3);
-    Eigen::MatrixXi F(out->polyList.size(), 3);
 
-    for(size_t id = 0; id < out->vertexList.size(); id ++ )
-    {
-        Vector3f pt = out->vertexList[id];
-        V.row(id) = Eigen::RowVector3d(pt.x, pt.y, pt.z);
-    }
-    for(size_t id = 0; id < out->polyList.size(); id++)
-    {
-        F.row(id) << out->polyList[id]->verIDs[0], out->polyList[id]->verIDs[1], out->polyList[id]->verIDs[2];
-    }
-
-    // Fix two points on the boundary
-    Eigen::VectorXi bnd,b(2,1);
-    igl::boundary_loop(F,bnd);
-    b(0) = bnd(0);
-    b(1) = bnd(round(bnd.size()/2));
-    Eigen::MatrixXd bc(2,2);
-    bc<<0,0,1,0;
-
-    Eigen::MatrixXd V_uv;
-    // LSCM parametrization
-    igl::lscm(V,F,b,bc,V_uv);
-
-//	Eigen::Vector2d min, max;
-//	min << V_uv.col(0).minCoeff(), V_uv.col(1).minCoeff();
-//	max << V_uv.col(0).maxCoeff(), V_uv.col(1).maxCoeff();
-//
-//	double x_length = std::min(0.9, max[0]) - std::max(0.1, min[0]);
-//	double y_length = std::min(0.9, max[1]) - std::max(0.1, min[1]);
-
-    for(int id = 0; id < V_uv.rows(); id++)
-    {
-        Eigen::Vector2d tex = V_uv.row(id);
-
-//		tex[0] = (tex[0] - min[0]) / (max[0] - min[0]) * x_length + std::max(0.1, min[0]);
-//		tex[1] = (tex[1] - min[1]) / (max[1] - min[1]) * y_length + std::max(0.1, min[1]);
-//		std::cout << tex.transpose() << std::endl;
-        out->texCoordList.push_back(Vector2f(tex[0], tex[1]));
-    }
-
-    for(size_t id = 0; id < out->polyList.size(); id++)
-    {
-        out->polyList[id]->texIDs.resize(3);
-        out->polyList[id]->texIDs[0] = F(id, 0);
-        out->polyList[id]->texIDs[1] = F(id, 1);
-        out->polyList[id]->texIDs[2] = F(id, 2);
-
-        out->polyList[id]->vers[0].texCoord = out->texCoordList[F(id, 0)];
-        out->polyList[id]->vers[1].texCoord = out->texCoordList[F(id, 1)];
-        out->polyList[id]->vers[2].texCoord = out->texCoordList[F(id, 2)];
-    }
-    out->texturedModel = true;
-
-    return;
-}
 
 
 //**************************************************************************************//

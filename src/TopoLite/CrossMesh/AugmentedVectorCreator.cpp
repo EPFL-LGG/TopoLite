@@ -87,7 +87,7 @@ void AugmentedVectorCreator<Scalar>::InitMeshTiltNormalsResolveConflicts(pCrossM
                 || (nextVisit.lock()->atBoundary && getVarList()->template get<bool>("ground_touch_bdry")))
                 continue;
 
-            nextVisit.lock()->updateTiltNormals(tiltAngle);
+            nextVisit.lock()->updateTiltNormals(tiltAngle, crossVisited);
             crossVisited[nextVisit.lock().get()] = true;
             bfsQueue.push(nextVisit.lock());
         }
@@ -97,8 +97,10 @@ void AugmentedVectorCreator<Scalar>::InitMeshTiltNormalsResolveConflicts(pCrossM
     if (getVarList()->template get<bool>("ground_touch_bdry")) {
         for (size_t id = 0; id < crossMesh->size(); ++id) {
             wpCross part = crossMesh->cross(id);
-            if (part.lock()->atBoundary)
-                part.lock()->updateTiltNormals(tiltAngle);
+            if (part.lock()->atBoundary){
+                part.lock()->updateTiltNormals(tiltAngle, crossVisited);
+                crossVisited[part.lock().get()] = true;
+            }
         }
     }
 }

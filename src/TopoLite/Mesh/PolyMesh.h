@@ -122,6 +122,8 @@ public:
 
     std::pair<Matrix<Scalar, 3, 1>, Scalar> normalize();
 
+    void fromEigenMesh(const MatrixX &V, const MatrixX &T, const MatrixXi &F);
+
     void setPolyLists(vector<pPolygon> _polyList);
 
     // Read OBJ File

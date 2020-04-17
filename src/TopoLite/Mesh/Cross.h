@@ -53,11 +53,6 @@ public:
 	vector<shared_ptr<OrientPoint<Scalar>>> oriPoints;  // A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
 
 public:
-    //temporary variables
-
-	bool isVisited;                           			// For correcting tilt angles
-
-public:
 
     Cross(const _Polygon<Scalar> &polygon, std::shared_ptr<InputVarList> var);
 
@@ -74,7 +69,6 @@ public:
         atBoundary = false;
         neighbors.clear();
         oriPoints.clear();
-        isVisited = false;
 	}
 
     shared_ptr<OrientPoint<Scalar>> ori(int index)
@@ -114,7 +108,7 @@ public:
 	 * 2) The sign of some orient point could be changed in order to resolve conflict \n
 	 * 3) In odd polygon, neighboring orient point could have same sign
 	 */
-	void updateTiltNormals(float tiltAngle);
+	void updateTiltNormals(float tiltAngle, const std::unordered_map<Cross<Scalar> *, bool>& crossVisited);
 
 public:
     //neighbor
