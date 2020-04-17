@@ -62,6 +62,10 @@ public:
 
     typedef Matrix<Scalar, 4, 4> Matrix4;
 
+    typedef Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> MatrixX;
+
+    typedef Matrix<int, Eigen::Dynamic, Eigen::Dynamic> MatrixXi;
+
     typedef std::unordered_map<Cross<Scalar> *, int> mapCrossInt;
 
 public:

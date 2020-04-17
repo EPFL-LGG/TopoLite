@@ -57,14 +57,14 @@ void PolyMesh<Scalar>::fromEigenMesh(const MatrixX &V, const MatrixX &T, const M
 
     //add vertex
     for(int id = 0; id < V.rows(); id++){
-        pVertex vertex = make_shared<VPoint>(V.row(id));
+        pVertex vertex = make_shared<VPoint<Scalar>>(V.row(id));
         vertex->verID = id;
         vertexList.push_back(vertex);
     }
 
     //add tex
     for(int id = 0; id < T.rows(); id++){
-        pVTex tex = make_shared<VTex>(T.row(id));
+        pVTex tex = make_shared<VTex<Scalar>>(T.row(id));
         tex->texID = id;
         textureList.push_back(tex);
     }

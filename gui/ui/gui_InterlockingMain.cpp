@@ -192,7 +192,8 @@ public:
     void init_mesh()
     {
         gui_LoadScene loader(scene);
-        loader.loadAnia();
+        loader.load_ania_frametappered();
+        refresh_trackball_center();
     }
 
     virtual void draw(NVGcontext *ctx) {

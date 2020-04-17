@@ -98,7 +98,7 @@ bool CrossMeshCreator<Scalar>::setReferenceSurface(pPolyMesh _ref){
     if(_ref == nullptr) return false;
     if(!_ref->texturedModel)
     {
-       referenceSurface = make_shared<PolyMesh_AABBTree>(*_ref);
+       referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_ref);
        recomputeTexture();
     }
 
@@ -179,8 +179,8 @@ bool CrossMeshCreator<Scalar>::createCrossMesh( bool previewMode, Matrix4 textur
             pattern2D == nullptr)
         {
             sta = clock();
-            PatternCreator patternCreator(getVarList());
-            patternCreator.CreateMesh_2DPattern(patternID, patternRadius, pattern2D);
+            PatternCreator<Scalar> patternCreator(getVarList());
+            patternCreator.create2DPattern(PatternType(patternID), patternRadius, pattern2D);
             default_patternRadius = patternRadius;
             default_patternID = patternID;
             std::cout << "--2D PATTERN:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
@@ -189,8 +189,8 @@ bool CrossMeshCreator<Scalar>::createCrossMesh( bool previewMode, Matrix4 textur
         pPolyMesh baseMesh2D;
 
         sta = clock();
-        BaseMeshCreator baseMeshCreator(referenceSurface, pattern2D);
-        baseMeshCreator.computeBaseMesh(textureMat, baseMesh2D, crossMesh, previewMode);
+        BaseMeshCreator<Scalar> baseMeshCreator(referenceSurface, pattern2D, getVarList());
+        baseMeshCreator.computeBaseCrossMesh(textureMat, baseMesh2D, crossMesh, previewMode);
         std::cout << "--Remesh Para:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
 //        sta = clock();
@@ -198,15 +198,15 @@ bool CrossMeshCreator<Scalar>::createCrossMesh( bool previewMode, Matrix4 textur
 //        meshOptimizer.OptimizeBaseMesh(crossMesh);
 
         sta = clock();
-        AugmentedVectorCreator vectorCreator(getVarList());
-        vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
+        vectorCreator.createAugmentedVector(tiltAngle, crossMesh);
         std::cout << "--Remesh Own:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
 
-        crossMesh->SetBaseMesh2D(baseMesh2D);
+        crossMesh->setBaseMesh2D(baseMesh2D);
     }
     else if(crossMesh){
         sta = clock();
-        AugmentedVectorCreator vectorCreator(getVarList());
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
         vectorCreator.UpdateMeshTiltNormals(crossMesh, tiltAngle);
         std::cout << "--UpdateMeshTiltNormals:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
     }
@@ -238,8 +238,8 @@ bool CrossMeshCreator<Scalar>::updateTiltRange()
 template <typename Scalar>
 void CrossMeshCreator<Scalar>::recomputeTexture() {
     if (referenceSurface) {
-        Eigen::MatrixXd V;
-        Eigen::MatrixXi F;
+        MatrixX V;
+        MatrixXi F;
         Eigen::VectorXi C;
         referenceSurface->convertPosToEigenMesh(V, F, C);
 
@@ -248,14 +248,14 @@ void CrossMeshCreator<Scalar>::recomputeTexture() {
         igl::boundary_loop(F, bnd);
         b(0) = bnd(0);
         b(1) = bnd(round(bnd.size() / 2));
-        Eigen::MatrixXd bc(2, 2);
+        MatrixX bc(2, 2);
         bc << 0, 0, 1, 0;
 
-        Eigen::MatrixXd V_uv;
+        MatrixX V_uv;
         // LSCM parametrization
         igl::lscm(V, F, b, bc, V_uv);
 
-        referenceSurface->fromEigenMesh(V, F, V_uv);
+        referenceSurface->fromEigenMesh(V, V_uv, F);
 
         return;
     }

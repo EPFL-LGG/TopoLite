@@ -112,7 +112,8 @@ void AugmentedVectorCreator<Scalar>::UpdateMeshTiltNormals(pCrossMesh crossMesh,
     if (crossMesh == nullptr)
         return;
 
-    for (const auto &cross : crossMesh->crossList) {
+    for (size_t id = 0; id < crossMesh->size(); id++) {
+        pCross cross = crossMesh->cross(id);
         // cross is a shared_ptr
         if (cross == nullptr)
             continue;
@@ -121,10 +122,7 @@ void AugmentedVectorCreator<Scalar>::UpdateMeshTiltNormals(pCrossMesh crossMesh,
             shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
             if (cross->neighbors[jd].lock() != nullptr) {
                 if (!cross->neighbors[jd].lock()->atBoundary || !cross->atBoundary) {
-                    oriPt->normal = cross->RotateNormal(oriPt->rotation_base,
-                                                        oriPt->rotation_axis,
-                                                        tiltAngle * oriPt->tiltSign);
-                    oriPt->update_rotation(tiltAngle);
+                    oriPt->updateAngle(tiltAngle);
                 }
             }
         }

@@ -66,7 +66,7 @@ public:
 
         shared_ptr<gui_PolyMeshLists<double>> polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, scene.lock()->render_pass);
 
-        double max_length = 5;
+        double max_length = 1;
         for(int id = 0; id < polyMeshLists->ani_translation.size(); id++){
             max_length = std::max(max_length, interlockData->traslation[id].norm());
             max_length = std::max(max_length, interlockData->rotation[id].norm());
@@ -266,6 +266,64 @@ public:
         LinesObject->visible = true;
     }
 
+    void load_ania_multihand(){
+        std::string file_name[3] = { "piece0.obj", "piece1.obj", "piece2.obj"};
+        bool textureModel;
+
+        vector<gui_LinesGroup<double>> lgroups;
+        for(int id = 0; id < 3; id++){
+            std::string part_filename = "data/Mesh/Ania_200417_multihand/";
+            part_filename += file_name[id];
+            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+            polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+            polyMesh->mergeFaces(1e-3);
+            meshLists.push_back(polyMesh);
+        }
+
+        atboundary.resize(3);
+        atboundary[0] = false;
+        atboundary[1] = false;
+        atboundary[2] = true;
+
+        insertMeshandContactsIntoScene();
+    }
+
+    void load_ania_frametappered(){
+        std::string file_name[14] = { "piece0.obj",
+                                     "piece1.obj",
+                                     "piece2.obj",
+                                     "piece3.obj",
+                                     "piece4.obj",
+                                     "piece5.obj",
+                                     "piece6.obj",
+                                     "piece7.obj",
+                                     "piece8.obj",
+                                     "piece9.obj",
+                                     "piece10.obj",
+                                     "piece11.obj",
+                                     "piece12.obj",
+                                     "piece13.obj"};
+        bool textureModel;
+
+        vector<gui_LinesGroup<double>> lgroups;
+        for(int id = 0; id < 14; id++){
+            std::string part_filename = "data/Mesh/Ania_200417_frame/";
+            part_filename += file_name[id];
+            shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+            polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+            polyMesh->mergeFaces(1e-3);
+            meshLists.push_back(polyMesh);
+        }
+
+        atboundary.resize(14, false);
+        atboundary[0] = true;
+        atboundary[1] = true;
+        atboundary[4] = true;
+        atboundary[13] = true;
+
+        insertMeshandContactsIntoScene();
+    }
+
     void loadminimalsurface(){
         shared_ptr<InputVarList> varList;
         varList = make_shared<InputVarList>();
@@ -303,7 +361,11 @@ public:
         vector<nanogui::Color> colors;
         colors.push_back(nanogui::Color(200, 200 ,200, 255));
 
-        CrossMeshCreator crossMeshCreator();
+        CrossMeshCreator<double> crossMeshCreator(varList);
+        crossMeshCreator.setReferenceSurface(_polyMesh);
+        crossMeshCreator.createCrossMesh(false, interactMat);
+
+        shared_ptr<CrossMesh<double>> crossMesh = crossMeshCreator.crossMesh;
 
         meshLists.push_back(crossMesh->getPolyMesh());
 
