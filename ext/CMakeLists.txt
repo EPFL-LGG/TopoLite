@@ -49,6 +49,14 @@ set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/CoinUtils/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
 
+# IPOPT
+set(IPOPT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ipopt/Ipopt/src
+                      ${CMAKE_CURRENT_SOURCE_DIR}/ipopt/Ipopt/src/Apps
+                      ${CMAKE_CURRENT_SOURCE_DIR}/ipopt/Ipopt/src/Common
+                      ${CMAKE_CURRENT_SOURCE_DIR}/ipopt/Ipopt/src/contrib
+                      ${CMAKE_CURRENT_SOURCE_DIR}/ipopt/Ipopt/src/LinAlg
+                      ${CMAKE_CURRENT_SOURCE_DIR}/ipopt/Ipopt/src/Interfaces)
+
 #Pybind11
 if(HAVE_PYBIND)
     #Pybind11
@@ -71,7 +79,8 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
                 ${CLP_INCLUDE_DIR}
-                PARENT_SCOPE)
+                ${IPOPT_INCLUDE_DIR}
+                 PARENT_SCOPE)
 
 set(ext_lib pugixml
             QuickHull
@@ -83,5 +92,6 @@ set(ext_lib pugixml
             lib_Osi
             lib_Clp
             lib_CoinUtils
+            ipoptfort
             ${Boost_LIBRARIES}
             PARENT_SCOPE)

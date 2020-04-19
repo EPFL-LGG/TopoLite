@@ -59,7 +59,7 @@ endfunction()
 function(topolite_download_ipopt)
     topolite_download_project(ipopt
             GIT_REPOSITORY https://github.com/robin-forks/COIN-OR_Ipopt
-            GIT_TAG        v1.1.0
+            GIT_TAG        v1.2.0
             )
 endfunction()
 

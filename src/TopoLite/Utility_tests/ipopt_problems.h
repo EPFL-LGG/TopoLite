@@ -6,7 +6,7 @@
 #define TOPOLITE_IPOPT_PROBLEM_H
 
 
-#include "IpTNLP.hpp"
+#include <IpTNLP.hpp>
 
 using namespace Ipopt;
 
@@ -22,6 +22,8 @@ using namespace Ipopt;
  *
  *        Solution is: x,y,z = (2,1,3)
  *                     max   = 16
+ *
+ * @note This class is overloaded from TNLP interface
  */
 class problem_NLP: public TNLP
 {

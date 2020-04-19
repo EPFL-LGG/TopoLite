@@ -19,7 +19,7 @@ if(NOT TARGET lib_Clp)
 endif()
 
 # COIN-OR IPOPT
-if(NOT TARGET lib_Ipopt AND HAVE_IPOPT)
+if(NOT TARGET ipoptfort)
     topolite_download_Ipopt()
     add_subdirectory(${TOPOLITE_EXTERNAL}/ipopt)
 endif()

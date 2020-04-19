@@ -8,10 +8,11 @@
 #include <iostream>
 #include <Eigen/Sparse>
 
-#include "Interlocking/InterlockingSolver_Clp.h"
-#include "IO/XMLIO.h"
-#include "ClpSimplex.hpp"
-#include "ipopt_problems.h"
+#include <IpIpoptApplication.hpp>
+#include "Utility_tests/ipopt_problems.h"
+
+
+//using namespace Ipopt;
 
 
 typedef Eigen::SparseMatrix<double> SpMat;
@@ -32,5 +33,6 @@ typedef Eigen::Matrix<double, 3, 1> Vector3d;
  *                     max   = 16
  */
 TEST_CASE("IPOPT simplex - Simple LP problem") {
-    printf("Not implemented yet");
+    // [1] - Instance of NLP
+    SmartPtr<IpoptApplication> app = IpoptApplicationFactory();
 }

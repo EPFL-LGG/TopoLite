@@ -6,7 +6,7 @@ if(HAVE_TEST)
     include(CTest)
     include(ParseAndAddCatchTests)
 
-    file(GLOB testTopoFiles Interlocking/Test_ipopt.cpp)
+    file(GLOB testTopoFiles Interlocking/Test_IPOPT_implementation.cpp)
 
 #    file(GLOB testTopoFiles
 #            Interlocking/*.cpp

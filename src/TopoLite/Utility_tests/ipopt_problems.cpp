@@ -2,9 +2,10 @@
 // Created by Robin Jodon on 19.04.20.
 //
 
-#include "ipopt_problems.h"
 #include <cassert>
 #include <iostream>
+
+#include "ipopt_problems.h"
 
 using namespace Ipopt;
 

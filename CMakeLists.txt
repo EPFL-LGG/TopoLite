@@ -12,10 +12,9 @@ set(CMAKE_CXX_STANDARD 17)
 #####                               #####
 #########################################
 
-option(HAVE_NANOGUI     "Compile the gui"                               ON)
+option(HAVE_NANOGUI     "Compile the gui"                               OFF)
 option(HAVE_TEST        "Compile the united test"                       ON)
 option(HAVE_PYBIND      "Compile the python binding"                    ON)
-option(HAVE_IPOPT       "Compile the nonlinear optimization solver"     OFF)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
