@@ -1,6 +1,8 @@
 //
 // Created by robin jodon on 2020-04-16.
 //
+// Test file to understand how to use CLP
+//
 
 #include <catch2/catch.hpp>
 #include <iostream>
@@ -28,7 +30,7 @@ typedef Eigen::Matrix<double, 3, 1> Vector3d;
  *        Solution is: x,y,z = (2,1,3)
  *                     max   = 16
  */
-TEST_CASE("Simple case - SolveSimplex") {
+TEST_CASE("CLP simplex - Simple LP problem") {
     // Mock
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
     InitVarLite(varList.get());
@@ -72,34 +74,39 @@ TEST_CASE("Simple case - SolveSimplex") {
     }
 
     // Objective func + Ei for i in [1,2,3]
-    printf("Definition of the problem\n");
     for (size_t id = 0; id < num_row; id++) {
         constraintLower[id] = -COIN_DBL_MAX;
         constraintUpper[id] = rhs[id];
         objective[id] = -objective_function[id];  // simplex minimises by default
-        printf("%zu %E %E %E \n", id, constraintLower[id], constraintUpper[id], objective[id]);
     }
 
-    printf("Optimization - start\n");
     ClpSimplex model;
     CoinMessageHandler handler;
-    handler.setLogLevel(4);
+    handler.setLogLevel(0);
     model.passInMessageHandler(&handler);
     model.newLanguage(CoinMessages::us_en);
     model.loadProblem(matrix, varLower, varUpper, objective, constraintLower, constraintUpper);
-    model.setPrimalTolerance(1e-15);
+    model.setPrimalTolerance(1e-9);
     model.primal();
     // Get the solution
     const double obj_solution = model.rawObjectiveValue();
     double *solution = model.primalColumnSolution();
     double *row_solution = model.primalRowSolution();
 
-    for (size_t id = 0; id <num_var; id++)
-        printf("x%zu = %E\n", id+1, solution[id]);
-    for (size_t id = 0; id < num_row; id++)
-        printf("E%zu = %E\n", id+1, row_solution[id]);
+    SECTION("CLP simplex - Solutions checkup") {
+        REQUIRE(solution[0] == Approx(2.0).epsilon(1E-9));
+        REQUIRE(solution[1] == Approx(1.0).epsilon(1E-9));
+        REQUIRE(solution[2] == Approx(3.0).epsilon(1E-9));
+    }
 
-    printf("Optimal?    %d \n", model.isProvenOptimal());
-    printf("Infeasable? %d \n", model.isProvenPrimalInfeasible());
-    printf("Optimization - done");
+    SECTION("CLP simplex - Constraints checkup") {
+        REQUIRE(row_solution[0] == Approx(4.0).epsilon(1E-9));
+        REQUIRE(row_solution[1] == Approx(8.0).epsilon(1E-9));
+        REQUIRE(row_solution[2] == Approx(6.0).epsilon(1E-9));
+    }
+
+    SECTION("CLP simplex - Problem checkup") {
+        REQUIRE(model.isProvenOptimal());
+        REQUIRE_FALSE(model.isProvenPrimalInfeasible());
+    }
 }
