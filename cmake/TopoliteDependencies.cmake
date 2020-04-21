@@ -1,3 +1,6 @@
+include(FetchContent)
+
+
 ### Configuration
 set(TOPOLITE_ROOT "${CMAKE_CURRENT_LIST_DIR}/..")
 set(TOPOLITE_EXTERNAL "${TOPOLITE_ROOT}/ext")
@@ -17,12 +20,29 @@ if(NOT TARGET lib_Clp)
     topolite_download_clp()
     add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
 endif()
+#
+## COIN-OR IPOPT
+#if(NOT TARGET ipoptfort)
+#    topolite_download_Ipopt()
+#    add_subdirectory(${TOPOLITE_EXTERNAL}/ipopt)
+#endif()
 
-# COIN-OR IPOPT
-if(NOT TARGET ipoptfort)
-    topolite_download_Ipopt()
-    add_subdirectory(${TOPOLITE_EXTERNAL}/ipopt)
-endif()
+# FIXME: does not work - clone recurse fails because ampl/mp is outdated and is sourcing ampl/gecode which does not exist anymore
+## COIN-OR suite
+#if(NOT TARGET coinor_lp)
+#    topolite_download_coinor_lp()
+#    add_subdirectory(${TOPOLITE_EXTERNAL}/coinor_lp)
+#endif()
+
+#FetchContent_Declare(
+#        coinor
+#        GIT_REPOSITORY https://github.com/robin-forks/COIN-OR_suite_cmake_compatible.git
+#        GIT_TAG        7d69f4b
+#)
+#FetchContent_MakeAvailable(coinor)
+#set(coinor_SOURCE_DIR ${coinor_SOURCE_DIR}/coinor)
+#include_directories(${coinor_SOURCE_DIR} ${coinor_BINARY_DIR})
+# ENDFIXME
 
 # Catch2
 if(NOT TARGET catch2::catch2)

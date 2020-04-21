@@ -63,6 +63,14 @@ function(topolite_download_ipopt)
             )
 endfunction()
 
+## COIN-OR LP
+function(topolite_download_coinor_lp)
+    topolite_download_project(coinor_lp
+            GIT_REPOSITORY https://github.com/robin-forks/COIN-OR_suite_cmake_compatible.git
+            GIT_TAG        7d69f4b48869e3f30db11cf04e1b3bc49480fca8
+            )
+endfunction()
+
 ## filesystem
 function(topolite_download_filesystem)
     topolite_download_project(filesystem
