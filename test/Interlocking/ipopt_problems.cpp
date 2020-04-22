@@ -13,7 +13,9 @@ const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 
 
 // constructor
-problem_NLP::problem_NLP() = default;
+problem_NLP::problem_NLP() {
+    x_sol = {0,0,0};            // initial position vector that becomes the solution
+};
 
 // destructor
 problem_NLP::~problem_NLP() = default;
@@ -64,9 +66,9 @@ bool problem_NLP::get_starting_point(Index n, bool init_x, Number *x, bool init_
     assert(!init_lambda);
 
     // initialize to the given starting point
-    x[0] = 1.0;
-    x[1] = 1.0;
-    x[2] = 1.0;
+    x[0] = x_sol[0];
+    x[1] = x_sol[1];
+    x[2] = x_sol[2];
 
     return true;
 }
@@ -153,13 +155,14 @@ void problem_NLP::finalize_solution(SolverReturn status,
                                     Number obj_value,
                                     const IpoptData *ip_data,
                                     IpoptCalculatedQuantities *ip_cq) {
-    // here is where we would store the solution to variables, or write to a file, etc
-    // so we could use the solution.
+
 
     // For this example, we write the solution to the console
     printf("Solution of the primal variables, x\n");
-    for (Index i = 0; i < n; i++)
+    for (Index i = 0; i < n; i++) {
+        this->x_sol[i] = x[i];
         printf("--  x[%d] = %E\n", i, x[i]);
+    }
 
     printf("Solution of the bound multipliers, z_L and z_U\n");
     for (Index i = 0; i < n; i++)

@@ -27,12 +27,17 @@ using namespace Ipopt;
  */
 class problem_NLP: public TNLP
 {
+
 public:
+    /** solution vector - Used for the init point as well */
+    std::vector<double> x_sol;
+
     /** Default constructor */
     problem_NLP();
 
     /** Default destructor */
     ~problem_NLP() override;
+
 
     /**@name Overloaded from TNLP */
     //@{
