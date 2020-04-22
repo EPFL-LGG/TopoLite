@@ -21,18 +21,21 @@ if(NOT TARGET lib_Clp)
     add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
 endif()
 #
+
+# BUG: Cmakelist is not complete
 ## COIN-OR IPOPT
 #if(NOT TARGET ipoptfort)
 #    topolite_download_Ipopt()
 #    add_subdirectory(${TOPOLITE_EXTERNAL}/ipopt)
 #endif()
 
-# FIXME: does not work - clone recurse fails because ampl/mp is outdated and is sourcing ampl/gecode which does not exist anymore
+# BUG: does not work - clone recurse fails because ampl/mp is outdated and is sourcing ampl/gecode which does not exist anymore
 ## COIN-OR suite
 #if(NOT TARGET coinor_lp)
 #    topolite_download_coinor_lp()
 #    add_subdirectory(${TOPOLITE_EXTERNAL}/coinor_lp)
 #endif()
+
 
 #FetchContent_Declare(
 #        coinor
@@ -42,7 +45,7 @@ endif()
 #FetchContent_MakeAvailable(coinor)
 #set(coinor_SOURCE_DIR ${coinor_SOURCE_DIR}/coinor)
 #include_directories(${coinor_SOURCE_DIR} ${coinor_BINARY_DIR})
-# ENDFIXME
+# ENDBUG
 
 # Catch2
 if(NOT TARGET catch2::catch2)

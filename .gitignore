@@ -18,7 +18,6 @@ data/origin_data/Simulation/*.*
 ext/tbb
 ext/Catch2
 ext/clp
-ext/ipopt
 ext/.cache
 ext/shapeop
 ext/libigl
@@ -26,5 +25,4 @@ ext/filesystem
 ext/eigen
 ext/pugixml
 ext/pybind11
-
 Xcode/*

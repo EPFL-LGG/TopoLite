@@ -50,29 +50,10 @@ set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
 
 ## IPOPT
+find_package(IPOPT REQUIRED)
 
-set(COINOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/coinor)
-add_subdirectory(${COINOR_INCLUDE_DIR})
+## Pybind11
 
-# Note sure it is needed. Things should be made inside coinor/CmakeLists
-set(
-        IPOPT_INCLUDE_DIR
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/Algorithm
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/Algorithm/Inexact
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/Algorithm/LinearSolvers
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/Apps
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/Common
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/contrib/CGPenalty
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/contrib/LinearSolverLoader
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/LinAlg
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/LinAlg/TMatrices
-        ${COINOR_INCLUDE_DIR}/Ipopt/Ipopt/src/Interfaces
-)
-
-
-
-#Pybind11
 if(HAVE_PYBIND)
     #Pybind11
     if(WIN32)
@@ -94,8 +75,7 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
                 ${CLP_INCLUDE_DIR}
-                ${IPOPT_INCLUDE_DIR}
-                ${COINOR_INCLUDE_DIR}
+                ${IPOPT_INCLUDE_DIRS}           # defined in findIPOPT.cmake
                  PARENT_SCOPE)
 
 set(ext_lib pugixml
@@ -108,6 +88,6 @@ set(ext_lib pugixml
             lib_Osi
             lib_Clp
             lib_CoinUtils
-            libipopt
+            ${IPOPT_LIBRARIES}                  # defined in findIPOPT.cmake
             ${Boost_LIBRARIES}
             PARENT_SCOPE)
