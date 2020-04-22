@@ -6,7 +6,10 @@ if(HAVE_TEST)
     include(CTest)
     include(ParseAndAddCatchTests)
 
-    file(GLOB testTopoFiles Interlocking/Test_IPOPT_implementation.cpp)
+    file(GLOB testTopoFiles
+            Interlocking/ipopt_problems.cpp
+            Interlocking/Test_IPOPT_implementation.cpp
+            )
 
 #    file(GLOB testTopoFiles
 #            Interlocking/*.cpp
@@ -15,6 +18,7 @@ if(HAVE_TEST)
 #            IO/*.cpp
 #            Utility/*.cpp
 #            )
+
 
     set(testTopoFiles ${testTopoFiles} Test_Main.cpp)
 
