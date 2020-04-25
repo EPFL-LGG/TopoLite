@@ -7,7 +7,10 @@
 #include <catch2/catch.hpp>
 #include <iostream>
 
+#define HAVE_CSTDDEF
 #include <IpIpoptApplication.hpp>
+#undef HAVE_CSTDDEF
+
 #include "ipopt_problems.h"
 
 
@@ -35,7 +38,6 @@ TEST_CASE("IPOPT simplex - Simple LP problem") {
     app->Options()->SetNumericValue("tol", 1e-7);
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
-    app->Options()->SetStringValue("mehrota_algorithm", "yes");
     app->Options()->SetStringValue("mu_strategy", "adaptive");
     app->Options()->SetStringValue("output_file", "ipopt.out");
     app->Options()->SetStringValue("linear_solver", "mumps");  // only available yet
