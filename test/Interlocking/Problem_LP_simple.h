@@ -26,7 +26,7 @@ using namespace Ipopt;
  *
  * @note This class is overloaded from TNLP interface
  */
-class problem_NLP: public TNLP
+class problem_LP: public TNLP
 {
 
 public:
@@ -34,10 +34,10 @@ public:
     std::vector<double> x_sol;
 
     /** Default constructor */
-    problem_NLP();
+    problem_LP();
 
     /** Default destructor */
-    ~problem_NLP() override;
+    ~problem_LP() override;
 
 
     /**@name Overloaded from TNLP */
@@ -160,12 +160,12 @@ private:
      *  knowing. (See Scott Meyers book, "Effective C++")
      */
     //@{
-    problem_NLP(
-            const problem_NLP&
+    problem_LP(
+            const problem_LP&
     );
 
-    problem_NLP& operator=(
-            const problem_NLP&
+    problem_LP& operator=(
+            const problem_LP&
     );
     //@}
 };
