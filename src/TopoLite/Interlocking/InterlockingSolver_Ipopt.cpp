@@ -1,9 +1,10 @@
 //
 // Created by robinjodon on 29.04.20.
 //
-
-
+#include <IpIpoptApplication.hpp>
 #include "InterlockingSolver_Ipopt.h"
+#include "Ipopt_Interlocking_Problem.h"
+
 #include "tbb/tbb.h"
 #include <Eigen/SparseQR>
 
@@ -38,7 +39,6 @@ bool InterlockingSolver_Ipopt<Scalar>::isRotationalInterlocking(InterlockingSolv
         return false;
     }
 
-    // Ignore this for lpopt - Enlarging the matrix
     int num_var = size[1];
     InterlockingSolver<Scalar>::appendAuxiliaryVariables(tris, size);
     InterlockingSolver<Scalar>::appendMergeConstraints(tris, size, true);
@@ -51,10 +51,12 @@ template<typename Scalar>
 bool InterlockingSolver_Ipopt<Scalar>::checkSpecialCase(pInterlockingData &data,
                                                         vector<EigenTriple> copy_tris,
                                                         bool rotationalInterlockingCheck,
-                                                        Eigen::Vector2i copy_size) {}
+                                                        Eigen::Vector2i copy_size) {
+    return true;
+}
 
 /**
- * @brief 
+ * @brief UPDATE THIS 
  *
  *  Problem definition
  *  ------------------
@@ -84,21 +86,45 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
                                              int num_col,
                                              int num_var) {
 
-// 
-}
+    // [0] - Define the matrix B
+    EigenSpMat b(num_row, num_col);
+    b.setFromTriplets(tris.begin(), tris.end());
 
-template<typename Scalar>
-bool InterlockingSolver_Ipopt<Scalar>::solveSimplex(pInterlockingData &data,
-                                                    bool rotationalInterlockingCheck,
-                                                    int num_row,
-                                                    int num_col,
-                                                    int num_var,
-                                                    const CoinPackedMatrix &matrix,
-                                                    const double *colLower,
-                                                    const double *colUpper,
-                                                    const double *objective,
-                                                    const double *rowLower,
-                                                    const double *rowUpper) {}
+    // [1] - Instance for Ipopt App and NLP
+    SmartPtr<IpoptProblem> interlock_pb = new IpoptProblem();       // problem to solve
+    SmartPtr<IpoptApplication> app = IpoptApplicationFactory();     // solver
+
+    interlock_pb->initialize(num_var, num_col, b);
+
+    // [2] - Set some options for the solver 
+    app->Options()->SetNumericValue("tol", 1e-7);
+    app->Options()->SetStringValue("jac_d_constant", "yes");
+    app->Options()->SetStringValue("hessian_constant", "yes");
+    app->Options()->SetStringValue("mu_strategy", "adaptive");
+    app->Options()->SetStringValue("output_file", "ipopt.out");
+    app->Options()->SetStringValue("linear_solver", "mumps");  // only available yet with installed IPOPT lib
+    // app->Options()->SetStringValue("derivative_test", "first-order"); // excellent for debugging
+
+    // [3] - Intialize the IpoptApplication and process the options
+    ApplicationReturnStatus status;
+    status = app->Initialize();
+    if (status != Solve_Succeeded) {
+        printf("\n\n*** Error during initialization!\n");
+    }
+    
+
+    // [5] - Optimzation
+    status = app->OptimizeTNLP(interlock_pb);
+
+    if (status == Solve_Succeeded) {
+        printf("\n\n*** The problem solved!\n");
+    } else {
+        printf("\n\n*** The problem FAILED!\n");
+    }
+
+    // unpackSolution(data, rotationalInterlockingCheck, solution, num_var);
+    return true;
+}
 
 template<typename Scalar>
 void InterlockingSolver_Ipopt<Scalar>::unpackSolution(InterlockingSolver_Ipopt::pInterlockingData &data,

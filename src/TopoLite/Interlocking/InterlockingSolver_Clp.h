@@ -28,8 +28,9 @@ public:
     CLP_SOLVER_TYPE type;
 
 public:
-    InterlockingSolver_Clp(pContactGraph _graph, shared_ptr<InputVarList> varList, CLP_SOLVER_TYPE _type = SIMPLEX)
-    : InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList), type(_type)
+    InterlockingSolver_Clp(pContactGraph _graph,
+            shared_ptr<InputVarList> varList,
+            CLP_SOLVER_TYPE _type = SIMPLEX): InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList), type(_type)
     {
 
     }

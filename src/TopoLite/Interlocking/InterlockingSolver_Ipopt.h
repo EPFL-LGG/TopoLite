@@ -8,10 +8,6 @@
 #include "InterlockingSolver.h"
 #include "CoinHelperFunctions.hpp"
 
-enum IPOPT_SOLVER_TYPE {
-    SIMPLEX,
-    BARRIER
-};
 
 template<typename Scalar>
 class InterlockingSolver_Ipopt : public InterlockingSolver<Scalar> {
@@ -24,13 +20,9 @@ public:
     using InterlockingSolver<Scalar>::graph;
     typedef Matrix<Scalar, 3, 1> Vector3;
 
-    IPOPT_SOLVER_TYPE type;
-
 public:
-    InterlockingSolver_Ipopt(
-            pContactGraph _graph,
-            shared_ptr<InputVarList> varList,
-            IPOPT_SOLVER_TYPE _type = SIMPLEX) : InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList), type(_type) {}
+    InterlockingSolver_Ipopt(pContactGraph _graph, shared_ptr<InputVarList> varList) :
+     InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList) {}
 
 public:
 
@@ -50,31 +42,9 @@ public:
                int num_col,
                int num_var);
 
-    bool solveSimplex(pInterlockingData &data,
-                      bool rotationalInterlockingCheck,
-                      int num_row,
-                      int num_col,
-                      int num_var,
-                      const CoinPackedMatrix &matrix,
-                      const double *colLower,
-                      const double *colUpper,
-                      const double *objective,
-                      const double *rowLower,
-                      const double *rowUpper);
-
-    bool solveBarrier(pInterlockingData &data,
-                      bool rotationalInterlockingCheck,
-                      int num_row,
-                      int num_col,
-                      int num_var,
-                      const CoinPackedMatrix &matrix,
-                      const double *colLower,
-                      const double *colUpper,
-                      const double *objective,
-                      const double *rowLower,
-                      const double *rowUpper);
-
-    void unpackSolution(InterlockingSolver_Ipopt::pInterlockingData &data, bool rotationalInterlockingCheck, const double *solution,
+    void unpackSolution(InterlockingSolver_Ipopt::pInterlockingData &data, 
+                        bool rotationalInterlockingCheck, 
+                        const double *solution,
                         int num_var);
 };
 

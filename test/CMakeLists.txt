@@ -10,7 +10,8 @@ if(HAVE_TEST)
 #            Interlocking/Problem_LP_simple.cpp
 #            Interlocking/Problem_LP_bigm.cpp
 #            Interlocking/Test_IPOPT_implementation.cpp
-             Utility/Test_SparseOperations.cpp
+            Interlocking/Test_interlockingSolver_Ipopt.cpp
+#            Utility/Test_SparseOperations.cpp
             )
 
 #    file(GLOB testTopoFiles

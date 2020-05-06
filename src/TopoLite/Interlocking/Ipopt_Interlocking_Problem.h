@@ -5,10 +5,10 @@
 #ifndef TOPOLITE_IPOPT_INTERLOCK_PROBLEM_H
 #define TOPOLITE_IPOPT_INTERLOCK_PROBLEM_H
 
+#include <Eigen/SparseQR>
+
 #define HAVE_CSTDDEF
-
-#include <IpTNLP.hpp>
-
+#include "IpTNLP.hpp"
 #undef HAVE_CSTDDEF
 
 using namespace Ipopt;
@@ -27,28 +27,57 @@ using namespace Ipopt;
  *
  *  The optimization is formulated as:
  *
- *              min (-\sum_{i = 0}^{num_row} t_i)
- *  s.t.             A[x, t] >= 0
- *                  1 >= t >= 0
- *                    x \in R
+ *              max (\sum_{i = 0}^{num_row} t_i) + \lambda M
+ *  s.t.             A.X + \lambda * \id >= T
+ *                   0 =< x_i =< 1
+ *                   (x_i, \lambda) >= 0
  *
  *  Expected results
  *  ----------------
  *
  *  - Ideally if the structure is interlocking, the objective value should be zero.
  *  - In practice, due to numerical error, we have to allow a small tolerance for the objective value.
+ *
+ *  Biblio
+ *  ------
+ *  - Wang, Z. et al. (2019). ACM Transactions on Graphics, 38(6), 1–13. https://doi.org/10.1145/3355089.3356489
+ *  - Wang, Z. (2019). Supplementary Material. ACM Transactions on Graphics, 38(6), 3–5.
  */
-class IpoptInterlockProblem : public TNLP {
+class IpoptProblem : public TNLP {
 
 public:
-    /** solution vector - Used for the init point as well */
-    std::vector<double> x_sol;
+    typedef Eigen::Matrix<Number, Eigen::Dynamic, 1> RVectorXd;
+    typedef Eigen::SparseMatrix<Number, Eigen::ColMajor>  EigenSpMat;
+
+    /** Dimensions of the problem */
+    Index n_var;
+    Index n_var_real;
+    Index n_constraints;
+    Index non_zero_jacobian_elements;
+    Index non_zero_hessian_elements;
+    IndexStyleEnum index_style;
+
+    /** Bounds for variables x and constraints g  (l:lower, u:upper) */
+    RVectorXd x_l, x_u;
+    RVectorXd g_l, g_u;
+
+    /** Coefficients matrix */
+    EigenSpMat b_coeff;
+
+
+    /** Objective value, x and x_solution vectors */
+    RVectorXd x;                // current test vector
+    RVectorXd x_solution;       // optimum vector
+    Number obj_value;           // objective function (individual sum of x components)
+
+    /** big M */
+    Number big_m;
 
     /** Default constructor */
-    IpoptInterlockProblem();
+    IpoptProblem();
 
     /** Default destructor */
-    ~IpoptInterlockProblem() override;
+    ~IpoptProblem() override;
 
 
     /**
@@ -67,11 +96,9 @@ public:
      *
      * @param n number of variables
      * @param m number of constraints eq/ineq
-     * @param nnz_jac_g non-zero elements in constaints Jacobian
-     * @param nnz_h_lag non-zero elements in Lagrangian and Hessian
-     * @param index_style C or Fortran style
+     * @param mat initial B matrix elements before adding big M contribution to it
      */
-    bool set_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style);
+    bool initialize(Index n, Index m, EigenSpMat &mat);
 
     /**
      * @brief Get the problem bounds conditions
@@ -85,18 +112,21 @@ public:
      */
     bool get_bounds_info(Index n, Number *x_l, Number *x_u, Index m, Number *g_l, Number *g_u) override;
 
-
+    /**
+     * @brief Compute B = B_interlock + L matrix   
+     *        - It is a concatenation along the horizontal axis of B and L 
+     *        - L is just the identity matrix of dim m
+     *        
+     *          / B00 ... B1n | L00 ... 0   \
+     *     B =  | ... ... ... | 0   ... 0   |
+     *          \ Bm1 ... Bmn | 0   ... Lmm /
+     * 
+     */
+    void compute_constraints_matrix(EigenSpMat &mat);
     /**
      * @brief Set the problem bounds conditions. The following vars are set.
-     *
-     * @param n number of variables
-     * @param x_l lower bounds for the variables
-     * @param x_u upper bounds for the variables
-     * @param m number of constraints eq/ineq
-     * @param g_l lower bounds for the constraints
-     * @param g_u upper bounds for the constraints
      */
-    bool set_bounds_info(Index n, Number *x_l, Number *x_u, Index m, Number *g_l, Number *g_u);
+    bool set_bounds_info();
 
     /**
      * @brief  Get the starting point for solving the pb
@@ -176,12 +206,12 @@ private:
      *  knowing. (See Scott Meyers book, "Effective C++")
      */
     //@{
-    IpoptInterlockProblem(
-            const IpoptInterlockProblem &
+    IpoptProblem(
+            const IpoptProblem &
     );
 
-    IpoptInterlockProblem &operator=(
-            const IpoptInterlockProblem &
+    IpoptProblem &operator=(
+            const IpoptProblem &
     );
     //@}
 };
