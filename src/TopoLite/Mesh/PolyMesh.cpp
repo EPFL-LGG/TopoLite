@@ -666,10 +666,14 @@ void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) 
 template <typename Scalar>
 void PolyMesh<Scalar>::mergeFaces(double eps)
 {
+
     this->removeDuplicatedVertices(eps);
+
     vector<vector<wpPolygon>> vertexFaces(vertexList.size());
-    for(pPolygon poly: polyList){
-        for(pVertex vertex: poly->vers){
+    for(pPolygon poly: polyList)
+    {
+        for(pVertex vertex: poly->vers)
+        {
             vertexFaces[vertex->verID].push_back(poly);
         }
     }

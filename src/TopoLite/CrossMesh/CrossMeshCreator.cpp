@@ -101,6 +101,10 @@ bool CrossMeshCreator<Scalar>::setReferenceSurface(pPolyMesh _ref){
        referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_ref);
        recomputeTexture();
     }
+    else{
+        referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_ref);
+        referenceSurface->buildTexTree();
+    }
 
     if(referenceSurface)
     {
@@ -256,6 +260,8 @@ void CrossMeshCreator<Scalar>::recomputeTexture() {
         igl::lscm(V, F, b, bc, V_uv);
 
         referenceSurface->fromEigenMesh(V, V_uv, F);
+
+        referenceSurface->buildTexTree();
 
         return;
     }

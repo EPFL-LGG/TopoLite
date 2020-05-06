@@ -192,7 +192,7 @@ public:
     void init_mesh()
     {
         gui_LoadScene loader(scene);
-        loader.load_ania_frametappered();
+        loader.load_ania_multihand();
         refresh_trackball_center();
     }
 

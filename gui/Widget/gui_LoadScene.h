@@ -325,11 +325,7 @@ public:
     }
 
     void loadminimalsurface(){
-        shared_ptr<InputVarList> varList;
-        varList = make_shared<InputVarList>();
-        InitVarLite(varList.get());
-
-        std::shared_ptr<PolyMesh_AABBTree<double>> _polyMesh;
+        std::shared_ptr<PolyMesh<double>> _polyMesh;
         std::shared_ptr<CrossMesh<double>> _pattern2D;
 
         XMLIO IO;
@@ -345,10 +341,9 @@ public:
         surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
 
         bool texturedModel;
-        _polyMesh = make_shared<PolyMesh_AABBTree<double>>(data.varList);
+        _polyMesh = make_shared<PolyMesh<double>>(data.varList);
         _polyMesh->readOBJModel(surface_objfile.c_str(), texturedModel, true);
 
-        _polyMesh->buildTexTree();
         data.varList->set("minCrossArea", 0.2f);
 
         Eigen::Matrix4d interactMat;
@@ -361,7 +356,7 @@ public:
         vector<nanogui::Color> colors;
         colors.push_back(nanogui::Color(200, 200 ,200, 255));
 
-        CrossMeshCreator<double> crossMeshCreator(varList);
+        CrossMeshCreator<double> crossMeshCreator(data.varList);
         crossMeshCreator.setReferenceSurface(_polyMesh);
         crossMeshCreator.createCrossMesh(false, interactMat);
 

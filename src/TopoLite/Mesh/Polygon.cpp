@@ -44,6 +44,11 @@ _Polygon<Scalar>::_Polygon(const _Polygon<Scalar> &poly)
         texs.push_back(make_shared<VTex<Scalar>>(*tex));
     }
 
+    edge_at_boundary.clear();
+    for(bool vb: poly.edge_at_boundary){
+        edge_at_boundary.push_back(vb);
+    }
+
     this->polyType = poly.polyType;
 }
 
