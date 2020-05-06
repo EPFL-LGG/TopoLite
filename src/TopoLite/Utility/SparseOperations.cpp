@@ -10,6 +10,7 @@ using namespace Eigen;
 
 template<typename Scalar>
 void stack_col_SparseMat(const SparseMatrix<Scalar> &B, const SparseMatrix<Scalar>  &I, SparseMatrix<Scalar>  &C) {
+    C.resize(B.rows(), B.cols() + I.cols());
     C.reserve(B.nonZeros() + I.nonZeros());
     for (Index c = 0; c < B.outerSize(); ++c) {
         for (SparseMatrix<double>::InnerIterator it(B, c); it; ++it) {
@@ -36,4 +37,3 @@ void print_SparseMat(const SparseMatrix<Scalar> &A) {
     }
     printf("\n");
 }
-//void stack_row_SparseMat(SpMat &B, SpMat &I, SpMat &C) {}

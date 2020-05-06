@@ -36,9 +36,9 @@ TEST_CASE("stack_col_SparseMat -> Contactenate two sparse matrices A and B horiz
     // Create the expected result matrix
     expected.setFromTriplets(coeff_a.begin(), coeff_a.end());
 
-    SpMat c(a.rows(), a.cols() + b.cols());
     
     // The function to test
+    SpMat c;
     stack_col_SparseMat(a, b, c);
 
     // Create a sparseMat from c - expected - Should be close to {0.0}
