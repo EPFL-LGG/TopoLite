@@ -4,6 +4,25 @@
 #include <catch2/catch.hpp>
 #include "Utility/SparseOperations.h"
 
+TEST_CASE("create_identity_sparseMat") {
+    // Reference identity matrix
+    vector<T> triplets; 
+    triplets.push_back(Triplet<double>(0, 0, 1));
+    triplets.push_back(Triplet<double>(1, 1, 1));
+    triplets.push_back(Triplet<double>(2, 2, 1));
+
+    SpMat id(3, 3);
+    id.setFromTriplets(triplets.begin(), triplets.end());
+
+    // Call create identity matrix and compare the results
+    SpMat r; 
+    create_identity_SparseMat(r, 3); 
+
+    SpMat res = r - id ;
+    res.prune(0.0, 1E-7);
+    REQUIRE(res.nonZeros() == 0);
+}
+
 
 TEST_CASE("stack_col_SparseMat -> Contactenate two sparse matrices A and B horizontally") {
 

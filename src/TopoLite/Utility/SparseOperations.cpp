@@ -8,6 +8,19 @@ typedef Eigen::Triplet<double> T;
 using namespace std;
 using namespace Eigen;
 
+
+
+template<typename Scalar>
+void create_identity_SparseMat(SparseMatrix<Scalar>  &m, int dim) {
+    std::vector<Triplet<double>> triplets;
+    m.resize(dim, dim);
+    for (int i=0; i<dim; i++)
+        triplets.push_back(Triplet<double>(i,i,1));
+
+    m.setFromTriplets(triplets.begin(), triplets.end());
+}
+
+
 template<typename Scalar>
 void stack_col_SparseMat(const SparseMatrix<Scalar> &B, const SparseMatrix<Scalar>  &I, SparseMatrix<Scalar>  &C) {
     C.resize(B.rows(), B.cols() + I.cols());

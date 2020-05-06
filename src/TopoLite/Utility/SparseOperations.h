@@ -12,6 +12,16 @@ using namespace std;
 using namespace Eigen;
 
 /**
+ * @brief Create a identity SparseMat object
+ * 
+ * @tparam Scalar 
+ * @param m the matrix the create 
+ * @param dim the dimensions of the matrix. 
+ */
+template<typename Scalar>
+void create_identity_SparseMat(SparseMatrix<Scalar>  &m, int dim);
+
+/**
  * @brief Concatenate B and I horizontally
  *
  *          / B00 B01 B02 | I00 I01 \
