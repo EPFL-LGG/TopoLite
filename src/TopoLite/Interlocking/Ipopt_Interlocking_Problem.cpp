@@ -29,7 +29,7 @@ IpoptProblem::~IpoptProblem() = default;
 
 
 // returns the problem dimensions
-bool IpoptProblem::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style) {
+bool IpoptProblem::get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag, IndexStyleEnum &index_style) {
     n = this->n_var;                                    // N+M variables [x, t, lamdba]
     m = this->n_constraints;                            // M inequalities
     nnz_jac_g = this->non_zero_jacobian_elements;       // non zero elements in Jacobian
@@ -39,7 +39,7 @@ bool IpoptProblem::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz
     return true;
 }
 
-bool IpoptProblem::initialize(Index n, Index m, EigenSpMat &mat) {
+bool IpoptProblem::initialize(int n, int m, EigenSpMat &mat) {
     this->n_var_real = n;                                   // variables without big M multipliers lambdas
     this->n_var = n + m;                                    // variables
     this->n_constraints = m;                                // Constraints inequalities
@@ -60,14 +60,14 @@ void IpoptProblem::compute_constraints_matrix(EigenSpMat &mat) {
 }
 
 // returns the variable bounds
-bool IpoptProblem::get_bounds_info(Index n, Number *x_l, Number *x_u, Index m, Number *g_l, Number *g_u) {
+bool IpoptProblem::get_bounds_info(int n, Number *x_l, Number *x_u, int m, Number *g_l, Number *g_u) {
 
-    for (Index i = 0; i < this->n_var; i++) {
+    for (int i = 0; i < this->n_var; i++) {
         x_l[i] = this->x_l[i];
         x_u[i] = this->x_u[i];
     }
 
-    for (Index i = 0; i < this->n_constraints; i++) {
+    for (int i = 0; i < this->n_constraints; i++) {
         g_l[i] = this->g_l[i];
         g_u[i] = this->g_u[i];
     }
@@ -76,12 +76,12 @@ bool IpoptProblem::get_bounds_info(Index n, Number *x_l, Number *x_u, Index m, N
 }
 
 bool IpoptProblem::set_bounds_info() {
-    for (Index i = 0; i < this->n_constraints; i++) {
+    for (int i = 0; i < this->n_constraints; i++) {
         this->g_l[i] = 0.0;
         this->g_u[i] = 1.0;
     }
 
-    for (Index i = 0; i < this->n_var; i++) {
+    for (int i = 0; i < this->n_var; i++) {
         if (i < this->n_var_real) {
             // x_i is defined in R
             this->x_l[i] = COIN_DBL_MAX * (-1.0);
@@ -96,10 +96,10 @@ bool IpoptProblem::set_bounds_info() {
 }
 
 // returns the initial point for the problem
-bool IpoptProblem::get_starting_point(Index n, bool init_x, Number *x, bool init_z, Number *z_L, Number *z_U,
-                                      Index m, bool init_lambda, Number *lambda) {
+bool IpoptProblem::get_starting_point(int n, bool init_x, Number *x, bool init_z, Number *z_L, Number *z_U,
+                                      int m, bool init_lambda, Number *lambda) {
 
-    for (Index i = 0; i < this->n_var; i++) {
+    for (int i = 0; i < this->n_var; i++) {
         this->x[i] = 0.0;
         x[i] = 0.0;
     }
@@ -107,11 +107,11 @@ bool IpoptProblem::get_starting_point(Index n, bool init_x, Number *x, bool init
 }
 
 // return the objective function
-bool IpoptProblem::eval_f(Index n, const Number *x, bool new_x, Number &obj_value) {
+bool IpoptProblem::eval_f(int n, const Number *x, bool new_x, Number &obj_value) {
     this->obj_value = 0.0;
     double r;
     // fixme: the big M matrix is here
-    for (Index i = 0; i < this->n_var; i++) {
+    for (int i = 0; i < this->n_var; i++) {
         if (i < this->n_var_real)
             this->obj_value += 0;
         else
@@ -123,9 +123,9 @@ bool IpoptProblem::eval_f(Index n, const Number *x, bool new_x, Number &obj_valu
 }
 
 // return the gradient of the objective function grad_{x} f(x)
-bool IpoptProblem::eval_grad_f(Index n, const Number *x, bool new_x, Number *grad_f) {
+bool IpoptProblem::eval_grad_f(int n, const Number *x, bool new_x, Number *grad_f) {
     // fixme: find a neater/faster construction
-    for (Index i = 0; i < this->n_var; i++)
+    for (int i = 0; i < this->n_var; i++)
         if (i < this->n_var_real) {
             grad_f[i] = 0;
         } else {
@@ -135,7 +135,7 @@ bool IpoptProblem::eval_grad_f(Index n, const Number *x, bool new_x, Number *gra
 }
 
 // return the value of the constraints: g(x)
-bool IpoptProblem::eval_g(Index n, const Number *x, bool new_x, Index m, Number *g) {
+bool IpoptProblem::eval_g(int n, const Number *x, bool new_x, int m, Number *g) {
     // g = B * X
     for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
         for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
@@ -146,11 +146,11 @@ bool IpoptProblem::eval_g(Index n, const Number *x, bool new_x, Index m, Number 
 }
 
 // return the triplet structure or values of the Jacobian
-bool IpoptProblem::eval_jac_g(Index n, const Number *x, bool new_x,
-                              Index m, Index nele_jac, Index *iRow, Index *jCol, Number *values) {
+bool IpoptProblem::eval_jac_g(int n, const Number *x, bool new_x,
+                              int m, int nele_jac, int *iRow, int *jCol, Number *values) {
     if (values == nullptr) {
         // return the 2 first triplet index row, col for the structure of the Jacobian
-        Index idx = 0;
+        int idx = 0;
         for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
             for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
                 iRow[idx] = it.row();
@@ -160,7 +160,7 @@ bool IpoptProblem::eval_jac_g(Index n, const Number *x, bool new_x,
         }
     } else {
         // loop through B sparse elements and get its values.
-        Index idx = 0;
+        int idx = 0;
         for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
             for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
                 values[idx] = it.value();
@@ -172,14 +172,14 @@ bool IpoptProblem::eval_jac_g(Index n, const Number *x, bool new_x,
 }
 
 //return the structure or values of the Hessian
-bool IpoptProblem::eval_h(Index n, const Number *x, bool new_x, Number obj_factor, Index m, const Number *lambda,
-                          bool new_lambda, Index nele_hess, Index *iRow, Index *jCol, Number *values) {
+bool IpoptProblem::eval_h(int n, const Number *x, bool new_x, Number obj_factor, int m, const Number *lambda,
+                          bool new_lambda, int nele_hess, int *iRow, int *jCol, Number *values) {
 
     if (values == nullptr) {
         // return the structure. This is a symmetric matrix, fill the lower left triangle only.
-        Index idx = 0;
-        for (Index row = 0; row < this->non_zero_hessian_elements; row++) {
-            for (Index col = 0; col <= row; col++) {
+        int idx = 0;
+        for (int row = 0; row < this->non_zero_hessian_elements; row++) {
+            for (int col = 0; col <= row; col++) {
                 iRow[idx] = row;
                 jCol[idx] = col;
                 idx++;
@@ -197,11 +197,11 @@ bool IpoptProblem::eval_h(Index n, const Number *x, bool new_x, Number obj_facto
 }
 
 void IpoptProblem::finalize_solution(SolverReturn status,
-                                     Index n,
+                                     int n,
                                      const Number *x,
                                      const Number *z_L,
                                      const Number *z_U,
-                                     Index m,
+                                     int m,
                                      const Number *g,
                                      const Number *lambda,
                                      Number obj_value,
@@ -211,22 +211,22 @@ void IpoptProblem::finalize_solution(SolverReturn status,
 
     // For this example, we write the solution to the console
     printf("Solution of the primal variables, x\n");
-    for (Index i = 0; i < n; i++) {
+    for (int i = 0; i < n; i++) {
         this->x_solution[i] = x[i];
         printf("--  x[%d] = %E\n", i, x[i]);
     }
 
     printf("Solution of the bound multipliers, z_L and z_U\n");
-    for (Index i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         printf("--  z_L[%d] = %E\n", i, z_L[i]);
 
-    for (Index i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         printf("--  z_U[%d] = %E\n", i, z_U[i]);
 
     printf("Objective value");
     printf("-- f(x*) = %E\n", obj_value);
 
     printf("Final values of the constraints\n");
-    for (Index i = 0; i < m; i++)
+    for (int i = 0; i < m; i++)
         printf("--  g[%d] = %E\n", i, g[i]);
 }
