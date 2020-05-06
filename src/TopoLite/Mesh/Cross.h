@@ -37,7 +37,7 @@ public:
 
     typedef weak_ptr<Cross<Scalar>> wpCross;
 
-    typedef Matrix<Scalar, 3 ,1> Vector3;
+    typedef Eigen::Matrix<Scalar, 3 ,1> Vector3;
 
     typedef shared_ptr<VPoint<Scalar>> pVertex;
 
