@@ -16,7 +16,7 @@ const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 // constructor
 IpoptProblem::IpoptProblem() {
     this->index_style = TNLP::C_STYLE;
-    this->big_m = -500;
+    this->big_m = -5E4;
 }
 
 // destructor
@@ -35,9 +35,12 @@ bool IpoptProblem::get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag, 
 }
 
 bool IpoptProblem::initialize(EigenSpMat &mat) {
-    this->n_var_real = mat.cols() - mat.rows();                      // variables without big M multipliers lambdas and aux vars
-    this->n_var = mat.rows() + mat.cols();                           // variables including big M multipliers and auxiliary vars
-    this->n_constraints = mat.rows();                                // Constraints inequalities
+    this->n_var_real = mat.cols() - mat.rows();         // variables without big M multiplier lambda and aux vars
+    this->n_var = 1 + mat.cols();                       // variables including big M multiplier and auxiliary vars
+    this->n_constraints = mat.rows();                   // Constraints inequalities
+
+    mat.prune(0.0, 1E-9);
+    this->b_coeff = mat; 
 
     set_vectors_dimensions();
     
@@ -64,9 +67,13 @@ void IpoptProblem::set_vectors_dimensions() {
 }
 
 void IpoptProblem::append_bigm_variables(EigenSpMat &mat) {
-    EigenSpMat lambda_mat; 
-    create_identity_SparseMat(lambda_mat, this->n_constraints);
-    stack_col_SparseMat(mat, lambda_mat, this->b_coeff);
+    this->b_coeff.conservativeResize(mat.rows(), this->n_var);
+    this->b_coeff.reserve(mat.nonZeros() + mat.rows());
+    for (int c = 0; c < mat.rows(); ++c) {
+        this->b_coeff.insert(c, this->n_var-1) = -1.0;
+    }
+    this->b_coeff.finalize();
+    this->b_coeff.prune(0.0, 1E-9);
 }
 
 // returns the variable bounds
@@ -99,7 +106,7 @@ bool IpoptProblem::set_bounds_info() {
             this->x_l[i] = COIN_DBL_MAX * (-1.0);
             this->x_u[i] = COIN_DBL_MAX;
         } else {
-            // lambda_i >= 0
+            // lambda >= 0
             this->x_l[i] = 0.0;
             this->x_u[i] = COIN_DBL_MAX;
         }
@@ -121,14 +128,15 @@ bool IpoptProblem::get_starting_point(int n, bool init_x, Number *x, bool init_z
 // return the objective function
 bool IpoptProblem::eval_f(int n, const Number *x, bool new_x, Number &obj_value) {
     this->obj_value = 0.0;
-    double r;
-    // fixme: the big M matrix is here
-    for (int i = 0; i < this->n_var; i++) {
+    for (int i = 0; i < this->n_var-1; i++) {
         if (i < this->n_var_real)
             this->obj_value += 0;
         else
-            this->obj_value += x[i] * this->big_m + 1.0;
+            this->obj_value += 1.0;
     }
+    this->obj_value += x[this->n_var-1] * this->big_m;
+    
+
     this->obj_value = -1.0 * this->obj_value; // minus sign for searching for the maximum
     obj_value = this->obj_value;
     return true;
@@ -136,19 +144,22 @@ bool IpoptProblem::eval_f(int n, const Number *x, bool new_x, Number &obj_value)
 
 // return the gradient of the objective function grad_{x} f(x)
 bool IpoptProblem::eval_grad_f(int n, const Number *x, bool new_x, Number *grad_f) {
-    // fixme: find a neater/faster construction
-    for (int i = 0; i < this->n_var; i++)
+    // minus everywhere --> searching for maximum
+    // loop through n_var -1
+    for (int i = 0; i < this->n_var-1; i++)
         if (i < this->n_var_real) {
-            grad_f[i] = 0;
+            grad_f[i] = 0.0;
         } else {
-            grad_f[i] = this->big_m;
+            grad_f[i] = -1.0;
         }
+    // Last constribition: the big_m
+    grad_f[this->n_var-1] = -1.0 * this->big_m;
     return true;
 }
 
 // return the value of the constraints: g(x)
+// Computes g = B * X
 bool IpoptProblem::eval_g(int n, const Number *x, bool new_x, int m, Number *g) {
-    // g = B * X
     for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
         for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
             g[it.row()] += it.value() * x[it.col()];
@@ -171,11 +182,12 @@ bool IpoptProblem::eval_jac_g(int n, const Number *x, bool new_x,
             }
         }
     } else {
-        // loop through B sparse elements and get its values.
+        // loop through B sparse elements and get values.
         int idx = 0;
         for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
             for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
                 values[idx] = it.value();
+                idx++;
             }
         }
 
@@ -227,6 +239,7 @@ void IpoptProblem::finalize_solution(SolverReturn status,
     // For this example, we write the solution to the console
     printf("Solution of the primal variables, x\n");
     for (int i = 0; i < n; i++) {
+        this->x[i] = x[i];
         this->x_solution[i] = x[i];
         printf("--  x[%d] = %E\n", i, x[i]);
     }

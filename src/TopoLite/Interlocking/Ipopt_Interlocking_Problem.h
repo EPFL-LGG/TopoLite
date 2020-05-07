@@ -113,13 +113,11 @@ public:
     void set_vectors_dimensions();
 
     /**
-     * @brief Compute B = B_interlock + L matrix   
-     *        - It is a concatenation along the horizontal axis of B and L 
-     *        - L is just the identity matrix of dim m
+     * @brief Compute B = B_interlock + t0   
      *        
-     *          / B00 ... B1n | L00 ... 0   \
-     *     B =  | ... ... ... | 0   ... 0   |
-     *          \ Bm1 ... Bmn | 0   ... Lmm /
+     *          / B00 ... B1n | 1 \
+     *     B =  | ... ... ... | 1 |
+     *          \ Bm1 ... Bmn | 1 /
      * 
      */
     void append_bigm_variables(EigenSpMat &mat);
@@ -157,6 +155,8 @@ public:
 
     /**
      * @brief Method to return the gradient of the objective
+     *               
+     * 
      * @param n number of variables
      * @param x variables values
      * @param new_x
@@ -167,6 +167,8 @@ public:
 
     /**
      * @brief Method to return the constraint residuals
+     *        Computes g = B * X        
+     * 
      * @param n number of variables
      * @param x variables values
      * @param new_x

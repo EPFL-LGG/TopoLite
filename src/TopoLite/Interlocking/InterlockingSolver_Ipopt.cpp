@@ -98,7 +98,7 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     interlock_pb->initialize(b);
 
     // [2] - Set some options for the solver 
-    app->Options()->SetNumericValue("tol", 1e-3);
+    app->Options()->SetNumericValue("tol", 1e-2);
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
     app->Options()->SetStringValue("mu_strategy", "adaptive");

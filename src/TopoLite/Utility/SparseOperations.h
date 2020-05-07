@@ -59,7 +59,15 @@ void stack_row_SparseMat(SpMat &B, SpMat &I, SpMat &C);
  * @param A the sparse matrix to print
  */
 template<typename Scalar>
-void print_SparseMat(const SparseMatrix<Scalar> &A);
+void print_SparseMatTriplets(const SparseMatrix<Scalar> &A);
+
+/**
+ * @brief Print out as a dense matrix
+ *  
+ * @param A the sparse matrix to print
+ */
+template<typename Scalar>
+void print_SparseMatTriplets(const SparseMatrix<Scalar> &A, const int precision=0);
 
 #include "SparseOperations.cpp"
 

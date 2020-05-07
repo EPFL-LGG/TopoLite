@@ -41,7 +41,7 @@ void stack_row_SparseMat(SpMat &B, SpMat &I, SpMat &C) {
 }
 
 template<typename Scalar>
-void print_SparseMat(const SparseMatrix<Scalar> &A) { 
+void print_SparseMatTriplets(const SparseMatrix<Scalar> &A) { 
     for (int i = 0; i < A.rows(); ++i) {
         for (SparseMatrix<double>::InnerIterator it(A, i); it; ++it) {
             // fixme: the template will break if <Scalar> is not <double>
@@ -49,4 +49,10 @@ void print_SparseMat(const SparseMatrix<Scalar> &A) {
         }
     }
     printf("\n");
+}
+
+template<typename Scalar>
+void print_SparseMat(const SparseMatrix<Scalar> &A, const int precision=0) { 
+    std::cout.precision(precision);
+    std::cout << Eigen::MatrixXd(A).format(StreamPrecision) << std::endl;
 }
