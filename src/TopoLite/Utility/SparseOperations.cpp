@@ -24,13 +24,13 @@ void create_identity_SparseMat(SparseMatrix<Scalar>  &m, int dim) {
 template<typename Scalar>
 void stack_col_SparseMat(const SparseMatrix<Scalar> &B, const SparseMatrix<Scalar>  &I, SparseMatrix<Scalar>  &C) {
     C.resize(B.rows(), B.cols() + I.cols());
-    C.reserve(B.nonZeros() + I.nonZeros());
-    for (int c = 0; c < B.outerSize(); ++c) {
+    C.reserve(B.nonZeros() + I.cols());
+    for (int c = 0; c < B.rows(); ++c) {
         for (SparseMatrix<double>::InnerIterator it(B, c); it; ++it) {
             C.insert(it.row(), it.col()) = it.value();
         }
         for (SparseMatrix<double>::InnerIterator it(I, c); it; ++it) {
-            C.insert(it.row(), it.col() + B.cols()) = it.value();
+            C.insert(it.row(), (B.cols() + it.col())) = it.value();
         }
     }
     C.finalize();
@@ -42,7 +42,7 @@ void stack_row_SparseMat(SpMat &B, SpMat &I, SpMat &C) {
 
 template<typename Scalar>
 void print_SparseMat(const SparseMatrix<Scalar> &A) { 
-    for (int i = 0; i < A.outerSize(); ++i) {
+    for (int i = 0; i < A.rows(); ++i) {
         for (SparseMatrix<double>::InnerIterator it(A, i); it; ++it) {
             // fixme: the template will break if <Scalar> is not <double>
             printf("%ld %ld %f\n", it.row(), it.col(), it.value());
