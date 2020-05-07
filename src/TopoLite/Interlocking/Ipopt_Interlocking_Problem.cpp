@@ -16,7 +16,7 @@ const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 // constructor
 IpoptProblem::IpoptProblem() {
     this->index_style = TNLP::C_STYLE;
-    this->big_m = -5E4;
+    this->big_m = 5E3;
 }
 
 // destructor
