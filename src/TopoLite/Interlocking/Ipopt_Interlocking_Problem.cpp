@@ -15,13 +15,8 @@ const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 
 // constructor
 IpoptProblem::IpoptProblem() {
-    n_var = 0;                                          // nb of variables [x, t] + lambda
-    n_var_real = 0;                                     // nf of variables [x, t] 
-    n_constraints = 0;                              
-    non_zero_jacobian_elements = 0; 
-    non_zero_hessian_elements = 0;
-    index_style = TNLP::C_STYLE;
-    obj_value = 0;
+    this->index_style = TNLP::C_STYLE;
+    this->big_m = -500;
 }
 
 // destructor
@@ -39,21 +34,36 @@ bool IpoptProblem::get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag, 
     return true;
 }
 
-bool IpoptProblem::initialize(int n, int m, EigenSpMat &mat) {
-    this->n_var_real = n;                                   // variables without big M multipliers lambdas
-    this->n_var = n + m;                                    // variables
-    this->n_constraints = m;                                // Constraints inequalities
-    this->non_zero_jacobian_elements = mat.nonZeros() + m;  // non zero elements in Jacobian (initial B matrix + id(m,m))
-    this->non_zero_hessian_elements = 0;                    // non-zero elements in Lagrangian Hessian
+bool IpoptProblem::initialize(EigenSpMat &mat) {
+    this->n_var_real = mat.cols() - mat.rows();                      // variables without big M multipliers lambdas and aux vars
+    this->n_var = mat.rows() + mat.cols();                           // variables including big M multipliers and auxiliary vars
+    this->n_constraints = mat.rows();                                // Constraints inequalities
 
+    set_vectors_dimensions();
+    
     set_bounds_info();
 
-    compute_constraints_matrix(mat);
+    append_bigm_variables(mat);
+
+    this->non_zero_jacobian_elements = this->b_coeff.nonZeros();     // non zero elements in Jacobian (initial B matrix + id(m,m))
+    this->non_zero_hessian_elements = 0;                             // non-zero elements in Lagrangian Hessian
 
     return true;
 }
 
-void IpoptProblem::compute_constraints_matrix(EigenSpMat &mat) {
+void IpoptProblem::set_vectors_dimensions() {
+    // allocate size for x vector
+    this->x.resize(n_var);
+    this->x_solution.resize(n_var);
+
+    this->x_l.resize(this->n_var);
+    this->x_u.resize(this->n_var);
+
+    this->g_l.resize(this->n_constraints);
+    this->g_u.resize(this->n_constraints);
+}
+
+void IpoptProblem::append_bigm_variables(EigenSpMat &mat) {
     EigenSpMat lambda_mat; 
     create_identity_SparseMat(lambda_mat, this->n_constraints);
     stack_col_SparseMat(mat, lambda_mat, this->b_coeff);
@@ -76,6 +86,8 @@ bool IpoptProblem::get_bounds_info(int n, Number *x_l, Number *x_u, int m, Numbe
 }
 
 bool IpoptProblem::set_bounds_info() {
+    // Dynamic allocation
+
     for (int i = 0; i < this->n_constraints; i++) {
         this->g_l[i] = 0.0;
         this->g_u[i] = 1.0;
@@ -188,9 +200,12 @@ bool IpoptProblem::eval_h(int n, const Number *x, bool new_x, Number obj_factor,
     } else {
         // Hessian is zero
         // fixme: faster and neater declaration here
-        int hess_dim = (this->n_constraints + this->n_var) * this->n_constraints;
-        for (int id = 0; id < hess_dim; id++)
-            values[id] = 0;
+        int idx = 0;
+        for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
+            for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
+                values[idx] = 0;
+            }
+        }
     }
 
     return true;

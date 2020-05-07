@@ -86,18 +86,19 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
                                              int num_col,
                                              int num_var) {
 
-    // [0] - Define the matrix B
-    EigenSpMat b(num_row, num_col);
-    b.setFromTriplets(tris.begin(), tris.end());
 
-    // [1] - Instance for Ipopt App and NLP
+    // [0] - Instance for Ipopt App and NLP
     SmartPtr<IpoptProblem> interlock_pb = new IpoptProblem();       // problem to solve
     SmartPtr<IpoptApplication> app = IpoptApplicationFactory();     // solver
 
-    interlock_pb->initialize(num_var, num_col, b);
+    // [1] - Define the matrix B
+    EigenSpMat b(num_row, num_col);
+    b.setFromTriplets(tris.begin(), tris.end());
+
+    interlock_pb->initialize(b);
 
     // [2] - Set some options for the solver 
-    app->Options()->SetNumericValue("tol", 1e-7);
+    app->Options()->SetNumericValue("tol", 1e-3);
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
     app->Options()->SetStringValue("mu_strategy", "adaptive");
@@ -112,7 +113,6 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
         printf("\n\n*** Error during initialization!\n");
     }
     
-
     // [5] - Optimzation
     status = app->OptimizeTNLP(interlock_pb);
 

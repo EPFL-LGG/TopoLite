@@ -94,11 +94,9 @@ public:
     /**
      * @brief Set infos about problem dimensions. The following vars are set:
      *
-     * @param n number of variables
-     * @param m number of constraints eq/ineq
      * @param mat initial B matrix elements before adding big M contribution to it
      */
-    bool initialize(Index n, Index m, EigenSpMat &mat);
+    bool initialize(EigenSpMat &mat);
 
     /**
      * @brief Get the problem bounds conditions
@@ -112,6 +110,8 @@ public:
      */
     bool get_bounds_info(Index n, Number *x_l, Number *x_u, Index m, Number *g_l, Number *g_u) override;
 
+    void set_vectors_dimensions();
+
     /**
      * @brief Compute B = B_interlock + L matrix   
      *        - It is a concatenation along the horizontal axis of B and L 
@@ -122,7 +122,7 @@ public:
      *          \ Bm1 ... Bmn | 0   ... Lmm /
      * 
      */
-    void compute_constraints_matrix(EigenSpMat &mat);
+    void append_bigm_variables(EigenSpMat &mat);
     /**
      * @brief Set the problem bounds conditions. The following vars are set.
      */
