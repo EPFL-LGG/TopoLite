@@ -8,7 +8,6 @@
 #include "InterlockingSolver.h"
 #include "CoinHelperFunctions.hpp"
 
-
 template<typename Scalar>
 class InterlockingSolver_Ipopt : public InterlockingSolver<Scalar> {
 public:
@@ -47,7 +46,4 @@ public:
                         const double *solution,
                         int num_var);
 };
-
-#include "InterlockingSolver_Ipopt.cpp"
-
 #endif //TOPOLITE_INTERLOCKINGSOLVER_IPOPT_H

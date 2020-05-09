@@ -300,3 +300,8 @@ void InterlockingSolver_Clp<Scalar>::unpackSolution(InterlockingSolver_Clp::pInt
 //        std::cout << node->staticID << ":" << trans.transpose() << ", " << rotate.transpose() << std::endl;
     }
 }
+
+void TemporaryFunction_InterlockingSolver_Clp ()
+{
+    InterlockingSolver_Clp<double> solver(nullptr, nullptr);
+}

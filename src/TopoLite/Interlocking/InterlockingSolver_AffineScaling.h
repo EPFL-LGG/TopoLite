@@ -27,6 +27,4 @@ public:
     bool isRotationalInterlocking(pInterlockingData &data);
 };
 
-#include "InterlockingSolver_AffineScaling.cpp"
-
 #endif //TOPOLITE_INTERLOCKINGSOLVER_AFFINESCALING_H

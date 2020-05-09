@@ -3,11 +3,11 @@
 //
 // bug: we keep this here for now but it is not working.
 //
-
 #include "InterlockingSolver_AffineScaling.h"
 
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
+
 template<typename Scalar>
 bool InterlockingSolver_AffineScaling<Scalar>::isTranslationalInterlocking(pInterlockingData &data)
 {
@@ -110,4 +110,10 @@ bool InterlockingSolver_AffineScaling<Scalar>::isRotationalInterlocking(pInterlo
         }
     }
     return false;
+}
+
+
+void TemporaryFunction_InterlockingSolver_AffineScaling ()
+{
+    InterlockingSolver_AffineScaling<double> solver(nullptr, nullptr);
 }

@@ -469,5 +469,15 @@ void ContactGraph<Scalar>::computeConvexHullofEdgePolygons()
         edges.push_back(edge);
         sta = end;
     }
+}
 
+// No need to call this TemporaryFunction() function,
+// it's just to avoid link error.
+void TemporaryFunction_ContactGraph ()
+{
+    ContactGraph<double> contactGraph(nullptr);
+    vector<shared_ptr<PolyMesh<double>>> polyMesh;
+    vector<bool> atBoundary;
+    contactGraph.buildFromMeshes(polyMesh, atBoundary);
+    contactGraph.mergeNode(nullptr, nullptr);
 }

@@ -16,7 +16,7 @@ const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 // constructor
 IpoptProblem::IpoptProblem() {
     this->index_style = TNLP::C_STYLE;
-    this->big_m = 5E3;
+    this->big_m = 5E6;
 }
 
 // destructor
@@ -70,7 +70,7 @@ void IpoptProblem::append_bigm_variables(EigenSpMat &mat) {
     this->b_coeff.conservativeResize(mat.rows(), this->n_var);
     this->b_coeff.reserve(mat.nonZeros() + mat.rows());
     for (int c = 0; c < mat.rows(); ++c) {
-        this->b_coeff.insert(c, this->n_var-1) = -1.0;
+        this->b_coeff.insert(c, this->n_var-1) = 1.0;
     }
     this->b_coeff.finalize();
     this->b_coeff.prune(0.0, 1E-9);
@@ -108,7 +108,7 @@ bool IpoptProblem::set_bounds_info() {
         } else {
             // lambda >= 0
             this->x_l[i] = 0.0;
-            this->x_u[i] = COIN_DBL_MAX;
+            this->x_u[i] = 1.1; //don't need to be inifinite, 1 is enough.
         }
     }
     return true;
@@ -119,8 +119,15 @@ bool IpoptProblem::get_starting_point(int n, bool init_x, Number *x, bool init_z
                                       int m, bool init_lambda, Number *lambda) {
 
     for (int i = 0; i < this->n_var; i++) {
-        this->x[i] = 0.0;
-        x[i] = 0.0;
+        if (i < this->n_var_real)
+        {
+            // x_i is defined in R
+            this->x[i] = x[i] = 0.0;
+        }
+        else
+        {
+            this->x[i] = x[i] = 1.0;
+        }
     }
     return true;
 }
@@ -129,15 +136,11 @@ bool IpoptProblem::get_starting_point(int n, bool init_x, Number *x, bool init_z
 bool IpoptProblem::eval_f(int n, const Number *x, bool new_x, Number &obj_value) {
     this->obj_value = 0.0;
     for (int i = 0; i < this->n_var-1; i++) {
-        if (i < this->n_var_real)
-            this->obj_value += 0;
-        else
-            this->obj_value += 1.0;
+        if (i >= this->n_var_real)
+            this->obj_value -= x[i];
     }
     this->obj_value += x[this->n_var-1] * this->big_m;
     
-
-    this->obj_value = -1.0 * this->obj_value; // minus sign for searching for the maximum
     obj_value = this->obj_value;
     return true;
 }
@@ -153,18 +156,16 @@ bool IpoptProblem::eval_grad_f(int n, const Number *x, bool new_x, Number *grad_
             grad_f[i] = -1.0;
         }
     // Last constribition: the big_m
-    grad_f[this->n_var-1] = -1.0 * this->big_m;
+    grad_f[this->n_var-1] = 1.0 * this->big_m;
     return true;
 }
 
 // return the value of the constraints: g(x)
 // Computes g = B * X
 bool IpoptProblem::eval_g(int n, const Number *x, bool new_x, int m, Number *g) {
-    for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
-        for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
-            g[it.row()] += it.value() * x[it.col()];
-        }
-    }
+    Eigen::Map<const Eigen::VectorXd> vecx(x, n);
+    VectorXd vecg = b_coeff * vecx;
+    std::copy(vecg.data(), vecg.data() + m, g);
     return true;
 }
 
@@ -237,24 +238,28 @@ void IpoptProblem::finalize_solution(SolverReturn status,
 
 
     // For this example, we write the solution to the console
-    printf("Solution of the primal variables, x\n");
+    max_abs_t = 0;
+//    printf("Solution of the primal variables, x\n");
     for (int i = 0; i < n; i++) {
         this->x[i] = x[i];
         this->x_solution[i] = x[i];
-        printf("--  x[%d] = %E\n", i, x[i]);
+        if(i >= n_var_real && i < n_var - 1){
+            max_abs_t = std::max(x[i], max_abs_t);
+        }
     }
 
-    printf("Solution of the bound multipliers, z_L and z_U\n");
-    for (int i = 0; i < n; i++)
-        printf("--  z_L[%d] = %E\n", i, z_L[i]);
+    
+//    printf("Solution of the bound multipliers, z_L and z_U\n");
+//    for (int i = 0; i < n; i++)
+////        printf("--  z_L[%d] = %E\n", i, z_L[i]);
+//
+//    for (int i = 0; i < n; i++)
+////        printf("--  z_U[%d] = %E\n", i, z_U[i]);
 
-    for (int i = 0; i < n; i++)
-        printf("--  z_U[%d] = %E\n", i, z_U[i]);
-
-    printf("Objective value");
-    printf("-- f(x*) = %E\n", obj_value);
-
-    printf("Final values of the constraints\n");
+    printf("Maximum |t|:\t %E\n", max_abs_t);
+    
+    Number sum_g = 0;
     for (int i = 0; i < m; i++)
-        printf("--  g[%d] = %E\n", i, g[i]);
+        sum_g+= std::abs(g[i]);
+    printf("Sum of the final values of the constraints:\t %.3f\n", sum_g);
 }

@@ -81,5 +81,4 @@ public:
     void unpackSolution(InterlockingSolver_Clp::pInterlockingData& data, bool rotationalInterlockingCheck, const double *solution, int num_var);
 };
 
-#include "InterlockingSolver_Clp.cpp"
 #endif //TOPOLITE_INTERLOCKINGSOLVER_CLP_H

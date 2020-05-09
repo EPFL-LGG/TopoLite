@@ -8,7 +8,6 @@
 #include "tbb/tbb.h"
 #include <Eigen/SparseQR>
 
-
 template<typename Scalar>
 bool InterlockingSolver_Ipopt<Scalar>::isTranslationalInterlocking(InterlockingSolver_Ipopt::pInterlockingData &data) {
     vector<EigenTriple> tris;
@@ -98,7 +97,7 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     interlock_pb->initialize(b);
 
     // [2] - Set some options for the solver 
-    app->Options()->SetNumericValue("tol", 1e-2);
+    app->Options()->SetNumericValue("tol", 1E-6);
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
     app->Options()->SetStringValue("mu_strategy", "adaptive");
@@ -123,7 +122,12 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     }
 
     // unpackSolution(data, rotationalInterlockingCheck, solution, num_var);
-    return true;
+    if(interlock_pb->max_abs_t < 1E-4){
+        return true;
+    }
+    else{
+        return false;
+    }
 }
 
 template<typename Scalar>
@@ -157,4 +161,10 @@ void InterlockingSolver_Ipopt<Scalar>::unpackSolution(InterlockingSolver_Ipopt::
 
 //        std::cout << node->staticID << ":" << trans.transpose() << ", " << rotate.transpose() << std::endl;
     }
+}
+
+
+void TemporaryFunction_InterlockingSolver_Ipopt ()
+{
+    InterlockingSolver_Ipopt<double> solver(nullptr, nullptr);
 }

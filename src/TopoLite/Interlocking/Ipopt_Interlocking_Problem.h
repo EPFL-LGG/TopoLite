@@ -69,6 +69,7 @@ public:
     RVectorXd x;                // current test vector
     RVectorXd x_solution;       // optimum vector
     Number obj_value;           // objective function (individual sum of x components)
+    Number max_abs_t;           // the biggest absolute value of t
 
     /** big M */
     Number big_m;

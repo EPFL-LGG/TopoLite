@@ -30,7 +30,7 @@ TEST_CASE("eval_g") {
     x_ptr = &x(0); 
     g_ptr = &g(0);
 
-    ipb->eval_g(0, x_ptr, false, 0, g_ptr);
+    ipb->eval_g(6, x_ptr, false, 4, g_ptr);
     for (int i = 0; i < 4; i++)
         REQUIRE(g_ptr[i] == g_expected[i]); 
 }
