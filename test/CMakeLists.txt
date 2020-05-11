@@ -10,7 +10,6 @@ if(HAVE_TEST)
 #            Interlocking/Problem_LP_simple.cpp
 #            Interlocking/Problem_LP_bigm.cpp
 #            Interlocking/Test_IPOPT_implementation.cpp
-            Interlocking/Test_Ipopt_interlocking_problem.cpp
             Interlocking/Test_interlockingSolver_Ipopt.cpp
 #            Utility/Test_SparseOperations.cpp
             )

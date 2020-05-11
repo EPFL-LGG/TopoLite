@@ -331,7 +331,7 @@ bool IpoptProblem::eval_grad_f(int n, const Number *x, bool new_x, Number *grad_
             grad_f[i] = -1.0;
         }
     // Last constribition: the big_m
-    grad_f[this->n_var-1] = 1.0 * this->big_m;
+    grad_f[this->n_var-1] = this->big_m;
     return true;
 }
 
