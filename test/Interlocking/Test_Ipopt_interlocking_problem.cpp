@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 #include <iostream>
-#include "Interlocking/Ipopt_Interlocking_Problem.h"
+#include "Interlocking/InterlockingSolver_Ipopt.h"
 #include <Eigen/Sparse> 
 
 using namespace Eigen;

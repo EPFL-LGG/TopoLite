@@ -3,7 +3,6 @@
 //
 
 #include <catch2/catch.hpp>
-//#include "Interlocking/InterlockingSolver_Clp.h"
 #include "Interlocking/InterlockingSolver_Ipopt.h"
 #include "IO/XMLIO.h"
 #include <iostream>
