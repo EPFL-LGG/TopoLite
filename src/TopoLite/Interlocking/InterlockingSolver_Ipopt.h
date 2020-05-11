@@ -58,7 +58,7 @@ public:
 
 
 /**
- * @brief  Interace between Ipopt NLP interface and TopoLite Interlocking Solver
+ * @brief  Interface between Ipopt NLP interface and TopoLite Interlocking Solver
  *         - NLP provides an easy interface to Ipopt.
  *
  *  Problem definition
@@ -95,26 +95,26 @@ public:
     typedef Eigen::SparseMatrix<Number, Eigen::ColMajor>  EigenSpMat;
 
     /** Dimensions of the problem */
-    Index n_var;
-    Index n_var_real;
-    Index n_constraints;
-    Index non_zero_jacobian_elements;
+    Index n_var;                        // N+M+1 variables - Includes auxiliary and big M multiplier [x_i,t_i, lambda]
+    Index n_var_real;                   // Real variables - No auxiliary and big M multiplier
+    Index n_constraints;                // M inequalities
+    Index non_zero_jacobian_elements;   
     Index non_zero_hessian_elements;
-    IndexStyleEnum index_style;
+    IndexStyleEnum index_style;         // Index start from 0 (C-style) or 1 (Fortran)
 
     /** Bounds for variables x and constraints g  (l:lower, u:upper) */
     RVectorXd x_l, x_u;
     RVectorXd g_l, g_u;
 
     /** Coefficients matrix */
-    EigenSpMat b_coeff;
+    EigenSpMat b_coeff;                 // matrix containing the constraints coefficients.
 
 
     /** Objective value, x and x_solution vectors */
-    RVectorXd x;                // current test vector
-    RVectorXd x_solution;       // optimum vector
-    Number obj_value;           // objective function (individual sum of x components)
-    Number max_abs_t;           // the biggest absolute value of t
+    RVectorXd x;                        // current test vector
+    RVectorXd x_solution;               // optimum vector
+    Number obj_value;                   // objective function (individual sum of x components)
+    Number max_abs_t;                   // the biggest absolute value of t
 
     /** big M */
     Number big_m;
@@ -124,7 +124,6 @@ public:
 
     /** Default destructor */
     ~IpoptProblem() override;
-
 
     /**
      * @brief Get infos about problem dimensions
@@ -167,6 +166,7 @@ public:
      * 
      */
     void append_bigm_variables(EigenSpMat &mat);
+
     /**
      * @brief Set the problem bounds conditions. The following vars are set.
      */

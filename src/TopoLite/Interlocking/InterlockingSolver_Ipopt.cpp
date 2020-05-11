@@ -66,30 +66,6 @@ bool InterlockingSolver_Ipopt<Scalar>::checkSpecialCase(pInterlockingData &data,
     return true;
 }
 
-/**
- * @brief UPDATE THIS 
- *
- *  Problem definition
- *  ------------------
- *
- *  - tris is equal to a sparse matrix A, which size is [num_row x num_col] 
- *  - our variables are [x, t], a row vector.
- *  - x: (size: num_var) is the instant translational and rotational velocity.
- *  - t: (size: num_col - num_var) is the auxiliary variable.
- *
- *  The optimization is formulated as:
- *
- *              min (-\sum_{i = 0}^{num_row} t_i)
- *  s.t.             A[x, t] >= 0
- *                  1 >= t >= 0
- *                    x \in R
- *
- *  Expected results
- *  ----------------
- *
- *  - Ideally if the structure is interlocking, the objective value should be zero.
- *  - In practice, due to numerical error, we have to allow a small tolerance for the objective value.
- */
 template<typename Scalar>
 bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterlockingData &data, vector<EigenTriple> &tris,
                                              bool rotationalInterlockingCheck,
@@ -185,13 +161,10 @@ void TemporaryFunction_InterlockingSolver_Ipopt ()
 /* ----IPOPT INTERLOCKING PROBLEM------------------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------------------------------------------------ */
 
-/**
- * @brief Construct a new Ipopt Problem:: Ipopt Problem object
- * 
- */
+
 IpoptProblem::IpoptProblem() {
-    this->index_style = TNLP::C_STYLE;
-    this->big_m = 5E6;
+    index_style = TNLP::C_STYLE;
+    big_m = 5E6;
 }
 
 // destructor
@@ -200,22 +173,22 @@ IpoptProblem::~IpoptProblem() = default;
 
 // returns the problem dimensions
 bool IpoptProblem::get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag, IndexStyleEnum &index_style) {
-    n = this->n_var;                                    // N+M variables [x, t, lamdba]
-    m = this->n_constraints;                            // M inequalities
-    nnz_jac_g = this->non_zero_jacobian_elements;       // non zero elements in Jacobian
-    nnz_h_lag = this->non_zero_hessian_elements;        // non-zero elements in Lagrangian Hessian
-    index_style = this->index_style;                    // use the C style indexing (0-based)
+    n = n_var;                                    // N+M variables [x, t, lamdba]
+    m = n_constraints;                            // M inequalities
+    nnz_jac_g = non_zero_jacobian_elements;       // non zero elements in Jacobian
+    nnz_h_lag = non_zero_hessian_elements;        // non-zero elements in Lagrangian Hessian
+    index_style = index_style;                    // use the C style indexing (0-based)
 
     return true;
 }
 
 bool IpoptProblem::initialize(EigenSpMat &mat) {
-    this->n_var_real = mat.cols() - mat.rows();         // variables without big M multiplier lambda and aux vars
-    this->n_var = 1 + mat.cols();                       // variables including big M multiplier and auxiliary vars
-    this->n_constraints = mat.rows();                   // Constraints inequalities
+    n_var_real = mat.cols() - mat.rows();         // variables without big M multiplier lambda and aux vars
+    n_var = 1 + mat.cols();                       // variables including big M multiplier and auxiliary vars
+    n_constraints = mat.rows();                   // Constraints inequalities
 
     mat.prune(0.0, 1E-9);
-    this->b_coeff = mat; 
+    b_coeff = mat; 
 
     set_vectors_dimensions();
     
@@ -223,38 +196,38 @@ bool IpoptProblem::initialize(EigenSpMat &mat) {
 
     append_bigm_variables(mat);
 
-    this->non_zero_jacobian_elements = this->b_coeff.nonZeros();     // non zero elements in Jacobian (initial B matrix + id(m,m))
-    this->non_zero_hessian_elements = 0;                             // non-zero elements in Lagrangian Hessian
+    non_zero_jacobian_elements = b_coeff.nonZeros();     // non zero elements in Jacobian (initial B matrix + id(m,m))
+    non_zero_hessian_elements = 0;                             // non-zero elements in Lagrangian Hessian
 
     return true;
 }
 
 void IpoptProblem::set_vectors_dimensions() {
     // allocate size for x vector
-    this->x.resize(n_var);
-    this->x_solution.resize(n_var);
+    x.resize(n_var);
+    x_solution.resize(n_var);
 
-    this->x_l.resize(this->n_var);
-    this->x_u.resize(this->n_var);
+    x_l.resize(n_var);
+    x_u.resize(n_var);
 
-    this->g_l.resize(this->n_constraints);
-    this->g_u.resize(this->n_constraints);
+    g_l.resize(n_constraints);
+    g_u.resize(n_constraints);
 }
 
 void IpoptProblem::append_bigm_variables(EigenSpMat &mat) {
-    this->b_coeff.conservativeResize(mat.rows(), this->n_var);
-    this->b_coeff.reserve(mat.nonZeros() + mat.rows());
+    b_coeff.conservativeResize(mat.rows(), n_var);
+    b_coeff.reserve(mat.nonZeros() + mat.rows());
     for (int c = 0; c < mat.rows(); ++c) {
-        this->b_coeff.insert(c, this->n_var-1) = 1.0;
+        b_coeff.insert(c, n_var-1) = 1.0;
     }
-    this->b_coeff.finalize();
-    this->b_coeff.prune(0.0, 1E-9);
+    b_coeff.finalize();
+    b_coeff.prune(0.0, 1E-9);
 }
 
 // returns the variable bounds
 bool IpoptProblem::get_bounds_info(int n, Number *x_l, Number *x_u, int m, Number *g_l, Number *g_u) {
 
-    for (int i = 0; i < this->n_var; i++) {
+    for (int i = 0; i < n_var; i++) {
         x_l[i] = this->x_l[i];
         x_u[i] = this->x_u[i];
     }
@@ -270,20 +243,20 @@ bool IpoptProblem::get_bounds_info(int n, Number *x_l, Number *x_u, int m, Numbe
 bool IpoptProblem::set_bounds_info() {
     // Dynamic allocation
 
-    for (int i = 0; i < this->n_constraints; i++) {
-        this->g_l[i] = 0.0;
-        this->g_u[i] = 1.0;
+    for (int i = 0; i < n_constraints; i++) {
+        g_l[i] = 0.0;
+        g_u[i] = 1.0;
     }
 
-    for (int i = 0; i < this->n_var; i++) {
-        if (i < this->n_var_real) {
+    for (int i = 0; i < n_var; i++) {
+        if (i < n_var_real) {
             // x_i is defined in R
-            this->x_l[i] = COIN_DBL_MAX * (-1.0);
-            this->x_u[i] = COIN_DBL_MAX;
+            x_l[i] = COIN_DBL_MAX * (-1.0);
+            x_u[i] = COIN_DBL_MAX;
         } else {
             // lambda >= 0
-            this->x_l[i] = 0.0;
-            this->x_u[i] = 1.1; //don't need to be inifinite, 1 is enough.
+            x_l[i] = 0.0;
+            x_u[i] = 1.1; //don't need to be inifinite, 1 is enough.
         }
     }
     return true;
@@ -293,8 +266,8 @@ bool IpoptProblem::set_bounds_info() {
 bool IpoptProblem::get_starting_point(int n, bool init_x, Number *x, bool init_z, Number *z_L, Number *z_U,
                                       int m, bool init_lambda, Number *lambda) {
 
-    for (int i = 0; i < this->n_var; i++) {
-        if (i < this->n_var_real)
+    for (int i = 0; i < n_var; i++) {
+        if (i < n_var_real)
         {
             // x_i is defined in R
             this->x[i] = x[i] = 0.0;
@@ -310,9 +283,9 @@ bool IpoptProblem::get_starting_point(int n, bool init_x, Number *x, bool init_z
 // return the objective function
 bool IpoptProblem::eval_f(int n, const Number *x, bool new_x, Number &obj_value) {
     this->obj_value = 0.0;
-    for (int i = 0; i < this->n_var-1; i++) {
-        if (i >= this->n_var_real)
-            this->obj_value -= x[i];
+    for (int i = 0; i < n_var-1; i++) {
+        if (i >= n_var_real)
+            obj_value -= x[i];
     }
     this->obj_value += x[this->n_var-1] * this->big_m;
     
@@ -324,14 +297,14 @@ bool IpoptProblem::eval_f(int n, const Number *x, bool new_x, Number &obj_value)
 bool IpoptProblem::eval_grad_f(int n, const Number *x, bool new_x, Number *grad_f) {
     // minus everywhere --> searching for maximum
     // loop through n_var -1
-    for (int i = 0; i < this->n_var-1; i++)
-        if (i < this->n_var_real) {
+    for (int i = 0; i < n_var-1; i++)
+        if (i < n_var_real) {
             grad_f[i] = 0.0;
         } else {
             grad_f[i] = -1.0;
         }
     // Last constribition: the big_m
-    grad_f[this->n_var-1] = this->big_m;
+    grad_f[n_var-1] = big_m;
     return true;
 }
 
@@ -350,8 +323,8 @@ bool IpoptProblem::eval_jac_g(int n, const Number *x, bool new_x,
     if (values == nullptr) {
         // return the 2 first triplet index row, col for the structure of the Jacobian
         int idx = 0;
-        for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
-            for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
+        for (int k = 0; k < b_coeff.outerSize(); ++k) {
+            for (SparseMatrix<double>::InnerIterator it(b_coeff, k); it; ++it) {
                 iRow[idx] = it.row();
                 jCol[idx] = it.col();
                 idx++;
@@ -360,8 +333,8 @@ bool IpoptProblem::eval_jac_g(int n, const Number *x, bool new_x,
     } else {
         // loop through B sparse elements and get values.
         int idx = 0;
-        for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
-            for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
+        for (int k = 0; k < b_coeff.outerSize(); ++k) {
+            for (SparseMatrix<double>::InnerIterator it(b_coeff, k); it; ++it) {
                 values[idx] = it.value();
                 idx++;
             }
@@ -378,7 +351,7 @@ bool IpoptProblem::eval_h(int n, const Number *x, bool new_x, Number obj_factor,
     if (values == nullptr) {
         // return the structure. This is a symmetric matrix, fill the lower left triangle only.
         int idx = 0;
-        for (int row = 0; row < this->non_zero_hessian_elements; row++) {
+        for (int row = 0; row < non_zero_hessian_elements; row++) {
             for (int col = 0; col <= row; col++) {
                 iRow[idx] = row;
                 jCol[idx] = col;
@@ -389,8 +362,8 @@ bool IpoptProblem::eval_h(int n, const Number *x, bool new_x, Number obj_factor,
         // Hessian is zero
         // fixme: faster and neater declaration here
         int idx = 0;
-        for (int k = 0; k < this->b_coeff.outerSize(); ++k) {
-            for (SparseMatrix<double>::InnerIterator it(this->b_coeff, k); it; ++it) {
+        for (int k = 0; k < b_coeff.outerSize(); ++k) {
+            for (SparseMatrix<double>::InnerIterator it(b_coeff, k); it; ++it) {
                 values[idx] = 0;
             }
         }
@@ -416,8 +389,7 @@ void IpoptProblem::finalize_solution(SolverReturn status,
     max_abs_t = 0;
 //    printf("Solution of the primal variables, x\n");
     for (int i = 0; i < n; i++) {
-        this->x[i] = x[i];
-        this->x_solution[i] = x[i];
+        this->x[i] = x_solution[i] = x[i];
         if(i >= n_var_real && i < n_var - 1){
             max_abs_t = std::max(x[i], max_abs_t);
         }
