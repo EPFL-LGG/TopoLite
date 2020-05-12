@@ -32,7 +32,7 @@ class problem_LP: public TNLP
 public:
     /** solution vector - Used for the init point as well */
     std::vector<double> x_sol;
-
+    Index hessian_triplets_nb;
     /** Default constructor */
     problem_LP();
 

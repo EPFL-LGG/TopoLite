@@ -15,6 +15,7 @@ const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 // constructor
 problem_LP::problem_LP() {
     x_sol = {0,0,0};            // initial position vector that becomes the solution
+    hessian_triplets_nb = 0;
 };
 
 // destructor
@@ -127,7 +128,7 @@ bool problem_LP::eval_h(Index n, const Number *x, bool new_x, Number obj_factor,
     if (values == nullptr) {
         // return the structure. This is a symmetric matrix, fill the lower left triangle only.
         Index idx = 0;
-        for (Index row = 0; row < 4; row++) {
+        for (Index row = 0; row < hessian_triplets_nb; row++) {
             for (Index col = 0; col <= row; col++) {
                 iRow[idx] = row;
                 jCol[idx] = col;
@@ -136,8 +137,7 @@ bool problem_LP::eval_h(Index n, const Number *x, bool new_x, Number obj_factor,
         }
     } else {
         // Hessian is zero
-        int hess_dim = m * m;
-        for (int id = 0; id < hess_dim; id++)
+        for (int id = 0; id < hessian_triplets_nb; id++)
             values[id] = 0;
     }
 
