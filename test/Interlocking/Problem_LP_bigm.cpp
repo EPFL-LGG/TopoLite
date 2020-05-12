@@ -11,6 +11,9 @@ using namespace Ipopt;
 
 const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 
+/********************************************************************************/
+/****BIG M WITH A GIVEN LAMBDA PER CONSTRAINT************************************/
+/********************************************************************************/
 
 // constructor
 problem_LP_bigm::problem_LP_bigm() {
@@ -358,7 +361,7 @@ void problem_LP_bigm_unidim::finalize_solution(SolverReturn status,
                                          const IpoptData *ip_data,
                                          IpoptCalculatedQuantities *ip_cq) {
 
-
+    
     // For this example, we write the solution to the console
     printf("Solution of the primal variables, x\n");
     for (Index i = 0; i < n; i++) {

@@ -95,8 +95,14 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
 
-    // 
+    // C.6 Barrier param
     app->Options()->SetStringValue("mu_strategy", "adaptive");
+
+    // C.7 Multiplier update
+    app->Options()->SetStringValue("alpha_for_y", "primal-and-full");   // step size use the primal step size and full step if delta x ¡= alpha for y tol
+    app->Options()->SetNumericValue("alpha_for_y_tol", 1000);            // Tolerance for switching to full equality multiplier steps
+
+
     // Linear solver 
     app->Options()->SetStringValue("linear_solver", "mumps");           // only available yet with installed IPOPT lib
     app->Options()->SetIntegerValue("max_soc", 0);                      // Disable 2ndOrder correction for trial steps at each iter.

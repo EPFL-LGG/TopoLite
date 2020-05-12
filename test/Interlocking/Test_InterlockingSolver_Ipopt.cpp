@@ -35,6 +35,7 @@ using namespace Eigen;
      SECTION("fix key and second part"){
          // set the first and second part to be on the boundires
          // then the structure is interlocking
+         printf("\tfix key and second part\n");
          atboundary[0] = true;
          atboundary[1] = true;
          // construct the contact graph
@@ -49,6 +50,7 @@ using namespace Eigen;
      SECTION("fix key"){
          // if only set the key to be fixed
          // the reset parts could move together, therefore the structure is not interlocking
+         printf("\tfix key\n");
          atboundary[0] = true;
 
          // construct the contact graph
@@ -64,6 +66,7 @@ using namespace Eigen;
      SECTION("fix key and merge key and second part"){
          // if only set the key to be fixed
          // the reset parts could move together, therefore the structure is not interlocking
+         printf("\tfix key and merge second part\n");
          atboundary[0] = true;
 
          // construct the contact graph
@@ -82,39 +85,39 @@ using namespace Eigen;
 
 
 
-TEST_CASE("Ania Example"){
-    std::string file_name[5] = { "piece4_tri.obj", "piece0.obj", "piece1.obj", "piece3.obj", "piece2.obj"};
+// TEST_CASE("Ania Example"){
+//     std::string file_name[5] = { "piece4_tri.obj", "piece0.obj", "piece1.obj", "piece3.obj", "piece2.obj"};
 
-    vector<shared_ptr<PolyMesh<double>>> meshList;
-    vector<bool> atboundary;
-    shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
-    bool textureModel;
+//     vector<shared_ptr<PolyMesh<double>>> meshList;
+//     vector<bool> atboundary;
+//     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
+//     InitVarLite(varList.get());
+//     bool textureModel;
 
 
-    for(int id = 0; id < 5; id++){
-        char number[50];
-        std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
-        part_filename += file_name[id];
-        shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
-        meshList.push_back(polyMesh);
-        atboundary.push_back(true);
-    }
+//     for(int id = 0; id < 5; id++){
+//         char number[50];
+//         std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
+//         part_filename += file_name[id];
+//         shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
+//         polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+//         meshList.push_back(polyMesh);
+//         atboundary.push_back(true);
+//     }
 
-    atboundary[0] = false;
+//     atboundary[0] = false;
 
-    shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
-    graph->buildFromMeshes(meshList, atboundary, 1e-3);
+//     shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
+//     graph->buildFromMeshes(meshList, atboundary, 1e-3);
 
-    SECTION("Ipopt"){
-        // solve the interlocking problem by using ipopt
-        InterlockingSolver_Ipopt<double> solver(graph, varList);
-        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
-    }
+//     SECTION("Ipopt"){
+//         // solve the interlocking problem by using ipopt
+//         InterlockingSolver_Ipopt<double> solver(graph, varList);
+//         shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+//         REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
+//     }
 
-}
+// }
 
 
 TEST_CASE("IpoptProblem eval_g") {

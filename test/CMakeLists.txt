@@ -7,10 +7,10 @@ if(HAVE_TEST)
     include(ParseAndAddCatchTests)
 
     file(GLOB testTopoFiles
-#            Interlocking/Problem_LP_simple.cpp
-#            Interlocking/Problem_LP_bigm.cpp
-#            Interlocking/Test_IPOPT_implementation.cpp
-            Interlocking/Test_interlockingSolver_Ipopt.cpp
+           Interlocking/Problem_LP_simple.cpp
+           Interlocking/Problem_LP_bigm.cpp
+            # Interlocking/Test_toymodel_Ipopt.cpp
+           Interlocking/Test_interlockingSolver_Ipopt.cpp
 #            Utility/Test_SparseOperations.cpp
             )
 
