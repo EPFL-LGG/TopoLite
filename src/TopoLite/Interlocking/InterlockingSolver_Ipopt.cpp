@@ -90,7 +90,9 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     app->Options()->SetStringValue("hessian_constant", "yes");
     app->Options()->SetStringValue("mu_strategy", "adaptive");
     app->Options()->SetStringValue("output_file", "ipopt.out");
-    app->Options()->SetStringValue("linear_solver", "mumps");   // only available yet with installed IPOPT lib
+    app->Options()->SetStringValue("linear_solver", "mumps");           // only available yet with installed IPOPT lib
+    app->Options()->SetIntegerValue("min_refinement_steps", 0);         // iterative refinement steps/linear solve. Default=1
+    app->Options()->SetIntegerValue("max_refinement_steps", 5);         // 
     app->Options()->SetIntegerValue("mumps_permuting_scaling", 7);      // not significant, 7 is 3% faster   (see MUMPS ICNTL(6))
     app->Options()->SetIntegerValue("mumps_pivot_order", 6);            // 0, 2, 6 are showing best perfs    (see MUMPS ICNTL(7))
     app->Options()->SetIntegerValue("mumps_scaling", 77);               // no differences,  77 is default    (see MUMPS ICNTL(8))
