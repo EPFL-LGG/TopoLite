@@ -85,14 +85,24 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     interlock_pb->initialize(b);
 
     // [2] - Set some options for the solver 
+
+    // C.2 Termination
     app->Options()->SetNumericValue("tol", 1e-5);
+    app->Options()->SetNumericValue("acceptable_tol", 1e-5);
+
+    // C.4 NLP
+    app->Options()->SetStringValue("jac_c_constant", "yes");
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
+
+    // 
     app->Options()->SetStringValue("mu_strategy", "adaptive");
-    app->Options()->SetStringValue("output_file", "ipopt.out");
+    // Linear solver 
     app->Options()->SetStringValue("linear_solver", "mumps");           // only available yet with installed IPOPT lib
+    app->Options()->SetIntegerValue("max_soc", 0);                      // Disable 2ndOrder correction for trial steps at each iter.
     app->Options()->SetIntegerValue("min_refinement_steps", 0);         // iterative refinement steps/linear solve. Default=1
     app->Options()->SetIntegerValue("max_refinement_steps", 5);         // 
+    // MUMPS 
     app->Options()->SetIntegerValue("mumps_permuting_scaling", 7);      // not significant, 7 is 3% faster   (see MUMPS ICNTL(6))
     app->Options()->SetIntegerValue("mumps_pivot_order", 6);            // 0, 2, 6 are showing best perfs    (see MUMPS ICNTL(7))
     app->Options()->SetIntegerValue("mumps_scaling", 77);               // no differences,  77 is default    (see MUMPS ICNTL(8))
@@ -169,7 +179,7 @@ void TemporaryFunction_InterlockingSolver_Ipopt ()
 
 IpoptProblem::IpoptProblem() {
     index_style = TNLP::C_STYLE;
-    big_m = 5E6;
+    big_m = 5E7;                    // a smaller bigM works 5e6, solving is faster but final lambda is not exactly 0 
 }
 
 // destructor
@@ -249,8 +259,8 @@ bool IpoptProblem::set_bounds_info() {
     // Dynamic allocation
 
     for (int i = 0; i < n_constraints; i++) {
-        g_l[i] = 0.0;
-        g_u[i] = 1.0;
+        g_l[i] = 0;
+        g_u[i] = COIN_DBL_MAX;
     }
 
     for (int i = 0; i < n_var; i++) {
@@ -259,9 +269,9 @@ bool IpoptProblem::set_bounds_info() {
             x_l[i] = COIN_DBL_MAX * (-1.0);
             x_u[i] = COIN_DBL_MAX;
         } else {
-            // lambda >= 0
+            // lambda and aux variables >= 0
             x_l[i] = 0.0;
-            x_u[i] = 1.1; //don't need to be inifinite, 1 is enough.
+            x_u[i] = COIN_DBL_MAX;  //don't need to be inifinite, 1 is enough. However unbounding reduce execution time
         }
     }
     return true;
@@ -272,14 +282,10 @@ bool IpoptProblem::get_starting_point(int n, bool init_x, Number *x, bool init_z
                                       int m, bool init_lambda, Number *lambda) {
 
     for (int i = 0; i < n_var; i++) {
-        if (i < n_var_real)
-        {
-            // x_i is defined in R
+        if (i < n_var_real) {
             this->x[i] = x[i] = 0.0;
-        }
-        else
-        {
-            this->x[i] = x[i] = 1.0;
+        } else {
+            this->x[i] = x[i] = 0.0;  // note: setting 0 instead of 1 makes the code faster
         }
     }
     return true;
@@ -401,6 +407,7 @@ void IpoptProblem::finalize_solution(SolverReturn status,
     }
 
     printf("Maximum |t|:\t %E\n", max_abs_t);
+    printf("Lambda     :\t %E\n", x[n_var-1]);
     
     Number sum_g = 0;
     for (int i = 0; i < m; i++)
