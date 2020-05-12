@@ -85,12 +85,15 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     interlock_pb->initialize(b);
 
     // [2] - Set some options for the solver 
-    app->Options()->SetNumericValue("tol", 1E-6);
+    app->Options()->SetNumericValue("tol", 1e-5);
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
     app->Options()->SetStringValue("mu_strategy", "adaptive");
     app->Options()->SetStringValue("output_file", "ipopt.out");
-    app->Options()->SetStringValue("linear_solver", "mumps");  // only available yet with installed IPOPT lib
+    app->Options()->SetStringValue("linear_solver", "mumps");   // only available yet with installed IPOPT lib
+    app->Options()->SetIntegerValue("mumps_permuting_scaling", 7);      // not significant, 7 is 3% faster   (see MUMPS ICNTL(6))
+    app->Options()->SetIntegerValue("mumps_pivot_order", 6);            // 0, 2, 6 are showing best perfs    (see MUMPS ICNTL(7))
+    app->Options()->SetIntegerValue("mumps_scaling", 77);               // no differences,  77 is default    (see MUMPS ICNTL(8))
     // app->Options()->SetStringValue("derivative_test", "first-order"); // excellent for debugging
 
     // [3] - Intialize the IpoptApplication and process the options
