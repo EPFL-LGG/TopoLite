@@ -103,19 +103,34 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
 
     // C.7 Multiplier update
     app->Options()->SetStringValue("alpha_for_y", "primal-and-full");   // step size use the primal step size and full step if delta x ¡= alpha for y tol
-    app->Options()->SetNumericValue("alpha_for_y_tol", 1000);            // Tolerance for switching to full equality multiplier steps
+    app->Options()->SetNumericValue("alpha_for_y_tol", 100);            // Tolerance for switching to full equality multiplier steps
 
-
-    // Linear solver 
-    app->Options()->SetStringValue("linear_solver", "mumps");           // only available yet with installed IPOPT lib
+    // C.8 Line search 
     app->Options()->SetIntegerValue("max_soc", 0);                      // Disable 2ndOrder correction for trial steps at each iter.
-    app->Options()->SetIntegerValue("min_refinement_steps", 0);         // iterative refinement steps/linear solve. Default=1
-    app->Options()->SetIntegerValue("max_refinement_steps", 5);         // 
-    // MUMPS 
-    app->Options()->SetIntegerValue("mumps_permuting_scaling", 7);      // not significant, 7 is 3% faster   (see MUMPS ICNTL(6))
-    app->Options()->SetIntegerValue("mumps_pivot_order", 6);            // 0, 2, 6 are showing best perfs    (see MUMPS ICNTL(7))
-    app->Options()->SetIntegerValue("mumps_scaling", 77);               // no differences,  77 is default    (see MUMPS ICNTL(8))
-    // app->Options()->SetStringValue("derivative_test", "first-order"); // excellent for debugging
+
+    // C.10 Restoration phase
+    app->Options()->SetStringValue("expect_infeasible_problem", "yes"); // enable heuristics to detect infeasibility quicker
+
+    
+    // C.11 Linear Solver 
+    app->Options()->SetStringValue("linear_solver", "mumps");           // only available yet with installed IPOPT lib
+    app->Options()->SetIntegerValue("min_refinement_steps", 0);         // iterative refinement steps/linear solve. Default=1 (changes Sum of the final values of constraints)
+    app->Options()->SetIntegerValue("max_refinement_steps", 3);         // 
+    // C.20 MUMPS settings 
+    //  pivot_order is the most significant parameter
+    //  * 1, 3 not accessible (can't install SCOTCH, 1 is manual mode)
+    //  * 2 (AMF) is very slow (approximate minimum fill)
+    //  * 4 (PORD) is slow.
+    //  * 0 (AMD) quite fast (approximate minimum degree ordering)
+    //  * 5 (METIS) is slow
+    //  * 6 (QAMD the fastest (aproximate minimum degree ordering + quasi-dense row detection)
+    //  * 77 (auto) seems to use AMD
+    app->Options()->SetIntegerValue("mumps_pivot_order", 6);            // 0, 2, 6 are showing best perfs           (see MUMPS ICNTL(7))
+    app->Options()->SetIntegerValue("mumps_scaling",   4);             // Huge differences (7 and 8 are slower),    (see MUMPS ICNTL(8))
+    
+    // For debugging purposes
+    // app->Options()->SetStringValue("derivative_test", "first-order");
+
 
     // [3] - Intialize the IpoptApplication and process the options
     ApplicationReturnStatus status;
