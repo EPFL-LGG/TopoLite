@@ -97,6 +97,9 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
 
     // C.6 Barrier param
     app->Options()->SetStringValue("mu_strategy", "adaptive");
+    // Oracle for the new barrier param - Deetermines how the new barrier is computed in each "free mode" iteration
+    // probing/loqo/quality-function (default)
+    app->Options()->SetStringValue("mu_oracle", "loqo");
 
     // C.7 Multiplier update
     app->Options()->SetStringValue("alpha_for_y", "primal-and-full");   // step size use the primal step size and full step if delta x ¡= alpha for y tol
