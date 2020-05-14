@@ -371,7 +371,7 @@ Scalar PolyPolyBoolean<Scalar>::computeScale(const PolyPolyBoolean::PolysVector3
         }
     }
 
-    Scale = std::max(Scale, std::pow(10, std::max(0, 8 - maxdigit)));
+    Scale = std::max(Scale, (Scalar)(std::pow(10, std::max(0, 8 - maxdigit))));
     return Scale;
 }
 

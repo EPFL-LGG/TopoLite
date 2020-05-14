@@ -54,12 +54,12 @@ public:
         return Vector3(0, 0, 0);
     }
 
-    void get_norm_fric_for_block(int partID, int polyID, Vector3 &normal, Vector3 &ufric, Vector3 &vfric)
+    void get_norm_fric_for_block(int partID, Vector3 &normal, Vector3 &ufric, Vector3 &vfric)
     {
-        normal = getContactNormal(partID, polyID) * (-1.0);
-        ufric = Eigen::Vector3d(1, 0, 0).cross(normal);
+        normal = getContactNormal(partID) * (-1.0);
+        ufric = Vector3(1, 0, 0).cross(normal);
         if((ufric).norm() < FLOAT_ERROR_SMALL){
-            ufric = Eigen::Vector3d(0, 1, 0).cross(normal);
+            ufric = Vector3(0, 1, 0).cross(normal);
         }
         ufric /= ufric.norm();
         vfric = normal.cross(ufric); vfric /= vfric.norm();
@@ -70,7 +70,7 @@ public:
     {
         int num_vks = 0;
         for(pPolygon poly : polygons)
-            num_vks += poly.size();
+            num_vks += poly->size();
         return num_vks;
     }
 

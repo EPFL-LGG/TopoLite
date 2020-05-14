@@ -167,7 +167,7 @@ void _Polygon<Scalar>::print() const
 template <typename Scalar>
 Matrix<Scalar, 3, 1> _Polygon<Scalar>::center() const
 {
-    Vector3d _center = Vector3d(0, 0, 0);
+    Vector3 _center = Vector3(0, 0, 0);
 	for (size_t i = 0; i < vers.size(); i++)
 	{
         _center += vers[i]->pos;
@@ -228,7 +228,7 @@ Matrix<Scalar, 3, 1> _Polygon<Scalar>::computeFitedPlaneNormal() const
 		return Vector3(0, 0, 0);
 	}
 
-	Vector3d _normal;
+	Vector3 _normal;
 	if(maxDet == det_x)
 	{
         _normal = Vector3(det_x, xz*yz - xy*zz, xy*yz - xz*yy);
