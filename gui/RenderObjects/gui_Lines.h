@@ -84,6 +84,17 @@ public:
 
 public:
     void initShader(){
+
+
+#if defined(NANOGUI_USE_OPENGL)
+        //read text from file
+        std::ifstream file("shader/Lines.vert");
+        std::string shader_vert((std::istreambuf_iterator<char>(file)),
+                                std::istreambuf_iterator<char>());
+        file = std::ifstream("shader/Lines.frag");
+        string shader_frag((std::istreambuf_iterator<char>(file)),
+                           std::istreambuf_iterator<char>());
+#elif defined(NANOGUI_USE_METAL)
         //read text from file
         std::ifstream file("shader/Lines_vert.metal");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
@@ -92,6 +103,7 @@ public:
         file = std::ifstream("shader/Lines_frag.metal");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
+#endif
 
         shader = new nanogui::Shader(render_pass, "LinesShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None);
 

@@ -27,6 +27,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 
 #NANOGUI
 if(HAVE_NANOGUI)
+    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
     find_package(NanoGUI)
     set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} PARENT_SCOPE)
     set(NANOGUI_EXTRA_DEFS ${NANOGUI_EXTRA_DEFS} PARENT_SCOPE)

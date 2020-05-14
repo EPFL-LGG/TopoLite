@@ -168,8 +168,9 @@ public:
     }
 
     void init_render_pass(){
-        nanogui::ref<nanogui::Texture> depth_stencil = new nanogui::Texture(
-                nanogui::Texture::PixelFormat::DepthStencil,
+#if defined(NANOGUI_USE_METAL)
+        nanogui::ref<nanogui::Texture> depth_texture = new nanogui::Texture(
+                nanogui::Texture::PixelFormat::Depth,
                 nanogui::Texture::ComponentFormat::Float32,
                 framebuffer_size(),
                 nanogui::Texture::InterpolationMode::Bilinear,
@@ -178,8 +179,22 @@ public:
                 1,
                 nanogui::Texture::TextureFlags::RenderTarget
         );
+        m_render_pass = new nanogui::RenderPass({ this }, depth_texture);
+#elif defined(NANOGUI_USE_OPENGL)
+//        nanogui::ref<nanogui::Texture> depth_texture = new nanogui::Texture(
+//                nanogui::Texture::PixelFormat::Depth,
+//                nanogui::Texture::ComponentFormat::Float16,
+//                framebuffer_size(),
+//                nanogui::Texture::InterpolationMode::Nearest,
+//                nanogui::Texture::InterpolationMode::Nearest,
+//                nanogui::Texture::WrapMode::ClampToEdge,
+//                1,
+//                nanogui::Texture::TextureFlags::RenderTarget
+//        );
+//        m_render_pass = new nanogui::RenderPass({ this }, depth_texture);;
+          m_render_pass = new nanogui::RenderPass({this});
+        #endif
 
-        m_render_pass = new nanogui::RenderPass({ this }, depth_stencil);
         m_render_pass->set_clear_color(0, nanogui::Color(0.9f, 0.9f, 0.9f, 1.f));
         m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
         m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);

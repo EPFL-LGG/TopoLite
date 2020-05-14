@@ -1,4 +1,5 @@
 //
+//
 // Created by ziqwang on 09.04.20.
 //
 
@@ -78,6 +79,11 @@ public:
     void draw(){
         /* MVP uniforms */
         render_pass->begin();
+#if defined(NANOGUI_USE_OPENGL)
+        glClear(GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_DEPTH_TEST);
+        glDepthMask( true );
+#endif
         for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
             if(object->visible){
                 object->update_uniform();

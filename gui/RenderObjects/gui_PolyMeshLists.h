@@ -8,6 +8,7 @@
 #include "Mesh/PolyMesh.h"
 #include "gui_RenderObject.h"
 #include <nanogui/vector.h>
+#include <fstream>
 
 template<typename Scalar>
 class gui_PolyMeshLists : public gui_RenderObject<Scalar>{
@@ -113,6 +114,15 @@ public:
     void initShader()
     {
         //read text from file
+#if defined(NANOGUI_USE_OPENGL)
+        std::ifstream file("shader/PolyMeshAnimation.vert");
+        std::string shader_vert((std::istreambuf_iterator<char>(file)),
+                                std::istreambuf_iterator<char>());
+
+        file = std::ifstream("shader/PolyMeshAnimation.frag");
+        string shader_frag((std::istreambuf_iterator<char>(file)),
+                           std::istreambuf_iterator<char>());
+#elif defined(NANOGUI_USE_METAL)
         std::ifstream file("shader/PolyMeshAnimation_vert.metal");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
@@ -120,7 +130,7 @@ public:
         file = std::ifstream("shader/PolyMeshAnimation_frag.metal");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
-
+#endif
         shader = new nanogui::Shader(render_pass, "PolyMeshShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None);
 
         update_buffer();
@@ -138,6 +148,7 @@ public:
         buffer_rotation.clear();
         buffer_center.clear();
 
+#if defined(NANOGUI_USE_METAL)
         for(size_t mID = 0; mID < meshLists.size(); mID++){
             for(int kd = 0; kd < 3; kd++){
                 buffer_colors.push_back(object_colors[mID][kd]);
@@ -146,6 +157,7 @@ public:
                 buffer_center.push_back(ani_center[mID][kd]);
             }
         }
+#endif
 
         for(size_t mID = 0; mID < meshLists.size(); mID++)
         {
@@ -185,9 +197,22 @@ public:
                     buffer_barycentric.push_back(0.5);
                     buffer_barycentric.push_back(10);
 
+#if defined(NANOGUI_USE_OPENGL)
+                    for(int vID = 0; vID < 3; vID ++)
+                    {
+                        for(int kd = 0; kd < 3; kd ++)
+                        {
+                            buffer_colors.push_back(object_colors[mID][kd]);
+                            buffer_translation.push_back(ani_translation[mID][kd]);
+                            buffer_rotation.push_back(ani_rotation[mID][kd]);
+                            buffer_center.push_back(ani_center[mID][kd]);
+                        }
+                    }
+#elif defined(NANOGUI_USE_METAL)
                     for(int kd = 0; kd < 3; kd++){
                         buffer_objectindex.push_back(mID);
                     }
+#endif
                 }
             }
         }
@@ -195,14 +220,14 @@ public:
 
         shader->set_buffer("position", nanogui::VariableType::Float32, {buffer_positions.size() / 3, 3},  buffer_positions.data());
         shader->set_buffer("barycentric", nanogui::VariableType::Float32, {buffer_barycentric.size() / 3, 3}, buffer_barycentric.data());
-        shader->set_buffer("color", nanogui::VariableType::Float32, {buffer_colors.size() / 3, 3}, buffer_colors.data());
 
+        shader->set_buffer("color", nanogui::VariableType::Float32, {buffer_colors.size() / 3, 3}, buffer_colors.data());
         shader->set_buffer("translation", nanogui::VariableType::Float32, {buffer_translation.size() / 3, 3}, buffer_translation.data());
         shader->set_buffer("rotation", nanogui::VariableType::Float32, {buffer_rotation.size() / 3, 3}, buffer_rotation.data());
         shader->set_buffer("center", nanogui::VariableType::Float32, {buffer_center.size() / 3, 3}, buffer_center.data());
-
+#if defined(NANOGUI_USE_METAL)
         shader->set_buffer("objectindex", nanogui::VariableType::Int32, {buffer_objectindex.size(), 1}, buffer_objectindex.data());
-
+#endif
     }
 
     void update_uniform(){
