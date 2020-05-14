@@ -16,6 +16,7 @@
 
 #include "TopoLite/Utility/GeometricPrimitives.h"
 #include "TopoLite/Utility/TopoObject.h"
+#include <unordered_map>
 
 #include "Polygon.h"
 

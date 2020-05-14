@@ -46,8 +46,8 @@ TEST_CASE("PolyMesh_AABBTree - Test findTexPoint")
 
         PolyMesh_AABBTree<double> aabbTree(*polyMesh);
         aabbTree.buildTexTree();
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0.0, 0.3)) == polyMesh->polyList[1]);
-        REQUIRE(aabbTree.findTexPoint(Vector2d(0.1, 0.0)) == polyMesh->polyList[0]);
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.0, 0.3)) == aabbTree.polyList[1]);
+        REQUIRE(aabbTree.findTexPoint(Vector2d(0.1, 0.0)) == aabbTree.polyList[0]);
         REQUIRE(aabbTree.findTexPoint(Vector2d(0.0, 0.0)) != nullptr);                  // These pts are in p0 and p1
         REQUIRE(aabbTree.findTexPoint(Vector2d(0.5, 0.5)) != nullptr);                  // we don't care which one it is
         REQUIRE(aabbTree.findTexPoint(Vector2d(0.6, 0.5)) == nullptr);                  // outside
