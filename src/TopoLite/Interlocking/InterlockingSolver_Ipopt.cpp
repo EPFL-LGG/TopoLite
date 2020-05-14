@@ -85,6 +85,7 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     interlock_pb->initialize(b);
 
     // [2] - Set some options for the solver 
+    app->Options()->SetIntegerValue("print_level", 5);
 
     // C.2 Termination
     app->Options()->SetNumericValue("tol", 1e-5);
@@ -94,12 +95,6 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     app->Options()->SetStringValue("jac_c_constant", "yes");
     app->Options()->SetStringValue("jac_d_constant", "yes");
     app->Options()->SetStringValue("hessian_constant", "yes");
-
-    // C.6 Barrier param
-    app->Options()->SetStringValue("mu_strategy", "adaptive");
-    // Oracle for the new barrier param - Deetermines how the new barrier is computed in each "free mode" iteration
-    // probing/loqo/quality-function (default)
-    app->Options()->SetStringValue("mu_oracle", "loqo");
 
     // C.7 Multiplier update
     app->Options()->SetStringValue("alpha_for_y", "primal-and-full");   // step size use the primal step size and full step if delta x ¡= alpha for y tol
@@ -111,11 +106,12 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     // C.10 Restoration phase
     app->Options()->SetStringValue("expect_infeasible_problem", "yes"); // enable heuristics to detect infeasibility quicker
 
-    
+    // todo: Exiting if t > 0 and lambda = 0 
+
     // C.11 Linear Solver 
     app->Options()->SetStringValue("linear_solver", "mumps");           // only available yet with installed IPOPT lib
     app->Options()->SetIntegerValue("min_refinement_steps", 0);         // iterative refinement steps/linear solve. Default=1 (changes Sum of the final values of constraints)
-    app->Options()->SetIntegerValue("max_refinement_steps", 3);         // 
+    app->Options()->SetIntegerValue("max_refinement_steps", 5);         // 
     // C.20 MUMPS settings 
     //  pivot_order is the most significant parameter
     //  * 1, 3 not accessible (can't install SCOTCH, 1 is manual mode)
@@ -127,6 +123,23 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
     //  * 77 (auto) seems to use AMD
     app->Options()->SetIntegerValue("mumps_pivot_order", 6);            // 0, 2, 6 are showing best perfs           (see MUMPS ICNTL(7))
     app->Options()->SetIntegerValue("mumps_scaling",   4);             // Huge differences (7 and 8 are slower),    (see MUMPS ICNTL(8))
+
+    // C.6 Barrier param
+    bool mehrotra = false;
+    if (mehrotra) { 
+        // Runs Mehrotra predictor-corrector algo. Works well with LPs. A bit more aggressive but slightly slower than adaptive coupled with LOQO. 
+        app->Options()->SetStringValue("mehrotra_algorithm", "yes");
+        app->Options()->SetNumericValue("tol", 1e+1);
+        app->Options()->SetNumericValue("acceptable_tol", 1e+1);
+        app->Options()->SetIntegerValue("min_refinement_steps", 0);         // iterative refinement steps/linear solve. Default=1 (changes Sum of the final values of constraints)
+        app->Options()->SetIntegerValue("max_refinement_steps", 5);         // 
+    } else { 
+        app->Options()->SetStringValue("mu_strategy", "adaptive");
+        /* Oracle for the new barrier param - Deetermines how the new barrier is computed in each "free mode" iteration
+         * probing/loqo/quality-function (default) */
+        app->Options()->SetStringValue("mu_oracle", "loqo");
+    }
+
     
     // For debugging purposes
     // app->Options()->SetStringValue("derivative_test", "first-order");
