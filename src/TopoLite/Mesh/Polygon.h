@@ -219,7 +219,4 @@ public:
 	int getPtVerID(Vector3 point) const;
 
 };
-
-#include "Polygon.cpp"
-
 #endif

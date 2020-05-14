@@ -20,11 +20,11 @@ template<typename Scalar>
 class InterlockingSolver_Ipopt : public InterlockingSolver<Scalar> {
 public:
     typedef shared_ptr<typename InterlockingSolver<Scalar>::InterlockingData> pInterlockingData;
-    typedef Eigen::SparseMatrix<Scalar, Eigen::ColMajor> EigenSpMat;
-    typedef Eigen::Triplet<Scalar> EigenTriple;
+    typedef Eigen::SparseMatrix<double, Eigen::ColMajor> EigenSpMat;
+    typedef Eigen::Triplet<double> EigenTriple;
     typedef shared_ptr<ContactGraph<Scalar>> pContactGraph;
     typedef shared_ptr<ContactGraphNode<Scalar>> pContactGraphNode;
-    typedef Eigen::Matrix<Scalar, 3, 1> Vector3;
+    typedef Eigen::Matrix<double, 3, 1> Vector3;
 
     using InterlockingSolver<Scalar>::graph;
 

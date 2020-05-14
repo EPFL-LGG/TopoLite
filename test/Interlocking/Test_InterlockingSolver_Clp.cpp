@@ -9,7 +9,7 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseQR>
 
-TEST_CASE("Bunny Example")
+TEST_CASE("Bunny Example Clp")
 {
     vector<shared_ptr<PolyMesh<double>>> meshList;
     vector<bool> atboundary;
@@ -82,7 +82,7 @@ TEST_CASE("Bunny Example")
 }
 
 
-TEST_CASE("Ania Example"){
+TEST_CASE("Ania Example Clp"){
     std::string file_name[5] = { "piece4_tri.obj", "piece0.obj", "piece1.obj", "piece3.obj", "piece2.obj"};
 
     vector<shared_ptr<PolyMesh<double>>> meshList;
@@ -107,12 +107,12 @@ TEST_CASE("Ania Example"){
     shared_ptr<ContactGraph<double>>graph = make_shared<ContactGraph<double>>(varList);
     graph->buildFromMeshes(meshList, atboundary, 1e-3);
 
-    SECTION("Simplex Method"){
-        // solve the interlocking problem by using CLP library
-        InterlockingSolver_Clp<double> solver(graph, varList, SIMPLEX);
-        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
-        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
-    }
+//    SECTION("Simplex Method"){
+//        // solve the interlocking problem by using CLP library
+//        InterlockingSolver_Clp<double> solver(graph, varList, SIMPLEX);
+//        shared_ptr<typename InterlockingSolver<double>::InterlockingData> interlockData;
+//        REQUIRE(solver.isRotationalInterlocking(interlockData) == false);
+//    }
 
     SECTION("Barrier Method"){
         // solve the interlocking problem by using CLP library
@@ -126,7 +126,7 @@ TEST_CASE("Ania Example"){
 TEST_CASE("Ania Example: Special Case"){
     //Read all Parts
 
-    std::string file_name[3] = {"piece0.obj", "piece1.obj", "piece4.obj"};
+    std::string file_name[3] = {"piece0.obj", "piece1.obj", "piece4_tri.obj"};
     vector<shared_ptr<PolyMesh<double>>> meshList;
     vector<bool> atboundary;
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();

@@ -166,7 +166,7 @@ void InterlockingSolver_Ipopt<Scalar>::unpackSolution(InterlockingSolver_Ipopt::
     for (pContactGraphNode node: graph->nodes) {
         Vector3 trans(0, 0, 0);
         Vector3 rotate(0, 0, 0);
-        Vector3 center = node->centroid;
+        Vector3 center = (node->centroid).template cast<double>();
         if (node->dynamicID != -1) {
             if (rotationalInterlockingCheck) {
                 trans = Vector3(solution[node->dynamicID * 6],
@@ -190,12 +190,6 @@ void InterlockingSolver_Ipopt<Scalar>::unpackSolution(InterlockingSolver_Ipopt::
     }
 }
 
-
-void TemporaryFunction_InterlockingSolver_Ipopt ()
-{
-    InterlockingSolver_Ipopt<double> solver(nullptr, nullptr);
-}
-
 /* ------------------------------------------------------------------------------------------------------------------ */
 /* ----IPOPT INTERLOCKING PROBLEM------------------------------------------------------------------------------------ */
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -211,12 +205,12 @@ IpoptProblem::~IpoptProblem() = default;
 
 
 // returns the problem dimensions
-bool IpoptProblem::get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag, IndexStyleEnum &index_style) {
+bool IpoptProblem::get_nlp_info(int &n, int &m, int &nnz_jac_g, int &nnz_h_lag, IndexStyleEnum &_index_style) {
     n = n_var;                                    // N+M variables [x, t, lamdba]
     m = n_constraints;                            // M inequalities
     nnz_jac_g = non_zero_jacobian_elements;       // non zero elements in Jacobian
     nnz_h_lag = non_zero_hessian_elements;        // non-zero elements in Lagrangian Hessian
-    index_style = index_style;                    // use the C style indexing (0-based)
+    _index_style = index_style;                    // use the C style indexing (0-based)
 
     return true;
 }
@@ -438,3 +432,12 @@ void IpoptProblem::finalize_solution(SolverReturn status,
         sum_g+= std::abs(g[i]);
     printf("Sum of the final values of the constraints:\t %.3f\n", sum_g);
 }
+
+
+void TemporaryFunction_InterlockingSolver_Ipopt ()
+{
+    InterlockingSolver_Ipopt<double> solver(nullptr, nullptr);
+}
+template class InterlockingSolver_Ipopt<float>;
+template class InterlockingSolver_Ipopt<double>;
+

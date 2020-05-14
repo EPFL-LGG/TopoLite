@@ -416,3 +416,6 @@ int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point) const
 
 	return ELEMENT_OUT_LIST;
 }
+
+template class _Polygon<double>;
+template class _Polygon<float>;

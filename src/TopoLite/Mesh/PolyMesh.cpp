@@ -939,3 +939,7 @@ shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh() const
     polymesh->update();
     return polymesh;
 }
+
+
+template class PolyMesh<double>;
+template class PolyMesh<float>;

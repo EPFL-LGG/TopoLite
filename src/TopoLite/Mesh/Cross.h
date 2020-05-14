@@ -132,7 +132,4 @@ public:
 
     bool checkNeighborAtBoundary(int nID);
 };
-
-#include "Cross.cpp"
-
 #endif

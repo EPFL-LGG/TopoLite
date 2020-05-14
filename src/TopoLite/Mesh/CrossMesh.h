@@ -166,8 +166,5 @@ private:
 
 
 };
-
-#include "CrossMesh.cpp"
-
 #endif
 

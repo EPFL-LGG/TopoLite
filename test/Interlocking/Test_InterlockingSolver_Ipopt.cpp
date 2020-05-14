@@ -11,7 +11,7 @@
 
 using namespace Eigen;
 
- TEST_CASE("Bunny Example")
+ TEST_CASE("Bunny Example Ipopt")
  {
      vector<shared_ptr<PolyMesh<double>>> meshList;
      vector<bool> atboundary;
@@ -85,7 +85,7 @@ using namespace Eigen;
 
 
 
-TEST_CASE("Ania Example"){
+TEST_CASE("Ania Example Ipopt"){
     std::string file_name[5] = { "piece4_tri.obj", "piece0.obj", "piece1.obj", "piece3.obj", "piece2.obj"};
 
     vector<shared_ptr<PolyMesh<double>>> meshList;

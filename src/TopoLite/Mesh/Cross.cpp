@@ -342,3 +342,7 @@ bool Cross<Scalar>::checkNeighborAtBoundary(int nID) {
     // neighbor exists
     return neighbors.at(nID).lock()->atBoundary;
 }
+
+
+template class Cross<double>;
+template class Cross<float>;

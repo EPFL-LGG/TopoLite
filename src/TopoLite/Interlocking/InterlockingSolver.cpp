@@ -454,7 +454,7 @@ void TemporaryFunction_InterlockingSolver ()
     InterlockingSolver<double> solver(nullptr, nullptr);
     vector<InterlockingSolver<double>::EigenTriple> tri;
     Eigen::Vector2i size;
-    bool isRotation;
+    bool isRotation = true;
     solver.appendMergeConstraints(tri, size, isRotation);
     solver.appendAuxiliaryVariables(tri, size);
     solver.computeRotationalInterlockingMatrix(tri, size);
