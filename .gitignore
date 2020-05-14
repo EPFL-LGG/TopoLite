@@ -4,11 +4,13 @@ cmake_*/
 Cmake_*/
 cmake-*/
 .idea/
+Xcode/*
 build
 .vs
 Release/*.*
 Release
 out
+ipopt.out 
 
 data/origin_data/PartGeometry/*.*
 data/origin_data/Simulation/*.*
@@ -25,4 +27,3 @@ ext/filesystem
 ext/eigen
 ext/pugixml
 ext/pybind11
-Xcode/*

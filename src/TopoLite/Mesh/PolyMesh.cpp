@@ -322,7 +322,7 @@ Matrix<Scalar, 3, 1> PolyMesh<Scalar>::computeCentroid(vector<pTriangle> triList
         centroid = centroid / (2.0 * volume);
     }
     else{
-        centroid = Vector3d(0, 0, 0);
+        centroid = Vector3(0, 0, 0);
     }
 
     return centroid;
@@ -981,3 +981,7 @@ shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh() const
     polymesh->update();
     return polymesh;
 }
+
+
+template class PolyMesh<double>;
+template class PolyMesh<float>;

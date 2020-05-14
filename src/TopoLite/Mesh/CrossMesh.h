@@ -32,9 +32,9 @@ public:
 
     using pTriangle = shared_ptr<Triangle<Scalar>> ;
 
-    typedef Matrix<Scalar, 3, 1> Vector3;
+    typedef Eigen::Matrix<Scalar, 3, 1> Vector3;
 
-    typedef Matrix<Scalar, 2, 1> Vector2;
+    typedef Eigen::Matrix<Scalar, 2, 1> Vector2;
 
     typedef shared_ptr<VPoint<Scalar>> pVertex;
 
@@ -166,8 +166,5 @@ private:
 
 
 };
-
-#include "CrossMesh.cpp"
-
 #endif
 

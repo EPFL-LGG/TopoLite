@@ -91,14 +91,14 @@ void InterlockingSolver<Scalar>::get_A_j_k(int partID, int edgeID, Eigen::Matrix
         for(size_t id = 0; id < edge->polygons.size(); id++)
         {
             shared_ptr<_Polygon<Scalar>> poly = edge->polygons[id];
-            int num_vk = poly.points.size();
+            int num_vk = poly->vers.size();
 
             // 3.0 filling the force fx, fy, fz, term
 
-            Vector3 normal, u_fric, v_fric;
+            Matrix<Scalar, 3, 1> normal, u_fric, v_fric;
             RowVector2 fkx, fky, fkz;
-            edge->get_norm_fric_for_block(partID, id, normal, u_fric, v_fric);
-            get_force_from_norm_fric(normal, u_fric, v_fric, fkx, fky, fkz);
+            edge->get_norm_fric_for_block(partID, normal, u_fric, v_fric);
+            get_force_from_norm_fric(normal.template cast<double>(), u_fric.template cast<double>(), v_fric.template cast<double>(), fkx, fky, fkz);
             Ajk.block(0, 2 * stack_vk, 1, 2 * num_vk) = fkx.replicate(1, num_vk);
             Ajk.block(1, 2 * stack_vk, 1, 2 * num_vk) = fky.replicate(1, num_vk);
             Ajk.block(2, 2 * stack_vk, 1, 2 * num_vk) = fkz.replicate(1, num_vk);
@@ -106,9 +106,9 @@ void InterlockingSolver<Scalar>::get_A_j_k(int partID, int edgeID, Eigen::Matrix
             // 4.0 filling the torque mx, my, mz term
             for(int jd = 0; jd < num_vk; jd++)
             {
-                Vector3 r = poly.points[jd] - part->centroid;
+                Vector3 r = (poly->vers[jd]->pos - part->centroid).template cast<double>();
                 RowVector2 mx, my, mz;
-                get_moment_from_norm_fric_vertex(normal, u_fric, v_fric, r, mx, my, mz);
+                get_moment_from_norm_fric_vertex(normal.template cast<double>(), u_fric.template cast<double>(), v_fric.template cast<double>(), r, mx, my, mz);
                 Ajk.block(3, jd * 2 + 2 * stack_vk, 1, 2) = mx;
                 Ajk.block(4, jd * 2 + 2 * stack_vk, 1, 2) = my;
                 Ajk.block(5, jd * 2 + 2 * stack_vk, 1, 2) = mz;
@@ -131,14 +131,14 @@ void InterlockingSolver<Scalar>::get_A_j_k(int partID, int edgeID, Eigen::Matrix
         for(size_t id = 0; id < edge->polygons.size(); id++)
         {
             shared_ptr<_Polygon<Scalar>> poly = edge->polygons[id];
-            int num_vk = poly.points.size();
+            int num_vk = poly->vers.size();
 
             // 3.0 filling the force fx, fy, fz, term
 
-            Vector3 normal, u_fric, v_fric;
+            Matrix<Scalar, 3, 1> normal, u_fric, v_fric;
             RowVector4 fkx, fky, fkz;
-            edge->get_norm_fric_for_block(partID, id, normal, u_fric, v_fric);
-            get_force_from_norm_fric(normal, u_fric, v_fric, fkx, fky, fkz);
+            edge->get_norm_fric_for_block(partID, normal, u_fric, v_fric);
+            get_force_from_norm_fric(normal.template cast<double>(), u_fric.template cast<double>(), v_fric.template cast<double>(), fkx, fky, fkz);
             Ajk.block(0, 4 * stack_vk, 1, 4 * num_vk) = fkx.replicate(1, num_vk);
             Ajk.block(1, 4 * stack_vk, 1, 4 * num_vk) = fky.replicate(1, num_vk);
             Ajk.block(2, 4 * stack_vk, 1, 4 * num_vk) = fkz.replicate(1, num_vk);
@@ -148,9 +148,9 @@ void InterlockingSolver<Scalar>::get_A_j_k(int partID, int edgeID, Eigen::Matrix
 
             for(int jd = 0; jd < num_vk; jd++)
             {
-                Vector3 r = poly.points[jd] - part->centroid;
+                Vector3 r = (poly->vers[jd]->pos - part->centroid).template cast<double>();
                 RowVector4 mx, my, mz;
-                get_moment_from_norm_fric_vertex(normal, u_fric, v_fric, r, mx, my, mz);
+                get_moment_from_norm_fric_vertex(normal.template cast<double>(), u_fric.template cast<double>(), v_fric.template cast<double>(), r, mx, my, mz);
                 Ajk.block(3, jd * 4 + 4 * stack_vk, 1, 4) = mx;
                 Ajk.block(4, jd * 4 + 4 * stack_vk, 1, 4) = my;
                 Ajk.block(5, jd * 4 + 4 * stack_vk, 1, 4) = mz;
@@ -180,7 +180,7 @@ void InterlockingSolver<Scalar>::computeTranslationalInterlockingMatrix(vector<E
 
         int iB = graph->nodes[edge->partIDB]->dynamicID;
 
-        Vector3 nrm = edge->normal;
+        Vector3 nrm = (edge->normal).template cast<double>();
         for (size_t id = 0; id < edge->size(); id++) {
             if (iA != -1) {
                 tri.push_back(EigenTriple(rowID, 3 * iA, -nrm[0]));
@@ -212,16 +212,16 @@ void InterlockingSolver<Scalar>::computeRotationalInterlockingMatrix(vector<Eige
         int iA = nodeA->dynamicID;
         int iB = nodeB->dynamicID;
 
-        Vector3 ctA = nodeA->centroid;
-        Vector3 ctB = nodeB->centroid;
+        Vector3 ctA = (nodeA->centroid).template cast<double>();
+        Vector3 ctB = (nodeB->centroid).template cast<double>();
 
-        Vector3 nrm = edge->normal;
+        Vector3 nrm = (edge->normal).template cast<double>();
         for(size_t id = 0; id < edge->size(); id++)
         {
             shared_ptr<_Polygon<Scalar>> poly = edge->polygons[id];
             for(pVertex ver: poly->vers)
             {
-                Vector3 pt = ver->pos;
+                Vector3 pt = (ver->pos).template cast<double>();;
                 if (iA != -1)
                 {
                     Vector3 mt = (pt - ctA).cross(nrm);
@@ -447,3 +447,18 @@ Scalar InterlockingSolver<Scalar>::computeEquilibriumMatrixConditonalNumber()
 }
 
 
+// No need to call this TemporaryFunction() function,
+// it's just to avoid link error.
+void TemporaryFunction_InterlockingSolver ()
+{
+    InterlockingSolver<double> solver(nullptr, nullptr);
+    vector<InterlockingSolver<double>::EigenTriple> tri;
+    Eigen::Vector2i size;
+    bool isRotation = true;
+    solver.appendMergeConstraints(tri, size, isRotation);
+    solver.appendAuxiliaryVariables(tri, size);
+    solver.computeRotationalInterlockingMatrix(tri, size);
+    solver.computeTranslationalInterlockingMatrix(tri, size);
+}
+template class InterlockingSolver<double>;
+template class InterlockingSolver<float>;

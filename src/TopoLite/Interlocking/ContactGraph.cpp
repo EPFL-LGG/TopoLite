@@ -18,7 +18,9 @@
  * @param varList
  */
 template<typename Scalar>
-ContactGraph<Scalar>::ContactGraph(const shared_ptr<InputVarList> &varList):TopoObject(varList) {}
+ContactGraph<Scalar>::ContactGraph(const shared_ptr<InputVarList> &varList):TopoObject(varList) {
+    
+}
 
 /**
  * @brief Class destructor
@@ -452,7 +454,7 @@ void ContactGraph<Scalar>::computeConvexHullofEdgePolygons()
             Vector3 normal = contact_edges[sta]->normal, x_axis, y_axis;
 
             vector<Vector3> convexhull_points;
-            ConvexHull2D<double> convexhull_solver;
+            ConvexHull2D<Scalar> convexhull_solver;
             convexhull_solver.compute(corner_points, normal, convexhull_points);
 
             pPolygon convexhull_poly = make_shared<_Polygon<Scalar>>();
@@ -469,5 +471,19 @@ void ContactGraph<Scalar>::computeConvexHullofEdgePolygons()
         edges.push_back(edge);
         sta = end;
     }
-
 }
+
+// No need to call this TemporaryFunction() function,
+// it's just to avoid link error.
+void TemporaryFunction_ContactGraph ()
+{
+    shared_ptr<InputVarList> varList;
+    ContactGraph<double> contactGraph(varList);
+    vector<shared_ptr<PolyMesh<double>>> polyMesh;
+    vector<bool> atBoundary;
+    contactGraph.buildFromMeshes(polyMesh, atBoundary);
+    contactGraph.mergeNode(nullptr, nullptr);
+    contactGraph.getContactMesh(polyMesh.front());
+}
+template class ContactGraph<double>;
+template class ContactGraph<float>;

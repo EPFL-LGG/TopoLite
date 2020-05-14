@@ -13,8 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 #########################################
 
 option(HAVE_NANOGUI     "Compile the gui"                               ON)
-option(HAVE_TEST        "Compile the united test"                       OFF)
-option(HAVE_PYBIND      "Compile the python binding"                    OFF)
+option(HAVE_TEST        "Compile the united test"                       ON)
+option(HAVE_PYBIND      "Compile the python binding"                    ON)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)

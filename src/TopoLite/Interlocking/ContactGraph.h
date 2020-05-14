@@ -150,6 +150,4 @@ private:
     void computeConvexHullofEdgePolygons();
 };
 
-#include "ContactGraph.cpp"
-
 #endif //TOPOLOCKCREATOR_CONTACTGRAPH_H

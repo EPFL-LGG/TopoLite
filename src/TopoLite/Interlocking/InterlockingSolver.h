@@ -113,6 +113,4 @@ public:
     virtual bool isEquilibrium(Vector3 gravity, shared_ptr<EquilibriumData> &data){ return  true;}
 };
 
-#include "InterlockingSolver.cpp"
-
 #endif //TOPOLITE_INTERLOCKINGSOLVER_H

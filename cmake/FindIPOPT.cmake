@@ -111,6 +111,10 @@ if(NOT WIN32)
         set(IPOPT_DEFINITIONS "")
         set(IPOPT_LINK_FLAGS "")
     endif()
+
+    if(NOT ${IPOPT_INCLUDE_DIRS})
+        set(IPOPT_INCLUDE_DIRS /usr/local/include/coin)
+    endif()
     message("--  Include dir: " ${IPOPT_INCLUDE_DIRS})
     message("--  Lib path   : " ${IPOPT_LIBRARIES})
 

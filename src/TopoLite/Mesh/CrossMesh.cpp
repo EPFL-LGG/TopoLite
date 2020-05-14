@@ -35,13 +35,14 @@ CrossMesh<Scalar>::~CrossMesh()
 
 template<typename Scalar>
 CrossMesh<Scalar>::CrossMesh(const CrossMesh<Scalar> &crossMesh)
+:PolyMesh<Scalar>(crossMesh.getVarList())
 {
     clear();
 
     // create cross geometry
     for(size_t id = 0; id < crossMesh.crossList.size(); id++)
     {
-        pCross cross = make_shared<Cross>(*crossMesh.crossList[id]);
+        pCross cross = make_shared<Cross<Scalar>>(*crossMesh.crossList[id]);
         crossList.push_back(cross);
         PolyMesh<Scalar>::polyList.push_back(cross);
     }
@@ -166,7 +167,7 @@ void CrossMesh<Scalar>::print() const
 
 	for (size_t i = 0; i < crossList.size(); i++)
 	{
-        crossList[i]->Print();
+        crossList[i]->print();
 	}
 }
 
@@ -256,6 +257,9 @@ void CrossMesh<Scalar>::erase_nullptr()
     updateCrossID();
 }
 
+
+template class CrossMesh<double>;
+template class CrossMesh<float>;
 
 
 

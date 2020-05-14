@@ -5,7 +5,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "ipopt_problems.h"
+#include "Problem_LP_simple.h"
 
 using namespace Ipopt;
 
@@ -13,15 +13,16 @@ const double COIN_DBL_MAX = std::numeric_limits<double>::max();
 
 
 // constructor
-problem_NLP::problem_NLP() {
+problem_LP::problem_LP() {
     x_sol = {0,0,0};            // initial position vector that becomes the solution
+    hessian_triplets_nb = 0;
 };
 
 // destructor
-problem_NLP::~problem_NLP() = default;
+problem_LP::~problem_LP() = default;
 
 // returns the problem dimensions
-bool problem_NLP::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style) {
+bool problem_LP::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_h_lag, IndexStyleEnum &index_style) {
     n = 3;                          // 3 variables
     m = 3;                          // 3 inequalities
     nnz_jac_g = 5;                  // non zero elements in Jacobian
@@ -32,7 +33,7 @@ bool problem_NLP::get_nlp_info(Index &n, Index &m, Index &nnz_jac_g, Index &nnz_
 }
 
 // returns the variable bounds
-bool problem_NLP::get_bounds_info(Index n, Number *x_l, Number *x_u, Index m, Number *g_l, Number *g_u) {
+bool problem_LP::get_bounds_info(Index n, Number *x_l, Number *x_u, Index m, Number *g_l, Number *g_u) {
     // Ensure dimensions are set properly
     assert(n == 3);
     assert(m == 3);
@@ -58,7 +59,7 @@ bool problem_NLP::get_bounds_info(Index n, Number *x_l, Number *x_u, Index m, Nu
 }
 
 // returns the initial point for the problem
-bool problem_NLP::get_starting_point(Index n, bool init_x, Number *x, bool init_z, Number *z_L, Number *z_U,
+bool problem_LP::get_starting_point(Index n, bool init_x, Number *x, bool init_z, Number *z_L, Number *z_U,
                                      Index m, bool init_lambda, Number *lambda) {
 
     assert(init_x);
@@ -74,7 +75,7 @@ bool problem_NLP::get_starting_point(Index n, bool init_x, Number *x, bool init_
 }
 
 // return the objective function
-bool problem_NLP::eval_f(Index n, const Number *x, bool new_x, Number &obj_value) {
+bool problem_LP::eval_f(Index n, const Number *x, bool new_x, Number &obj_value) {
     // minus sign everywhere, we are looking for max
     obj_value = 3 * x[0] + 4 * x[1] + 2 * x[2];
     obj_value = -1.0 * obj_value;
@@ -82,7 +83,7 @@ bool problem_NLP::eval_f(Index n, const Number *x, bool new_x, Number &obj_value
 }
 
 // return the gradient of the objective function grad_{x} f(x)
-bool problem_NLP::eval_grad_f(Index n, const Number *x, bool new_x, Number *grad_f) {
+bool problem_LP::eval_grad_f(Index n, const Number *x, bool new_x, Number *grad_f) {
     // minus sign everywhere, we are looking for max
     grad_f[0] = -3;
     grad_f[1] = -4;
@@ -91,7 +92,7 @@ bool problem_NLP::eval_grad_f(Index n, const Number *x, bool new_x, Number *grad
 }
 
 // return the value of the constraints: g(x)
-bool problem_NLP::eval_g(Index n, const Number *x, bool new_x, Index m, Number *g) {
+bool problem_LP::eval_g(Index n, const Number *x, bool new_x, Index m, Number *g) {
     g[0] = 2 * x[0];
     g[1] = 1 * x[0] + 2 * x[2];
     g[2] = 3 * x[1] + 1 * x[2];
@@ -99,7 +100,7 @@ bool problem_NLP::eval_g(Index n, const Number *x, bool new_x, Index m, Number *
 }
 
 // return the triplet structure or values of the Jacobian
-bool problem_NLP::eval_jac_g(Index n, const Number *x, bool new_x,
+bool problem_LP::eval_jac_g(Index n, const Number *x, bool new_x,
                              Index m, Index nele_jac, Index *iRow, Index *jCol, Number *values) {
     if (values == nullptr) {
         // return the 2 first triplet index row, col for the structure of the Jacobian
@@ -121,13 +122,13 @@ bool problem_NLP::eval_jac_g(Index n, const Number *x, bool new_x,
 }
 
 //return the structure or values of the Hessian
-bool problem_NLP::eval_h(Index n, const Number *x, bool new_x, Number obj_factor, Index m, const Number *lambda,
+bool problem_LP::eval_h(Index n, const Number *x, bool new_x, Number obj_factor, Index m, const Number *lambda,
                          bool new_lambda, Index nele_hess, Index *iRow, Index *jCol, Number *values) {
 
     if (values == nullptr) {
         // return the structure. This is a symmetric matrix, fill the lower left triangle only.
         Index idx = 0;
-        for (Index row = 0; row < 4; row++) {
+        for (Index row = 0; row < hessian_triplets_nb; row++) {
             for (Index col = 0; col <= row; col++) {
                 iRow[idx] = row;
                 jCol[idx] = col;
@@ -136,15 +137,14 @@ bool problem_NLP::eval_h(Index n, const Number *x, bool new_x, Number obj_factor
         }
     } else {
         // Hessian is zero
-        int hess_dim = m * m;
-        for (int id = 0; id < hess_dim; id++)
+        for (int id = 0; id < hessian_triplets_nb; id++)
             values[id] = 0;
     }
 
     return true;
 }
 
-void problem_NLP::finalize_solution(SolverReturn status,
+void problem_LP::finalize_solution(SolverReturn status,
                                     Index n,
                                     const Number *x,
                                     const Number *z_L,

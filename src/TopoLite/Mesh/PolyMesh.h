@@ -197,7 +197,4 @@ private:
 
     Vector3 computeExtremeVertex(Vector3 rayDir) const;
 };
-
-#include "PolyMesh.cpp"
-
 #endif

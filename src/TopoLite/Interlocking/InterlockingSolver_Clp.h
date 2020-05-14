@@ -28,8 +28,9 @@ public:
     CLP_SOLVER_TYPE type;
 
 public:
-    InterlockingSolver_Clp(pContactGraph _graph, shared_ptr<InputVarList> varList, CLP_SOLVER_TYPE _type = SIMPLEX)
-    : InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList), type(_type)
+    InterlockingSolver_Clp(pContactGraph _graph,
+            shared_ptr<InputVarList> varList,
+            CLP_SOLVER_TYPE _type = SIMPLEX): InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList), type(_type)
     {
 
     }
@@ -80,5 +81,4 @@ public:
     void unpackSolution(InterlockingSolver_Clp::pInterlockingData& data, bool rotationalInterlockingCheck, const double *solution, int num_var);
 };
 
-#include "InterlockingSolver_Clp.cpp"
 #endif //TOPOLITE_INTERLOCKINGSOLVER_CLP_H
