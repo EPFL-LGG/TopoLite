@@ -59,10 +59,10 @@ if(NOT TARGET igl::core)
     topolite_download_libigl()
 endif()
 
-# shapeop
-if(NOT TARGET ShapeOp)
-    topolite_download_shapeop()
-endif()
+## shapeop
+#if(NOT TARGET ShapeOp)
+#    topolite_download_shapeop()
+#endif()
 
 # pugixml
 if(NOT TARGET pugixml)
@@ -88,13 +88,17 @@ if(NOT TARGET tbb)
     set(TBB_BUILD_TESTS             OFF CACHE BOOL " " FORCE)
 
     topolite_download_tbb()
-    add_subdirectory(${TOPOLITE_EXTERNAL}/tbb tbb)
-    set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
-    #set_target_properties(tbb_static PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-missing-field-initializers -Wno-unused-parameter -Wno-keyword-macro")
-
-    add_library(tbb INTERFACE)
-    target_include_directories(tbb SYSTEM INTERFACE ${TOPOLITE_EXTERNAL}/tbb/include)
-    target_link_libraries(tbb INTERFACE tbb_static tbbmalloc_static)
-    add_library(tbb::tbb ALIAS tbb)
+    include(${TOPOLITE_EXTERNAL}/tbb/cmake/TBBBuild.cmake)
+    tbb_build(TBB_ROOT ${TOPOLITE_EXTERNAL}/tbb CONFIG_DIR TBB_DIR MAKE_ARGS tbb_cpf=1)
+    list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/tbb/cmake)
+    find_package(TBB REQUIRED tbb_preview tbb)
+#    add_subdirectory(${TOPOLITE_EXTERNAL}/tbb tbb)
+#    set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
+#    #set_target_properties(tbb_static PROPERTIES COMPILE_FLAGS "-Wno-implicit-fallthrough -Wno-missing-field-initializers -Wno-unused-parameter -Wno-keyword-macro")
+#
+#    add_library(tbb INTERFACE)
+#    target_include_directories(tbb SYSTEM INTERFACE ${TOPOLITE_EXTERNAL}/tbb/include)
+#    target_link_libraries(tbb INTERFACE tbb_static tbbmalloc_static)
+#    add_library(tbb::tbb ALIAS tbb)
 endif()
 

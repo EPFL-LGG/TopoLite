@@ -39,11 +39,17 @@ function(topolite_download_catch)
 endfunction()
 
 ## TBB
+#function(topolite_download_tbb)
+#    topolite_download_project(tbb
+#            GIT_REPOSITORY https://github.com/wjakob/tbb.git
+#            GIT_TAG        20357d83871e4cb93b2c724fe0c337cd999fd14f
+#            )
+#endfunction()
+
 function(topolite_download_tbb)
     topolite_download_project(tbb
-            GIT_REPOSITORY https://github.com/wjakob/tbb.git
-            GIT_TAG        20357d83871e4cb93b2c724fe0c337cd999fd14f
-            )
+            GIT_REPOSITORY https://github.com/oneapi-src/oneTBB.git
+            GIT_TAG        60b7d0a78f8910976678ba63a19fdaee22c0ef65)
 endfunction()
 
 ## CLP
@@ -87,13 +93,13 @@ function(topolite_download_libigl)
             )
 endfunction()
 
-## ShapeOp
-function(topolite_download_shapeop)
-    topolite_download_project(shapeop
-            GIT_REPOSITORY     https://github.com/EPFL-LGG/ShapeOp.git
-            GIT_TAG            9a79b808c5e4144b8b6f0f429df7273f61e95547
-            )
-endfunction()
+### ShapeOp
+#function(topolite_download_shapeop)
+#    topolite_download_project(shapeop
+#            GIT_REPOSITORY     https://github.com/EPFL-LGG/ShapeOp.git
+#            GIT_TAG            9a79b808c5e4144b8b6f0f429df7273f61e95547
+#            )
+#endfunction()
 
 # pugixml
 function(topolite_download_pugixml)

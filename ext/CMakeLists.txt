@@ -22,9 +22,9 @@ set(LIBIGL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libigl/include)
 list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../cmake")
 include(libigl)
 
-#ShapeOp
-set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
+##ShapeOp
+#set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
+#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
 
 #NANOGUI
 if(HAVE_NANOGUI)
@@ -85,9 +85,8 @@ set(ext_lib pugixml
             Clipper
             igl::core
             igl::triangle
-            ShapeOp
-            tbb
-            tbb_static
+#            ShapeOp
+            ${TBB_IMPORTED_TARGETS}
             lib_Osi
             lib_Clp
             lib_CoinUtils
