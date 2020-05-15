@@ -19,7 +19,6 @@ using std::shared_ptr;
 template<typename Scalar>
 class InterlockingSolver: public TopoObject{
 public:
-
     typedef Matrix<double, 3, 1> Vector3;
     typedef Matrix<double, 1, 2> RowVector2;
     typedef Matrix<double, 1, 4> RowVector4;

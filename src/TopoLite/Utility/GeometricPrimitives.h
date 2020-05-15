@@ -435,11 +435,15 @@ public:
 
 	int vIndices[3];       // Index of each vertex
 
+	bool edge_at_boundary[3];
 public:
     Triangle(){
         v[0] = Vector3(0, 0, 0);
         v[1] = Vector3(0, 0, 0);
         v[2] = Vector3(0, 0, 0);
+        edge_at_boundary[0] = false;
+        edge_at_boundary[1] = false;
+        edge_at_boundary[2] = false;
     }
 
     Triangle(Vector3 _v0, Vector3 _v1, Vector3 _v2)
@@ -447,6 +451,9 @@ public:
         v[0] = _v0;
         v[1] = _v1;
         v[2] = _v2;
+        edge_at_boundary[0] = false;
+        edge_at_boundary[1] = false;
+        edge_at_boundary[2] = false;
     }
 
     Triangle(Vector2 _v0, Vector2 _v1, Vector2 _v2)
@@ -454,6 +461,19 @@ public:
         v[0].x() = _v0.x(); v[0].y() = _v0.y(); v[0].z() = 0;
         v[1].x() = _v1.x(); v[1].y() = _v1.y(); v[1].z() = 0;
         v[2].x() = _v2.x(); v[2].y() = _v2.y(); v[2].z() = 0;
+        edge_at_boundary[0] = false;
+        edge_at_boundary[1] = false;
+        edge_at_boundary[2] = false;
+    }
+
+    Triangle(Vector3 _v0, Vector3 _v1, Vector3 _v2, bool b0, bool b1, bool b2)
+    {
+        v[0] = _v0;
+        v[1] = _v1;
+        v[2] = _v2;
+        edge_at_boundary[0] = b0;
+        edge_at_boundary[1] = b1;
+        edge_at_boundary[2] = b2;
     }
 
 public:

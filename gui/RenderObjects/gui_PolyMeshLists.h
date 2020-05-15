@@ -9,7 +9,7 @@
 #include "gui_RenderObject.h"
 #include <nanogui/vector.h>
 #include <fstream>
-
+#include "igl/triangle/triangulate.h"
 template<typename Scalar>
 class gui_PolyMeshLists : public gui_RenderObject<Scalar>{
 public:
@@ -120,8 +120,8 @@ public:
                                 std::istreambuf_iterator<char>());
 
         file = std::ifstream("shader/PolyMeshAnimation.frag");
-        string shader_frag((std::istreambuf_iterator<char>(file)),
-                           std::istreambuf_iterator<char>());
+        std::string shader_frag((std::istreambuf_iterator<char>(file)),
+                                std::istreambuf_iterator<char>());
 #elif defined(NANOGUI_USE_METAL)
         std::ifstream file("shader/PolyMeshAnimation_vert.metal");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
@@ -165,38 +165,30 @@ public:
             for(pPolygon polygon: mesh.lock()->polyList)
             {
                 Vector3 face_center = polygon->center();
-                for(size_t id = 0; id < polygon->vers.size(); id++)
+                vector<pPolygon> tris;
+                polygon->triangulate(tris);
+                for(pPolygon tri: tris)
                 {
-                    object_center = object_center + polygon->vers[id]->pos;
-                    num_vertices ++;
-
-                    Vector3 sta = polygon->vers[id]->pos;
-                    Vector3 end = polygon->vers[(id + 1) % polygon->vers.size()]->pos;
-
-                    buffer_positions.push_back(sta.x());
-                    buffer_positions.push_back(sta.y());
-                    buffer_positions.push_back(sta.z());
-
-                    buffer_positions.push_back(end.x());
-                    buffer_positions.push_back(end.y());
-                    buffer_positions.push_back(end.z());
-
-                    buffer_positions.push_back(face_center.x());
-                    buffer_positions.push_back(face_center.y());
-                    buffer_positions.push_back(face_center.z());
+                    for(int vID = 0; vID < 3; vID++)
+                    {
+                        buffer_positions.push_back(tri->vers[vID]->pos.x());
+                        buffer_positions.push_back(tri->vers[vID]->pos.y());
+                        buffer_positions.push_back(tri->vers[vID]->pos.z());
+                        object_center = object_center + tri->vers[vID]->pos;
+                        num_vertices++;
+                    }
 
                     buffer_barycentric.push_back(1);
                     buffer_barycentric.push_back(0);
-                    buffer_barycentric.push_back(polygon->at_boundary(id) ? 0 : 10);
+                    buffer_barycentric.push_back(0);
 
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(1);
-                    buffer_barycentric.push_back(polygon->at_boundary(id) ? 0 : 10);
+                    buffer_barycentric.push_back(0);
 
-                    buffer_barycentric.push_back(0.5);
-                    buffer_barycentric.push_back(0.5);
-                    buffer_barycentric.push_back(10);
-
+                    buffer_barycentric.push_back(0);
+                    buffer_barycentric.push_back(0);
+                    buffer_barycentric.push_back(1);
 #if defined(NANOGUI_USE_OPENGL)
                     for(int vID = 0; vID < 3; vID ++)
                     {

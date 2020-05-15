@@ -235,5 +235,21 @@ TEST_CASE("Polygon")
         REQUIRE(barycentric[1] == Approx(1).margin(1e-7));
     }
 
+    SECTION("triangle"){
+        PolyVector3d pts;
+        pts.push_back(Vector3d(0, 0, 0));
+        pts.push_back(Vector3d(1, 0, 0));
+        pts.push_back(Vector3d(1, 1, 0));
+        pts.push_back(Vector3d(0, 1, 0));
+        poly.setVertices(pts);
+        vector<shared_ptr<_Polygon<double>>> tris;
+        poly.edge_at_boundary[0] = true;
+        poly.edge_at_boundary[1] = true;
+        poly.triangulate(tris);
+
+        REQUIRE(tris.size() == 2);
+        REQUIRE(tris[0]->edge_at_boundary[0] == true);
+    }
+
 }
 

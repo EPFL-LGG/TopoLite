@@ -14,7 +14,9 @@
 #include "Utility/GeometricPrimitives.h"
 #include "Utility/HelpDefine.h"
 #include "Polygon.h"
-
+#include <igl/triangle/triangulate.h>
+#include <iostream>
+#include <set>
 //**************************************************************************************//
 //                                    Initialization
 //**************************************************************************************//
@@ -67,6 +69,8 @@ void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
         pVertex vertex = make_shared<VPoint<Scalar>>(_vers[i]);
         vers.push_back(vertex);
     }
+    edge_at_boundary.clear();
+    edge_at_boundary.resize(_vers.size(), false);
 }
 
 template <typename Scalar>
@@ -421,6 +425,43 @@ int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point) const
 
 	return ELEMENT_OUT_LIST;
 }
+template <typename Scalar>
+void _Polygon<Scalar>::triangulate(vector<shared_ptr<_Polygon<Scalar>>> &tris) const{
+    tris.clear();
+    Vector3 x_axis, y_axis, origin;
+    computeFrame(x_axis, y_axis, origin);
+
+    Eigen::Matrix<Scalar, Eigen::Dynamic, 2> V(vers.size(), 2), V2;
+    Eigen::Matrix<int, Eigen::Dynamic, 2> E(vers.size(), 2);
+    Eigen::Matrix<int, Eigen::Dynamic, 3> F;
+    Eigen::Matrix<Scalar, 0, 2> H;
+
+    for(int id = 0; id < vers.size(); id++){
+        Scalar x = (vers[id]->pos - origin).dot(x_axis);
+        Scalar y = (vers[id]->pos - origin).dot(y_axis);
+        V(id, 0) = x;
+        V(id, 1) = y;
+        E(id, 0) = id;
+        E(id, 1) = (id + 1) % size();
+    }
+
+    igl::triangle::triangulate(V, E, H, "Q", V2, F);
+    Eigen::Matrix<Scalar, Eigen::Dynamic, 3> V2_3d(V2.rows(), 3);
+    for(int id = 0; id < V2.rows(); id++){
+        V2_3d.row(id) = V2(id, 0) * x_axis + V2(id , 1) * y_axis + origin;
+    }
+
+    for(int id = 0; id < F.rows(); id++){
+        shared_ptr<_Polygon<Scalar>> tri = make_shared<_Polygon<Scalar>>();
+        for(int kd = 0; kd < 3; kd++)
+        {
+            tri->push_back(V2_3d.row(F(id, kd)));
+        }
+        tris.push_back(tri);
+    }
+    return;
+}
+
 
 template class _Polygon<double>;
 template class _Polygon<float>;

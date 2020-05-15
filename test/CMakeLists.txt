@@ -6,21 +6,22 @@ if(HAVE_TEST)
     include(CTest)
     include(ParseAndAddCatchTests)
 
-#    file(GLOB testTopoFiles
-#           Interlocking/Problem_LP_simple.cpp
-#           Interlocking/Problem_LP_bigm.cpp
-#            # Interlocking/Test_toymodel_Ipopt.cpp
-#           Interlocking/Test_interlockingSolver_Clp.cpp
-##            Utility/Test_SparseOperations.cpp
-#            )
-
     file(GLOB testTopoFiles
-            Interlocking/*.cpp
-            CrossMesh/*.cpp
-            Mesh/*.cpp
-            IO/*.cpp
-            Utility/*.cpp
+           #Interlocking/Problem_LP_simple.cpp
+           #Interlocking/Problem_LP_bigm.cpp
+            # Interlocking/Test_toymodel_Ipopt.cpp
+           #Interlocking/Test_interlockingSolver_Clp.cpp
+#            Utility/Test_SparseOperations.cpp
+            Mesh/Test_Polygon.cpp
             )
+
+#    file(GLOB testTopoFiles
+#            Interlocking/*.cpp
+#            CrossMesh/*.cpp
+#            Mesh/*.cpp
+#            IO/*.cpp
+#            Utility/*.cpp
+#            )
 
 
     set(testTopoFiles ${testTopoFiles} Test_Main.cpp)

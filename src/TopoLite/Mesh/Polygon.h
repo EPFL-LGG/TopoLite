@@ -152,7 +152,7 @@ public:
         return texs.at(index)->texCoord;
     }
 
-    bool at_boundary(int edge_index){
+    bool at_boundary(int edge_index) const{
         if(edge_index >= 0 && edge_index < edge_at_boundary.size()){
             return edge_at_boundary[edge_index];
         }
@@ -215,6 +215,8 @@ public:
 
     // Polygon Operations
 	void convertToTriangles(vector<pTriangle> &tris) const;
+
+    void triangulate(vector<shared_ptr<_Polygon<Scalar>>> &tris) const;
 
 	int getPtVerID(Vector3 point) const;
 

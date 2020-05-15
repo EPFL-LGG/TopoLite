@@ -99,7 +99,7 @@ public:
 
     void insertMeshandContactsIntoScene(){
         insertMeshesIntoScene();
-        //insertContactsIntoScene();
+        insertContactsIntoScene();
     }
 
 public:
