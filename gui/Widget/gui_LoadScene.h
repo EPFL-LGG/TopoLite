@@ -334,7 +334,7 @@ public:
         std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         XMLData data;
-        IO.XMLReader(xmlFileName.c_str(), data);
+        IO.XMLReader(xmlFileName.string(), data);
 
         // read polyMesh
         std::filesystem::path surface_objfile(UNITTEST_DATAPATH);
@@ -342,7 +342,7 @@ public:
 
         bool texturedModel;
         _polyMesh = make_shared<PolyMesh<double>>(data.varList);
-        _polyMesh->readOBJModel(surface_objfile.c_str(), texturedModel, true);
+        _polyMesh->readOBJModel(surface_objfile.string().c_str(), texturedModel, true);
 
         data.varList->set("minCrossArea", 0.2f);
 

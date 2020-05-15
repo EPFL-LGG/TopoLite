@@ -61,7 +61,7 @@ public:
 //    void XMLWriter_Output(pugi::xml_node &xmlroot, boost::filesystem::path &xmlFileName_path, XMLData &data);
 //    void XMLWriter_PartGeoData(pugi::xml_node &xml_root, boost::filesystem::path &xmlFileName_path, XMLData &data);
 
-    bool XMLReader(string xmlFileName, XMLData &data);
+    bool XMLReader(const string xmlFileName, XMLData &data);
     void XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data);
 //    void XMLReader_PartGeoData(pugi::xml_node &xml_root, string &xmlFileName_path, XMLData &data);
 //    void XMLReader_Boundary(pugi::xml_node &xml_root, XMLData &data);

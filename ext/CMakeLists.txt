@@ -30,7 +30,7 @@ include(libigl)
 if(HAVE_NANOGUI)
 #    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
     find_package(NanoGUI)
-    set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} PARENT_SCOPE)
+    set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} ${NANOGUI_EXTRA_INCS} PARENT_SCOPE)
     set(NANOGUI_EXTRA_DEFS ${NANOGUI_EXTRA_DEFS} PARENT_SCOPE)
     set(NANOGUI_DIR ${NANOGUI_DIR} PARENT_SCOPE)
 endif()
@@ -52,7 +52,7 @@ set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
 
 ## IPOPT
-find_package(IPOPT REQUIRED)
+find_package(IPOPT)
 
 ## Pybind11
 
@@ -72,24 +72,23 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${QuickHull_INCLUDE_DIR}
                 ${Clipper_INCLUDE_DIR}
                 ${LIBIGL_INCLUDE_DIR}
-                ${SHAPEOP_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
-                ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
                 ${CLP_INCLUDE_DIR}
-                ${IPOPT_INCLUDE_DIRS}           # defined in findIPOPT.cmake
-                 PARENT_SCOPE)
+		PARENT_SCOPE)
 
 set(ext_lib pugixml
             QuickHull
             Clipper
             igl::core
             igl::triangle
-#            ShapeOp
             ${TBB_IMPORTED_TARGETS}
             lib_Osi
             lib_Clp
-            lib_CoinUtils
-            ${IPOPT_LIBRARIES}                  # defined in findIPOPT.cmake
-            ${Boost_LIBRARIES}
+            lib_CoinUtils          
             PARENT_SCOPE)
+
+if(IPOPT_FOUND)
+	list(APPEND ext_include ${IPOPT_INCLUDE_DIRS})
+	list(APPEND ext_lib ${IPOPT_LIBRARIES})
+endif()

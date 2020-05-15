@@ -156,7 +156,7 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle, const std::unordered_map<
         if (neighbors.size() <= i)
             break;
         pCross neighbor = neighbors[i].lock();
-        if (neighbor == nullptr or crossVisited.find(neighbor.get()) == crossVisited.end())
+        if (neighbor == nullptr || crossVisited.find(neighbor.get()) == crossVisited.end())
             continue;
 
         // 2) reverse the tilt sign of its neighbor

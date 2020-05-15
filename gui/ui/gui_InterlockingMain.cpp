@@ -202,6 +202,7 @@ public:
     }
 
     virtual void draw_contents() {
+        scene->render_pass->resize(framebuffer_size());
         if(!play->pushed() && !pause->pushed() && !stop->pushed()){
             if(prev_animate_state == Run){
                 scene->update_state(Stop);

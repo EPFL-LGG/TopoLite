@@ -425,7 +425,7 @@
 //                                  XML Reader
 //**************************************************************************************//
 
-bool XMLIO::XMLReader(string xmlFileName, XMLData &data)
+bool XMLIO::XMLReader(const string xmlFileName, XMLData &data)
 {
 
     // load xmlfile

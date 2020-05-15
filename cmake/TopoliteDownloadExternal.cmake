@@ -52,6 +52,14 @@ function(topolite_download_tbb)
             GIT_TAG        60b7d0a78f8910976678ba63a19fdaee22c0ef65)
 endfunction()
 
+
+function(topolite_download_tbb_binary)
+    topolite_download_project(tbb
+            GIT_REPOSITORY https://github.com/KIKI007/tbb_binary.git
+            GIT_TAG        8fb255d3d464b787e1629318c262d80befc87497)
+endfunction()
+
+
 ## CLP
 function(topolite_download_clp)
     topolite_download_project(clp

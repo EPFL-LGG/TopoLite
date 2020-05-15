@@ -166,7 +166,7 @@ template <typename Scalar>
 bool CrossMeshCreator<Scalar>::createCrossMesh( bool previewMode, Matrix4 textureMat)
 {
     float   tiltAngle       = getVarList()->template get<float>("tiltAngle");
-    float   patternID       = getVarList()->template get<int>("patternID");
+    int   patternID       = getVarList()->template get<int>("patternID");
     float   patternRadius   = getVarList()->template get<int>("patternRadius");
     bool    texturedModel   = getVarList()->template get<int>("texturedModel");
 
