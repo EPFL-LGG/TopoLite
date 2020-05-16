@@ -18,8 +18,6 @@ endif()
 # COIN-OR CLP
 if(NOT TARGET lib_Clp)
     topolite_download_clp()
-    set(BUILD_SHARED_LIBS OFF CACHE STRING "Build clp using static library" FORCE)
-    add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
 endif()
 #
 
@@ -80,22 +78,11 @@ endif()
 
 # TBB library
 if(NOT TARGET tbb)
-    set(TBB_BUILD_STATIC            ON  CACHE BOOL " " FORCE)
-    set(TBB_BUILD_SHARED            OFF CACHE BOOL " " FORCE)
-    set(TBB_BUILD_TBBMALLOC         ON  CACHE BOOL " " FORCE) # needed for CGAL's parallel mesher
-    set(TBB_BUILD_TBBMALLOC_PROXY   OFF CACHE BOOL " " FORCE)
-    set(TBB_BUILD_TESTS             OFF CACHE BOOL " " FORCE)
-
-
     if(WIN32)
-         topolite_download_tbb_binary()
-	 list(APPEND CMAKE_PREFIX_PATH ${TOPOLITE_EXTERNAL}/tbb/cmake)
+        topolite_download_tbb_binary()
     else()
-    	topolite_download_tbb()
-	include(${TOPOLITE_EXTERNAL}/tbb/cmake/TBBBuild.cmake)
-    	tbb_build(TBB_ROOT ${TOPOLITE_EXTERNAL}/tbb CONFIG_DIR TBB_DIR MAKE_ARGS tbb_cpf=1)
-    	list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/tbb/cmake)
+        topolite_download_tbb()
     endif()
-        find_package(TBB REQUIRED tbb_preview)
+
 endif()
 

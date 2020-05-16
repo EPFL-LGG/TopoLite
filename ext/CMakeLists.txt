@@ -11,10 +11,10 @@ set(FILESYSTEM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/filesystem)
 find_package(PUGIXML REQUIRED)
 
 # quickhull
-find_package(QuickHull)
+find_package(QuickHull REQUIRED)
 
 # clipper
-find_package(Clipper)
+find_package(Clipper REQUIRED)
 
 #LIBIGL
 set(LIBIGL_WITH_TRIANGLE ON CACHE BOOL "Use Triangle" FORCE)
@@ -33,13 +33,29 @@ endif()
 
 # TBB
 # Handled in cmake/TopoliteDependencies.cmake
-set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
+if(WIN32)
+    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tbb/cmake)
+    find_package(TBB REQUIRED tbb_preview)
+else()
+    set(TBB_BUILD_STATIC            ON CACHE BOOL " " FORCE)
+    set(TBB_BUILD_SHARED            OFF CACHE BOOL " " FORCE)
+    set(TBB_BUILD_TBBMALLOC         ON  CACHE BOOL " " FORCE) # needed for CGAL's parallel mesher
+    set(TBB_BUILD_TBBMALLOC_PROXY   OFF CACHE BOOL " " FORCE)
+    set(TBB_BUILD_TESTS             OFF CACHE BOOL " " FORCE)
+    add_subdirectory(${TOPOLITE_EXTERNAL}/tbb)
+    set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
+    set(TBB_IMPORTED_TARGETS tbb_static tbbmalloc_static)
+endif()
+
 
 # CLP
+set(BUILD_SHARED_LIBS OFF CACHE STRING "Build clp using static library" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/clp)
 set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src/OsiClp
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/CoinUtils/src
         ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
+set(CLP_LIBRARIES CoinUtils Osi Clp OsiClpSolver)
 
 ## IPOPT
 find_package(IPOPT)
