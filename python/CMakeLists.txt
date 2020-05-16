@@ -1,4 +1,4 @@
-if(HAVE_PYBIND)
+if(BUILD_TOPOPYBIND)
     file(GLOB TpPythonFiles
             ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/*.h)

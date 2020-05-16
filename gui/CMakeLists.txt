@@ -1,4 +1,4 @@
-if(HAVE_NANOGUI)
+if(BUILD_TOPOGUI)
     #for testing interlocking
 
     add_subdirectory(RenderObjects)
@@ -12,7 +12,6 @@ if(HAVE_NANOGUI)
             ${CMAKE_CURRENT_SOURCE_DIR}/RenderObjects
             ${CMAKE_CURRENT_SOURCE_DIR}/Widget)
     target_compile_definitions(InterlockingGUI PUBLIC ${NANOGUI_EXTRA_DEFS})
-    target_compile_options(InterlockingGUI PRIVATE "/D_HAS_STD_BYTE=0")
 
 
     #for viewing topocreator

@@ -1,4 +1,4 @@
-if(HAVE_TEST)
+if(BUILD_TOPOTEST)
 
     set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
             ${CMAKE_CURRENT_SOURCE_DIR}/../ext/Catch2/contrib)

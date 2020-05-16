@@ -23,4 +23,6 @@ find_package_handle_standard_args(LIBIGL
     LIBIGL_INCLUDE_DIR)
 mark_as_advanced(LIBIGL_INCLUDE_DIR)
 list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../cmake")
+
+set(LIBIGL_USE_STATIC_LIBRARY ON CACHE STRING "Build libigl using static library" FORCE)
 include(libigl)

@@ -11,15 +11,15 @@
 if(NOT NANOGUI_FOUND)
 
     set(NANOGUI_DIR "${PROJECT_SOURCE_DIR}/ext/nanogui")
-
     # Disable the examples and python stuff from nanogui
     set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_BUILD_EXAMPLE OFF CACHE BOOL " " FORCE)
+    set(NANOGUI_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
+    set(NANOGUI_BUILD_SHARED_DEFAULT OFF CACHE BOOL " " FORCE)
     set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
     add_subdirectory("${NANOGUI_DIR}" "nanogui")
 
     # For reliability of parallel build, make the NanoGUI targets dependencies
-    set_property(TARGET glfw glfw_objects bin2c nanogui PROPERTY FOLDER "dependencies")
+    set_property(TARGET glfw glfw_objects nanogui PROPERTY FOLDER "dependencies")
 
     set(NANOGUI_INCLUDE_DIRS
         "${NANOGUI_DIR}/include"

@@ -18,6 +18,7 @@ endif()
 # COIN-OR CLP
 if(NOT TARGET lib_Clp)
     topolite_download_clp()
+    set(BUILD_SHARED_LIBS OFF CACHE STRING "Build clp using static library" FORCE)
     add_subdirectory(${TOPOLITE_EXTERNAL}/clp)
 endif()
 #
@@ -48,10 +49,8 @@ endif()
 # ENDBUG
 
 # Catch2
-if(NOT TARGET catch2::catch2)
+if(NOT TARGET catch2::catch2 AND BUILD_TOPOTEST)
     topolite_download_catch()
-    add_subdirectory(${TOPOLITE_EXTERNAL}/catch2)
-    list(APPEND CMAKE_MODULE_PATH ${TOPOLITE_EXTERNAL}/catch2/contrib)
 endif()
 
 # libigl
@@ -70,12 +69,12 @@ if(NOT TARGET pugixml)
 endif()
 
 # pybind11
-if(NOT TARGET pybind11::pybind11 AND HAVE_PYBIND)
+if(NOT TARGET pybind11::pybind11 AND BUILD_TOPOPYBIND)
     topolite_download_pybind11()
 endif()
 
 # nanogui
-if(NOT TARGET nanogui AND HAVE_NANOGUI)
+if(NOT TARGET nanogui AND BUILD_TOPOGUI)
     topolite_download_nanogui()
 endif()
 

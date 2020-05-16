@@ -12,9 +12,9 @@ set(CMAKE_CXX_STANDARD 17)
 #####                               #####
 #########################################
 
-option(HAVE_NANOGUI     "Compile the gui"                               ON)
-option(HAVE_TEST        "Compile the united test"                       ON)
-option(HAVE_PYBIND      "Compile the python binding"                    ON)
+set(BUILD_TOPOGUI         ON CACHE STRING "Build gui" FORCE)
+set(BUILD_TOPOTEST        OFF CACHE STRING "Build test" FORCE)
+set(BUILD_TOPOPYBIND      OFF CACHE STRING "Build pybind11" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -33,7 +33,7 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
     # NANOGUI uses Metal, not supported by GCC
-    option(HAVE_NANOGUI "Compile the gui" OFF)
+    option(BUILD_TOPOGUI "Compile the gui" OFF)
 endif()
 
     #3rd party library

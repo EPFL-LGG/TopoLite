@@ -22,24 +22,14 @@ set(LIBIGL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libigl/include)
 list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../cmake")
 include(libigl)
 
-##ShapeOp
-#set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
-#add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
-
 #NANOGUI
-if(HAVE_NANOGUI)
+if(BUILD_TOPOGUI)
 #    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
     find_package(NanoGUI)
     set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} ${NANOGUI_EXTRA_INCS} PARENT_SCOPE)
     set(NANOGUI_EXTRA_DEFS ${NANOGUI_EXTRA_DEFS} PARENT_SCOPE)
     set(NANOGUI_DIR ${NANOGUI_DIR} PARENT_SCOPE)
 endif()
-
-#if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
-#set_target_properties(ShapeOp  PROPERTIES
-#        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"
-#        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release")
-#endif()
 
 # TBB
 # Handled in cmake/TopoliteDependencies.cmake
@@ -55,8 +45,7 @@ set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
 find_package(IPOPT)
 
 ## Pybind11
-
-if(HAVE_PYBIND)
+if(BUILD_TOPOPYBIND)
     #Pybind11
     if(WIN32)
         set(PYTHON_EXECUTABLE $ENV{USERPROFILE}/anaconda3/python.exe)
@@ -66,26 +55,29 @@ if(HAVE_PYBIND)
     add_subdirectory(pybind11)
 endif()
 
+if(BUILD_TOPOTEST)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/catch2)
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/catch2/contrib)
+endif()
+
 
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}
-                ${QuickHull_INCLUDE_DIR}
-                ${Clipper_INCLUDE_DIR}
+                ${QUICKHULL_INCLUDE_DIR}
+                ${CLIPPER_INCLUDE_DIR}
                 ${LIBIGL_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
                 ${EIGEN3_INCLUDE_DIR}
                 ${CLP_INCLUDE_DIR}
-		PARENT_SCOPE)
+		        PARENT_SCOPE)
 
-set(ext_lib pugixml
-            QuickHull
-            Clipper
+set(ext_lib ${PUGIXML_LIBRARIES}
+            ${QUICKHULL_LIBRARIES}
+            ${CLIPPER_LIBRARIES}
+            ${TBB_IMPORTED_TARGETS}
             igl::core
             igl::triangle
-            ${TBB_IMPORTED_TARGETS}
-            lib_Osi
-            lib_Clp
-            lib_CoinUtils          
+            ${CLP_LIBRARIES}
             PARENT_SCOPE)
 
 if(IPOPT_FOUND)
