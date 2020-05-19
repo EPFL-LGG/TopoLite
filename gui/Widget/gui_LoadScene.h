@@ -383,6 +383,80 @@ public:
         scene.lock()->objects.push_back(LinesObject);
         LinesObject->visible = true;
     }
+
+    void loadminimalsurface_pattern(){
+        std::shared_ptr<PolyMesh<double>> _polyMesh;
+        std::shared_ptr<CrossMesh<double>> _pattern2D;
+
+        XMLIO IO;
+
+        // read xml
+        std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
+        XMLData data;
+        IO.XMLReader(xmlFileName.string(), data);
+
+        // read polyMesh
+        std::filesystem::path surface_objfile(UNITTEST_DATAPATH);
+        surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
+
+        bool texturedModel;
+        _polyMesh = make_shared<PolyMesh<double>>(data.varList);
+        _polyMesh->readOBJModel(surface_objfile.string().c_str(), texturedModel, true);
+
+        data.varList->set("minCrossArea", 0.2f);
+
+        Eigen::Matrix4d interactMat;
+        interactMat << data.interactMatrix[0], data.interactMatrix[4], data.interactMatrix[8], data.interactMatrix[12],
+                data.interactMatrix[1], data.interactMatrix[5], data.interactMatrix[9], data.interactMatrix[13],
+                data.interactMatrix[2], data.interactMatrix[6], data.interactMatrix[10], data.interactMatrix[14],
+                data.interactMatrix[3], data.interactMatrix[7], data.interactMatrix[11], data.interactMatrix[15];
+
+
+        vector<nanogui::Color> colors;
+        colors.push_back(nanogui::Color(200, 200 ,200, 255));
+
+        CrossMeshCreator<double> crossMeshCreator(data.varList);
+        crossMeshCreator.setReferenceSurface(_polyMesh);
+        Eigen::Matrix4d textureMat = crossMeshCreator.computeTextureMat_backwards_compatible(interactMat);
+        
+        crossMeshCreator.createCrossMesh(false, textureMat);
+
+        shared_ptr<gui_PolyMeshLists<double>> polyMeshLists;
+        shared_ptr<PolyMesh<double>> pattern_mesh = crossMeshCreator.pattern2D->getPolyMesh();
+        pattern_mesh->removeDuplicatedVertices();
+        for(auto vertex: pattern_mesh->vertexList){
+            vertex->pos[0] = (vertex->pos[0] + 1) / 2;
+            vertex->pos[1] = (vertex->pos[1] + 1) / 2;
+        }
+        meshLists.push_back(pattern_mesh);
+        polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, scene.lock()->render_pass);
+        polyMeshLists->update_attr("show_face", false);
+        polyMeshLists->model_init_mat = textureMat.cast<float>();
+        polyMeshLists->line_color = nanogui::Color(100, 100, 100, 255);
+        scene.lock()->objects.push_back(polyMeshLists);
+        
+        
+        meshLists.clear();
+        shared_ptr<PolyMesh<double>> baseMesh = crossMeshCreator.crossMesh->baseMesh2D;
+        baseMesh->removeDuplicatedVertices();
+        meshLists.push_back(baseMesh);
+        polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, scene.lock()->render_pass);
+        polyMeshLists->update_attr("show_face", false);
+        scene.lock()->objects.push_back(polyMeshLists);
+        polyMeshLists->model_mat_fixed = true;
+        
+        meshLists.clear();
+        shared_ptr<PolyMesh<double>> textureMesh =crossMeshCreator.referenceSurface->getTextureMesh();
+        meshLists.push_back(textureMesh);
+        polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, scene.lock()->render_pass);
+        polyMeshLists->update_attr("show_wireframe", false);
+        polyMeshLists->model_mat_fixed = true;
+        scene.lock()->objects.push_back(polyMeshLists);
+        
+        scene.lock()->focus_item = 2;
+        
+    }
 };
 
 

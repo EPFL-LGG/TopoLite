@@ -54,13 +54,13 @@ Cross<Scalar>::Cross(const Cross &_cross) : _Polygon<Scalar>(_cross), TopoObject
 
 template<typename Scalar>
 Cross<Scalar>::Cross(const _Polygon<Scalar> &polygon, std::shared_ptr<InputVarList> var)
-        :TopoObject(var), _Polygon<Scalar>(polygon) {
+        :_Polygon<Scalar>(polygon), TopoObject(var) {
     clear();
 }
 
 
 template<typename Scalar>
-void Cross<Scalar>::print() {
+void Cross<Scalar>::print() const{
     printf("oriPoints num: %lu \n", oriPoints.size());
     for (size_t i = 0; i < oriPoints.size(); i++) {
         oriPoints[i]->print();

@@ -17,6 +17,7 @@
 
 #include "Mesh/PolyMesh.h"
 #include "Mesh/CrossMesh.h"
+#include "Mesh/Cross.h"
 #include "Utility/TopoObject.h"
 
 #include <tbb/tbb.h>
@@ -44,6 +45,8 @@ public:
     typedef shared_ptr<Cross<Scalar>> pCross;
 
     typedef weak_ptr<Cross<Scalar>> wpCross;
+    
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
 
     typedef Matrix<Scalar, 3, 1> Vector3;
 
@@ -82,8 +85,6 @@ public:
     bool UpdateMeshTiltRange(pCrossMesh crossMesh);
 
 };
-
-#include "AugmentedVectorCreator.cpp"
 #endif
 
 

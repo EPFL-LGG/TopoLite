@@ -47,12 +47,12 @@
 #include "gui_SceneObject.h"
 #include "gui_PolyMeshLists.h"
 
-#include "gui_ArcballScene.h"
+#include "gui_Arcball_Canvas.h"
 #include "gui_LoadScene.h"
 
-class TopoLiteApplication : public gui_ArcballScene{
+class TopoLiteApplication : public gui_Arcball_Canvas{
 public:
-    TopoLiteApplication() : gui_ArcballScene()
+    TopoLiteApplication() : gui_Arcball_Canvas()
     {
         nanogui::Window *window = new nanogui::Window(this, "Menu");
         window->set_position(nanogui::Vector2i(15, 15));
@@ -160,7 +160,7 @@ public:
      ********************************************************************************************/
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers)
     {
-        if(gui_ArcballScene::keyboard_event(key, scancode, action, modifiers)){
+        if(gui_Arcball_Canvas::keyboard_event(key, scancode, action, modifiers)){
            return true;
         }
 
@@ -227,7 +227,7 @@ public:
         timeline_slider->set_value(scene->simtime * maximum_time_one_unit);
         text_box_timeline->set_value(float_to_string(scene->simtime * maximum_time_one_unit, 3) );
 
-        gui_ArcballScene::draw_contents();
+        gui_Arcball_Canvas::draw_contents();
     }
 private:
     nanogui::ToolButton *play, *pause, *stop;

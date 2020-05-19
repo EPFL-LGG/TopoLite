@@ -131,9 +131,5 @@ public:
 public:
     //python
     vector<vector<double>> PyCreateMesh_2DPattern(int patternID, int patternRadius);
-
 };
-
-#include "PatternCreator.cpp"
-
 #endif

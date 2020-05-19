@@ -391,7 +391,7 @@ vector<Scalar> _Polygon<Scalar>::computeBaryCentric(Vector2 sta, Vector2 end, Ve
 
 
 template <typename Scalar>
-void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris) const
+void _Polygon<Scalar>::triangulateNaive(vector<pTriangle> &tris) const
 {
     if(vers.size() < 3)
         return;
@@ -400,9 +400,9 @@ void _Polygon<Scalar>::convertToTriangles(vector<pTriangle> &tris) const
     for (size_t i = 0; i < vers.size(); i++)
 	{
 		pTriangle tri = make_shared<Triangle<Scalar>>();
-		tri->v[0] = _center;
-		tri->v[1] = vers[i]->pos;
-		tri->v[2] = vers[(i + 1)%vers.size()]->pos;
+		tri->v[0] = vers[i]->pos;
+		tri->v[1] = vers[(i + 1)%vers.size()]->pos;
+        tri->v[2] = _center;
 		tris.push_back(tri);
 	}
 
@@ -426,7 +426,7 @@ int _Polygon<Scalar>::getPtVerID(_Polygon<Scalar>::Vector3 point) const
 	return ELEMENT_OUT_LIST;
 }
 template <typename Scalar>
-void _Polygon<Scalar>::triangulate(vector<shared_ptr<_Polygon<Scalar>>> &tris) const{
+void _Polygon<Scalar>::triangulate(vector<pTriangle> &tris) const{
     tris.clear();
     Vector3 x_axis, y_axis, origin;
     computeFrame(x_axis, y_axis, origin);
@@ -452,10 +452,10 @@ void _Polygon<Scalar>::triangulate(vector<shared_ptr<_Polygon<Scalar>>> &tris) c
     }
 
     for(int id = 0; id < F.rows(); id++){
-        shared_ptr<_Polygon<Scalar>> tri = make_shared<_Polygon<Scalar>>();
+        shared_ptr<Triangle<Scalar>> tri = make_shared<Triangle<Scalar>>();
         for(int kd = 0; kd < 3; kd++)
         {
-            tri->push_back(V2_3d.row(F(id, kd)));
+            tri->v[kd] = V2_3d.row(F(id, kd));
         }
         tris.push_back(tri);
     }

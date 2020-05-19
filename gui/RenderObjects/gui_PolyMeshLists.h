@@ -4,7 +4,6 @@
 
 #ifndef TOPOLITE_GUI_POLYMESHLIST_H
 #define TOPOLITE_GUI_POLYMESHLIST_H
-
 #include "Mesh/PolyMesh.h"
 #include "gui_RenderObject.h"
 #include <nanogui/vector.h>
@@ -17,12 +16,14 @@ public:
     typedef weak_ptr<PolyMesh<Scalar>> wpPolyMesh;
     typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
     typedef shared_ptr<_Polygon<Scalar>> pPolygon;
+    typedef shared_ptr<Triangle<Scalar>> pTriangle;
     typedef Matrix<Scalar, 3, 1> Vector3;
 
 
 public:
     using gui_RenderObject<Scalar>::object_colors;
     using gui_RenderObject<Scalar>::object_center;
+    nanogui::Color line_color;
     vector<wpPolyMesh> meshLists;
     vector<Vector3> ani_translation;
     vector<Vector3> ani_center;
@@ -46,16 +47,15 @@ public:  //buffers
 
 public: // uniform
     using gui_RenderObject<Scalar>::varList;
-    using gui_RenderObject<Scalar>::proj;
-    using gui_RenderObject<Scalar>::model;
-    using gui_RenderObject<Scalar>::view;
+    using gui_RenderObject<Scalar>::proj_mat;
+    using gui_RenderObject<Scalar>::model_mat;
+    using gui_RenderObject<Scalar>::view_mat;
     using gui_RenderObject<Scalar>::eye;
     using gui_RenderObject<Scalar>::simtime;
 
 public:
     gui_PolyMeshLists(const vector<pPolyMesh> &_meshLists,
-                      nanogui::ref<nanogui::RenderPass> _render_pass)
-                      : gui_RenderObject<Scalar>::gui_RenderObject(_render_pass){
+                      nanogui::ref<nanogui::RenderPass> _render_pass) : gui_RenderObject<Scalar>::gui_RenderObject(_render_pass){
         for(pPolyMesh mesh: _meshLists)
         {
             meshLists.push_back(mesh);
@@ -69,18 +69,19 @@ public:
         ani_translation.resize(meshLists.size(), Vector3(0, 0, 0));
         ani_rotation.resize(meshLists.size(), Vector3(0, 0, 0));
         ani_center.resize(meshLists.size(), Vector3(0, 0, 0));
-
+        
+        line_color = nanogui::Color(0, 0, 0, 0);
 
         varList->add((bool)true, "show_wireframe",  "");
         varList->add((bool)true, "show_face", "");
+                          
         state = Stop;
         initShader();
     }
 
     gui_PolyMeshLists(const vector<pPolyMesh> &_meshLists,
                  vector<nanogui::Color> _object_colors,
-                 nanogui::ref<nanogui::RenderPass> _render_pass)
-            : gui_RenderObject<Scalar>::gui_RenderObject(_render_pass){
+                 nanogui::ref<nanogui::RenderPass> _render_pass) : gui_RenderObject<Scalar>::gui_RenderObject(_render_pass){
 
         for(pPolyMesh mesh: _meshLists)
         {
@@ -98,12 +99,16 @@ public:
                 object_colors.push_back(nanogui::Color(rand() % 255, rand() % 255, rand() % 255, 255));
             }
         }
+        
+        line_color = nanogui::Color(0, 0, 0, 0);
+        
         ani_translation.resize(meshLists.size(), Vector3(0, 0, 0));
         ani_rotation.resize(meshLists.size(), Vector3(0, 0, 0));
         ani_center.resize(meshLists.size(), Vector3(0, 0, 0));
 
         varList->add((bool)true, "show_wireframe",  "");
         varList->add((bool)true, "show_face", "");
+        varList->add((float)true, "show_face", "");
         state = Stop;
         initShader();
     }
@@ -115,19 +120,21 @@ public:
     {
         //read text from file
 #if defined(NANOGUI_USE_OPENGL)
-        std::ifstream file("shader/PolyMeshAnimation.vert");
+        string shader_path = TOPOCREATOR_SHADER_PATH;
+        std::ifstream file(TOPOCREATOR_SHADER_PATH + "PolyMeshAnimation.vert");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 
-        file = std::ifstream("shader/PolyMeshAnimation.frag");
+        file = std::ifstream(TOPOCREATOR_SHADER_PATH + "PolyMeshAnimation.frag");
         std::string shader_frag((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 #elif defined(NANOGUI_USE_METAL)
-        std::ifstream file("shader/PolyMeshAnimation_vert.metal");
+        string shader_path = TOPOCREATOR_SHADER_PATH;
+        std::ifstream file(shader_path + "PolyMeshAnimation_vert.metal");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 
-        file = std::ifstream("shader/PolyMeshAnimation_frag.metal");
+        file = std::ifstream(shader_path + "PolyMeshAnimation_frag.metal");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
 #endif
@@ -164,17 +171,16 @@ public:
             wpPolyMesh mesh = meshLists[mID];
             for(pPolygon polygon: mesh.lock()->polyList)
             {
-                Vector3 face_center = polygon->center();
-                vector<pPolygon> tris;
-                polygon->triangulate(tris);
-                for(pPolygon tri: tris)
+                vector<pTriangle> tris;
+                polygon->triangulateNaive(tris);
+                for(pTriangle tri: tris)
                 {
                     for(int vID = 0; vID < 3; vID++)
                     {
-                        buffer_positions.push_back(tri->vers[vID]->pos.x());
-                        buffer_positions.push_back(tri->vers[vID]->pos.y());
-                        buffer_positions.push_back(tri->vers[vID]->pos.z());
-                        object_center = object_center + tri->vers[vID]->pos;
+                        buffer_positions.push_back(tri->v[vID].x());
+                        buffer_positions.push_back(tri->v[vID].y());
+                        buffer_positions.push_back(tri->v[vID].z());
+                        object_center = object_center + tri->v[vID];
                         num_vertices++;
                     }
 
@@ -225,8 +231,9 @@ public:
     void update_uniform(){
         shader->set_uniform("show_wireframe", varList->template get<bool>("show_wireframe"));
         shader->set_uniform("show_face", varList->template get<bool>("show_face"));
-        shader->set_uniform("mvp", this->toNanoguiMatrix(proj * view * model));
+        shader->set_uniform("mvp", this->toNanoguiMatrix(proj_mat * view_mat * model_mat));
         shader->set_uniform("simtime", simtime);
+        shader->set_uniform("line_color", line_color);
     }
 };
 

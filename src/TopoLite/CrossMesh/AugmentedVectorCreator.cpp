@@ -14,6 +14,7 @@
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
+#include "AugmentedVectorCreator.h"
 
 template<typename Scalar>
 AugmentedVectorCreator<Scalar>::~AugmentedVectorCreator() {
@@ -136,25 +137,27 @@ bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {
         return false;
 
     auto big_zero_eps = getVarList()->template get<float>("big_zero_eps");
-    for (const auto &cross : crossMesh->crossList) {
+    for (int id = 0; id < crossMesh->size(); id++)
+    {
+        pCross cross = crossMesh->cross(id);
         if (cross == nullptr)
             continue;
 
-        for (int jd = 0; jd < cross->oriPoints.size(); jd++) {
+        for (int jd = 0; jd < cross->oriPoints.size(); jd++)
+        {
             shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
             if (oriPt == nullptr)
                 continue;
 
             Vector3 t = oriPt->rotation_base.normalized();
-            Vector3 e = oriPt->rotation_axis.normalized();
-
+            
             Vector3 y = (oriPt->rotation_base.cross(oriPt->rotation_axis)).normalized();
             if (oriPt->tiltSign == 1) y *= -1;
 
             Vector3 p0 = oriPt->point;
 
-            for (auto  &ver : cross->vers) {
-                Vector3 pi = ver.pos;
+            for (pVertex ver : cross->vers) {
+                Vector3 pi = ver->pos;
                 double yPiP0 = (y).dot(pi - p0);
                 double tPiP0 = (-t).dot(pi - p0);
                 if (std::abs(tPiP0) < big_zero_eps && std::abs(yPiP0) < big_zero_eps)
@@ -174,7 +177,7 @@ bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {
                     } else {
                         angle = std::fabs(std::atan(yPiP0 / tPiP0) * 180 / M_PI) + 90;
                     }
-                    if (oriPt->tilt_range.y > angle) oriPt->tilt_range.y = angle;
+                    if (oriPt->tilt_range.y() > angle) oriPt->tilt_range.y() = angle;
                 }
                 oriPt->sided_range = oriPt->tilt_range;
             }
@@ -184,14 +187,17 @@ bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {
     double min_max = 90.0;
     double max_min = 0.0;
 
-    for (const auto &cross : crossMesh->crossList) {
-        for (int jd = 0; jd < cross->neighbors.size(); jd++) {
-            pCross ncross = cross->neighbors[jd].lock();
+    for (int id = 0; id < crossMesh->size(); id++)
+    {
+        pCross cross = crossMesh->cross(id);
+        for (int jd = 0; jd < cross->neighbors.size(); jd++)
+        {
+            shared_ptr<Cross<Scalar>> ncross = cross->neighbors[jd].lock();
 
             if (ncross == nullptr || cross->crossID > ncross->crossID)
                 continue;
 
-            int edgeID = ncross->GetNeighborEdgeID(cross->crossID);
+            int edgeID = ncross->getEdgeIDSharedWithCross(cross.get());
             shared_ptr<OrientPoint<Scalar>> noriPt = ncross->oriPoints[edgeID];
             shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
             Vector2 range(0, 0);
@@ -211,3 +217,5 @@ bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {
     Scalar tiltangle = getVarList()->template get<float>("tiltAngle");
     return tiltangle < max_min || tiltangle > min_max ? false : true;
 }
+
+template class AugmentedVectorCreator<double>;

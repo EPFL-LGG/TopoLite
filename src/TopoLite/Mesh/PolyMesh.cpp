@@ -831,7 +831,7 @@ void PolyMesh<Scalar>::convertToTriMesh(vector<pTriangle> &triList) const
         pPolygon poly = polyList[i];
 
         vector<pTriangle> triangles;
-        poly->convertToTriangles(triangles);
+        poly->triangulateNaive(triangles);
 
         for (size_t j = 0; j < triangles.size(); j++)
         {

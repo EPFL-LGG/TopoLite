@@ -214,9 +214,9 @@ public:
 public:
 
     // Polygon Operations
-	void convertToTriangles(vector<pTriangle> &tris) const;
+	void triangulateNaive(vector<pTriangle> &tris) const;
 
-    void triangulate(vector<shared_ptr<_Polygon<Scalar>>> &tris) const;
+    void triangulate(vector<pTriangle> &tris) const;
 
 	int getPtVerID(Vector3 point) const;
 

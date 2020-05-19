@@ -15,6 +15,7 @@
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
+#include "CrossMeshCreator.h"
 
 template <typename Scalar>
 CrossMeshCreator<Scalar>::CrossMeshCreator(shared_ptr<InputVarList> var) :TopoObject(var)
@@ -48,9 +49,9 @@ CrossMeshCreator<Scalar>::CrossMeshCreator(const CrossMeshCreator &_model) : Top
     default_patternRadius = _model.default_patternRadius;
     default_patternID = _model.default_patternID;
 
-    if(_model.pattern2D) pattern2D = make_shared<CrossMesh>(*_model.pattern2D);
-    if(_model.referenceSurface) referenceSurface = make_shared<PolyMesh>(*_model.referenceSurface);
-    if(_model.crossMesh) crossMesh = make_shared<CrossMesh>(*_model.crossMesh);
+    if(_model.pattern2D) pattern2D = make_shared<CrossMesh<Scalar>>(*_model.pattern2D);
+    if(_model.referenceSurface) referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_model.referenceSurface);
+    if(_model.crossMesh) crossMesh = make_shared<CrossMesh<Scalar>>(*_model.crossMesh);
 }
 
 template <typename Scalar>
@@ -67,16 +68,16 @@ template <typename Scalar>
 bool CrossMeshCreator<Scalar>::loadSurface(const char *objFileName)
 {
 	// 1. Read OBJ model
-	pPolyMesh surface;
-    surface = make_shared<PolyMesh>(getVarList());
+	shared_ptr<PolyMesh<Scalar>> surface;
+    surface = make_shared<PolyMesh<Scalar>>(getVarList());
 	bool texturedModel;
 
-	if(surface->ReadOBJModel(objFileName, texturedModel, true))
+	if(surface->readOBJModel(objFileName, texturedModel, true))
 	{
 		// 2. Load a Texture model with parametrization.
 		if (texturedModel)
 		{
-            referenceSurface = make_shared<PolyMesh_AABBTree>(*surface);
+            referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*surface);
             getVarList()->set("texturedModel", true);
         }
 		// 3. Load a Cross Mesh
@@ -142,12 +143,13 @@ bool CrossMeshCreator<Scalar>::setCrossMesh(pPolyMesh _cross, vector<bool> &atBo
 
     getVarList()->set("texturedModel", false);
     crossMesh = make_shared<CrossMesh<Scalar>>(*_cross);
-    BaseMeshCreator<Scalar> baseMeshCreator;
+    BaseMeshCreator<Scalar> baseMeshCreator(getVarList());
 
-    if(crossMesh->crossList.size() == atBoundary.size())
+    if(crossMesh->size() == atBoundary.size())
     {
-        for(pCross cross: crossMesh->crossList)
+        for(int id = 0; id < crossMesh->size(); id++)
         {
+            pCross cross = crossMesh->cross(id);
             cross->atBoundary = atBoundary[cross->crossID];
         }
     }
@@ -156,8 +158,8 @@ bool CrossMeshCreator<Scalar>::setCrossMesh(pPolyMesh _cross, vector<bool> &atBo
     }
 
     float   tiltAngle       = getVarList()->template get<float>("tiltAngle");
-    AugmentedVectorCreator vectorCreator(getVarList());
-    vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
+    AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
+    vectorCreator.createAugmentedVector(tiltAngle, crossMesh);
 
     return  true;
 }
@@ -224,7 +226,7 @@ bool CrossMeshCreator<Scalar>::updateTiltRange()
     //compute the tilt range
     if(crossMesh)
     {
-        AugmentedVectorCreator vectorCreator(getVarList());
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
         if(!vectorCreator.UpdateMeshTiltRange(crossMesh))
         {
             return false;
@@ -236,7 +238,7 @@ bool CrossMeshCreator<Scalar>::updateTiltRange()
 }
 
 //**************************************************************************************//
-//                                Auxiliary Tree
+//                                Utility Function
 //**************************************************************************************//
 
 template <typename Scalar>
@@ -266,3 +268,44 @@ void CrossMeshCreator<Scalar>::recomputeTexture() {
         return;
     }
 }
+
+template<typename Scalar>
+Matrix<Scalar, 4, 4> CrossMeshCreator<Scalar>::computeTextureMat_backwards_compatible(Matrix4 interactMat)
+{
+    //the following want to tranform the points in the surface texture space to the pattern space
+
+    // Compute 2D bounding box of the parameterized surface mesh
+    Box<Scalar> texBBox = referenceSurface->texBBox();
+
+    //1) centralize the surface texture
+    Matrix4 trans1 = Eigen::Matrix4d::Identity();
+    trans1(0, 3) = -0.5*(texBBox.minPt.x() + texBBox.maxPt.x());
+    trans1(1, 3) = -0.5*(texBBox.minPt.y() + texBBox.maxPt.y());
+    trans1(2, 3) = 0;
+
+    //2) scale 1) into [-0.5, -0.5]x [0.5, 0.5]
+    Scalar scale_factor = getVarList()->template get<float>("textureScaleFactor");
+    Scalar footScale = scale_factor / max(texBBox.maxPt.x() - texBBox.minPt.x(), texBBox.maxPt.y() - texBBox.minPt.y());
+    Matrix4 scale = Eigen::Matrix4d::Identity();
+    scale(0, 0) = footScale; scale(1, 1) = footScale;
+
+    //3) tranform 2) by inveInteractMat
+    Matrix4 inveInteractMat = interactMat.inverse();
+    //Compatible issue with the old data
+    //Reason: Since the scale of 2D pattern space is [-1, 1] while the scale of 2D texture space is [0, 1]
+    inveInteractMat(0, 3) /= 2;
+    inveInteractMat(1, 3) /= 2;
+    inveInteractMat(2, 3) /= 2;
+
+    //4) move the 3)'s center into [0.5, 0.5], so that it is within [0, 0] x[1, 1]
+    Matrix4 trans2 = Eigen::Matrix4d::Identity();
+    trans2(0, 3) = 0.5;
+    trans2(1, 3) = 0.5;
+    trans2(2, 3) = 0;
+
+    Matrix4 textureMat = trans2 * inveInteractMat * scale * trans1;
+    //5) inverse it because we want a transform form pattern space to surface texture space
+    return textureMat.inverse();
+}
+
+template class CrossMeshCreator<double>;

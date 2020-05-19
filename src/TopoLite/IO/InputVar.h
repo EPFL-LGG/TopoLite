@@ -47,6 +47,10 @@ public:
         var_value_type = GLUI_VAR_VALUE_NONE;
         visible = true;
     }
+    
+    ~InputVar(){
+        
+    }
 
     InputVar& operator<<(string name){
         var_names.push_back(name);
@@ -83,6 +87,10 @@ public:
         bound = _bound;
     }
 
+    ~InputVarInt(){
+        clear_value();
+    }
+    
     void clear_value()
     {
         value = default_value;
@@ -103,6 +111,10 @@ public:
         var_value_type = GLUI_VAR_VALUE_FLOAT;
         bound = _bound;
     }
+    
+    ~InputVarFloat(){
+        clear_value();
+    }
 
     void clear_value()
     {
@@ -122,6 +134,10 @@ public:
         var_value_type = GLUI_VAR_VALUE_BOOL;
     }
 
+    ~InputVarBool(){
+        clear_value();
+    }
+    
     void clear_value()
     {
         value = default_value;

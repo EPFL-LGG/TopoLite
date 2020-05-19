@@ -57,9 +57,9 @@ public:  //buffers
 public: // uniform
     using gui_RenderObject<Scalar>::simtime;
     using gui_RenderObject<Scalar>::varList;
-    using gui_RenderObject<Scalar>::proj;
-    using gui_RenderObject<Scalar>::model;
-    using gui_RenderObject<Scalar>::view;
+    using gui_RenderObject<Scalar>::proj_mat;
+    using gui_RenderObject<Scalar>::model_mat;
+    using gui_RenderObject<Scalar>::view_mat;
     using gui_RenderObject<Scalar>::eye;
     float line_width;
 
@@ -88,19 +88,21 @@ public:
 
 #if defined(NANOGUI_USE_OPENGL)
         //read text from file
-        std::ifstream file("shader/Lines.vert");
+        string shader_path = TOPOCREATOR_SHADER_PATH;
+        std::ifstream file(shader_path + "Lines.vert");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
-        file = std::ifstream("shader/Lines.frag");
+        file = std::ifstream(shader_path + "Lines.frag");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
 #elif defined(NANOGUI_USE_METAL)
         //read text from file
-        std::ifstream file("shader/Lines_vert.metal");
+        string shader_path = TOPOCREATOR_SHADER_PATH;
+        std::ifstream file(shader_path + "Lines_vert.metal");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 
-        file = std::ifstream("shader/Lines_frag.metal");
+        file = std::ifstream(shader_path + "Lines_frag.metal");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
 #endif
@@ -197,8 +199,8 @@ public:
     }
 
     void update_uniform(){
-        shader->set_uniform("proj", this->toNanoguiMatrix(proj));
-        shader->set_uniform("mv",this->toNanoguiMatrix(view * model));
+        shader->set_uniform("proj", this->toNanoguiMatrix(proj_mat));
+        shader->set_uniform("mv",this->toNanoguiMatrix(view_mat * model_mat));
         shader->set_uniform("simtime", simtime);
     }
 };

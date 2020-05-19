@@ -63,7 +63,7 @@ public:
 
     ~Cross();
 
-	virtual void print();
+    void print() const override;
 
 	void clear(){
         crossID = -1;

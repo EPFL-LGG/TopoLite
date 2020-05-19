@@ -34,14 +34,18 @@ public:  //buffers
     vector<float> buffer_positions;
     vector<float> buffer_colors;
 
+    
 public: // uniform
-    Eigen::Matrix4f proj;
-    Eigen::Matrix4f model;
-    Eigen::Matrix4f view;
+    
+    Eigen::Matrix4f proj_mat;
+    Eigen::Matrix4f model_mat;
+    Eigen::Matrix4f model_init_mat;
+    Eigen::Matrix4f view_mat;
     Eigen::Vector3f eye;
 
     float simtime;
     bool visible;
+    bool model_mat_fixed;
 
     shared_ptr<InputVarList> varList;
 
@@ -50,12 +54,14 @@ public:
     gui_RenderObject(nanogui::ref<nanogui::RenderPass> _render_pass){
         simtime = prev_time = 0;
         state = Stop;
-        model = Eigen::Matrix4f::Identity();
-        view = Eigen::Matrix4f::Identity();
-        proj = Eigen::Matrix4f::Identity();
+        model_init_mat = Eigen::Matrix4f::Identity();
+        model_mat = Eigen::Matrix4f::Identity();
+        view_mat = Eigen::Matrix4f::Identity();
+        proj_mat = Eigen::Matrix4f::Identity();
         eye = Eigen::Vector3f::Zero();
         render_pass = _render_pass;
         visible = true;
+        model_mat_fixed = false;
         varList = make_shared<InputVarList>();
     }
 

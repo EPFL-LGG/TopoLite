@@ -26,6 +26,7 @@ using std::queue;
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
+#include "PatternCreator.h"
 
 template<typename Scalar>
 PatternCreator<Scalar>::PatternCreator()
@@ -897,7 +898,7 @@ void PatternCreator<Scalar>::CreatePolygon_Rhombus(pPolygon &poly, Scalar edgeLe
 template<typename Scalar>
 vector<vector<double>> PatternCreator<Scalar>::PyCreateMesh_2DPattern(int patternID, int patternRadius) {
     pCrossMesh crossMesh;
-    CreateMesh_2DPattern(patternID, patternRadius, crossMesh);
+    create2DPattern(PatternType(patternID), patternRadius, crossMesh);
 
     vector<vector<double>> polys;
     for(size_t id = 0; id < crossMesh->baseMesh2D->polyList.size(); id++){
@@ -912,6 +913,4 @@ vector<vector<double>> PatternCreator<Scalar>::PyCreateMesh_2DPattern(int patter
     return polys;
 }
 
-
-
-
+template class PatternCreator<double>;

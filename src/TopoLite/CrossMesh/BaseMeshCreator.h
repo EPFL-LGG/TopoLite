@@ -85,6 +85,8 @@ public:
     BaseMeshCreator(pPolyMeshAABB _polyMesh,
                     pCrossMesh _pattern2D,
                     shared_ptr<InputVarList> varList);
+    
+    BaseMeshCreator(shared_ptr<InputVarList> varList);
 
     ~BaseMeshCreator();
 
@@ -98,12 +100,12 @@ public:
 	 * \brief: main function for mapping the 2D pattern into 3D surface
 	 * \param[in] polyMesh: input 3D guide surface
 	 * \param[in] pattern2D: input 2D pattern
-	 * \param[in] inverTextureMat: User interaction of the 2D pattern (Rotation, Translation and Scale)
+	 * \param[in] inverTextureMat: Map from 2D pattern space to surface texture space
 	 * \param[out] baseMesh2D: output the base 2D mesh
 	 * \param[out] baseMesh: output the base mesh
 	 * \note: it requires polyMesh with texture.
 	 */
-	void computeBaseCrossMesh(Matrix<Scalar, 4, 4> interactMat,
+	void computeBaseCrossMesh(Matrix<Scalar, 4, 4> textureMat,
 	                          pPolyMesh &baseMesh2D,
 	                          pCrossMesh &crossMesh,
 	                          bool previewMode = false);
@@ -137,12 +139,8 @@ public:
 	bool mapTexPointBackToSurface(Vector2 ptTexCoord, Vector3 &ptSurfCoord);
 
 	void splitIntoConsecutivePolygons(const vector<Line<Scalar>> &line, const vector<bool>& inside, tbb::concurrent_vector<pPolygon> &polyList);
-
-    Matrix4 computeTextureMat(const pPolyMesh &referenceSurface, Matrix4 interactMat);
+    
 };
-
-#include "BaseMeshCreator.cpp"
-
 #endif
 
 

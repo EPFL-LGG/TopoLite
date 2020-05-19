@@ -20,9 +20,11 @@
 #include "TopoLite/Mesh/PolyMesh_AABBTree.h"
 #include "BaseMeshCreator.h"
 #include "AugmentedVectorCreator.h"
+#include "PatternCreator.h"
 #include "Eigen/Dense"
 #include <vector>
 #include "igl/lscm.h"
+#include <memory>
 
 /*!
  * CrossMesh = BaseMesh + AugmentedVector
@@ -114,12 +116,14 @@ public:
 
     bool updateTiltRange();
 
+public:
+    
+    Matrix4 computeTextureMat_backwards_compatible(Matrix4 interactMat);
+
 private:
 
 	void recomputeTexture();
+    
 };
-
-#include "CrossMeshCreator.cpp"
-
 #endif
 

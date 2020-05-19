@@ -24,6 +24,12 @@ if(BUILD_TOPOGUI)
             ${CMAKE_CURRENT_SOURCE_DIR}/Widget)
     target_compile_definitions(TopoCreator PUBLIC ${NANOGUI_EXTRA_DEFS})
 
+
     file(COPY shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     file(COPY ../data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    if(CMAKE_GENERATOR STREQUAL Xcode)
+        target_compile_definitions(TopoCreator PUBLIC -DTOPOCREATOR_SHADER_PATH="../shader/")
+    else()
+        target_compile_definitions(TopoCreator PUBLIC -DTOPOCREATOR_SHADER_PATH="shader/")
+    endif()
 endif()

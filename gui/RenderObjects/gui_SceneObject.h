@@ -19,11 +19,14 @@ public:
     nanogui::ref<nanogui::RenderPass> render_pass;
     AnimationState state;
     float simtime;
-
+    int focus_item = -1;
 public:
 
     Eigen::Vector3f focus(){
-        if(objects.size() >= 1){
+        if(focus_item >= 0 && focus_item < objects.size()){
+            return Eigen::Vector3f(objects[focus_item]->object_center.x(), objects[focus_item]->object_center.y(), objects[focus_item]->object_center.z());
+        }
+        else if(objects.size() >= 1){
             return Eigen::Vector3f(objects[0]->object_center.x(), objects[0]->object_center.y(), objects[0]->object_center.z());
         }
         else{
@@ -54,19 +57,24 @@ public:
 
     void update_proj(Eigen::Matrix4f proj){
         for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
-            object->proj = proj;
+            object->proj_mat = proj;
         }
     }
 
     void update_model(Eigen::Matrix4f model){
         for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
-            object->model = model;
+            if(object->model_mat_fixed){
+                object->model_mat = object->model_init_mat;
+            }
+            else{
+                object->model_mat = model * object->model_init_mat;
+            }
         }
     }
 
     void update_view(Eigen::Matrix4f view){
         for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
-            object->view = view;
+            object->view_mat = view;
         }
     }
 
@@ -78,7 +86,6 @@ public:
 
     void draw(){
         /* MVP uniforms */
-        render_pass->begin();
 #if defined(NANOGUI_USE_OPENGL)
         glClear(GL_DEPTH_BUFFER_BIT);
         glEnable(GL_DEPTH_TEST);
@@ -91,9 +98,7 @@ public:
                 object->shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, object->buffer_positions.size() / 3, false);
                 object->shader->end();
             }
-        }
-        render_pass->end();
-    }
+        }    }
 
     template<typename AttrType>
     void update_attr(string name, AttrType value)

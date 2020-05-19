@@ -21,18 +21,31 @@
 #include <iostream>
 #include <memory>
 
-#include "gui_ArcballScene.h"
+#include "gui_Arcball_Canvas.h"
+#include "gui_2D_Canvas.h"
 #include "gui_LoadScene.h"
 #include "gui_Lines.h"
 
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_Clp.h"
 
-class TopoLiteApplication : public gui_ArcballScene{
+class TopoLiteApplication : public nanogui::Screen{
 public:
-    TopoLiteApplication() : gui_ArcballScene()
+    TopoLiteApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768))
     {
-        nanogui::Window *window = new nanogui::Window(this, "Menu");
+        nanogui::Window *window;
+        
+        //main canvas
+        main_canvas = new gui_Arcball_Canvas(this);
+        main_canvas->set_size(this->m_size);
+        
+        //pattern canvas
+        pattern_canvas = new gui_2D_Canvas(this);
+        int min_wh = std::min(m_size.x() / 2.5, m_size.y() / 2.5);
+        pattern_canvas->set_position(nanogui::Vector2i(m_size.x() - min_wh, m_size.y() - min_wh));
+        pattern_canvas->set_size(nanogui::Vector2i(min_wh, min_wh));
+    
+        window = new nanogui::Window(this, "Menu");
         window->set_position(nanogui::Vector2i(15, 15));
         window->set_layout(new nanogui::GroupLayout());
 
@@ -40,27 +53,25 @@ public:
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            scene->objects[0]->update_attr("show_wireframe", check);
+            main_canvas->scene->objects[0]->update_attr("show_wireframe", check);
             return check;
         });
 
         checkbox = new nanogui::CheckBox(window, "faces");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            scene->objects[0]->update_attr("show_face", check);
+            main_canvas->scene->objects[0]->update_attr("show_face", check);
             return check;
         });
 
-        checkbox = new nanogui::CheckBox(window, "contact");
+        checkbox = new nanogui::CheckBox(window, "augmented vectors");
         checkbox->set_checked(false);
         checkbox->set_callback([&](bool check){
-//            scene->objects[1]->visible = check;
-//            return check;
+            main_canvas->scene->objects[1]->visible = check;
+            return check;
         });
-
+        
         perform_layout();
-        refresh_trackball_center();
-
         init_mesh();
     }
 
@@ -69,12 +80,27 @@ public:
      *                              Key Board and Mouse
      *
      ********************************************************************************************/
-    virtual bool keyboard_event(int key, int scancode, int action, int modifiers)
+    bool keyboard_event(int key, int scancode, int action, int modifiers) override
     {
-        if(gui_ArcballScene::keyboard_event(key, scancode, action, modifiers)){
+        if(main_canvas->keyboard_event(key, scancode, action, modifiers)){
             return true;
         }
         return false;
+    }
+    
+    bool resize_event(const nanogui::Vector2i& size) override{
+
+        int min_wh = std::min(size.x() / 2.5, size.y() / 2.5);
+        pattern_canvas->set_position(nanogui::Vector2i(size.x() - min_wh, size.y() - min_wh));
+        pattern_canvas->set_size(nanogui::Vector2i(min_wh, min_wh));
+        pattern_canvas->resize_arcball(size);
+        
+        main_canvas->set_size(size);
+        main_canvas->resize_arcball(size);
+        
+        m_redraw = true;
+        draw_all();
+        return true;
     }
 
     /********************************************************************************************
@@ -86,19 +112,26 @@ public:
 
     void init_mesh()
     {
-        gui_LoadScene loader(scene);
+        gui_LoadScene loader(main_canvas->scene);
         loader.loadminimalsurface();
-        refresh_trackball_center();
+        loader = gui_LoadScene(pattern_canvas->scene);
+        loader.loadminimalsurface_pattern();
+
+        main_canvas->scene->objects[1]->visible = false;
+        main_canvas->refresh_trackball_center();
+        
+        pattern_canvas->refresh_trackball_center();
+
     }
 
-    virtual void draw(NVGcontext *ctx) {
+    void draw(NVGcontext *ctx) override {
         /* Draw the user interface */
         Screen::draw(ctx);
     }
-
-    virtual void draw_contents() {
-        gui_ArcballScene::draw_contents();
-    }
+    
+private:
+    nanogui::ref<gui_Arcball_Canvas> main_canvas;
+    nanogui::ref<gui_2D_Canvas> pattern_canvas;
 };
 
 int main(int /* argc */, char ** /* argv */) {
