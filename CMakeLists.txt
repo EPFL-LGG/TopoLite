@@ -13,7 +13,7 @@ set(CMAKE_CXX_STANDARD 17)
 #########################################
 
 set(BUILD_TOPOGUI         ON CACHE STRING "Build gui" FORCE)
-set(BUILD_TOPOTEST        OFF CACHE STRING "Build test" FORCE)
+set(BUILD_TOPOTEST        ON CACHE STRING "Build test" FORCE)
 set(BUILD_TOPOPYBIND      OFF CACHE STRING "Build pybind11" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE)

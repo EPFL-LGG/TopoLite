@@ -23,7 +23,7 @@
 
 #include "gui_Arcball_Canvas.h"
 #include "gui_2D_Canvas.h"
-#include "gui_LoadScene.h"
+#include "gui_TopoManager.h"
 #include "gui_Lines.h"
 
 #include "Interlocking/ContactGraph.h"
@@ -31,10 +31,10 @@
 
 class TopoLiteApplication : public nanogui::Screen{
 public:
-    TopoLiteApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768))
+    TopoLiteApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "TopoCreator")
     {
         nanogui::Window *window;
-        
+
         //main canvas
         main_canvas = new gui_Arcball_Canvas(this);
         main_canvas->set_size(this->m_size);
@@ -44,10 +44,20 @@ public:
         int min_wh = std::min(m_size.x() / 2.5, m_size.y() / 2.5);
         pattern_canvas->set_position(nanogui::Vector2i(m_size.x() - min_wh, m_size.y() - min_wh));
         pattern_canvas->set_size(nanogui::Vector2i(min_wh, min_wh));
+
+        //manager
+        topo_manager = make_shared<gui_TopoManager>(main_canvas, pattern_canvas);
     
         window = new nanogui::Window(this, "Menu");
         window->set_position(nanogui::Vector2i(15, 15));
         window->set_layout(new nanogui::GroupLayout());
+
+        new nanogui::Label(window, "File", "sans-bold");
+        nanogui::Button *open_button = new nanogui::Button(window, "open");
+        open_button->set_callback([&](){
+            load_from_xmlfile(nanogui::file_dialog({ {"xml", ""} }, false));
+            return true;
+        });
 
         new nanogui::Label(window, "Rendering Settings", "sans-bold");
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
@@ -68,11 +78,20 @@ public:
         checkbox->set_checked(false);
         checkbox->set_callback([&](bool check){
             main_canvas->scene->objects[1]->visible = check;
+            topo_manager->set_update_list_true({"update_augmented_vectors"});
             return check;
         });
+
+        checkbox = new nanogui::CheckBox(window, "struc");
+        checkbox->set_checked(true);
+        checkbox->set_callback([&](bool check){
+            main_canvas->scene->objects[2]->visible = check;
+            topo_manager->set_update_list_true({"update_struc"});
+            return check;
+        });
+
         
         perform_layout();
-        init_mesh();
     }
 
     /********************************************************************************************
@@ -110,28 +129,24 @@ public:
     ********************************************************************************************/
 
 
-    void init_mesh()
+    void load_from_xmlfile(string xmlfilename)
     {
-        gui_LoadScene loader(main_canvas->scene);
-        loader.loadminimalsurface();
-        loader = gui_LoadScene(pattern_canvas->scene);
-        loader.loadminimalsurface_pattern();
-
-        main_canvas->scene->objects[1]->visible = false;
-        main_canvas->refresh_trackball_center();
-        
-        pattern_canvas->refresh_trackball_center();
-
+        if(topo_manager && topo_manager->load_from_xmlfile(xmlfilename)){
+            topo_manager->init_main_canvas();
+            topo_manager->init_pattern_canvas();
+        }
     }
 
     void draw(NVGcontext *ctx) override {
         /* Draw the user interface */
         Screen::draw(ctx);
+        if(topo_manager)topo_manager->update();
     }
     
 private:
     nanogui::ref<gui_Arcball_Canvas> main_canvas;
     nanogui::ref<gui_2D_Canvas> pattern_canvas;
+    shared_ptr<gui_TopoManager> topo_manager;
 };
 
 int main(int /* argc */, char ** /* argv */) {
@@ -143,7 +158,7 @@ int main(int /* argc */, char ** /* argv */) {
             app->dec_ref();
             app->draw_all();
             app->set_visible(true);
-            nanogui::mainloop(1 / 60.f * 1000);
+            nanogui::mainloop(1 / 120.f * 1000);
         }
 
         nanogui::shutdown();

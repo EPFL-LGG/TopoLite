@@ -4,7 +4,7 @@
 
 #include "XMLIO.h"
 #include <sstream>
-
+#include <filesystem>
 //**************************************************************************************//
 //                                  XML Writer
 //**************************************************************************************//
@@ -443,43 +443,21 @@ bool XMLIO::XMLReader(const string xmlFileName, XMLData &data)
         InitVar(data.varList.get());
         XMLReader_GUISettings(xml_root, data);
 
-//        // 2) construct the cross mesh
-//        boost::filesystem::path xmlPathBoost(xmlFileName);
-//        data.varList->filename = xmlPathBoost.stem().string();
-//        string geomDataFolder = boost::filesystem::path(xmlFileName).parent_path().string();
-//        if (data.varList->get<bool>("texturedModel") == false)
-//        {
-//            // 2.1) if the model does not have texture
-//            pugi::xml_node crossMeshNode = xml_root.child("Output").child("CrossMesh");
-//            if (crossMeshNode)
-//            {
-//                string path = geomDataFolder + "/" + crossMeshNode.attribute("path").as_string();
-//                std::cout << "Read File...\t:" << path << std::endl;
-//                if (!data.strucCreator->LoadSurface(path.c_str())) return false;
-//                data.strucCreator->CreateStructure(true, data.interactMatrix, true);
-//            }
-//        }
-//        else
-//        {
-//            // 2.2) if the model has texture
-//            pugi::xml_node surfaceMesh = xml_root.child("Output").child("Structure");
-//            if (surfaceMesh)
-//            {
-//                string path = geomDataFolder + "/" + surfaceMesh.attribute("path").as_string();
-//                std::cout << "Read File...\t:" << path << std::endl;
-//                if (!data.strucCreator->LoadSurface(path.c_str())) return false;
-//                data.strucCreator->CreateStructure(true, data.interactMatrix, true);
-//            }
-//        }
-//
-//        // 3) update each cross
-//        if (data.strucCreator->struc != nullptr) {
-//            if (xml_root)
-//            {
-//                XMLReader_PartGeoData(xml_root, geomDataFolder, data);
-//                XMLReader_Boundary(xml_root, data);
-//            }
-//        }
+        // 2) construct the cross mesh
+        std::filesystem::path file_path(xmlFileName);
+        data.varList->filename = file_path.stem().string();
+
+        pugi::xml_node refenceSurfaceNode = xml_root.child("Output").child("Structure");
+        if (refenceSurfaceNode)
+        {
+            std::filesystem::path reference_surface_path(refenceSurfaceNode.attribute("path").as_string());
+            string path = (file_path.parent_path() / reference_surface_path).string();
+
+            std::cout << "Read File...\t:" << path << std::endl;
+            data.reference_surface = make_shared<PolyMesh<double>>(data.varList);
+            bool textureModel;
+            if (!data.reference_surface->readOBJModel(path.c_str(), textureModel, false)) return false;
+        }
     }
 
     return true;

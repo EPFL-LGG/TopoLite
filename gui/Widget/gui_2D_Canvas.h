@@ -38,12 +38,12 @@
 
 #include "gui_2Dball.h"
 #include "gui_SceneObject.h"
+#include "CrossMesh/CrossMeshCreator.h"
 
 class gui_2D_Canvas : public nanogui::Canvas {
 public:
     gui_2D_Canvas(Widget *parent) : Canvas(parent, 1)
     {
-        scene = make_shared<gui_SceneObject<double>>();
         init_render_pass();
     }
 
@@ -75,8 +75,8 @@ public:
         float fW = fH * (float) m_size.x() / (float) m_size.y();
 
         proj = frustum(-fW, fW, -fH, fH, camera_.dnear, camera_.dfar);
-        model = camera_.arcball.matrix();
 
+        model = camera_.arcball.matrix();
         model = scale(model, Eigen::Vector3f::Constant(camera_.zoom * camera_.modelZoom));
         model = translate(model, camera_.modelTranslation);
     }
@@ -135,16 +135,32 @@ public:
     }
 
     void refresh_trackball_center() {
-        // Re-center the mesh
-        camera_.arcball = gui_2Dball(0.5);
-        camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
-        camera_.modelZoom = 1;
-        
-        camera_.eye = Eigen::Vector3f(scene->focus().x(), scene->focus().y(), 1.5);
-        camera_.center = Eigen::Vector3f(scene->focus().x(), scene->focus().y(), 0);
+        if(scene && scene->objects.size() >= 3){
+            // Re-center the mesh
+            camera_.arcball = gui_2Dball(0.5);
+            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
+            camera_.modelZoom = 1;
+
+            camera_.modelTranslation = -scene->focus();
+            scene->objects[0]->model_init_mat = translate(Eigen::Matrix4f::Identity(), -scene->focus());
+            scene->objects[2]->model_init_mat = translate(Eigen::Matrix4f::Identity(), -scene->focus());
+        }
     }
 
-    void init_render_pass(){
+    Eigen::Matrix4d get_textureMat(){
+        if(scene && scene->objects.size() >= 3 && scene->objects[1]){
+            Eigen::Matrix4f model, view, proj;
+            computeCameraMatrices(model, view, proj);
+            Eigen::Matrix4f trans = translate(Eigen::Matrix4f::Identity(), scene->focus());
+            Eigen::Matrix4f model_init = scene->objects[1]->model_init_mat;
+            return (trans * model * model_init).cast<double>();
+        }
+        return Eigen::Matrix4d::Identity();
+    }
+
+    void init_render_pass()
+    {
+        scene = make_shared<gui_SceneObject<double>>();
         #if defined(NANOGUI_USE_METAL)
         m_render_pass = render_pass();
         #elif defined(NANOGUI_USE_OPENGL)
@@ -165,20 +181,22 @@ public:
     }
 
     virtual void draw_contents() {
-        scene->render_pass->resize(screen()->framebuffer_size());
+        if(m_render_pass){
+            scene->render_pass->resize(screen()->framebuffer_size());
 
-        Eigen::Matrix4f model, view, proj;
-        computeCameraMatrices(model, view, proj);
+            Eigen::Matrix4f model, view, proj;
+            computeCameraMatrices(model, view, proj);
 
-        scene->update_proj(proj);
-        scene->update_view(view);
-        scene->update_model(model);
-        scene->update_eye(camera_.eye);
+            scene->update_proj(proj);
+            scene->update_view(view);
+            scene->update_model(model);
+            scene->update_eye(camera_.eye);
 
-        /* MVP uniforms */
-        scene->draw();
+            /* MVP uniforms */
+            scene->draw();
+        }
     }
-
+    
 public:
     //shader and render pass
     shared_ptr<gui_SceneObject<double>> scene;
@@ -202,8 +220,7 @@ private:
 
     bool translate_ = false;
     Eigen::Vector2i translateStart_ = Eigen::Vector2i(0, 0);
-
-
+    
 };
 
 

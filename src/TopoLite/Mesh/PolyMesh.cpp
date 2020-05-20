@@ -76,6 +76,7 @@ void PolyMesh<Scalar>::fromEigenMesh(const MatrixX &V, const MatrixX &T, const M
             polygon->vers.push_back(vertexList[F(id, jd)]);
             polygon->texs.push_back(textureList[F(id, jd)]);
         }
+        polyList.push_back(polygon);
     }
 
     texturedModel = true;

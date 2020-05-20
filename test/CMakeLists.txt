@@ -12,7 +12,7 @@ if(BUILD_TOPOTEST)
             # Interlocking/Test_toymodel_Ipopt.cpp
            #Interlocking/Test_interlockingSolver_Clp.cpp
 #            Utility/Test_SparseOperations.cpp
-            Mesh/Test_Polygon.cpp
+            Structure/Test_ConvexBlock.cpp
             )
 
 #    file(GLOB testTopoFiles

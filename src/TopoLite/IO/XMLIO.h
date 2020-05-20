@@ -7,7 +7,6 @@
 
 #include "TopoLite/Utility/HelpDefine.h"
 #include "TopoLite/IO/InputVar.h"
-
 #include "TopoLite/Mesh/CrossMesh.h"
 
 #include <iostream>
@@ -33,9 +32,15 @@ struct InputMeshNormalizeData{
 
 struct XMLData{
     shared_ptr<InputVarList> varList;
-//    shared_ptr<StrucCreator> strucCreator;
+    shared_ptr<PolyMesh<double>> reference_surface;
+    shared_ptr<PolyMesh<double>> cross_mesh;
+
+    //old data
     vector<int> pickPartIDs;
     double interactMatrix[16];
+
+
+    //for rhino dll
     InteractData interact_delta;
     InputMeshNormalizeData normalizedData;
 };

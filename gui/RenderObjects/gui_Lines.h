@@ -82,6 +82,25 @@ public:
         initShader();
     }
 
+    void update_line(const vector<gui_LinesGroup<Scalar>> &_linegroups){
+        linegroups.clear();
+        object_colors.clear();
+        ani_translation.clear();
+        ani_center.clear();
+        ani_rotation.clear();
+
+        linegroups = _linegroups;
+        for(gui_LinesGroup<Scalar> lg: linegroups)
+        {
+            object_colors.push_back(lg.color);
+            ani_translation.push_back(lg.ani_translation);
+            ani_rotation.push_back(lg.ani_rotation);
+            ani_center.push_back(lg.ani_center);
+        }
+
+        update_buffer();
+    }
+
 public:
     void initShader(){
 
@@ -116,12 +135,15 @@ public:
         //init buffer_positions
         int num_vertices = 0;
         object_center = Eigen::Vector3d(0, 0, 0);
-        buffer_positions.clear();
 
+        buffer_positions.clear();
         buffer_colors.clear();
         buffer_translation.clear();
         buffer_rotation.clear();
         buffer_center.clear();
+        buffer_linesta.clear();
+        buffer_linedrt.clear();
+        buffer_objectindex.clear();
 
         for(size_t mID = 0; mID < linegroups.size(); mID++){
             for(int kd = 0; kd < 3; kd++){

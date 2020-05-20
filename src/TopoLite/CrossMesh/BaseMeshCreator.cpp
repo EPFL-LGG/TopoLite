@@ -46,7 +46,8 @@ BaseMeshCreator<Scalar>::~BaseMeshCreator()
 //**************************************************************************************//
 
 template <typename Scalar>
-void BaseMeshCreator<Scalar>::computeBaseCrossMesh(Matrix4 textureMat,
+void BaseMeshCreator<Scalar>::
+computeBaseCrossMesh(Matrix4 textureMat,
                                                    pPolyMesh &baseMesh2D,
                                                    pCrossMesh &crossMesh,
                                                    bool previewMode)
@@ -479,12 +480,7 @@ void  BaseMeshCreator<Scalar>::splitIntoConsecutivePolygons(
 template <typename Scalar>
 Matrix<Scalar, 2, 1> BaseMeshCreator<Scalar>::getTextureCoord(Vector2 point, Matrix4 textureMat)
 {
-    Vector2 texCoord;
-
-	texCoord.x() = (point.x() + 0.5f*viewSize) / viewSize;
-	texCoord.y() = (point.y() + 0.5f*viewSize) / viewSize;
-
-    texCoord = (textureMat * Matrix<Scalar, 4, 1>(texCoord.x(), texCoord.y(), 0, 1)).head(2);
+    Vector2 texCoord = (textureMat * Matrix<Scalar, 4, 1>(point.x(), point.y(), 0, 1)).head(2);
 
     return texCoord;
 }

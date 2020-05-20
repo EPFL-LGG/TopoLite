@@ -44,7 +44,6 @@ public:
     gui_Arcball_Canvas(nanogui::Widget* parent): nanogui::Canvas(parent, 1)
     {
         inc_ref();
-        scene = make_shared<gui_SceneObject<double>>();
         init_render_pass();
     }
 
@@ -168,17 +167,18 @@ public:
         camera_.arcball = gui_Arcball();
         camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
         camera_.modelZoom = 2;
-        camera_.modelTranslation = -scene->focus();
         
+        camera_.modelTranslation = -scene->focus();
+
     }
 
-    void init_render_pass(){
-        
+    void init_render_pass()
+    {
+        scene = make_shared<gui_SceneObject<double>>();
         m_render_pass = render_pass();
         m_render_pass->set_clear_color(0, nanogui::Color(0.9f, 0.9f, 0.9f, 1.f));
         m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
         m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);
-
         scene->render_pass = m_render_pass;
     }
 
@@ -190,18 +190,19 @@ public:
 
     virtual void draw_contents()
     {
-        
-        m_render_pass->resize(screen()->framebuffer_size());
-        Eigen::Matrix4f model, view, proj;
-        computeCameraMatrices(model, view, proj);
+        if(m_render_pass) {
+            m_render_pass->resize(screen()->framebuffer_size());
+            Eigen::Matrix4f model, view, proj;
+            computeCameraMatrices(model, view, proj);
 
-        scene->update_proj(proj);
-        scene->update_view(view);
-        scene->update_model(model);
-        scene->update_eye(camera_.eye);
+            scene->update_proj(proj);
+            scene->update_view(view);
+            scene->update_model(model);
+            scene->update_eye(camera_.eye);
 
-        /* MVP uniforms */
-        scene->draw();
+            /* MVP uniforms */
+            scene->draw();
+        }
     }
 
 public:

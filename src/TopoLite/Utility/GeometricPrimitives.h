@@ -727,10 +727,7 @@ struct HypVertex
 public:
 	int verID;
 	Vector3 point;
-
-	//int planeIDs[3];
-	int edgeID;         // For part mobility
-	bool isValid;
+	int planeIDs[3];
 };
 
 template <typename Scalar>

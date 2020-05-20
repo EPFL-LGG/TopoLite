@@ -49,6 +49,7 @@ public: // uniform
     using gui_RenderObject<Scalar>::varList;
     using gui_RenderObject<Scalar>::proj_mat;
     using gui_RenderObject<Scalar>::model_mat;
+    using gui_RenderObject<Scalar>::model_init_mat;
     using gui_RenderObject<Scalar>::view_mat;
     using gui_RenderObject<Scalar>::eye;
     using gui_RenderObject<Scalar>::simtime;
@@ -113,7 +114,35 @@ public:
         initShader();
     }
 
+    void update_mesh(const vector<pPolyMesh> &_meshLists, vector<nanogui::Color> _object_colors){
+        meshLists.clear();
+        object_colors.clear();
+        for(pPolyMesh mesh: _meshLists)
+        {
+            meshLists.push_back(mesh);
+        }
+
+        //if the size of the input buffer_colors matches the size of the meshlist
+        if(_object_colors.size() == meshLists.size()){
+            object_colors = _object_colors;
+        }
+        else{
+            //all faces have random color
+            for(int id = 0; id < meshLists.size(); id++)
+            {
+                object_colors.push_back(nanogui::Color(rand() % 255, rand() % 255, rand() % 255, 255));
+            }
+        }
+        ani_translation.clear(); ani_translation.resize(meshLists.size(), Vector3(0, 0, 0));
+        ani_rotation.clear(); ani_rotation.resize(meshLists.size(), Vector3(0, 0, 0));
+        ani_center.clear(); ani_center.resize(meshLists.size(), Vector3(0, 0, 0));
+        
+
+        update_buffer();
+    }
+
 public:
+
 
 
     void initShader()
@@ -147,13 +176,14 @@ public:
         //init buffer_positions
         int num_vertices = 0;
         object_center = Eigen::Vector3d(0, 0, 0);
+
         buffer_positions.clear();
         buffer_barycentric.clear();
-
         buffer_colors.clear();
         buffer_translation.clear();
         buffer_rotation.clear();
         buffer_center.clear();
+        buffer_objectindex.clear();
 
 #if defined(NANOGUI_USE_METAL)
         for(size_t mID = 0; mID < meshLists.size(); mID++){
