@@ -14,7 +14,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(BUILD_TOPOGUI         ON CACHE STRING "Build gui" FORCE)
 set(BUILD_TOPOTEST        ON CACHE STRING "Build test" FORCE)
-set(BUILD_TOPOPYBIND      OFF CACHE STRING "Build pybind11" FORCE)
+set(BUILD_TOPOPYBIND      ON CACHE STRING "Build pybind11" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -71,6 +71,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
 add_subdirectory(src)
 add_library(TpCorelib STATIC ${TpCoreFiles})
+
+get_property(ext_include GLOBAL PROPERTY ext_include_property)
+get_property(ext_defs GLOBAL PROPERTY ext_defs_property)
+get_property(ext_lib GLOBAL PROPERTY ext_lib_property)
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})
 

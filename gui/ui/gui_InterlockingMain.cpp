@@ -50,10 +50,14 @@
 #include "gui_Arcball_Canvas.h"
 #include "gui_LoadScene.h"
 
-class TopoLiteApplication : public gui_Arcball_Canvas{
+class TopoLiteApplication : public nanogui::Screen{
 public:
-    TopoLiteApplication() : gui_Arcball_Canvas()
+    TopoLiteApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "TopoCreator")
     {
+        //main canvas
+        main_canvas = new gui_Arcball_Canvas(this);
+        main_canvas->set_size(this->m_size);
+
         nanogui::Window *window = new nanogui::Window(this, "Menu");
         window->set_position(nanogui::Vector2i(15, 15));
         window->set_layout(new nanogui::GroupLayout());
@@ -62,21 +66,21 @@ public:
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            scene->objects[0]->update_attr("show_wireframe", check);
+            main_canvas->scene->objects[0]->update_attr("show_wireframe", check);
             return check;
         });
 
         checkbox = new nanogui::CheckBox(window, "faces");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            scene->objects[0]->update_attr("show_face", check);
+            main_canvas->scene->objects[0]->update_attr("show_face", check);
             return check;
         });
 
         checkbox = new nanogui::CheckBox(window, "contact");
         checkbox->set_checked(false);
         checkbox->set_callback([&](bool check){
-            scene->objects[1]->visible = check;
+            main_canvas->scene->objects[1]->visible = check;
             return check;
         });
 
@@ -92,19 +96,19 @@ public:
 
         play->set_callback([&](){
             prev_animate_state = Run;
-            scene->update_state(prev_animate_state);
+            main_canvas->scene->update_state(prev_animate_state);
             return true;
         });
 
         pause->set_callback([&](){
             prev_animate_state = Pause;
-            scene->update_state(prev_animate_state);
+            main_canvas->scene->update_state(prev_animate_state);
             return true;
         });
 
         stop->set_callback([&](){
             prev_animate_state = Stop;
-            scene->update_state(prev_animate_state);
+            main_canvas->scene->update_state(prev_animate_state);
             return true;
         });
 
@@ -121,10 +125,10 @@ public:
 
         text_box_speed = new nanogui::TextBox(panel);
         text_box_speed->set_fixed_size(nanogui::Vector2i(60, 25));
-        text_box_speed->set_value(float_to_string(1 / minimum_time_one_unit, 3));
+        text_box_speed->set_value(main_canvas->float_to_string(1 / minimum_time_one_unit, 3));
 
         speed_slider->set_callback([&](float value) {
-            text_box_speed->set_value(float_to_string(value, 3));
+            text_box_speed->set_value(main_canvas->float_to_string(value, 3));
             animation_speed = value;
         });
 
@@ -143,12 +147,12 @@ public:
         text_box_timeline->set_value("0");
 
         timeline_slider->set_callback([&](float value) {
-            text_box_timeline->set_value(float_to_string(value, 3));
-            scene->update_simtime(value / maximum_time_one_unit);
+            text_box_timeline->set_value(main_canvas->float_to_string(value, 3));
+            main_canvas->scene->update_simtime(value / maximum_time_one_unit);
         });
 
         perform_layout();
-        refresh_trackball_center();
+        main_canvas->refresh_trackball_center();
 
         init_mesh();
     }
@@ -160,7 +164,7 @@ public:
      ********************************************************************************************/
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers)
     {
-        if(gui_Arcball_Canvas::keyboard_event(key, scancode, action, modifiers)){
+        if(main_canvas->keyboard_event(key, scancode, action, modifiers)){
            return true;
         }
 
@@ -169,13 +173,13 @@ public:
                 prev_animate_state = Pause;
                 pause->set_pushed(true);
                 play->set_pushed(false);
-                scene->update_state(prev_animate_state);
+                main_canvas->scene->update_state(prev_animate_state);
             }
             else if(prev_animate_state != Run){
                 prev_animate_state = Run;
                 play->set_pushed(true);
                 pause->set_pushed(false);
-                scene->update_state(prev_animate_state);
+                main_canvas->scene->update_state(prev_animate_state);
             }
         }
 
@@ -191,9 +195,9 @@ public:
 
     void init_mesh()
     {
-        gui_LoadScene loader(scene);
+        gui_LoadScene loader(main_canvas->scene);
         loader.load_ania_multihand();
-        refresh_trackball_center();
+        main_canvas->refresh_trackball_center();
     }
 
     virtual void draw(NVGcontext *ctx) {
@@ -202,32 +206,32 @@ public:
     }
 
     virtual void draw_contents() {
-        scene->render_pass->resize(framebuffer_size());
+        main_canvas->scene->render_pass->resize(framebuffer_size());
         if(!play->pushed() && !pause->pushed() && !stop->pushed()){
             if(prev_animate_state == Run){
-                scene->update_state(Stop);
+                main_canvas->scene->update_state(Stop);
             }
             if(prev_animate_state == Pause){
-                scene->update_state(Run);
+                main_canvas->scene->update_state(Run);
                 play->set_pushed(true);
             }
-            scene->update_state(prev_animate_state);
+            main_canvas->scene->update_state(prev_animate_state);
         }
 
-        scene->update_time((float)glfwGetTime(), animation_speed);
+        main_canvas->scene->update_time((float)glfwGetTime(), animation_speed);
 
 
         if(timeline_slider->value() > maximum_time_one_unit && Run){
-            scene->update_state(Pause);
+            main_canvas->scene->update_state(Pause);
             pause->set_pushed(true);
             play->set_pushed(false);
             prev_animate_state = Pause;
         }
 
-        timeline_slider->set_value(scene->simtime * maximum_time_one_unit);
-        text_box_timeline->set_value(float_to_string(scene->simtime * maximum_time_one_unit, 3) );
+        timeline_slider->set_value(main_canvas->scene->simtime * maximum_time_one_unit);
+        text_box_timeline->set_value(main_canvas->float_to_string(main_canvas->scene->simtime * maximum_time_one_unit, 3) );
 
-        gui_Arcball_Canvas::draw_contents();
+        main_canvas->draw_contents();
     }
 private:
     nanogui::ToolButton *play, *pause, *stop;
@@ -237,6 +241,7 @@ private:
 public:
     //animation
     AnimationState prev_animate_state;
+    nanogui::ref<gui_Arcball_Canvas> main_canvas;
     float animation_speed = 0.1;
     float minimum_time_one_unit = 3;
     float maximum_time_one_unit = 20;

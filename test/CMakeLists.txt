@@ -7,6 +7,14 @@ if(BUILD_TOPOTEST)
     include(ParseAndAddCatchTests)
 
     file(GLOB testTopoFiles
+            Interlocking/*.*
+            CrossMesh/*.*
+            Mesh/*.*
+            IO/*.*
+            Utility/*.*
+            )
+
+    file(GLOB singleTestFile
            #Interlocking/Problem_LP_simple.cpp
            #Interlocking/Problem_LP_bigm.cpp
             # Interlocking/Test_toymodel_Ipopt.cpp
@@ -15,16 +23,8 @@ if(BUILD_TOPOTEST)
             Structure/Test_ConvexBlock.cpp
             )
 
-#    file(GLOB testTopoFiles
-#            Interlocking/*.cpp
-#            CrossMesh/*.cpp
-#            Mesh/*.cpp
-#            IO/*.cpp
-#            Utility/*.cpp
-#            )
-
-
     set(testTopoFiles ${testTopoFiles} Test_Main.cpp)
+    # set(singleTestFile ${singleTestFile} Test_Main.cpp)
 
     add_executable(testTopo ${testTopoFiles})
 
@@ -33,4 +33,9 @@ if(BUILD_TOPOTEST)
     ParseAndAddCatchTests(testTopo)
 
     file(COPY ../data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    if(CMAKE_GENERATOR STREQUAL Xcode)
+        target_compile_definitions(testTopo PUBLIC -DTOPOCREATOR_DATA_PATH="../data/")
+    else()
+        target_compile_definitions(testTopo PUBLIC -DTOPOCREATOR_DATA_PATH="data/")
+    endif()
 endif()

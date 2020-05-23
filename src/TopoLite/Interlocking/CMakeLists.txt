@@ -1,4 +1,5 @@
 file(GLOB InterlockingFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.h ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
+get_property(IPOPT_FOUND GLOBAL PROPERTY IPOPT_FOUND)
 if(NOT IPOPT_FOUND)
 	list(REMOVE_ITEM InterlockingFiles "${CMAKE_CURRENT_SOURCE_DIR}/InterlockingSolver_Ipopt.cpp")
 	list(REMOVE_ITEM InterlockingFiles "${CMAKE_CURRENT_SOURCE_DIR}/InterlockingSolver_Ipopt.h")

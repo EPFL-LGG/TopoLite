@@ -451,6 +451,6 @@ void TemporaryFunction_InterlockingSolver_Ipopt ()
 {
     InterlockingSolver_Ipopt<double> solver(nullptr, nullptr);
 }
+
 template class InterlockingSolver_Ipopt<float>;
 template class InterlockingSolver_Ipopt<double>;
-

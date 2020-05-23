@@ -24,7 +24,7 @@ include(libigl)
 
 #NANOGUI
 if(BUILD_TOPOGUI)
-#    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
+    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
     find_package(NanoGUI)
     set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} ${NANOGUI_EXTRA_INCS} PARENT_SCOPE)
     set(NANOGUI_EXTRA_DEFS ${NANOGUI_EXTRA_DEFS} PARENT_SCOPE)
@@ -77,6 +77,8 @@ if(BUILD_TOPOTEST)
 endif()
 
 
+#Set external inlude path/library/definitions
+
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}
                 ${QUICKHULL_INCLUDE_DIR}
@@ -84,8 +86,7 @@ set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${LIBIGL_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
                 ${EIGEN3_INCLUDE_DIR}
-                ${CLP_INCLUDE_DIR}
-		        PARENT_SCOPE)
+                ${CLP_INCLUDE_DIR})
 
 set(ext_lib ${PUGIXML_LIBRARIES}
             ${QUICKHULL_LIBRARIES}
@@ -93,10 +94,16 @@ set(ext_lib ${PUGIXML_LIBRARIES}
             ${TBB_IMPORTED_TARGETS}
             igl::core
             igl::triangle
-            ${CLP_LIBRARIES}
-            PARENT_SCOPE)
+            ${CLP_LIBRARIES})
+
+set(ext_defs ${NANOGUI_EXTRA_DEFS})
 
 if(IPOPT_FOUND)
-	list(APPEND ext_include ${IPOPT_INCLUDE_DIRS})
-	list(APPEND ext_lib ${IPOPT_LIBRARIES})
+    set(ext_include ${ext_include} ${IPOPT_INCLUDE_DIRS})
+    set(ext_lib ${ext_lib} ${IPOPT_LIBRARIES})
 endif()
+
+set_property(GLOBAL PROPERTY ext_include_property "${ext_include}")
+set_property(GLOBAL PROPERTY ext_lib_property "${ext_lib}")
+set_property(GLOBAL PROPERTY ext_defs_property "${ext_defs}")
+set_property(GLOBAL PROPERTY IPOPT_FOUND ${IPOPT_FOUND})

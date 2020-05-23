@@ -128,7 +128,7 @@ TEST_CASE("Polygon")
 
         SECTION("convertToTriangles"){
             vector<shared_ptr<Triangle<double>>> tris;
-            poly.convertToTriangles(tris);
+            poly.triangulateNaive(tris);
             REQUIRE(tris.size() == 4);
         }
 
@@ -242,13 +242,12 @@ TEST_CASE("Polygon")
         pts.push_back(Vector3d(1, 1, 0));
         pts.push_back(Vector3d(0, 1, 0));
         poly.setVertices(pts);
-        vector<shared_ptr<_Polygon<double>>> tris;
+        vector<shared_ptr<Triangle<double>>> tris;
         poly.edge_at_boundary[0] = true;
         poly.edge_at_boundary[1] = true;
         poly.triangulate(tris);
 
         REQUIRE(tris.size() == 2);
-        REQUIRE(tris[0]->edge_at_boundary[0] == true);
     }
 
 }

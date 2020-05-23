@@ -33,7 +33,7 @@ TEST_CASE("AugmentedVectorCreator"){
         BaseMeshCreator<double> baseMeshCreator(nullptr, nullptr, varList);
         baseMeshCreator.recomputeBoundary(crossMesh);
 
-        augmentedVectorCreator.createAugmentedVector(30, crossMesh);
+        augmentedVectorCreator.createAugmentedVectors(30, crossMesh);
     }
 
 }

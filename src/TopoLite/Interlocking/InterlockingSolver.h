@@ -4,7 +4,7 @@
 
 #ifndef TOPOLITE_INTERLOCKINGSOLVER_H
 #define TOPOLITE_INTERLOCKINGSOLVER_H
-#include "Eigen/Sparse"
+#include <Eigen/Sparse>
 #include <Eigen/SparseCore>
 #include <Eigen/Dense>
 #include "ContactGraph.h"

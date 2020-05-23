@@ -3,7 +3,8 @@
 //
 
 #include <catch2/catch.hpp>
-#include <CrossMesh/BaseMeshCreator.h>
+#include "CrossMesh/BaseMeshCreator.h"
+#include "CrossMesh/CrossMeshCreator.h"
 #include "Mesh/PolyMesh.h"
 #include "Mesh/CrossMesh.h"
 #include "Mesh/PolyMesh_AABBTree.h"
@@ -59,6 +60,10 @@ TEST_CASE("BaseMeshCreator")
 	    data.interactMatrix[2], data.interactMatrix[6], data.interactMatrix[10], data.interactMatrix[14],
 	    data.interactMatrix[3], data.interactMatrix[7], data.interactMatrix[11], data.interactMatrix[15];
 
+        CrossMeshCreator<double> crossMeshCreator(varList);
+        crossMeshCreator.setReferenceSurface(_polyMesh);
+        Eigen::Matrix4d textureMat = crossMeshCreator.computeTextureMat_backwards_compatible(interactMat);
+
         SECTION("baseMeshCreator computeBaseCrossMesh")
         {
             data.varList->set("minCrossArea", 0.2f);
@@ -69,7 +74,6 @@ TEST_CASE("BaseMeshCreator")
         }
 
         SECTION("getTextureCoord"){
-            Eigen::Matrix4d textureMat = baseMeshCreator.computeTextureMat(_polyMesh, interactMat);
 
             // map 2D pattern vertices on 3D input surface
             for(size_t id = 0; id < _pattern2D->vertexList.size(); id++) {

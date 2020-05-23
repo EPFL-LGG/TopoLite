@@ -185,6 +185,7 @@ public:
     std::string float_to_string(float a_value, int n){
         std::ostringstream out;
         out.precision(n);
+        out << a_value;
         return out.str();
     }
 

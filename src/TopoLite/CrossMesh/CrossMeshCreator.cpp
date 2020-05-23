@@ -216,53 +216,59 @@ void CrossMeshCreator<Scalar>::recomputeTexture() {
 template<typename Scalar>
 Matrix<Scalar, 4, 4> CrossMeshCreator<Scalar>::computeTextureMat_backwards_compatible(Matrix4 interactMat)
 {
-    //the following want to tranform the points in the surface texture space to the pattern space
+    if(referenceSurface){
+        //the following want to tranform the points in the surface texture space to the pattern space
 
-    // Compute 2D bounding box of the parameterized surface mesh
-    Box<Scalar> texBBox = referenceSurface->texBBox();
+        // Compute 2D bounding box of the parameterized surface mesh
+        Box<Scalar> texBBox = referenceSurface->texBBox();
 
-    //1) centralize the surface texture
-    Matrix4 trans1 = Matrix4::Identity();
-    trans1(0, 3) = -0.5*(texBBox.minPt.x() + texBBox.maxPt.x());
-    trans1(1, 3) = -0.5*(texBBox.minPt.y() + texBBox.maxPt.y());
-    trans1(2, 3) = 0;
+        //1) centralize the surface texture
+        Matrix4 trans1 = Matrix4::Identity();
+        trans1(0, 3) = -0.5*(texBBox.minPt.x() + texBBox.maxPt.x());
+        trans1(1, 3) = -0.5*(texBBox.minPt.y() + texBBox.maxPt.y());
+        trans1(2, 3) = 0;
 
-    //2) scale 1) into [-0.5, -0.5]x [0.5, 0.5]
-    Scalar scale_factor = getVarList()->template get<float>("textureScaleFactor");
-    Scalar footScale = scale_factor / max(texBBox.maxPt.x() - texBBox.minPt.x(), texBBox.maxPt.y() - texBBox.minPt.y());
-    Matrix4 scale = Matrix4::Identity();
-    scale(0, 0) = footScale; scale(1, 1) = footScale;
+        //2) scale 1) into [-0.5, -0.5]x [0.5, 0.5]
+        Scalar scale_factor = getVarList()->template get<float>("textureScaleFactor");
+        Scalar footScale = scale_factor / max(texBBox.maxPt.x() - texBBox.minPt.x(), texBBox.maxPt.y() - texBBox.minPt.y());
+        Matrix4 scale = Matrix4::Identity();
+        scale(0, 0) = footScale; scale(1, 1) = footScale;
 
-    //3) tranform 2) by inveInteractMat
-    Matrix4 inveInteractMat = interactMat.inverse();
-    //Compatible issue with the old data
-    //Reason: Since the scale of 2D pattern space is [-1, 1] while the scale of 2D texture space is [0, 1]
-    inveInteractMat(0, 3) /= 2;
-    inveInteractMat(1, 3) /= 2;
-    inveInteractMat(2, 3) /= 2;
+        //3) tranform 2) by inveInteractMat
+        Matrix4 inveInteractMat = interactMat.inverse();
+        //Compatible issue with the old data
+        //Reason: Since the scale of 2D pattern space is [-1, 1] while the scale of 2D texture space is [0, 1]
+        inveInteractMat(0, 3) /= 2;
+        inveInteractMat(1, 3) /= 2;
+        inveInteractMat(2, 3) /= 2;
 
-    //4) move the 3)'s center into [0.5, 0.5], so that it is within [0, 0] x[1, 1]
-    Matrix4 trans2 = Matrix4::Identity();
-    trans2(0, 3) = 0.5;
-    trans2(1, 3) = 0.5;
-    trans2(2, 3) = 0;
+        //4) move the 3)'s center into [0.5, 0.5], so that it is within [0, 0] x[1, 1]
+        Matrix4 trans2 = Matrix4::Identity();
+        trans2(0, 3) = 0.5;
+        trans2(1, 3) = 0.5;
+        trans2(2, 3) = 0;
 
-    Matrix4 textureMat = trans2 * inveInteractMat * scale * trans1;
-    //5) inverse it because we want a transform form pattern space to surface texture space
-    
-    Matrix4 invtextureMat = textureMat.inverse();
-    
-    //6)scale the pattern from [-1, 1] x[1, 1] to [0, 1]
-    Matrix4 trans3 = Matrix4::Identity();
-    trans3(0, 3) = 1;
-    trans3(1, 3) = 1;
-    trans3(2, 3) = 0;
-    
-    Matrix4 scale2 = Matrix4::Identity();
-    scale2(0, 0) = 0.5;
-    scale2(1, 1) = 0.5;
-    
-    return invtextureMat * scale2 * trans3;
+        Matrix4 textureMat = trans2 * inveInteractMat * scale * trans1;
+        //5) inverse it because we want a transform form pattern space to surface texture space
+
+        Matrix4 invtextureMat = textureMat.inverse();
+
+        //6)scale the pattern from [-1, 1] x[1, 1] to [0, 1]
+        Matrix4 trans3 = Matrix4::Identity();
+        trans3(0, 3) = 1;
+        trans3(1, 3) = 1;
+        trans3(2, 3) = 0;
+
+        Matrix4 scale2 = Matrix4::Identity();
+        scale2(0, 0) = 0.5;
+        scale2(1, 1) = 0.5;
+
+        return invtextureMat * scale2 * trans3;
+    }
+    else{
+        return Matrix<Scalar, 4, 4>::Identity();
+    }
+
 }
 
 template class CrossMeshCreator<double>;

@@ -150,11 +150,11 @@ public:
         //read text from file
 #if defined(NANOGUI_USE_OPENGL)
         string shader_path = TOPOCREATOR_SHADER_PATH;
-        std::ifstream file(TOPOCREATOR_SHADER_PATH + "PolyMeshAnimation.vert");
+        std::ifstream file(shader_path + "PolyMeshAnimation.vert");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 
-        file = std::ifstream(TOPOCREATOR_SHADER_PATH + "PolyMeshAnimation.frag");
+        file = std::ifstream(shader_path + "PolyMeshAnimation.frag");
         std::string shader_frag((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 #elif defined(NANOGUI_USE_METAL)
@@ -203,6 +203,7 @@ public:
             {
                 vector<pTriangle> tris;
                 polygon->triangulateNaive(tris);
+                int edgeID = 0;
                 for(pTriangle tri: tris)
                 {
                     for(int vID = 0; vID < 3; vID++)
@@ -216,15 +217,19 @@ public:
 
                     buffer_barycentric.push_back(1);
                     buffer_barycentric.push_back(0);
-                    buffer_barycentric.push_back(0);
+                    if(!polygon->edge_at_boundary[edgeID]) buffer_barycentric.push_back(1);
+                    else buffer_barycentric.push_back(0);
 
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(1);
-                    buffer_barycentric.push_back(0);
+                    if(!polygon->edge_at_boundary[edgeID]) buffer_barycentric.push_back(1);
+                    else buffer_barycentric.push_back(0);
 
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(1);
+                    edgeID ++;
+
 #if defined(NANOGUI_USE_OPENGL)
                     for(int vID = 0; vID < 3; vID ++)
                     {

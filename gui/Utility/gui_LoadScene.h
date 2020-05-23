@@ -239,7 +239,7 @@ public:
         baseMeshCreator.recomputeBoundary(crossMesh);
 
         AugmentedVectorCreator<double> augmentedVectorCreator(varList);
-        augmentedVectorCreator.createAugmentedVector(30, crossMesh);
+        augmentedVectorCreator.createAugmentedVectors(30, crossMesh);
 
         vector<nanogui::Color> colors;
         colors.push_back(nanogui::Color(200, 200 ,200, 255));
