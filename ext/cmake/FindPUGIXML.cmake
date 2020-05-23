@@ -6,10 +6,24 @@
 # PUGIXML_LIBRARIES - library to link against
 # PUGIXML_FOUND - true if pugixml was found.
 
-unset (PUGIXML_LIBRARY CACHE)
-unset (PUGIXML_INCLUDE_DIR CACHE)
+if(PUGIXML_FOUND)
+    return()
+endif()
 
+find_path(PUGIXML_INCLUDE_DIR pugixml.hpp
+        HINTS
+        ENV PUGIXML_ROOT
+        PATHS
+        ${CMAKE_SOURCE_DIR}/ext/pugixml
+        PATH_SUFFIXES src
+        )
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(PUGIXML
+        "\nPUGIXML not found"
+        PUGIXML_INCLUDE_DIR)
+mark_as_advanced(PUGIXML_INCLUDE_DIR)
+
+set(BUILD_SHARED_LIBS OFF CACHE STRING "Build pugixml using static library" FORCE)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/pugixml)
-set(PUGIXML_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/pugixml/src)
-include_directories(${PUGIXML_INCLUDE_DIR})
-set(PUGIXML_LIBRARY pugixml)
+set(PUGIXML_LIBRARIES pugixml)
