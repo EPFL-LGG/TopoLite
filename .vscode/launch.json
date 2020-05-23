@@ -8,13 +8,17 @@
             "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Release/testTopo",
+            "program": "${workspaceFolder}/build/test/testTopo",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb"
+            "MIMode": "lldb",
+            "logging": {
+                "moduleLoad": false,
+                "trace": false  // can be useful
+              },
         }
     ]
 }

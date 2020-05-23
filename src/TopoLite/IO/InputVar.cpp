@@ -2,12 +2,11 @@
 // Created by ziqwang on 10.03.19.
 //
 #include "InputVar.h"
-
 void InitVar(InputVarList *varList)
 {
     varList->clear();
 
-    //Show_TI_Structure
+    // Show_TI_Structure
     varList->add(true, "showStruc", "Struc [F1]") = "Show_TI_Structure";
     varList->add(true, "showStrucWire", "Wireframe [F2]") = "Show_TI_Structure";
     varList->add(false, "showPickParts", "Show Select") = "Show_TI_Structure";
@@ -16,7 +15,7 @@ void InitVar(InputVarList *varList)
     //	varList->add(false, "showStrucNormal", "StrucNormal") =  "Show_TI_Structure";
     //	varList->add(false, "showStrucGraph", "StrucGraph") =  "Show_TI_Structure";
 
-    //Show_Input_Model
+    // Show_Input_Model
     varList->add(false, "showModel", "Model") = "Show_Input_Model";
     varList->add(false, "showModelTex", "Texture") = "Show_Input_Model";
     varList->add(false, "showAxes", "Axes") = "Show_Input_Model";
@@ -29,8 +28,8 @@ void InitVar(InputVarList *varList)
     varList->add(false, "showCrossTilt", "Augm. Vectors") = "Show_Base_Mesh";
     varList->add(false, "showCrossTiltBase", "TiltBase") = "Show_Base_Mesh";
     varList->add(false, "showCrossTiltFan", "TiltFan") = "Show_Base_Mesh";
-    //varList->add(false, "showCrossDual", "CrossDual") =  "Show_Base_Mesh";
-    //varList->add(false, "showCrossVertex", "CrossVertex") =  "Show_Base_Mesh";
+    // varList->add(false, "showCrossDual", "CrossDual") =  "Show_Base_Mesh";
+    // varList->add(false, "showCrossVertex", "CrossVertex") =  "Show_Base_Mesh";
     varList->add(false, "showInnerPolys", "InnerPolys") = "Show_Base_Mesh";
 
     // Show_TI_construction
@@ -57,12 +56,12 @@ void InitVar(InputVarList *varList)
     varList->add(false, "mult_move", "Mult. Move") = "Show_TI_Assembly";
 
     // Para Basic
-    varList->add(CROSS_HEXAGON, Vector2f(1, 15), "patternID", "Pattern\t:") << "Pattern_ID" = "Para_Basic";
+    varList->add(4, Vector2f(1, 15), "patternID", "Pattern\t:") << "Pattern_ID" = "Para_Basic";
     varList->add(20.0f, Vector2f(0, 90), "tiltAngle", "Alpha\t:") << "Tile_Angle_Upper" = "Para_Basic";
     varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Upper Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
     varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Lower Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
     varList->add((int)15, Vector2f(10, 30), "patternRadius", "Pattern Radius\t:") << "Pattern_Radius" = "Para_Basic";
-    varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Minimum Cross\t:") = "Para_Basic";
+    varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Minimum Cross Area (%)\t:") = "Para_Basic";
     varList->add(0.03f, Vector2f(0, 0.5), "minBoundaryEdge", "Minimum Bdry Edge\t:") = "Para_Basic";
     varList->add(1.0f, Vector2f(0, 1), "textureScaleFactor", "Texture Scale Factor\t:") = "Para_Basic";
     varList->add((int)(10), Vector2f(0, 32), "slopSample", "Slop Sample\t:") = "Para_Basic";
@@ -94,7 +93,7 @@ void InitVar(InputVarList *varList)
     varList->find("texturedModel")->visible = false;
     varList->find("penetration_check")->visible = false;
 
-    //ShapeOp Para
+    // ShapeOp Para
     varList->add(1.0f, Vector2f(0, 2), "shapeop_meshFit", "Mesh Fitness          \t:") = "Para_ShapeOp";
     varList->add(1.0f, Vector2f(0, 2), "shapeop_regularity", "Regularity            \t:") = "Para_ShapeOp";
     varList->add(1.0f, Vector2f(0, 2), "shapeop_planarity", "Planarity             \t:") = "Para_ShapeOp";
@@ -102,7 +101,7 @@ void InitVar(InputVarList *varList)
     varList->add(0.0f, Vector2f(0, 2), "shapeop_boundary", "Boundary              \t:") = "Para_ShapeOp";
     varList->add((int)0, Vector2f(0, 300), "shapeop_iterator", "Iterations              \t:") = "Para_ShapeOp";
 
-    //Mitsuba Para
+    // Mitsuba Para
     varList->add(false, "output_mitsuba", "Output Mitsuba") = "Para_Mitsuba";
     varList->add(0.001f, Vector2f(0, 0.01), "wireframe_thickness", "Wireframe Thinkness") = "Para_Mitsuba";
     varList->add((int)16, Vector2f(0, 32), "wireframe_circle_vertex_num", "Wireframe Subdivision") = "Para_Mitsuba";
@@ -115,9 +114,9 @@ void InitVar(InputVarList *varList)
     varList->add(12.0f, Vector2f(0, 24), "mitsuba_SunTime", "Sun Time\t:") = "Para_Mitsuba";
     varList->add(5.0f, Vector2f(0, 10.0), "mitsuba_SunStrength", "Sun Strength\t:") = "Para_Mitsuba";
     varList->find("mitsuba_SunTime")->visible = false;
-    //varList->find("mitsuba_SunStrength")->visible = false;
+    // varList->find("mitsuba_SunStrength")->visible = false;
 
-    //Interlocking Para
+    // Interlocking Para
     varList->add(1e-12f, "mosek_intpntCoTolRelGap", "IntPnt RelGap") = "Para_ContactGraph";
     varList->find("mosek_intpntCoTolRelGap")->visible = false;
     varList->add(1e-12f, "mosek_intpntCoTolInfeas", "") = "Para_ContactGraph";
@@ -141,10 +140,10 @@ void InitVar(InputVarList *varList)
     varList->add(-1.0f, Vector2f(-1, 1), "GravityY", "Gravity Y") = "Para_ContactGraph";
     varList->add(0.0f, Vector2f(-1, 1), "GravityZ", "Gravity Z") = "Para_ContactGraph";
 
-    //CrossMesh_Para
+    // CrossMesh_Para
     varList->add(1e-2f, "crossmesh_quadTree_leafNodeSize", "") = "Para_CrossMesh";
 
-    //Optimization_Para
+    // Optimization_Para
     varList->add(0.01f, "opt_compression_weight", "") = "Para_Opt";
     varList->add(10000.0f, "opt_tension_weight", "") = "Para_Opt";
     varList->add(1e-4f, "opt_activeset_eps", "") = "Para_Opt";
@@ -160,7 +159,7 @@ void InitVar(InputVarList *varList)
     varList->add((int)10, "opt_edge_sample", "") = "Para_Opt";
     varList->add((float)0, "opt_tot_time", "") = "Para_Opt";
 
-    //Assembly_Para
+    // Assembly_Para
     varList->add(false, "showAssembly", "Show Assembly") = "Para_Assembly";
     varList->add((int)1, Vector2f(1, 30), "assembling_layer", "Num Layer") = "Para_Assembly";
     varList->add((int)(-1), Vector2f(-2, 200), "assembling_Kth_part", "Kth Part") = "Para_Assembly";
@@ -177,6 +176,7 @@ void InitVarLite(InputVarList *varList)
 {
     InitVar(varList);
     varList->add(true, "showDemo", "") = "";
+    varList->add((int)1, "layerOfBoundary", "") = "";
 
     varList->find("patternRadius")->visible = true;
     varList->find("minCrossArea")->visible = true;

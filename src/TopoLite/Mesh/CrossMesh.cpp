@@ -13,281 +13,253 @@
 
 
 #include "Utility/HelpDefine.h"
-#include "Utility/HelpFunc.h"
-#include "Cross.h"
 #include "CrossMesh.h"
-#include "Mesh/PolyMesh.h"
-#include "IO/InputVar.h"
 
-#include <igl/remove_duplicate_vertices.h>
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
 
-CrossMesh::CrossMesh(std::shared_ptr<InputVarList> var) : TopoObject(var)
+
+template<typename Scalar>
+CrossMesh<Scalar>::CrossMesh(std::shared_ptr<InputVarList> var)
+:PolyMesh<Scalar>::PolyMesh(var)
 {
-	baseMesh2D = NULL;
+	clear();
 }
 
-CrossMesh::~CrossMesh()
+template<typename Scalar>
+CrossMesh<Scalar>::~CrossMesh()
 {
+    clear();
 }
 
-CrossMesh::CrossMesh(const CrossMesh &_cross)
+template<typename Scalar>
+CrossMesh<Scalar>::CrossMesh(const CrossMesh<Scalar> &crossMesh)
+:PolyMesh<Scalar>(crossMesh.getVarList())
 {
-    if(_cross.baseMesh2D) baseMesh2D = make_shared<PolyMesh>(*_cross.baseMesh2D);
-    vertexList = _cross.vertexList;
+    clear();
 
-    //boundary_vertexList_index = _cross.boundary_vertexList_index;
-
-    //create cross geometry
-    for(int id = 0; id < _cross.crossList.size(); id++)
+    // create cross geometry
+    for(size_t id = 0; id < crossMesh.crossList.size(); id++)
     {
-        shared_ptr<Cross> cross = make_shared<Cross>(*_cross.crossList[id]);
+        pCross cross = make_shared<Cross<Scalar>>(*crossMesh.crossList[id]);
         crossList.push_back(cross);
+        PolyMesh<Scalar>::polyList.push_back(cross);
     }
 
-    //create cross neighbor information
-    for(int id = 0; id < crossList.size(); id++)
+    PolyMesh<Scalar>::computeVertexList();
+    PolyMesh<Scalar>::computeTextureList();
+
+    createConnectivity();
+}
+
+template<typename Scalar>
+CrossMesh<Scalar>::CrossMesh(const PolyMesh<Scalar> &polyMesh)
+:PolyMesh<Scalar>::PolyMesh(polyMesh.getVarList())
+{
+    clear();
+
+    setPolyMesh(polyMesh);
+}
+
+template<typename Scalar>
+void CrossMesh<Scalar>::setPolyMesh(const PolyMesh<Scalar> &polyMesh)
+{
+    clear();
+
+    setVarList(polyMesh.getVarList());
+
+    // 1) create Cross
+    for(size_t id = 0; id < polyMesh.polyList.size(); id++)
     {
-        shared_ptr<Cross> cross = crossList[id];
-        cross->neighbors.clear();
-        for(int jd = 0; jd < _cross.crossList[id]->neighbors.size(); jd++)
-        {
-            shared_ptr<Cross> _ncross = _cross.crossList[id]->neighbors[jd].lock();
-            if(_ncross)
-            {
-                cross->neighbors.push_back(crossList[_ncross->crossID]);
-            }
-            else{
-                cross->neighbors.push_back(_ncross);
-            }
+        pCross cross = make_shared<Cross<Scalar>>(*polyMesh.polyList[id], polyMesh.getVarList());
+        cross->crossID = id;
+        crossList.push_back(cross);
+        PolyMesh<Scalar>::polyList.push_back(cross);
+    }
+
+    PolyMesh<Scalar>::computeVertexList();
+    PolyMesh<Scalar>::computeTextureList();
+    PolyMesh<Scalar>::removeDuplicatedVertices();
+
+    createConnectivity();
+}
+
+template<typename Scalar>
+void CrossMesh<Scalar>::update(){
+    PolyMesh<Scalar>::computeTextureList();
+    PolyMesh<Scalar>::removeDuplicatedVertices();
+    createConnectivity();
+}
+
+template<typename Scalar>
+void CrossMesh<Scalar>::createConnectivity()
+{
+    // 0) initialize
+    updateCrossID();
+    vertexCrossList.clear();
+
+    // 1) create vertexCrossList
+    vertexCrossList.resize(PolyMesh<Scalar>::vertexList.size());
+    for(pCross cross: crossList){
+        for(pVertex vertex: cross->vers){
+            vertexCrossList[vertex->verID].push_back(cross);
         }
     }
 
-    UpdateCrossVertexIndex();
-}
-
-bool CrossMesh::checkCoherency()
-{
-    for(pCross cross: crossList){
-        TopoASSERT(cross->getVarList() != getVarList());
+    // 2) create neighbors
+    for(pCross cross: crossList)
+    {
+        cross->neighbors.clear();
+        for(size_t id = 0; id < cross->vers.size(); id++)
+        {
+            pVertex curr_ver = cross->vers[id];
+            pVertex next_ver = cross->vers[(id + 1) % cross->vers.size()];
+            pCross neighbor = getNeighbor(cross, curr_ver, next_ver);
+            if(neighbor != nullptr){
+                cross->neighbors.push_back(neighbor);
+            }
+            else{
+                cross->neighbors.push_back(shared_ptr<Cross<Scalar>>());
+            }
+        }
     }
-    return true;
 }
 
-void CrossMesh::Print()
+template<typename Scalar>
+shared_ptr<Cross<Scalar>> CrossMesh<Scalar>::getNeighbor(pCross cross,
+                                                         CrossMesh::pVertex v0,
+                                                         CrossMesh::pVertex v1) const
+{
+
+    if(v0 == nullptr || v1 == nullptr || cross == nullptr)
+        return nullptr;
+
+    vector<int> crossIDs;
+    for(wpCross neighbor: vertexCrossList[v0->verID])
+    {
+        if(neighbor.lock()->crossID != cross->crossID)
+            crossIDs.push_back(neighbor.lock()->crossID);
+    }
+
+    for(wpCross neighbor: vertexCrossList[v1->verID])
+    {
+        if(neighbor.lock()->crossID != cross->crossID)
+            crossIDs.push_back(neighbor.lock()->crossID);
+    }
+
+    std::sort(crossIDs.begin(), crossIDs.end());
+
+
+    for(int id = 0; id < (int)(crossIDs.size()) - 1; id ++){
+        if(crossIDs[id] == crossIDs[id + 1])
+        {
+            return crossList[crossIDs[id]];
+        }
+    }
+    return nullptr;
+}
+
+template<typename Scalar>
+void CrossMesh<Scalar>::print() const
 {
 	printf("cross num: %lu \n", crossList.size());
 
-	for (int i = 0; i < crossList.size(); i++)
+	for (size_t i = 0; i < crossList.size(); i++)
 	{
-        crossList[i]->Print();
+        crossList[i]->print();
 	}
 }
 
-void CrossMesh::SetBaseMesh2D(shared_ptr<PolyMesh> _baseMesh2D)
+template<typename Scalar>
+void CrossMesh<Scalar>::setBaseMesh2D(shared_ptr<PolyMesh<Scalar>> _baseMesh2D)
 {
 	baseMesh2D = _baseMesh2D;
 }
 
-vector<Vector3f> CrossMesh::GetAllVertices()
-{
-    vector<Vector3f> vertices;
-
-    for (int i = 0; i < crossList.size(); ++i)
-    {
-        for (int j = 0; j <crossList[i]->vers.size(); ++j)
-        {
-            Vector3f ver = crossList[i]->vers[j].pos;
-
-            if( GetPointIndexInList(ver, vertices) == ELEMENT_OUT_LIST )
-            {
-                vertices.push_back( ver );
-            }
-        }
-    }
-
-    return vertices;
-}
 
 //**************************************************************************************//
 //                                   Update Vertices
 //**************************************************************************************//
 
-void CrossMesh::UpdateCrossFromVertexList()
+
+template<typename Scalar>
+Scalar CrossMesh<Scalar>::computeAverageCrossSize() const
 {
-    for (int i = 0; i < crossList.size(); i++)
-    {
-        shared_ptr<Cross> cross = crossList[i];
-        for (int j = 0; j < cross->vers.size(); j++)
-        {
-            int verID = cross->verIDs[j];
-            cross->vers[j].pos = vertexList[verID];
-        }
-        cross->ComputeCenter();
-        cross->ComputeNormal();
+    Scalar area = 0;
+    for(pCross cross: crossList){
+        area += cross->area();
     }
-
-    return;
+    if(crossList.empty()){
+        return 0;
+    }
+    return area / crossList.size();
 }
 
-void CrossMesh::UpdateCrossVertexIndex()
+template<typename Scalar>
+void CrossMesh<Scalar>::updateCrossID()
 {
-    vertexList.clear();
+    for(size_t id = 0; id < crossList.size(); id++){
+        if(crossList[id]) crossList[id]->crossID = id;
+    }
+}
 
-    //init vertexList
-    for(int id = 0; id < crossList.size(); id++)
-    {
-        shared_ptr<Cross> cross = crossList[id];
-        for(int jd = 0; jd < cross->vers.size(); jd++)
-        {
-            Vector3f pt = cross->vers[jd].pos;
-            cross->verIDs[jd] = vertexList.size();
-            vertexList.push_back(pt);
+template<typename Scalar>
+void CrossMesh<Scalar>::erase_nullptr()
+{
+    //remove crossList
+    for(auto it = crossList.begin(); it != crossList.end();){
+        if(*it == nullptr){
+            it = crossList.erase(it);
+        }
+        else{
+            it ++;
         }
     }
 
-    //init Matrix
-    Eigen::MatrixXd V(vertexList.size(), 3);
-    for(int id = 0; id < vertexList.size(); id++)
-    {
-        Vector3f pt = vertexList[id];
-        V.row(id) = Eigen::RowVector3d(pt.x, pt.y, pt.z);
-    }
-
-    //remove duplicate
-    Eigen::MatrixXd SV;
-    Eigen::VectorXi SVI, SVJ;
-    //   SV  #SV by dim new list of vertex positions
-    //   SVI #V by 1 list of indices so SV = V(SVI,:)
-    //   SVJ #SV by 1 list of indices so V = SV(SVJ,:)
-    igl::remove_duplicate_vertices(V, FLOAT_ERROR_SMALL, SV, SVI, SVJ);
-
-    vertexList.clear();
-    for(int id = 0; id < SV.rows(); id++)
-    {
-        Vector3f pt(SV(id, 0), SV(id, 1), SV(id, 2));
-        vertexList.push_back(pt);
-    }
-
-    //update cross verIDs
-    vertexCrossList.clear();
-    vertexCrossList.resize(vertexList.size());
-    for(int id = 0; id < crossList.size(); id++)
-    {
-        shared_ptr<Cross> cross = crossList[id];
-        for(int jd = 0; jd < cross->vers.size(); jd++)
-        {
-            int new_verID = SVJ(cross->verIDs[jd]);
-            cross->verIDs[jd] = new_verID;
-            vertexCrossList[new_verID].push_back(cross);
+    //remove polyList
+    for(auto it = PolyMesh<Scalar>::polyList.begin(); it != PolyMesh<Scalar>::polyList.end();){
+        if(*it == nullptr){
+            it = PolyMesh<Scalar>::polyList.erase(it);
+        }
+        else{
+            it ++;
         }
     }
 
-//
+    //remove vertexList and vertexCrossList
+    typename vector<vector<wpCross>>::iterator vcross_it = vertexCrossList.begin();
+    typename vector<pVertex>::iterator vertex_it = vertexList.begin();
+    for(;vcross_it != vertexCrossList.end(); ){
+        for(auto it = vcross_it->begin(); it != vcross_it->end(); ){
+            if(it->lock() == nullptr){
+                vcross_it->erase(it);
+            }
+            else{
+                it ++;
+            }
+        }
 
-    return;
-}
-
-float CrossMesh::averageCrossSize() {
-    return 0;
-}
-
-void CrossMesh::updateCrossID() {
-    for(int id = 0; id < crossList.size(); id++){
-        if(crossList[id])
-            crossList[id]->crossID = id;
+        if(vcross_it->empty()){
+            vcross_it = vertexCrossList.erase(vcross_it);
+            vertex_it = vertexList.erase(vertex_it);
+        }
+        else{
+            vcross_it ++;
+            vertex_it ++;
+        }
     }
-}
 
-void CrossMesh::TranslateMesh(Vector3f mv) {
     for(int id = 0; id < vertexList.size(); id++){
-        vertexList[id] += mv;
+        vertexList[id]->verID = id;
     }
 
-    for(int id = 0; id < crossList.size(); id++){
-        shared_ptr<Cross> cross = crossList[id];
-        for(int jd = 0; jd < cross->vers.size(); jd++){
-            cross->vers[jd].pos += mv;
-        }
-    }
+    updateCrossID();
 }
 
-shared_ptr<PolyMesh> CrossMesh::getPolyMesh()
-{
-    shared_ptr<PolyMesh> polymesh = make_shared<PolyMesh>(getVarList());
-    for (int i = 0; i < crossList.size(); i++) {
-        pPolygon poly = make_shared<_Polygon>(*crossList[i]);
-        polymesh->polyList.push_back(poly);
-    }
 
-    return polymesh;
-}
-
-//**************************************************************************************//
-//                                   Save OBJ File
-//**************************************************************************************//
-
-void CrossMesh::WriteOBJModel(const char *objFileName)
-{
-	FILE *fp;
-	if ((fp = fopen(objFileName, "w+")) == NULL)
-	{
-		printf("Error: file not exists! \n");
-		return;
-	}
-	else
-	{
-		///////////////////////////////////////////////////////////////////
-		// 1. Write the vertex info of the mesh
-
-		//fprintf(fp, "# Wavefront OBJ generated by Peng SONG \n\n");
-
-		vector<Vector3f> vertexList = GetAllVertices();
-
-		fprintf(fp, "# %d vertices \n", (int)vertexList.size());
-
-		for (int i = 0; i < vertexList.size(); i++)
-		{
-			fprintf(fp, "v %f %f %f \n", vertexList[i].x, vertexList[i].y, vertexList[i].z);
-		}
-		fprintf(fp, "\n");
-
-
-		///////////////////////////////////////////////////////////////////
-		// 2. Write each polygon info of the mesh
-
-		fprintf(fp, "# %d faces \n", (int)crossList.size());
-
-		for (int i = 0; i < crossList.size(); i++)
-		{
-			pPolygon poly = crossList[i];
-
-			//fprintf(fp, "f ");
-			//for (int j = 0; j < poly->verIDs.size(); j++)
-			//{
-			//	//Since the index in OBJ file starting from 1 instead of 0, we need to add 1 to each index
-			//	fprintf(fp, " %d", poly->verIDs[j] + 1);
-			//}
-			//fprintf(fp, "\n");
-
-			fprintf(fp, "f ");
-			for (int j = 0; j < poly->vers.size(); j++)
-			{
-				int verID = GetPointIndexInList(poly->vers[j].pos, vertexList);
-				//Since the index in OBJ file starting from 1 instead of 0, we need to add 1 to each index
-				fprintf(fp, " %d", verID + 1);
-			}
-			fprintf(fp, "\n");
-
-		}
-		fprintf(fp, "\n");
-
-		fclose(fp);
-	}
-}
-
+template class CrossMesh<double>;
+template class CrossMesh<float>;
 
 
 

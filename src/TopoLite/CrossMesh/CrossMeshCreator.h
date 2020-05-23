@@ -15,54 +15,77 @@
 #ifndef _MODEL_H
 #define _MODEL_H
 
-#include "TopoLite/Utility/vec.h"
 #include "TopoLite/Utility/TopoObject.h"
 #include "TopoLite/Mesh/CrossMesh.h"
-
-#include "QuadTree.h"
-#include "igl/AABB.h"
+#include "TopoLite/Mesh/PolyMesh_AABBTree.h"
+#include "BaseMeshCreator.h"
+#include "AugmentedVectorCreator.h"
+#include "PatternCreator.h"
 #include "Eigen/Dense"
 #include <vector>
-
-using pCrossMesh = shared_ptr<CrossMesh>;
-
+#include "igl/lscm.h"
+#include <memory>
 
 /*!
  * CrossMesh = BaseMesh + AugmentedVector
  */
+template <typename Scalar>
 class CrossMeshCreator : public TopoObject
 {
 public:
 
-	pPolyMesh referenceSurface;      //<! Polygonal mesh of the reference surface model
+    typedef shared_ptr<PolyMesh_AABBTree<Scalar>> pPolyMeshAABB;
+
+    typedef weak_ptr<PolyMesh_AABBTree<Scalar>> wpPolyMeshAABB;
+
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
+
+    typedef weak_ptr<PolyMesh<Scalar>> wpPolyMesh;
+
+    typedef shared_ptr<CrossMesh<Scalar>> pCrossMesh;
+
+    typedef weak_ptr<CrossMesh<Scalar>> wpCrossMesh;
+
+    typedef shared_ptr<_Polygon<Scalar>> pPolygon;
+
+    typedef weak_ptr<_Polygon<Scalar>> wpPolygon;
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef Matrix<Scalar, 2, 1> Vector2;
+
+    typedef shared_ptr<VTex<Scalar>> pVTex;
+
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
+
+    typedef Matrix<Scalar, 4, 4> Matrix4;
+
+    typedef Matrix<Scalar, Eigen::Dynamic, Eigen::Dynamic> MatrixX;
+
+    typedef Matrix<int, Eigen::Dynamic, Eigen::Dynamic> MatrixXi;
+
+    typedef std::unordered_map<Cross<Scalar> *, int> mapCrossInt;
+
+public:
+
+	pPolyMeshAABB referenceSurface;      //<! Polygonal mesh of the reference surface model
 
 	pCrossMesh crossMesh;           //<! Cross mesh
 
     pCrossMesh pattern2D;            //<! 2D tessellation mesh
-
-public:
-
-    double textureNormalizeMat[16];          //<! Transform the texture coordinates to be within [0, 1]
-
-    shared_ptr<QuadTree> quadTree;
-
-	shared_ptr<igl::AABB<Eigen::MatrixXd,3>> aabbTree;
-
-	shared_ptr<Eigen::MatrixXd> aabbV;
-
-	shared_ptr<Eigen::MatrixXi> aabbF;
-
-	int default_patternRadius;
-
-	int default_patternID;
-
+    
 public:
 	CrossMeshCreator(const CrossMeshCreator &_model);
     CrossMeshCreator(shared_ptr<InputVarList> var);
 	~CrossMeshCreator();
 
-	void ClearModel();
+	void clear();
 
+public:
 	/*!
 	 * \brief: load a .obj model from file
 	 * \param objFileName: .obj file path
@@ -76,40 +99,44 @@ public:
 
 	bool setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary);
 
+public:
+
+    /*!
+	 * \brief: function to create the 2D tiling pattern by using the method in PatternCreator.cpp/.h
+	 */
+    bool updatePatternMesh();
+
 	/*!
 	 * \brief: main function to create base CrossMesh
 	 * \param texturedModel: True if the geometry of cross mesh is unknown. False if the polymesh just need to be assigned the tilt angle
-	 * \param tiltAngle: Initial tilt angle
-	 * \param patternID: Specific the pattern to create the geometry of cross mesh
-	 * \param patternRadius: how many polygons the pattern has (the size the of the pattern)
-	 * \param interactMatrix: User interaction of the pattern (scale, rotate, translate)
+	 * \param previewMode: True if unnecessary operations are dismissed.
 	 */
-    bool CreateCrossMesh(   bool previewMode,
-	                        double interactMatrix[]);
-
-    bool UpdateTiltRange();
-
-public:
+    bool createCrossMeshFromRSnPattern(bool previewMode, Matrix4 textureMat);
 
     /*!
-    * \brief: For correct texture scale
+    * \brief: function to update the augmented vectors of each edge in cross mesh
     */
-    void ComputeTextureNormalizeMatrix();
+    bool createAugmentedVectors();
 
     /*!
-     * \brief: Compute the correct texture
-     */
-    void ComputeTextureMatrix(double interactMatrix[], double textureMatrix[16]);
+    * \brief: function to update the augmented vectors of each edge in cross mesh
+    */
+    bool updateAugmentedVectors();
 
+
+    /*!
+    * \brief: function to update the valid range of augmented vector
+    */
+    bool computeAugmentedRange();
 
 public:
+    
+    Matrix4 computeTextureMat_backwards_compatible(Matrix4 interactMat);
 
-	void OverwriteTexture();
+private:
 
-	void CreateQuadTree();
-
-	void CreateAABBTree();
+	void recomputeTexture();
+    
 };
-
 #endif
 

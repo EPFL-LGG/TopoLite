@@ -4,17 +4,19 @@
 
 #ifndef TOPOLOCKCREATOR_GLUIVAR_H
 #define TOPOLOCKCREATOR_GLUIVAR_H
-#include "string.h"
-#include "../Utility/HelpStruct.h"
+#include <string>
 #include <map>
 #include <pugixml.hpp>
+#include <vector>
+#include <Eigen/Dense>
 #include <memory>
+#include <iostream>
 using std::string;
-
-#if USE_OPENGL_DRAW
-    #include "glui.h"
-    extern GLUI *glui;
-#endif
+using std::vector;
+using Eigen::Vector2f;
+using std::shared_ptr;
+using std::make_shared;
+using std::map;
 
 enum gluiVarValueType{
     GLUI_VAR_VALUE_NONE,
@@ -44,10 +46,10 @@ public:
         var_control_type = GLUI_VAR_CONTROL_NONE;
         var_value_type = GLUI_VAR_VALUE_NONE;
         visible = true;
-#if USE_OPENGL_DRAW
-        aligned_settings = GLUI_ALIGN_LEFT;
-        gluiID = -1;
-#endif
+    }
+    
+    ~InputVar(){
+        
     }
 
     InputVar& operator<<(string name){
@@ -85,6 +87,10 @@ public:
         bound = _bound;
     }
 
+    ~InputVarInt(){
+        clear_value();
+    }
+    
     void clear_value()
     {
         value = default_value;
@@ -105,6 +111,10 @@ public:
         var_value_type = GLUI_VAR_VALUE_FLOAT;
         bound = _bound;
     }
+    
+    ~InputVarFloat(){
+        clear_value();
+    }
 
     void clear_value()
     {
@@ -124,6 +134,10 @@ public:
         var_value_type = GLUI_VAR_VALUE_BOOL;
     }
 
+    ~InputVarBool(){
+        clear_value();
+    }
+    
     void clear_value()
     {
         value = default_value;
@@ -159,6 +173,7 @@ public:
             if (typeid(Scalar) == typeid(int)) return ((InputVarInt *) var)->value;
             if (typeid(Scalar) == typeid(float)) return ((InputVarFloat *) var)->value;
             if (typeid(Scalar) == typeid(bool)) return ((InputVarBool *) var)->value;
+            if (typeid(Scalar) == typeid(double)) return ((InputVarFloat *) var)->value;
         }
         else{
             std::cout << "Error: get a unresgistered variable" << std::endl;
@@ -174,6 +189,7 @@ public:
             if (typeid(Scalar) == typeid(int)) ((InputVarInt *) var)->value = _v;
             if (typeid(Scalar) == typeid(float)) ((InputVarFloat *) var)->value = _v;
             if (typeid(Scalar) == typeid(bool)) ((InputVarBool *) var)->value = _v;
+            if (typeid(Scalar) == typeid(double)) ((InputVarFloat *) var)->value = _v;
         }
         return;
     }

@@ -14,10 +14,11 @@
 #ifndef _CROSS_H
 #define _CROSS_H
 
-#include "TopoLite/Utility/vec.h"
-#include "TopoLite/Utility/HelpStruct.h"
-#include "TopoLite/Mesh/Polygon.h"
+#include "TopoLite/Utility/GeometricPrimitives.h"
 #include "TopoLite/Utility/TopoObject.h"
+#include <unordered_map>
+
+#include "Polygon.h"
 
 #include <vector>
 #include <memory>
@@ -28,33 +29,64 @@ using std::weak_ptr;
 using std::shared_ptr;
 using std::make_shared;
 
-class Cross;
-using pCross = shared_ptr<Cross>;
-
-class Cross: public _Polygon, public TopoObject
+template<typename Scalar>
+class Cross: public _Polygon<Scalar>, public TopoObject
 {
+public:
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+
+    typedef Eigen::Matrix<Scalar, 3 ,1> Vector3;
+
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
+
 public:
     //storage
 
-	int crossID;                               			//!< Cross ID in the list
+	int crossID;                               			// Cross ID in the list
 
-	bool atBoundary;									//!< At Boundary or not
+	bool atBoundary;									// At Boundary or not
 
-	vector<weak_ptr<Cross>> neighbors;                  //!< Neighbors of the cross
+	vector<wpCross> neighbors;                          // Neighbors of the cross
 
-	vector<shared_ptr<OrientPoint>> oriPoints;            //!< A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
-
-public:
-    //temporary variables
-
-	bool isVisited;                           			//!< For correcting tilt angles
+	vector<shared_ptr<OrientPoint<Scalar>>> oriPoints;  // A set of oriented points for constructing upper polyhedron (saved in the same order as neighbors)
 
 public:
 
-    Cross(const Cross &Cross);
+    Cross(const _Polygon<Scalar> &polygon, std::shared_ptr<InputVarList> var);
+
+    Cross(const Cross<Scalar> &cross);
+
     Cross(std::shared_ptr<InputVarList> var);
-	~Cross();
-	void Print();
+
+    ~Cross();
+
+    void print() const override;
+
+	void clear(){
+        crossID = -1;
+        atBoundary = false;
+        neighbors.clear();
+        oriPoints.clear();
+	}
+
+    shared_ptr<OrientPoint<Scalar>> ori(int index)
+    {
+        if(oriPoints.empty())
+            return nullptr;
+        else{
+            int rID = index % oriPoints.size();
+            return oriPoints.at(rID);
+        }
+    }
+
+    pCross nei(int index){
+        if(index < 0 || index >= neighbors.size())
+            return nullptr;
+        return neighbors[index].lock();
+    }
 
 public:
     //edge tilt normal
@@ -62,14 +94,14 @@ public:
 	/*!
 	 * \brief Compute Initial Tilt Normal, the rotation angle is 0.
 	 */
-	void InitTiltNormals();
+	void initTiltNormals();
 
 	/*!
 	 * \brief: Initially update all oriPoints in this cross \n
 	 * 1) alternatively update the sign by following the order as oriPoints \n
 	 * 2) the sign of first orient point is positive \n
 	 */
-	void UpdateTiltNormal_Root(float tiltAngle);
+	void updateTiltNormalsRoot(float tiltAngle);
 
 	/*!
 	 * \brief: Update oriPoints in this cross \n
@@ -77,16 +109,7 @@ public:
 	 * 2) The sign of some orient point could be changed in order to resolve conflict \n
 	 * 3) In odd polygon, neighboring orient point could have same sign
 	 */
-	void UpdateTiltNormal(float tiltAngle);
-
-	/*!
-	 * \brief: Compute vector rotation
-	 * \param[in] normal based vector
-	 * \param[in] rotAxis rotation axis
-	 * \param[in] rotAngle rotation angle
-	 * \return vector after rotation
-	 */
-    Vector3f RotateNormal(Vector3f normal, Vector3f rotAxis, float rotAngle);
+	void updateTiltNormals(float tiltAngle, const std::unordered_map<Cross<Scalar> *, bool>& crossVisited);
 
 public:
     //neighbor
@@ -94,15 +117,14 @@ public:
     /*!
      * \brief: found the EdgeID (order in oriPoints) which correspond crossID is currCrossID
      */
-	int GetNeighborEdgeID(int currCrossID);
+	int getEdgeIDSharedWithCross(const Cross<Scalar>* ncross);
 
-	int GetVertexEdgeID(int vertexID);
+	int getEdgeIDOfGivenVertexID(int vertexID);
 
-	int GetSharedCross(weak_ptr<Cross> ncross);
+	int getCrossIDsSharedWithCross(const Cross<Scalar>* ncross, vector<int> &shared_crossIDs);
 
-	int GetShareEdge(weak_ptr<Cross> ncross);
+	int getPrevEdgeID(int edgeID);
 
-	int GetPrevEdgeID(int edgeID);
+    bool checkNeighborAtBoundary(int nID);
 };
-
 #endif

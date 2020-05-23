@@ -1,1 +1,0 @@
-Please read doc/main.dox and doc/libShapeOp.dox for more information.

@@ -1,21 +1,24 @@
 //
 // Created by ziqwang on 2020-02-03.
 //
-
+// bug: we keep this here for now but it is not working.
+//
 #include "InterlockingSolver_AffineScaling.h"
-#include "Eigen/SparseQR"
+
 using Eigen::VectorXd;
 using Eigen::MatrixXd;
 
-bool InterlockingSolver_AffineScaling::isTranslationalInterlocking(shared_ptr<InterlockingData> data)
+template<typename Scalar>
+bool InterlockingSolver_AffineScaling<Scalar>::isTranslationalInterlocking(pInterlockingData &data)
 {
     return false;
 }
 
-bool InterlockingSolver_AffineScaling::isRotationalInterlocking(shared_ptr<InterlockingData> data)
+template<typename Scalar>
+bool InterlockingSolver_AffineScaling<Scalar>::isRotationalInterlocking(pInterlockingData &data)
 {
     MatrixXd mat;
-    computeRotationalInterlockingMatrixDense(mat);
+    InterlockingSolver<Scalar>::computeRotationalInterlockingMatrixDense(mat);
 
     int m = mat.rows();
     int n = mat.cols();
@@ -107,4 +110,10 @@ bool InterlockingSolver_AffineScaling::isRotationalInterlocking(shared_ptr<Inter
         }
     }
     return false;
+}
+
+
+void TemporaryFunction_InterlockingSolver_AffineScaling ()
+{
+    InterlockingSolver_AffineScaling<double> solver(nullptr, nullptr);
 }

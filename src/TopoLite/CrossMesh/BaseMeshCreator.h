@@ -16,111 +16,131 @@
 #define _REMESH_PARA_H
 
 #include <vector>
-#include "Utility/vec.h"
-#include "QuadTree.h"
-#include "Mesh/HEdgeMesh.h"
+#include <unordered_map>
+#include <tbb/tbb.h>
 
-typedef shared_ptr<HEdgeMesh> pHEdgeMesh;
+#include "TopoLite/Mesh/PolyMesh_AABBTree.h"
+#include "Mesh/CrossMesh.h"
 
 using namespace std;
-
-
-class PolyMesh;
-class CrossMesh;
-
-typedef shared_ptr<PolyMesh> pPolyMesh;
-typedef shared_ptr<CrossMesh> pCrossMesh;
 
 /*!
  * \brief Mapping the 2D pattern into the 3D surface
  * \return the base polygonal mesh
  */
+
+template<typename Scalar>
 class BaseMeshCreator: public TopoObject
 {
 public:
 
-    weak_ptr<QuadTree> quadTree;
+    typedef shared_ptr<PolyMesh_AABBTree<Scalar>> pPolyMeshAABB;
 
-	vector<int> map_vertex2D_3D;
+    typedef weak_ptr<PolyMesh_AABBTree<Scalar>> wpPolyMeshAABB;
 
-	vector<int> map_vertex3D_2D;
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
 
-	vector<int> map_cross2D_3D;
+    typedef weak_ptr<PolyMesh<Scalar>> wpPolyMesh;
 
-	vector<int> map_cross3D_2D;
+    typedef shared_ptr<CrossMesh<Scalar>> pCrossMesh;
 
-	weak_ptr<PolyMesh> polyMesh;
+    typedef weak_ptr<CrossMesh<Scalar>> wpCrossMesh;
 
-	weak_ptr<CrossMesh> pattern2D;
+    typedef shared_ptr<_Polygon<Scalar>> pPolygon;
+
+    typedef weak_ptr<_Polygon<Scalar>> wpPolygon;
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef Matrix<Scalar, 2, 1> Vector2;
+
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
+
+    typedef Matrix<Scalar, 4, 4> Matrix4;
+
+    typedef std::unordered_map<Cross<Scalar> *, int> mapCrossInt;
+
+public:
+
+    //map the vertices of pattern2D onto polyMesh
+    //null when the vertices in outside of polyMesh's texture space
+    vector<pVertex> pattern2D_vertices_on_polyMesh;
+
+    //a polygon of pattern2D locates on the boundary of polyMesh's texture space
+    //null if not
+    tbb::concurrent_vector<pPolygon> boundary_pattern2D;
+
+    wpPolyMeshAABB polyMesh;
+
+    wpCrossMesh pattern2D;
 
 	const float viewSize = 2.0;   // Note: since the 2D pattern mesh has been normalized into [-1.0, 1.0]
 
 public:
 
-    BaseMeshCreator(    shared_ptr<QuadTree> _quadTree,
-                        shared_ptr<PolyMesh> _polyMesh,
-                        shared_ptr<CrossMesh> _pattern2D,
-                        shared_ptr<InputVarList> var);
-
-    BaseMeshCreator(shared_ptr<InputVarList> var);
+    BaseMeshCreator(pPolyMeshAABB _polyMesh,
+                    pCrossMesh _pattern2D,
+                    shared_ptr<InputVarList> varList);
+    
+    BaseMeshCreator(shared_ptr<InputVarList> varList);
 
     ~BaseMeshCreator();
 
-	// Compute Lifted 3D Mesh 
+
+
+public:
+
+    // Compute Lifted 3D Mesh
 
 	/*!
 	 * \brief: main function for mapping the 2D pattern into 3D surface
 	 * \param[in] polyMesh: input 3D guide surface
 	 * \param[in] pattern2D: input 2D pattern
-	 * \param[in] inverTextureMat: User interaction of the 2D pattern (Rotation, Translation and Scale)
+	 * \param[in] inverTextureMat: Map from 2D pattern space to surface texture space
 	 * \param[out] baseMesh2D: output the base 2D mesh
 	 * \param[out] baseMesh: output the base mesh
 	 * \note: it requires polyMesh with texture.
 	 */
+	void computeBaseCrossMesh(Matrix<Scalar, 4, 4> textureMat,
+	                          pPolyMesh &baseMesh2D,
+	                          pCrossMesh &crossMesh,
+	                          bool previewMode = false);
 
-	void Pattern2CrossMesh(double *inverTextureMat,
-                           shared_ptr<PolyMesh> &baseMesh2D,
-                           shared_ptr<CrossMesh> &crossMesh);
+public:
 
+	void computeInternalCross(Matrix4 textureMat,
+	                          pPolyMesh &baseMesh2D,
+	                          pCrossMesh &crossMesh);
 
-    void PolyMesh2CrossMesh(pPolyMesh polyMesh,
-                            pCrossMesh &crossMesh);
+	void computeBoundaryCross(Matrix4 textureMat,
+                              pPolyMesh &baseMesh2D,
+                              pCrossMesh &crossMesh);
 
-    void InitCrossMesh(     pPolyMesh polyMesh,
-                            pCrossMesh &crossMesh);
+	void removeSmallCrosses(pCrossMesh crossMesh);
 
-	void ComputeInsideCross(double *inverTextureMat,
-							shared_ptr<PolyMesh> &baseMesh2D,
-							shared_ptr<CrossMesh> &crossMesh);
+    void recomputeBoundary(pCrossMesh crossMesh);
 
-	void ComputeBoundaryCross(double *inverTextureMat,
-							  shared_ptr<PolyMesh> &baseMesh2D,
-							  shared_ptr<CrossMesh> &crossMesh);
+	void removeDanglingCross(pCrossMesh crossMesh);
 
-    void ComputePracticalBoundary(shared_ptr<CrossMesh> &crossMesh);
-
-	void ComputeCrossNeighbors(pHEdgeMesh hedgeMesh, pCrossMesh crossMesh);
-
-	void RemoveDanglingCross(shared_ptr<CrossMesh> crossMesh);
-
-	bool ComputeBoundaryVertex(double inverTextureMat[16], Vector3f sta2D, Vector3f end2D, Vector3f &pos2D, Vector3f &pos3D);
+public:
 	/*!
 	 * \brief: scale the 2D pattern position into UV space
 	 */
-	Vector3f GetTextureCoord(Vector3f point, float viewSize);
+    Vector2 getTextureCoord(Vector2 point, Matrix4 textureMat);
 
 	/*!
 	 * \brief: project the 2D ptTexCoord into the Surface
 	 * \return: the 3D position of 2D pattern vertices
 	 */
-	bool ComputeSurfaceCoord(pPolyMesh polyMesh, Vector3f ptTexCoord, Vector3f &ptSurfCoord);
+	bool mapTexPointBackToSurface(Vector2 ptTexCoord, Vector3 &ptSurfCoord);
 
-
-//
-//	// Remove Dangling Polygon
-//	void RemoveDanglingCross(pCrossMesh crossMesh);
+	void splitIntoConsecutivePolygons(const vector<Line<Scalar>> &line, const vector<bool>& inside, tbb::concurrent_vector<pPolygon> &polyList);
+    
 };
-
 #endif
 
 

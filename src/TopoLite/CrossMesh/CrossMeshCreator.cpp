@@ -12,277 +12,165 @@
 ///////////////////////////////////////////////////////////////
 
 
-#include "time.h"
-#include "Utility/HelpDefine.h"
-#include "Utility/HelpFunc.h"
-#include "Utility/vec.h"
-#include "Utility/math3D.h"
-#include "Mesh/Polygon.h"
-#include "Mesh/PolyMesh.h"
-#include "Mesh/HEdgeMesh.h"
-#include "PatternCreator.h"
-#include "Mesh/Cross.h"
-#include "Mesh/CrossMesh.h"
-#include "AugmentedVectorCreator.h"
-#include "BaseMeshCreator.h"
-#include "CrossMeshCreator.h"
-#include "BaseMeshOptimizer.h"
-#include "IO/InputVar.h"
-#include "Mesh/MeshConverter.h"
-#include <Eigen/Dense>
-
-#ifndef CATCH2_UNITTEST
-
 //**************************************************************************************//
 //                                   Initialization
 //**************************************************************************************//
+#include "CrossMeshCreator.h"
+#include "tbb/tbb.h"
 
-CrossMeshCreator::CrossMeshCreator(shared_ptr<InputVarList> var) :TopoObject(var)
+template <typename Scalar>
+CrossMeshCreator<Scalar>::CrossMeshCreator(shared_ptr<InputVarList> var) :TopoObject(var)
 {
-    aabbTree = nullptr;
-
-    quadTree = nullptr;
-
 	referenceSurface = nullptr;
 
 	pattern2D = nullptr;
 
 	crossMesh = nullptr;
-
-	default_patternRadius = -1;
-
-	default_patternID = -1;
+    
 }
-
-void CrossMeshCreator::ClearModel()
+template <typename Scalar>
+void CrossMeshCreator<Scalar>::clear()
 {
-    aabbTree.reset();
-    quadTree.reset();
-
     referenceSurface.reset();
     pattern2D.reset();
     crossMesh.reset();
-
-    aabbV.reset();
-    aabbF.reset();
-
-    default_patternRadius = -1;
-    default_patternID = -1;
 }
 
-CrossMeshCreator::CrossMeshCreator(const CrossMeshCreator &_model) : TopoObject(_model)
+template <typename Scalar>
+CrossMeshCreator<Scalar>::CrossMeshCreator(const CrossMeshCreator &_model) : TopoObject(_model)
 {
-    ClearModel();
+    clear();
 
-    default_patternRadius = _model.default_patternRadius;
-    default_patternID = _model.default_patternID;
-
-    if(_model.pattern2D) pattern2D = make_shared<CrossMesh>(*_model.pattern2D);
-    if(_model.referenceSurface) referenceSurface = make_shared<PolyMesh>(*_model.referenceSurface);
-    if(_model.crossMesh) crossMesh = make_shared<CrossMesh>(*_model.crossMesh);
-
-    for(int id = 0;id < 16; id++)
-    {
-        textureNormalizeMat[id] = _model.textureNormalizeMat[id];
-    }
-
-    if(referenceSurface->texturedModel)
-    {
-        CreateQuadTree();
-        CreateAABBTree();
-    }
+    if(_model.pattern2D) pattern2D = make_shared<CrossMesh<Scalar>>(*_model.pattern2D);
+    if(_model.referenceSurface) referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_model.referenceSurface);
+    if(_model.crossMesh) crossMesh = make_shared<CrossMesh<Scalar>>(*_model.crossMesh);
 }
 
-CrossMeshCreator::~CrossMeshCreator()
+template <typename Scalar>
+CrossMeshCreator<Scalar>::~CrossMeshCreator()
 {
 
 }
 
 //**************************************************************************************//
-//                                   Load Surface Model
+//                         Setup ReferenceSurface/PatternMesh/CrossMesh
 //**************************************************************************************//
 
-bool CrossMeshCreator::loadSurface(const char *objFileName)
-{
-	// 1. Read OBJ model
-	pPolyMesh surface;
-    surface = make_shared<PolyMesh>(getVarList());
-	bool texturedModel;
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::setReferenceSurface(pPolyMesh _ref){
 
-	if(surface->ReadOBJModel(objFileName, texturedModel, true))
-	{
-		// 2. Load a Texture model with parametrization.
-		if (texturedModel)
-		{
-            referenceSurface = make_shared<PolyMesh>(*surface);
-            referenceSurface->ComputeBBox();
-            ComputeTextureNormalizeMatrix();
-            CreateQuadTree();
-            CreateAABBTree();
-		}
-		// 3. Load a Cross Mesh
-		else{
-            referenceSurface.reset();
-            getVarList()->set("texturedModel", false);
-            vector<bool> atBoundary;
-            setCrossMesh(surface, atBoundary);
-		}
-        getVarList()->set("texturedModel", texturedModel);
-
-		return true;
-	}
-
-	return false;
-}
-
-bool CrossMeshCreator::setReferenceSurface(pPolyMesh surface){
-
-    if(surface == nullptr) return false;
-    if(!surface->texturedModel)
+    if(_ref == nullptr) return false;
+    if(!_ref->texturedModel)
     {
-        MeshConverter converter(getVarList());
-        referenceSurface.reset();
-        converter.generateTexture(surface.get(), referenceSurface);
+       referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_ref);
+       recomputeTexture();
+    }
+    else{
+        referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_ref);
+        referenceSurface->buildTexTree();
     }
 
     if(referenceSurface)
     {
         getVarList()->set("texturedModel", true);
-        ComputeTextureNormalizeMatrix();
-        CreateQuadTree();
-        CreateAABBTree();
-
-        default_patternRadius = -1;
-        default_patternID = -1;
     }
+    return referenceSurface != nullptr;
+}
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::setPatternMesh(pPolyMesh _pattern)
+{
+    if(_pattern == nullptr) return false;
+    pattern2D = make_shared<CrossMesh<Scalar>>(*_pattern);
     return true;
 }
 
-bool CrossMeshCreator::setPatternMesh(pPolyMesh surface)
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::setCrossMesh(pPolyMesh _cross, vector<bool> &atBoundary)
 {
-    if(surface == nullptr) return false;
-    surface->removeDuplicatedVertices();
+    if(_cross == nullptr) return false;
 
-
-    pattern2D.reset();
-    BaseMeshCreator baseMeshCreator(getVarList());
-    baseMeshCreator.PolyMesh2CrossMesh(surface, pattern2D);
-    
-    //for user defined 2D pattern
-    //we set patternRadius and patternID to be -1
-    //to dinstinguish it from other predefined patterns. 
-
-    default_patternRadius = -1;
-    default_patternID = -1;
-
-    getVarList()->set("patternID", default_patternID);
-    getVarList()->set("patternRadius", default_patternRadius);
-
-    return true;
-}
-
-bool CrossMeshCreator::setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary)
-{
-    if(surface == nullptr) return false;
-    referenceSurface.reset();
-    referenceSurface = make_shared<PolyMesh>(*surface);
     getVarList()->set("texturedModel", false);
-    referenceSurface->ComputeBBox();
+    crossMesh = make_shared<CrossMesh<Scalar>>(*_cross);
 
-    BaseMeshCreator baseMeshCreator(getVarList());
-    baseMeshCreator.PolyMesh2CrossMesh(referenceSurface, crossMesh);
-
-    if(crossMesh->crossList.size() == atBoundary.size())
+    if(crossMesh->size() == atBoundary.size())
     {
-        for(pCross cross: crossMesh->crossList)
+        for(int id = 0; id < crossMesh->size(); id++)
         {
+            pCross cross = crossMesh->cross(id);
             cross->atBoundary = atBoundary[cross->crossID];
         }
     }
     else{
-        baseMeshCreator.ComputePracticalBoundary(crossMesh);
+        BaseMeshCreator<Scalar> baseMeshCreator(getVarList());
+        baseMeshCreator.recomputeBoundary(crossMesh);
     }
-
-    float   tiltAngle       = getVarList()->get<float>("tiltAngle");
-    AugmentedVectorCreator vectorCreator(getVarList());
-    vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
-
     return  true;
 }
 
-bool CrossMeshCreator::CreateCrossMesh( bool previewMode,
-                                        double interactMatrix[])
+//**************************************************************************************//
+//                         Update ReferenceSurface/PatternMesh/CrossMesh
+//**************************************************************************************//
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::createCrossMeshFromRSnPattern( bool previewMode, Matrix4 textureMat)
 {
-    float   tiltAngle       = getVarList()->get<float>("tiltAngle");
-    float   patternID       = getVarList()->get<int>("patternID");
-    float   patternRadius   = getVarList()->get<int>("patternRadius");
-    bool    texturedModel   = getVarList()->get<int>("texturedModel");
-
-    clock_t sta;
-
-    if ( texturedModel )
-    {
-        //clear CrossMesh
-        if (crossMesh != nullptr) crossMesh.reset();
-
-        if(referenceSurface == nullptr) return false;
-        if(quadTree == nullptr) return false;
-        if(aabbTree == nullptr) return false;
-
-
-
-        if( default_patternID != patternID ||
-            default_patternRadius != patternRadius ||
-            pattern2D == nullptr)
-        {
-            sta = clock();
-            PatternCreator patternCreator(getVarList());
-            patternCreator.CreateMesh_2DPattern(patternID, patternRadius, pattern2D);
-            default_patternRadius = patternRadius;
-            default_patternID = patternID;
-            std::cout << "--2D PATTERN:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-        }
-
-        double textureMatrix[16];
-        ComputeTextureMatrix(interactMatrix, textureMatrix);
-        double inverTextureMat[16];
-        memcpy(inverTextureMat, textureMatrix, sizeof(double) * 16);
-        invertMat(inverTextureMat, 4);
-
-        shared_ptr<PolyMesh> baseMesh2D;
-
-        sta = clock();
-        BaseMeshCreator baseMeshCreator(quadTree, referenceSurface, pattern2D, getVarList());
-        baseMeshCreator.Pattern2CrossMesh(inverTextureMat, baseMesh2D, crossMesh);
-        std::cout << "--Remesh Para:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-
-        sta = clock();
-        BaseMeshOptimizer meshOptimizer(aabbTree, aabbV, aabbF, getVarList());
-        meshOptimizer.OptimizeBaseMesh(crossMesh);
-
-        sta = clock();
-        AugmentedVectorCreator vectorCreator(getVarList());
-        vectorCreator.CreateAugmentedVector(tiltAngle, crossMesh);
-        std::cout << "--Remesh Own:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-
-        crossMesh->SetBaseMesh2D(baseMesh2D);
+    if(pattern2D && referenceSurface && referenceSurface->texturedModel){
+        tbb::tick_count sta = tbb::tick_count::now();
+        pPolyMesh baseMesh2D;
+        BaseMeshCreator<Scalar> baseMeshCreator(referenceSurface, pattern2D, getVarList());
+        baseMeshCreator.computeBaseCrossMesh(textureMat, baseMesh2D, crossMesh, previewMode);
+        crossMesh->setBaseMesh2D(baseMesh2D);
+        std::cout << "BaseMesh Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
     }
-    else if(crossMesh){
-        sta = clock();
-        AugmentedVectorCreator vectorCreator(getVarList());
-        vectorCreator.UpdateMeshTiltNormals(crossMesh, tiltAngle);
-        std::cout << "--UpdateMeshTiltNormals:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-    }
-
     return crossMesh != nullptr;
 }
 
-bool CrossMeshCreator::UpdateTiltRange()
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>:: updatePatternMesh()
+{
+    tbb::tick_count sta = tbb::tick_count::now();
+    int patternID = getVarList()->template get<int>("patternID");
+    int patternRadius = getVarList()->template get<int>("patternRadius");
+    PatternCreator<Scalar> patternCreator(getVarList());
+    patternCreator.create2DPattern(PatternType(patternID), patternRadius, pattern2D);
+    std::cout << "Pattern Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
+    return pattern2D != nullptr;
+}
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::createAugmentedVectors(){
+    if(crossMesh){
+        tbb::tick_count sta = tbb::tick_count::now();
+        float tiltAngle = getVarList()->template get<float>("tiltAngle");
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
+        vectorCreator.createAugmentedVectors(tiltAngle, crossMesh);
+        std::cout << "Augmented Vectors Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
+        return true;
+    }
+    return false;
+}
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::updateAugmentedVectors(){
+    if(crossMesh){
+        tbb::tick_count sta = tbb::tick_count::now();
+        float tiltAngle = getVarList()->template get<float>("tiltAngle");
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
+        vectorCreator.updateAugmentedVectors(tiltAngle, crossMesh);
+        std::cout << "Augmented Vectors Update:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
+        return true;
+    }
+    return false;
+}
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::computeAugmentedRange()
 {
     //compute the tilt range
     if(crossMesh)
     {
-        AugmentedVectorCreator vectorCreator(getVarList());
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
         if(!vectorCreator.UpdateMeshTiltRange(crossMesh))
         {
             return false;
@@ -294,126 +182,93 @@ bool CrossMeshCreator::UpdateTiltRange()
 }
 
 //**************************************************************************************//
-//                                Texture Matrix
+//                                Utility Function
 //**************************************************************************************//
 
-void CrossMeshCreator::ComputeTextureNormalizeMatrix()
-{
-    // Compute 2D bounding box of the parameterized surface mesh
-    Box texBBox = referenceSurface->ComputeTextureBBox();
-    float scale_factor = getVarList()->get<float>("textureScaleFactor");
-    float footScale = scale_factor / max(texBBox.maxPt.x - texBBox.minPt.x, texBBox.maxPt.y - texBBox.minPt.y);
+template <typename Scalar>
+void CrossMeshCreator<Scalar>::recomputeTexture() {
+    if (referenceSurface) {
+        MatrixX V;
+        MatrixXi F;
+        Eigen::VectorXi C;
+        referenceSurface->convertPosToEigenMesh(V, F, C);
 
-    //Compute foot matrix that transform the 2D bbox into a unit 2D box [minPt(0,0), maxPt(1,1)]
-    Eigen::Matrix4d mat;
-    mat = Eigen::Matrix4d::Identity();
-    Eigen::Matrix4d trans1;
-    trans1 = Eigen::Matrix4d::Identity();
-    trans1(0, 3) = 0.5; trans1(1, 3) = 0.5; trans1(2, 3) = 0;
-    Eigen::Matrix4d scale;
-    scale = Eigen::Matrix4d::Identity();
-    scale(0, 0) = footScale; scale(1, 1) = footScale;
-    Eigen::Matrix4d trans2;
-    trans2 = Eigen::Matrix4d::Identity();
-    trans2(0, 3) = -0.5f*(texBBox.minPt.x + texBBox.maxPt.x); trans2(1, 3) = -0.5f*(texBBox.minPt.y + texBBox.maxPt.y); trans2(2, 3) = 0;
-    mat = mat * trans1 * scale * trans2;
-    for(int id = 0; id < mat.cols(); id++){
-        for(int jd = 0; jd < mat.rows(); jd++)
-            textureNormalizeMat[4 * id + jd] = mat(jd, id);
-    }
-}
+        // Fix two points on the boundary
+        Eigen::VectorXi bnd, b(2, 1);
+        igl::boundary_loop(F, bnd);
+        b(0) = bnd(0);
+        b(1) = bnd(round(bnd.size() / 2));
+        MatrixX bc(2, 2);
+        bc << 0, 0, 1, 0;
 
-void CrossMeshCreator::ComputeTextureMatrix(double interactMatrix[16], double textureMatrix[16])
-{
-    double inveInteractMat[16];
-    memcpy(inveInteractMat, interactMatrix, sizeof(double) * 16);
-    if (invertMat(inveInteractMat, 4) == 1)  printf("Inverse Matrix Error \n");
+        MatrixX V_uv;
+        // LSCM parametrization
+        igl::lscm(V, F, b, bc, V_uv);
 
-    inveInteractMat[12] = inveInteractMat[12] / 2.0f;   // Since the scale of 2D pattern space is [-1, 1] while the scale of 2D texture space is [0, 1]
-    inveInteractMat[13] = inveInteractMat[13] / 2.0f;
-    inveInteractMat[14] = inveInteractMat[14] / 2.0f;
+        referenceSurface->fromEigenMesh(V, V_uv, F);
 
+        referenceSurface->buildTexTree();
 
-    Eigen::Matrix4d mat;
-    mat = Eigen::Matrix4d::Identity();
-    Eigen::Matrix4d trans1;
-    trans1 = Eigen::Matrix4d::Identity();
-    trans1(0, 3) = 0.5; trans1(1, 3) = 0.5; trans1(2, 3) = 0;
-    Eigen::Matrix4d inveMat;
-    for(int id = 0; id < mat.cols(); id++){
-        for(int jd = 0; jd < mat.rows(); jd++)
-            inveMat(jd, id) = inveInteractMat[4 * id + jd];
-    }
-    Eigen::Matrix4d trans2;
-    trans2 = Eigen::Matrix4d::Identity();
-    trans2(0, 3) = -0.5; trans2(1, 3) = -0.5f; trans2(2, 3) = 0;
-
-    Eigen::Matrix4d footMat;
-    for(int id = 0; id < mat.cols(); id++){
-        for(int jd = 0; jd < mat.rows(); jd++)
-            footMat(jd, id) = textureNormalizeMat[4 * id + jd];
-    }
-
-    mat = mat * trans1 * inveMat * trans2 * footMat;
-    for(int id = 0; id < mat.cols(); id++)
-    {
-        for(int jd = 0; jd < mat.rows(); jd++)
-            textureMatrix[4 * id + jd] = mat(jd, id);
-    }
-}
-
-//**************************************************************************************//
-//                                Auxiliary Tree
-//**************************************************************************************//
-
-void CrossMeshCreator::OverwriteTexture()
-{
-	if(referenceSurface)
-	{
-		shared_ptr<PolyMesh> texMesh;
-		MeshConverter convert;
-        convert.generateTexture(referenceSurface.get(), texMesh);
-		referenceSurface = texMesh;
-		getVarList()->set("texturedModel", true);
-		texMesh->texturedModel = true;
-		texMesh->ComputeBBox();
-        CreateQuadTree();
-	}
-}
-
-void CrossMeshCreator::CreateQuadTree()
-{
-	quadTree.reset();
-	quadTree = make_shared<QuadTree>(referenceSurface, getVarList());
-}
-
-void CrossMeshCreator::CreateAABBTree()
-{
-    if(referenceSurface->vertexList.empty()){
         return;
     }
-
-    int n = referenceSurface->vertexList.size();
-    int m = referenceSurface->polyList.size();
-    aabbV = make_shared<Eigen::MatrixXd>(n, 3);
-    aabbF = make_shared<Eigen::MatrixXi>(m, 3);
-    for(int id = 0; id < n; id++)
-    {
-        Vector3f ver = referenceSurface->vertexList[id];
-        aabbV->row(id) = Eigen::RowVector3d(ver.x, ver.y, ver.z);
-    }
-    for(int id = 0; id < m; id++){
-        shared_ptr<_Polygon> poly = referenceSurface->polyList[id];
-        aabbF->row(id) = Eigen::RowVector3i(poly->verIDs[0], poly->verIDs[1], poly->verIDs[2]);
-    }
-
-    aabbTree.reset();
-    aabbTree = make_shared<igl::AABB<Eigen::MatrixXd,3>>();
-    aabbTree->init(*aabbV, *aabbF);
-
-    return;
 }
 
-#else
+template<typename Scalar>
+Matrix<Scalar, 4, 4> CrossMeshCreator<Scalar>::computeTextureMat_backwards_compatible(Matrix4 interactMat)
+{
+    if(referenceSurface){
+        //the following want to tranform the points in the surface texture space to the pattern space
 
-#endif
+        // Compute 2D bounding box of the parameterized surface mesh
+        Box<Scalar> texBBox = referenceSurface->texBBox();
+
+        //1) centralize the surface texture
+        Matrix4 trans1 = Matrix4::Identity();
+        trans1(0, 3) = -0.5*(texBBox.minPt.x() + texBBox.maxPt.x());
+        trans1(1, 3) = -0.5*(texBBox.minPt.y() + texBBox.maxPt.y());
+        trans1(2, 3) = 0;
+
+        //2) scale 1) into [-0.5, -0.5]x [0.5, 0.5]
+        Scalar scale_factor = getVarList()->template get<float>("textureScaleFactor");
+        Scalar footScale = scale_factor / max(texBBox.maxPt.x() - texBBox.minPt.x(), texBBox.maxPt.y() - texBBox.minPt.y());
+        Matrix4 scale = Matrix4::Identity();
+        scale(0, 0) = footScale; scale(1, 1) = footScale;
+
+        //3) tranform 2) by inveInteractMat
+        Matrix4 inveInteractMat = interactMat.inverse();
+        //Compatible issue with the old data
+        //Reason: Since the scale of 2D pattern space is [-1, 1] while the scale of 2D texture space is [0, 1]
+        inveInteractMat(0, 3) /= 2;
+        inveInteractMat(1, 3) /= 2;
+        inveInteractMat(2, 3) /= 2;
+
+        //4) move the 3)'s center into [0.5, 0.5], so that it is within [0, 0] x[1, 1]
+        Matrix4 trans2 = Matrix4::Identity();
+        trans2(0, 3) = 0.5;
+        trans2(1, 3) = 0.5;
+        trans2(2, 3) = 0;
+
+        Matrix4 textureMat = trans2 * inveInteractMat * scale * trans1;
+        //5) inverse it because we want a transform form pattern space to surface texture space
+
+        Matrix4 invtextureMat = textureMat.inverse();
+
+        //6)scale the pattern from [-1, 1] x[1, 1] to [0, 1]
+        Matrix4 trans3 = Matrix4::Identity();
+        trans3(0, 3) = 1;
+        trans3(1, 3) = 1;
+        trans3(2, 3) = 0;
+
+        Matrix4 scale2 = Matrix4::Identity();
+        scale2(0, 0) = 0.5;
+        scale2(1, 1) = 0.5;
+
+        return invtextureMat * scale2 * trans3;
+    }
+    else{
+        return Matrix<Scalar, 4, 4>::Identity();
+    }
+
+}
+
+template class CrossMeshCreator<double>;

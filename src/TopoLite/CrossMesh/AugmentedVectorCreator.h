@@ -15,61 +15,76 @@
 #ifndef _REMESH_OWN_H
 #define _REMESH_OWN_H
 
-#include "Utility/vec.h"
 #include "Mesh/PolyMesh.h"
-#include "Mesh/HEdgeMesh.h"
 #include "Mesh/CrossMesh.h"
+#include "Mesh/Cross.h"
 #include "Utility/TopoObject.h"
 
-#include <igl/AABB.h>
-#include <vector>
+#include <tbb/tbb.h>
+#include <utility>
+#include <queue>
+#include <unordered_map>
 
 using namespace std;
 
-using pCrossMesh = shared_ptr<CrossMesh>;
-using pHEdgeMesh = shared_ptr<HEdgeMesh>;
-using pPolyMesh = shared_ptr<PolyMesh>;
+
 
 /*!
  * \brief: Create CrossMesh by Input the polygonal mesh and tiltAngle
  */
+
+template<typename Scalar>
 class AugmentedVectorCreator : public TopoObject
 {
 public:
 
-    AugmentedVectorCreator(shared_ptr<InputVarList> var):TopoObject(var){}
+    typedef shared_ptr<CrossMesh<Scalar>> pCrossMesh;
 
-	~AugmentedVectorCreator();
+    typedef shared_ptr<PolyMesh<Scalar>> pPolyMesh;
+
+    typedef shared_ptr<Cross<Scalar>> pCross;
+
+    typedef weak_ptr<Cross<Scalar>> wpCross;
+    
+    typedef shared_ptr<VPoint<Scalar>> pVertex;
+
+    typedef Matrix<Scalar, 3, 1> Vector3;
+
+    typedef Matrix<Scalar, 2, 1> Vector2;
 
 public:
 
-	/*!
-	 * \brief Create crossMesh by setting alterative tiltAngle in polyMesh
-	 * \note This is the main function
-	 */
-	void CreateAugmentedVector(float tiltAngle, pCrossMesh &crossMesh);
+    explicit AugmentedVectorCreator(shared_ptr<InputVarList> var):TopoObject(std::move(var)){}
+
+    ~AugmentedVectorCreator();
 
 public:
 
-	/*!
-	 * \brief Set initial tilt angle for each cross.
-	 * \note: the initial tilt angle is 0.
-	 */
-	void InitMeshTiltNormals(pCrossMesh crossMesh);
+    /*!
+     * \brief Create crossMesh by setting alterative tiltAngle in polyMesh
+     * \note This is the main function
+     */
+    void createAugmentedVectors(Scalar tiltAngle, pCrossMesh crossMesh);
 
-	/*!
- 	* \brief Distribute the sign of each tilt angle
-	* \todo Only consider one possible distribution of sign for each edge. Other distribution may exist and can improve the structural stability
- 	*/
-	void InitMeshTiltNormalsResolveConflicts(pCrossMesh crossMesh, float tiltAngle);
+    void updateAugmentedVectors(Scalar tiltAngle, pCrossMesh crossMesh);
 
+public:
 
-	void UpdateMeshTiltNormals(pCrossMesh crossMesh, float tiltAngle);
+    /*!
+     * \brief Set initial tilt angle for each cross.
+     * \note: the initial tilt angle is 0.
+     */
+    static void InitMeshTiltNormals(pCrossMesh crossMesh);
 
-	bool UpdateMeshTiltRange(pCrossMesh crossMesh);
+    /*!
+     * \brief Distribute the sign of each tilt angle
+    * \todo Only consider one possible distribution of sign for each edge. Other distribution may exist and can improve the structural stability
+     */
+    void InitMeshTiltNormalsResolveConflicts(pCrossMesh crossMesh, Scalar tiltAngle);
+
+    bool UpdateMeshTiltRange(pCrossMesh crossMesh);
 
 };
-
 #endif
 
 

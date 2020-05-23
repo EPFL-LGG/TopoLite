@@ -6,21 +6,25 @@
 #define TOPOLITE_INTERLOCKINGSOLVER_AFFINESCALING_H
 
 #include "InterlockingSolver.h"
+#include "Eigen/SparseQR"
 
-class InterlockingSolver_AffineScaling : public  InterlockingSolver{
-
+template <typename Scalar>
+class InterlockingSolver_AffineScaling : public  InterlockingSolver<Scalar>{
 public:
-    InterlockingSolver_AffineScaling(shared_ptr<ContactGraph> _graph, shared_ptr<InputVarList> varList)
-    : InterlockingSolver(_graph, varList)
+    typedef shared_ptr<typename InterlockingSolver<Scalar>::InterlockingData> pInterlockingData;
+    typedef Eigen::SparseMatrix<Scalar, Eigen::ColMajor>  EigenSpMat;
+    typedef Eigen::Triplet<Scalar>  EigenTriple;
+public:
+    InterlockingSolver_AffineScaling(shared_ptr<ContactGraph<Scalar>> _graph, shared_ptr<InputVarList> varList)
+    : InterlockingSolver<Scalar>::InterlockingSolver(_graph, varList)
     {
 
     }
 
 public:
-    bool isTranslationalInterlocking(shared_ptr<InterlockingData> data);
+    bool isTranslationalInterlocking(pInterlockingData &data);
 
-    bool isRotationalInterlocking(shared_ptr<InterlockingData> data);
+    bool isRotationalInterlocking(pInterlockingData &data);
 };
-
 
 #endif //TOPOLITE_INTERLOCKINGSOLVER_AFFINESCALING_H

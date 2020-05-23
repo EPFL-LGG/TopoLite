@@ -1,67 +1,67 @@
 cmake_minimum_required(VERSION 3.1)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-#EIGEN
-set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Eigen)
+# eigen
+set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen)
 
-#set(EIGEN3_INCLUDE_DIR /usr/local/include/eigen3)
+# filesystem
+set(FILESYSTEM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/filesystem)
 
-if (WIN32)
-    #the boost in anaconda has some bugs
-    #instead we use https://sourceforge.net/projects/boost/files/boost-binaries/
-    set(BOOST_ROOT "C:/local/boost_1_66_0")
-else ()
-    set(BOOST_ROOT "$ENV{HOME}/anaconda3/envs/interlock/include")
-endif()
-
-set(Boost_USE_STATIC_LIBS OFF)
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost COMPONENTS system filesystem REQUIRED)
-
-#Cpp Subprocess
-set(CPPSUBPROCESS_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/cpp-subprocess)
-
-#PUGIXML
-set(BUILD_SHARED_LIBS ON)
+# pugixml
 find_package(PUGIXML REQUIRED)
 
-set_target_properties(pugixml  PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release")
+# quickhull
+find_package(QuickHull REQUIRED)
 
-#QuickHull
-find_package(QuickHull)
-
-#Clipper
-find_package(Clipper)
+# clipper
+find_package(Clipper REQUIRED)
 
 #LIBIGL
+set(LIBIGL_WITH_TRIANGLE ON CACHE BOOL "Use Triangle" FORCE)
 set(LIBIGL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libigl/include)
 list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../cmake")
 include(libigl)
 
-#ShapeOp
-set(SHAPEOP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/shapeop)
-
-if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
-set_target_properties(ShapeOp  PROPERTIES
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Release")
+#NANOGUI
+if(BUILD_TOPOGUI)
+    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
+    find_package(NanoGUI)
+    set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} ${NANOGUI_EXTRA_INCS} PARENT_SCOPE)
+    set(NANOGUI_EXTRA_DEFS ${NANOGUI_EXTRA_DEFS} PARENT_SCOPE)
+    set(NANOGUI_DIR ${NANOGUI_DIR} PARENT_SCOPE)
 endif()
 
-#TBBls
-set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
-set(TBB_BUILD_SHARED          OFF  CACHE BOOL " " FORCE)
-set(TBB_BUILD_STATIC          ON   CACHE BOOL " " FORCE)
-set(TBB_BUILD_TBBMALLOC       OFF  CACHE BOOL " " FORCE)
-set(TBB_BUILD_TBBMALLOC_PROXY OFF  CACHE BOOL " " FORCE)
-set(TBB_BUILD_TESTS           OFF  CACHE BOOL " " FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/tbb)
-set_property(TARGET tbb_static tbb_def_files PROPERTY FOLDER "dependencies")
+# TBB
+# Handled in cmake/TopoliteDependencies.cmake
+if(WIN32)
+    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tbb/cmake)
+    find_package(TBB REQUIRED tbb_preview)
+else()
+    set(TBB_BUILD_STATIC            ON CACHE BOOL " " FORCE)
+    set(TBB_BUILD_SHARED            OFF CACHE BOOL " " FORCE)
+    set(TBB_BUILD_TBBMALLOC         ON  CACHE BOOL " " FORCE) # needed for CGAL's parallel mesher
+    set(TBB_BUILD_TBBMALLOC_PROXY   OFF CACHE BOOL " " FORCE)
+    set(TBB_BUILD_TESTS             OFF CACHE BOOL " " FORCE)
+    add_subdirectory(${TOPOLITE_EXTERNAL}/tbb)
+    set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
+    set(TBB_IMPORTED_TARGETS tbb_static tbbmalloc_static)
+endif()
 
-#Pybind11
-if(USE_PYTHON_PLUGIN)
+
+# CLP
+set(BUILD_SHARED_LIBS OFF CACHE STRING "Build clp using static library" FORCE)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/clp)
+set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src/OsiClp
+        ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/CoinUtils/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
+set(CLP_LIBRARIES CoinUtils Osi Clp OsiClpSolver)
+
+## IPOPT
+find_package(IPOPT)
+
+## Pybind11
+if(BUILD_TOPOPYBIND)
     #Pybind11
     if(WIN32)
         set(PYTHON_EXECUTABLE $ENV{USERPROFILE}/anaconda3/python.exe)
@@ -71,23 +71,39 @@ if(USE_PYTHON_PLUGIN)
     add_subdirectory(pybind11)
 endif()
 
+if(BUILD_TOPOTEST)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/catch2)
+    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/catch2/contrib)
+endif()
+
+
+#Set external inlude path/library/definitions
 
 set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
                 ${PUGIXML_INCLUDE_DIR}
-                ${QuickHull_INCLUDE_DIR}
-                ${Clipper_INCLUDE_DIR}
+                ${QUICKHULL_INCLUDE_DIR}
+                ${CLIPPER_INCLUDE_DIR}
                 ${LIBIGL_INCLUDE_DIR}
-                ${SHAPEOP_INCLUDE_DIR}
                 ${TBB_INCLUDE_DIR}
-                ${Boost_INCLUDE_DIRS}
                 ${EIGEN3_INCLUDE_DIR}
-                PARENT_SCOPE)
+                ${CLP_INCLUDE_DIR})
 
-set(ext_lib pugixml
-            QuickHull
-            Clipper
+set(ext_lib ${PUGIXML_LIBRARIES}
+            ${QUICKHULL_LIBRARIES}
+            ${CLIPPER_LIBRARIES}
+            ${TBB_IMPORTED_TARGETS}
             igl::core
-            ShapeOp
-            tbb_static
-            ${Boost_LIBRARIES}
-            PARENT_SCOPE)
+            igl::triangle
+            ${CLP_LIBRARIES})
+
+set(ext_defs ${NANOGUI_EXTRA_DEFS})
+
+if(IPOPT_FOUND)
+    set(ext_include ${ext_include} ${IPOPT_INCLUDE_DIRS})
+    set(ext_lib ${ext_lib} ${IPOPT_LIBRARIES})
+endif()
+
+set_property(GLOBAL PROPERTY ext_include_property "${ext_include}")
+set_property(GLOBAL PROPERTY ext_lib_property "${ext_lib}")
+set_property(GLOBAL PROPERTY ext_defs_property "${ext_defs}")
+set_property(GLOBAL PROPERTY IPOPT_FOUND ${IPOPT_FOUND})

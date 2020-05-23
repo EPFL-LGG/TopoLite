@@ -1,44 +1,62 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.11)
 project(TopoLite)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_CXX_STANDARD 11)
-set(Boost_NO_BOOST_CMAKE 1)
 
-#if(LINUX)
-#    message(STATUS ">>> Linux")
-#    Set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-#endif()
-#special flag for linux
+add_definitions(-DUNITTEST_DATAPATH="${CMAKE_CURRENT_SOURCE_DIR}/data")
+set(CMAKE_CXX_STANDARD 17)
 
 #########################################
 #####                               #####
-#####           Option              #####
+#####      Compiler flags           #####
 #####                               #####
 #########################################
 
-option(USE_PYTHON_PLUGIN "USE PYBIND11 PLUGIN" ON)
-option(USE_UNIT_TEST "USE CATCH2 TEST" ON)
-option(USE_C_EXTENSION "USE_C_EXTENSION" OFF)
+set(BUILD_TOPOGUI         ON CACHE STRING "Build gui" FORCE)
+set(BUILD_TOPOTEST        ON CACHE STRING "Build test" FORCE)
+set(BUILD_TOPOPYBIND      ON CACHE STRING "Build pybind11" FORCE)
 
-#########################################
-#####                               #####
-#####      External Library         #####
-#####                               #####
-#########################################
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
+# set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
-#3rd party library
-if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
-    #For general purpose
-    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
-    #For Rhino Plugin(Mac, Windows)
+# Handles GCC and CLANG - Note that GCC on macOS is actually an alias to LLVM CLANG
+
+if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
+    message("Compiling ${CMAKE_CXX_COMPILER_ID}")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -stdlib=libc++")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -stdlib=libc++")
+elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
+    message("Compiling with ${CMAKE_CXX_COMPILER_ID} GCC")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+    # NANOGUI uses Metal, not supported by GCC
+    option(BUILD_TOPOGUI "Compile the gui" OFF)
+endif()
+
+    #3rd party library
+#if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
+#    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
 #	if(MSVC)
 #		set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/WinBin)
 #	else()
 #		set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/../TopoRhino/MacBin)
 #	endif()
-endif()
+#endif()
+
+#########################################
+#####                               #####
+#####      Dependencies             #####
+#####                               #####
+#########################################
+
+# Download and define targets for third-party dependencies
+
+include(TopoliteDependencies)
+
+# Add deps directory
 
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 
@@ -51,23 +69,15 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/ext/")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
-file(GLOB TpCoreFiles   ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Utility/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Mesh/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Mesh/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/IO/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/CrossMesh/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/CrossMesh/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Structure/*.h
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.cpp
-                        ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/Interlocking/*.h)
+add_subdirectory(src)
+add_library(TpCorelib STATIC ${TpCoreFiles})
 
-add_library(TpCorelib SHARED ${TpCoreFiles})
+get_property(ext_include GLOBAL PROPERTY ext_include_property)
+get_property(ext_defs GLOBAL PROPERTY ext_defs_property)
+get_property(ext_lib GLOBAL PROPERTY ext_lib_property)
 
 target_compile_definitions(TpCorelib PUBLIC ${ext_defs})
-        
+
 target_include_directories(TpCorelib PUBLIC SYSTEM
         ${ext_include}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -75,59 +85,10 @@ target_include_directories(TpCorelib PUBLIC SYSTEM
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
 
-#########################################
-#####                               #####
-#####        Pybind11  Plugin       #####
-#####                               #####
-#########################################
-
-if(USE_PYTHON_PLUGIN)
-    file(GLOB TpPythonFiles
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/PyInterface/*.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/PyInterface/*.h)
-
-    pybind11_add_module(pyTopo MODULE ${TpPythonFiles})
-    target_link_libraries(pyTopo PUBLIC TpCorelib)
+if(NOT ${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
+    set(TPCORELIB_EXTRA_INCLUDE ${ext_include} PARENT_SCOPE)
 endif()
 
-##########################################
-######                               #####
-######        Catch2    Test         #####
-######                               #####
-##########################################
-
-if(USE_UNIT_TEST)
-    set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
-                            ${CMAKE_CURRENT_SOURCE_DIR}/ext/Catch2/contrib)
-    add_subdirectory(ext/Catch2)
-    include(CTest)
-    include(ParseAndAddCatchTests)
-
-    file(GLOB testTopoFiles ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/*.cpp)
-
-    # run all cases
-    add_executable(testTopo ${testTopoFiles})
-
-    # only run one cases
-    #add_executable(testTopo
-            #${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/ContactGraph.cpp
-            #${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/test/testMain.cpp)
-
-    target_link_libraries(testTopo PUBLIC Catch2::Catch2)
-    target_link_libraries(testTopo PUBLIC TpCorelib)
-    ParseAndAddCatchTests(testTopo)
-endif()
-
-
-##########################################
-######                               #####
-######        Extern C Plugin        #####
-######                               #####
-##########################################
-if(USE_C_EXTENSION)
-    add_library(dllTopo SHARED
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/ExternC/CSharpExtern.h
-            ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite/ExternC/CSharpExtern.cpp)
-    target_link_libraries(dllTopo PUBLIC TpCorelib)
-    target_include_directories(dllTopo PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/)
-endif()
+add_subdirectory(test)
+add_subdirectory(gui)
+add_subdirectory(python)
