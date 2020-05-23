@@ -64,12 +64,17 @@ public:
         clear();
         if(IO.XMLReader(xmlFileName, data) && data.varList && data.reference_surface) {
             varList = data.varList;
-            varList->add((int)2, "layerOfBoundary",  "");
+            varList->add((int)1, "layerOfBoundary",  "");
             crossMeshCreator = std::make_shared<CrossMeshCreator<double>>(data.varList);
             Eigen::Matrix4d interactMat = toEigenMatrix(data.interactMatrix);
+            
             crossMeshCreator->setReferenceSurface(data.reference_surface);
+            crossMeshCreator->updatePatternMesh();
+            
             last_textureMat = init_textureMat = crossMeshCreator->computeTextureMat_backwards_compatible(interactMat);
-            crossMeshCreator->createCrossMesh(false, init_textureMat);
+            crossMeshCreator->createCrossMeshFromRSnPattern(false, init_textureMat);
+            crossMeshCreator->createAugmentedVectors();
+            
             if(crossMeshCreator->crossMesh){
                 strucCreator = make_shared<StrucCreator<double>>(varList);
                 strucCreator->compute(crossMeshCreator->crossMesh);
@@ -182,6 +187,19 @@ public:
         pattern_canvas->scene->focus_item = 2;
         pattern_canvas->refresh_trackball_center();
     }
+    
+public:
+    
+    void recompute_from_textureMat(Eigen::Matrix4d textureMat){
+        if(crossMeshCreator){
+            crossMeshCreator->createCrossMeshFromRSnPattern(false, textureMat);
+            crossMeshCreator->createAugmentedVectors();
+            if(crossMeshCreator->crossMesh){
+                strucCreator->compute(crossMeshCreator->crossMesh);
+                set_update_list_true({"update_base_mesh_2D", "update_cross_mesh", "update_augmented_vectors", "update_struc"});
+            }
+        }
+    }
 
 public:
 
@@ -275,21 +293,11 @@ public:
             }
         }
     }
-
-    void update_textureMat(Eigen::Matrix4d textureMat){
-        if(crossMeshCreator){
-            crossMeshCreator->createCrossMesh(false, textureMat);
-            if(crossMeshCreator->crossMesh){
-                strucCreator->compute(crossMeshCreator->crossMesh);
-                set_update_list_true({"update_base_mesh_2D", "update_cross_mesh", "update_augmented_vectors", "update_struc"});
-            }
-        }
-    }
-
+    
     void update(){
         Eigen::Matrix4d textureMat = pattern_canvas->get_textureMat();
         if((textureMat - last_textureMat).norm() > 1e-5) {
-            update_textureMat(textureMat);
+            recompute_from_textureMat(textureMat);
             last_textureMat = textureMat;
         }
 

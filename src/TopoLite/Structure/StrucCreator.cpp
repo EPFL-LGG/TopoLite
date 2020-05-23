@@ -39,7 +39,6 @@ bool StrucCreator<Scalar>::compute(pCrossMesh crossMesh)
 
     tbb::tick_count sta = tbb::tick_count::now();
     blocks.clear();
-    std::cout << "Number of Parts:\t" << crossMesh->size() << std::endl;
 	for (size_t id = 0; id < crossMesh->size(); id++)
 	{
 		pCross cross = crossMesh->cross(id);

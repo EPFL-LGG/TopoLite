@@ -64,7 +64,9 @@ public:
      * \brief Create crossMesh by setting alterative tiltAngle in polyMesh
      * \note This is the main function
      */
-    void createAugmentedVector(Scalar tiltAngle, pCrossMesh crossMesh);
+    void createAugmentedVectors(Scalar tiltAngle, pCrossMesh crossMesh);
+
+    void updateAugmentedVectors(Scalar tiltAngle, pCrossMesh crossMesh);
 
 public:
 
@@ -79,8 +81,6 @@ public:
     * \todo Only consider one possible distribution of sign for each edge. Other distribution may exist and can improve the structural stability
      */
     void InitMeshTiltNormalsResolveConflicts(pCrossMesh crossMesh, Scalar tiltAngle);
-
-    void UpdateMeshTiltNormals(pCrossMesh crossMesh, Scalar tiltAngle);
 
     bool UpdateMeshTiltRange(pCrossMesh crossMesh);
 

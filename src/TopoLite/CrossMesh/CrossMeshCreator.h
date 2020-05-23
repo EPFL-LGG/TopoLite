@@ -77,12 +77,7 @@ public:
 	pCrossMesh crossMesh;           //<! Cross mesh
 
     pCrossMesh pattern2D;            //<! 2D tessellation mesh
-
-public:
-
-	int default_patternRadius;
-	int default_patternID;
-
+    
 public:
 	CrossMeshCreator(const CrossMeshCreator &_model);
     CrossMeshCreator(shared_ptr<InputVarList> var);
@@ -90,6 +85,7 @@ public:
 
 	void clear();
 
+public:
 	/*!
 	 * \brief: load a .obj model from file
 	 * \param objFileName: .obj file path
@@ -103,18 +99,35 @@ public:
 
 	bool setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary);
 
+public:
+
+    /*!
+	 * \brief: function to create the 2D tiling pattern by using the method in PatternCreator.cpp/.h
+	 */
+    bool updatePatternMesh();
+
 	/*!
 	 * \brief: main function to create base CrossMesh
 	 * \param texturedModel: True if the geometry of cross mesh is unknown. False if the polymesh just need to be assigned the tilt angle
-	 * \param tiltAngle: Initial tilt angle
-	 * \param patternID: Specific the pattern to create the geometry of cross mesh
-	 * \param patternRadius: how many polygons the pattern has (the size the of the pattern)
-	 * \param interactMatrix: User interaction of the pattern (scale, rotate, translate)
+	 * \param previewMode: True if unnecessary operations are dismissed.
 	 */
-    bool createCrossMesh(   bool previewMode,
-                            Matrix4 textureMat);
+    bool createCrossMeshFromRSnPattern(bool previewMode, Matrix4 textureMat);
 
-    bool updateTiltRange();
+    /*!
+    * \brief: function to update the augmented vectors of each edge in cross mesh
+    */
+    bool createAugmentedVectors();
+
+    /*!
+    * \brief: function to update the augmented vectors of each edge in cross mesh
+    */
+    bool updateAugmentedVectors();
+
+
+    /*!
+    * \brief: function to update the valid range of augmented vector
+    */
+    bool computeAugmentedRange();
 
 public:
     

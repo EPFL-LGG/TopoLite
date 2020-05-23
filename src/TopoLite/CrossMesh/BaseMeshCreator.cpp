@@ -52,7 +52,6 @@ computeBaseCrossMesh(Matrix4 textureMat,
                                                    pCrossMesh &crossMesh,
                                                    bool previewMode)
 {
-	tbb::tick_count sta = tbb::tick_count::now();
 	//bool smooth boundary
 	bool use_smooth_boundary = getVarList()->template get<bool>("smooth_bdry");
 
@@ -82,8 +81,6 @@ computeBaseCrossMesh(Matrix4 textureMat,
         crossMesh->erase_nullptr();
         recomputeBoundary(crossMesh);
     }
-
-	std::cout << "Remesh Para:\t" << (tbb::tick_count::now() - sta).seconds() << std::endl;
 }
 template <typename Scalar>
 void BaseMeshCreator<Scalar>::computeInternalCross(Matrix4 textureMat,

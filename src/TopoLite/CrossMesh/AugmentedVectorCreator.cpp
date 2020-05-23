@@ -22,17 +22,43 @@ AugmentedVectorCreator<Scalar>::~AugmentedVectorCreator() {
 }
 
 //**************************************************************************************//
-//                           Convert Polygonal Mesh into Cross Mesh
+//
 //**************************************************************************************//
 
 template<typename Scalar>
-void AugmentedVectorCreator<Scalar>::createAugmentedVector(Scalar tiltAngle, pCrossMesh crossMesh) {
+void AugmentedVectorCreator<Scalar>::createAugmentedVectors(Scalar tiltAngle, pCrossMesh crossMesh) {
     if (crossMesh) {
         InitMeshTiltNormals(crossMesh);
         InitMeshTiltNormalsResolveConflicts(crossMesh, tiltAngle);
     }
 }
 
+template<typename Scalar>
+void AugmentedVectorCreator<Scalar>::updateAugmentedVectors(Scalar tiltAngle, pCrossMesh crossMesh) {
+
+    if (crossMesh == nullptr)
+        return;
+
+    for (size_t id = 0; id < crossMesh->size(); id++) {
+        pCross cross = crossMesh->cross(id);
+        // cross is a shared_ptr
+        if (cross == nullptr)
+            continue;
+
+        for (int jd = 0; jd < cross->oriPoints.size(); jd++) {
+            shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
+            if (cross->neighbors[jd].lock() != nullptr) {
+                if (!cross->neighbors[jd].lock()->atBoundary || !cross->atBoundary) {
+                    oriPt->updateAngle(tiltAngle);
+                }
+            }
+        }
+    }
+}
+
+//**************************************************************************************//
+//
+//**************************************************************************************//
 
 template<typename Scalar>
 void AugmentedVectorCreator<Scalar>::InitMeshTiltNormals(pCrossMesh crossMesh)
@@ -105,31 +131,6 @@ void AugmentedVectorCreator<Scalar>::InitMeshTiltNormalsResolveConflicts(pCrossM
         }
     }
 }
-
-
-template<typename Scalar>
-void AugmentedVectorCreator<Scalar>::UpdateMeshTiltNormals(pCrossMesh crossMesh, Scalar tiltAngle) {
-
-    if (crossMesh == nullptr)
-        return;
-
-    for (size_t id = 0; id < crossMesh->size(); id++) {
-        pCross cross = crossMesh->cross(id);
-        // cross is a shared_ptr
-        if (cross == nullptr)
-            continue;
-
-        for (int jd = 0; jd < cross->oriPoints.size(); jd++) {
-            shared_ptr<OrientPoint<Scalar>> oriPt = cross->oriPoints[jd];
-            if (cross->neighbors[jd].lock() != nullptr) {
-                if (!cross->neighbors[jd].lock()->atBoundary || !cross->atBoundary) {
-                    oriPt->updateAngle(tiltAngle);
-                }
-            }
-        }
-    }
-}
-
 
 template<typename Scalar>
 bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {

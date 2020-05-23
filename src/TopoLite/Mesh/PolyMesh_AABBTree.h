@@ -276,7 +276,9 @@ public:
     typedef Matrix<Scalar, 3, 1> Vector3;
     typedef Matrix<Scalar, Eigen::Dynamic, 1> VectorX;
     typedef shared_ptr<_Polygon<Scalar>> pPolygon;
-
+    
+public:
+    using PolyMesh<Scalar>::texturedModel;
 public:
 
     igl::AABB<MatrixX, 2> texTree;

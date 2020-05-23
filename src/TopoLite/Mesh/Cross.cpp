@@ -162,7 +162,6 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle, const std::unordered_map<
         // 2) reverse the tilt sign of its neighbor
 
         int neiborEdgeID = neighbor->getEdgeIDSharedWithCross(this);
-        TopoASSERT(neiborEdgeID != NONE_ELEMENT);
 
         if (neiborEdgeID == NONE_ELEMENT)
             continue;

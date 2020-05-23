@@ -16,6 +16,7 @@
 //                                   Initialization
 //**************************************************************************************//
 #include "CrossMeshCreator.h"
+#include "tbb/tbb.h"
 
 template <typename Scalar>
 CrossMeshCreator<Scalar>::CrossMeshCreator(shared_ptr<InputVarList> var) :TopoObject(var)
@@ -25,10 +26,7 @@ CrossMeshCreator<Scalar>::CrossMeshCreator(shared_ptr<InputVarList> var) :TopoOb
 	pattern2D = nullptr;
 
 	crossMesh = nullptr;
-
-	default_patternRadius = -1;
-
-	default_patternID = -1;
+    
 }
 template <typename Scalar>
 void CrossMeshCreator<Scalar>::clear()
@@ -36,18 +34,12 @@ void CrossMeshCreator<Scalar>::clear()
     referenceSurface.reset();
     pattern2D.reset();
     crossMesh.reset();
-
-    default_patternRadius = -1;
-    default_patternID = -1;
 }
 
 template <typename Scalar>
 CrossMeshCreator<Scalar>::CrossMeshCreator(const CrossMeshCreator &_model) : TopoObject(_model)
 {
     clear();
-
-    default_patternRadius = _model.default_patternRadius;
-    default_patternID = _model.default_patternID;
 
     if(_model.pattern2D) pattern2D = make_shared<CrossMesh<Scalar>>(*_model.pattern2D);
     if(_model.referenceSurface) referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*_model.referenceSurface);
@@ -61,37 +53,8 @@ CrossMeshCreator<Scalar>::~CrossMeshCreator()
 }
 
 //**************************************************************************************//
-//                                   Load Surface Model
+//                         Setup ReferenceSurface/PatternMesh/CrossMesh
 //**************************************************************************************//
-
-template <typename Scalar>
-bool CrossMeshCreator<Scalar>::loadSurface(const char *objFileName)
-{
-	// 1. Read OBJ model
-	shared_ptr<PolyMesh<Scalar>> surface;
-    surface = make_shared<PolyMesh<Scalar>>(getVarList());
-	bool texturedModel;
-
-	if(surface->readOBJModel(objFileName, texturedModel, true))
-	{
-		// 2. Load a Texture model with parametrization.
-		if (texturedModel)
-		{
-            referenceSurface = make_shared<PolyMesh_AABBTree<Scalar>>(*surface);
-            getVarList()->set("texturedModel", true);
-        }
-		// 3. Load a Cross Mesh
-		else{
-            referenceSurface.reset();
-            getVarList()->set("texturedModel", false);
-            vector<bool> atBoundary;
-            setCrossMesh(surface, atBoundary);
-		}
-		return true;
-	}
-
-	return false;
-}
 
 template <typename Scalar>
 bool CrossMeshCreator<Scalar>::setReferenceSurface(pPolyMesh _ref){
@@ -110,29 +73,15 @@ bool CrossMeshCreator<Scalar>::setReferenceSurface(pPolyMesh _ref){
     if(referenceSurface)
     {
         getVarList()->set("texturedModel", true);
-        default_patternRadius = -1;
-        default_patternID = -1;
     }
-    return true;
+    return referenceSurface != nullptr;
 }
 
 template <typename Scalar>
 bool CrossMeshCreator<Scalar>::setPatternMesh(pPolyMesh _pattern)
 {
     if(_pattern == nullptr) return false;
-
     pattern2D = make_shared<CrossMesh<Scalar>>(*_pattern);
-    
-    //for user defined 2D pattern
-    //we set patternRadius and patternID to be -1
-    //to dinstinguish it from other predefined patterns.
-
-    default_patternRadius = -1;
-    default_patternID = -1;
-
-    getVarList()->set("patternID", default_patternID);
-    getVarList()->set("patternRadius", default_patternRadius);
-
     return true;
 }
 
@@ -143,7 +92,6 @@ bool CrossMeshCreator<Scalar>::setCrossMesh(pPolyMesh _cross, vector<bool> &atBo
 
     getVarList()->set("texturedModel", false);
     crossMesh = make_shared<CrossMesh<Scalar>>(*_cross);
-    BaseMeshCreator<Scalar> baseMeshCreator(getVarList());
 
     if(crossMesh->size() == atBoundary.size())
     {
@@ -154,74 +102,70 @@ bool CrossMeshCreator<Scalar>::setCrossMesh(pPolyMesh _cross, vector<bool> &atBo
         }
     }
     else{
+        BaseMeshCreator<Scalar> baseMeshCreator(getVarList());
         baseMeshCreator.recomputeBoundary(crossMesh);
     }
-
-    float   tiltAngle       = getVarList()->template get<float>("tiltAngle");
-    AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
-    vectorCreator.createAugmentedVector(tiltAngle, crossMesh);
-
     return  true;
 }
 
+//**************************************************************************************//
+//                         Update ReferenceSurface/PatternMesh/CrossMesh
+//**************************************************************************************//
+
 template <typename Scalar>
-bool CrossMeshCreator<Scalar>::createCrossMesh( bool previewMode, Matrix4 textureMat)
+bool CrossMeshCreator<Scalar>::createCrossMeshFromRSnPattern( bool previewMode, Matrix4 textureMat)
 {
-    float   tiltAngle       = getVarList()->template get<float>("tiltAngle");
-    int   patternID       = getVarList()->template get<int>("patternID");
-    float   patternRadius   = getVarList()->template get<int>("patternRadius");
-    bool    texturedModel   = getVarList()->template get<int>("texturedModel");
-
-    clock_t sta;
-    if ( texturedModel )
-    {
-        //clear CrossMesh
-        if (crossMesh != nullptr) crossMesh.reset();
-
-        if(referenceSurface == nullptr) return false;
-
-        if( default_patternID != patternID ||
-            default_patternRadius != patternRadius ||
-            pattern2D == nullptr)
-        {
-            sta = clock();
-            PatternCreator<Scalar> patternCreator(getVarList());
-            patternCreator.create2DPattern(PatternType(patternID), patternRadius, pattern2D);
-            default_patternRadius = patternRadius;
-            default_patternID = patternID;
-            std::cout << "--2D PATTERN:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-        }
-
+    if(pattern2D && referenceSurface && referenceSurface->texturedModel){
+        tbb::tick_count sta = tbb::tick_count::now();
         pPolyMesh baseMesh2D;
-
-        sta = clock();
         BaseMeshCreator<Scalar> baseMeshCreator(referenceSurface, pattern2D, getVarList());
         baseMeshCreator.computeBaseCrossMesh(textureMat, baseMesh2D, crossMesh, previewMode);
-        std::cout << "--Remesh Para:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-
-//        sta = clock();
-//        BaseMeshOptimizer meshOptimizer(aabbTree, aabbV, aabbF, getVarList());
-//        meshOptimizer.OptimizeBaseMesh(crossMesh);
-
-        sta = clock();
-        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
-        vectorCreator.createAugmentedVector(tiltAngle, crossMesh);
-        std::cout << "--Remesh Own:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-
         crossMesh->setBaseMesh2D(baseMesh2D);
+        std::cout << "BaseMesh Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
     }
-    else if(crossMesh){
-        sta = clock();
-        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
-        vectorCreator.UpdateMeshTiltNormals(crossMesh, tiltAngle);
-        std::cout << "--UpdateMeshTiltNormals:\t" <<  (float)(clock() - sta) / (CLOCKS_PER_SEC) << std::endl;
-    }
-
     return crossMesh != nullptr;
 }
 
 template <typename Scalar>
-bool CrossMeshCreator<Scalar>::updateTiltRange()
+bool CrossMeshCreator<Scalar>:: updatePatternMesh()
+{
+    tbb::tick_count sta = tbb::tick_count::now();
+    int patternID = getVarList()->template get<int>("patternID");
+    int patternRadius = getVarList()->template get<int>("patternRadius");
+    PatternCreator<Scalar> patternCreator(getVarList());
+    patternCreator.create2DPattern(PatternType(patternID), patternRadius, pattern2D);
+    std::cout << "Pattern Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
+    return pattern2D != nullptr;
+}
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::createAugmentedVectors(){
+    if(crossMesh){
+        tbb::tick_count sta = tbb::tick_count::now();
+        float tiltAngle = getVarList()->template get<float>("tiltAngle");
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
+        vectorCreator.createAugmentedVectors(tiltAngle, crossMesh);
+        std::cout << "Augmented Vectors Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
+        return true;
+    }
+    return false;
+}
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::updateAugmentedVectors(){
+    if(crossMesh){
+        tbb::tick_count sta = tbb::tick_count::now();
+        float tiltAngle = getVarList()->template get<float>("tiltAngle");
+        AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
+        vectorCreator.updateAugmentedVectors(tiltAngle, crossMesh);
+        std::cout << "Augmented Vectors Update:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
+        return true;
+    }
+    return false;
+}
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::computeAugmentedRange()
 {
     //compute the tilt range
     if(crossMesh)
