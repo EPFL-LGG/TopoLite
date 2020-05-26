@@ -26,7 +26,6 @@ ConvexBlock<Scalar>::ConvexBlock(pCross _cross, Vector2 _cutter_heights)
 :TopoObject(_cross->getVarList()), cutter_heights(_cutter_heights), cross(_cross)
 {
 	polyMesh = nullptr;
-	atBoundary = cross.lock()->atBoundary;
 }
 
 template<typename Scalar>

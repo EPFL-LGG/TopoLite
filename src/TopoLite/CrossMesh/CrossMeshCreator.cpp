@@ -86,25 +86,10 @@ bool CrossMeshCreator<Scalar>::setPatternMesh(pPolyMesh _pattern)
 }
 
 template <typename Scalar>
-bool CrossMeshCreator<Scalar>::setCrossMesh(pPolyMesh _cross, vector<bool> &atBoundary)
+bool CrossMeshCreator<Scalar>::setCrossMesh(pCrossMesh _crossmesh)
 {
-    if(_cross == nullptr) return false;
-
-    getVarList()->set("texturedModel", false);
-    crossMesh = make_shared<CrossMesh<Scalar>>(*_cross);
-
-    if(crossMesh->size() == atBoundary.size())
-    {
-        for(int id = 0; id < crossMesh->size(); id++)
-        {
-            pCross cross = crossMesh->cross(id);
-            cross->atBoundary = atBoundary[cross->crossID];
-        }
-    }
-    else{
-        BaseMeshCreator<Scalar> baseMeshCreator(getVarList());
-        baseMeshCreator.recomputeBoundary(crossMesh);
-    }
+    if(_crossmesh == nullptr) return false;
+    crossMesh = make_shared<CrossMesh<Scalar>>(*_crossmesh);
     return  true;
 }
 
@@ -163,6 +148,26 @@ bool CrossMeshCreator<Scalar>::updateAugmentedVectors(){
     }
     return false;
 }
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::updateCrossMeshBoundary(const vector<int>& boundary_crossIDs){
+    if(crossMesh)
+    {
+        for(size_t id = 0; id < crossMesh->size(); id++){
+            crossMesh->cross(id)->atBoundary = false;
+        }
+        
+        for(size_t id = 0; id < boundary_crossIDs.size(); id++)
+        {
+            int crossID = boundary_crossIDs[id];
+            if(crossID >= 0 && crossID < crossMesh->size()){
+                crossMesh->cross(crossID)->atBoundary = true;
+            }
+        }
+    }
+    return true;
+}
+
 
 template <typename Scalar>
 bool CrossMeshCreator<Scalar>::computeAugmentedRange()

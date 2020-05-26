@@ -217,13 +217,13 @@ public:
 
                     buffer_barycentric.push_back(1);
                     buffer_barycentric.push_back(0);
-                    if(!polygon->edge_at_boundary[edgeID]) buffer_barycentric.push_back(1);
-                    else buffer_barycentric.push_back(0);
+                    if(!polygon->at_boundary(edgeID)) buffer_barycentric.push_back(1);
+                    buffer_barycentric.push_back(0);
 
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(1);
-                    if(!polygon->edge_at_boundary[edgeID]) buffer_barycentric.push_back(1);
-                    else buffer_barycentric.push_back(0);
+                    if(!polygon->at_boundary(edgeID)) buffer_barycentric.push_back(1);
+                    buffer_barycentric.push_back(0);
 
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(0);

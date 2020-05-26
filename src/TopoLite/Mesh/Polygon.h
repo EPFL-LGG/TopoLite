@@ -187,7 +187,7 @@ public:
     int getPolyType() const {
         return static_cast<int>(polyType);
     }
-
+    
 public:
 
     //compute the data

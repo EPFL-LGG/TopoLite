@@ -6,6 +6,7 @@
 #define TOPOLITE_GUI_TOPOMANAGER_H
 
 #include "IO/XMLIO.h"
+#include "IO/XMLIO_backward.h"
 #include "gui_Arcball_Canvas.h"
 #include "gui_2D_Canvas.h"
 #include "gui_PolyMeshLists.h"
@@ -59,7 +60,7 @@ public:
 public:
     bool load_from_xmlfile(string xmlFileName)
     {
-        XMLIO IO;
+        XMLIO_backward IO;
         XMLData data;
         clear();
         if(IO.XMLReader(xmlFileName, data) && data.varList && data.reference_surface) {
@@ -72,8 +73,15 @@ public:
             crossMeshCreator->updatePatternMesh();
             
             last_textureMat = init_textureMat = crossMeshCreator->computeTextureMat_backwards_compatible(interactMat);
-            crossMeshCreator->createCrossMeshFromRSnPattern(false, init_textureMat);
-            crossMeshCreator->createAugmentedVectors();
+            
+            if(data.cross_mesh != nullptr){
+                crossMeshCreator->setCrossMesh(data.cross_mesh);
+                crossMeshCreator->updateCrossMeshBoundary(data.boundary_crossIDs);
+            }
+            else if(data.reference_surface != nullptr && data.cross_mesh == nullptr){
+                crossMeshCreator->createCrossMeshFromRSnPattern(false, init_textureMat);
+                crossMeshCreator->createAugmentedVectors();
+            }
             
             if(crossMeshCreator->crossMesh){
                 strucCreator = make_shared<StrucCreator<double>>(varList);
@@ -126,7 +134,7 @@ public:
                 colors.clear();
                 for(auto block: strucCreator->blocks){
                     if(block && block->polyMesh){
-                        if(!block->atBoundary){
+                        if(!block->at_boundary()){
                             colors.push_back(nanogui::Color(250, 250 ,250, 255));
                         }
                         else{
@@ -150,10 +158,16 @@ public:
         shared_ptr<gui_PolyMeshLists<double>> polyMeshLists;
 
         pattern_canvas->init_render_pass();
+        
         //baseMesh2D
         {
-            shared_ptr<PolyMesh<double>> baseMesh = crossMeshCreator->crossMesh->baseMesh2D;
-            meshLists.push_back(baseMesh);
+            meshLists.clear();
+            if(crossMeshCreator->crossMesh->baseMesh2D)
+            {
+                shared_ptr<PolyMesh<double>> baseMesh = crossMeshCreator->crossMesh->baseMesh2D;
+                meshLists.push_back(baseMesh);
+            }
+            
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
             polyMeshLists->update_attr("show_face", false);
             polyMeshLists->line_color = nanogui::Color(242, 133, 0, 255);
@@ -164,8 +178,11 @@ public:
         //Pattern2D
         {
             meshLists.clear();
-            shared_ptr<PolyMesh<double>> pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
-            meshLists.push_back(pattern_mesh);
+            if(crossMeshCreator->pattern2D)
+            {
+                shared_ptr<PolyMesh<double>> pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
+                meshLists.push_back(pattern_mesh);
+            }
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
             polyMeshLists->update_attr("show_face", false);
             polyMeshLists->model_init_mat = init_textureMat.cast<float>();
@@ -177,8 +194,11 @@ public:
         {
             colors.push_back(nanogui::Color(255, 255 ,255, 255));
             meshLists.clear();
-            shared_ptr<PolyMesh<double>> textureMesh =crossMeshCreator->referenceSurface->getTextureMesh();
-            meshLists.push_back(textureMesh);
+            if(crossMeshCreator->referenceSurface)
+            {
+                shared_ptr<PolyMesh<double>> textureMesh =crossMeshCreator->referenceSurface->getTextureMesh();
+                meshLists.push_back(textureMesh);
+            }
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
             polyMeshLists->update_attr("show_wireframe", false);
             polyMeshLists->model_mat_fixed = true;
@@ -247,7 +267,7 @@ public:
         colors.clear();
         for(auto block: strucCreator->blocks){
             if(block && block->polyMesh){
-                if(!block->atBoundary){
+                if(!block->at_boundary()){
                     colors.push_back(nanogui::Color(250, 250 ,250, 255));
                 }
                 else{
@@ -294,7 +314,8 @@ public:
         }
     }
     
-    void update(){
+    void update()
+    {
         Eigen::Matrix4d textureMat = pattern_canvas->get_textureMat();
         if((textureMat - last_textureMat).norm() > 1e-5) {
             recompute_from_textureMat(textureMat);
@@ -321,6 +342,7 @@ public:
             update_struc();
             render_update_list->set("update_struc", false);
         }
+        
     }
 
 private:

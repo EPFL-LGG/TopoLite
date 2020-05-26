@@ -6,44 +6,18 @@
 #define TOPOLOCKCREATOR_GLUIXML_H
 
 #include "TopoLite/Utility/HelpDefine.h"
-#include "TopoLite/IO/InputVar.h"
-#include "TopoLite/Mesh/CrossMesh.h"
+#include "IO/IOData.h"
 
 #include <iostream>
 #include <unordered_map>
 #include <string>
-#include "TopoLite/Utility/TopoObject.h"
-#include "pugixml.hpp"
+#include <pugixml.hpp>
+
 
 // TI Assembly creator
 
 using IgnoreList = std::unordered_map<int, bool> ;
 
-struct InteractData{
-    double angle;
-    double x, y;
-    double scale;
-};
-
-struct InputMeshNormalizeData{
-    Vector3f trans;
-    float scale;
-};
-
-struct XMLData{
-    shared_ptr<InputVarList> varList;
-    shared_ptr<PolyMesh<double>> reference_surface;
-    shared_ptr<PolyMesh<double>> cross_mesh;
-
-    //old data
-    vector<int> pickPartIDs;
-    double interactMatrix[16];
-
-
-    //for rhino dll
-    InteractData interact_delta;
-    InputMeshNormalizeData normalizedData;
-};
 
 class XMLIO
 {
@@ -75,22 +49,5 @@ public:
 
     vector<std::string> split(const string str_text, const char separator) const;
 };
-
-//class MitsubaWriter : public TopoObject
-//{
-//public:
-//
-//    shared_ptr<StrucCreator> myStrucCreator;
-//    pugi::xml_node mitsuba_sensor;
-//
-//public:
-//
-//    MitsubaWriter(shared_ptr<InputVarList> var): TopoObject(var){}
-//public:
-//
-//    void change_attribute(pugi::xml_node &root, pugi::xml_node &node, string str_name, string str_attr, string str_value);
-//    void change_attribute(pugi::xml_node &node, string str_attr, string str_value);
-//    void scene_settings(pugi::xml_node &xml_root, XMLData &data);
-//};
 
 #endif //TOPOLOCKCREATOR_GLUIXML_H

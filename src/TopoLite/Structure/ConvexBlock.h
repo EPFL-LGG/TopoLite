@@ -42,8 +42,7 @@ public:
 	pPolyMesh polyMesh;                     // Resulted polyhedron
     Vector2 cutter_heights;
     int partID;
-    bool atBoundary;
-
+    
 private:
 
     vector<pHypPlane> hypList;
@@ -74,6 +73,10 @@ public:
 public:
 
 	virtual bool compute();
+    
+    bool at_boundary(){
+        return cross.lock()->atBoundary;
+    }
 };
 
 #endif

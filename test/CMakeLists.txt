@@ -20,13 +20,10 @@ if(BUILD_TOPOTEST)
             # Interlocking/Test_toymodel_Ipopt.cpp
            #Interlocking/Test_interlockingSolver_Clp.cpp
 #            Utility/Test_SparseOperations.cpp
-            Structure/Test_ConvexBlock.cpp
+            IO/Test_XMLIO_backward.cpp
             )
 
-    set(testTopoFiles ${testTopoFiles} Test_Main.cpp)
-    # set(singleTestFile ${singleTestFile} Test_Main.cpp)
-
-    add_executable(testTopo ${testTopoFiles})
+    add_executable(testTopo ${singleTestFile} Test_Main.cpp)
 
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)
     target_link_libraries(testTopo PUBLIC TpCorelib)

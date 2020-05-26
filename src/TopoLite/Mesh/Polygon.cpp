@@ -70,7 +70,7 @@ void _Polygon<Scalar>::setVertices(vector<Vector3> _vers)
         vers.push_back(vertex);
     }
     edge_at_boundary.clear();
-    edge_at_boundary.resize(_vers.size(), false);
+    edge_at_boundary.resize(_vers.size(), true);
 }
 
 template <typename Scalar>
