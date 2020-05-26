@@ -27,3 +27,6 @@ ext/filesystem
 ext/eigen
 ext/pugixml
 ext/pybind11
+
+# Sphinx doc
+docs/build
