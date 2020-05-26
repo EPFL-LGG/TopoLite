@@ -1,41 +1,50 @@
-# TopoLite
+Compiling
+=========
 
-## Mac
+Mac
+---
 
-1. Install boost
-    ```
+* Install boost
+
+``` bash
     brew install boost
-    ```
-2. Building the project. In Topolite root folder:
-    ```
+```
+
+* Building the project. In Topolite root folder:
+
+``` bash
     mkdir build && cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
-    make -j 8
-    ```
+    make -j 16
+```
 
+Windows
+-------
 
-## Windows
+* Install boost
+* Install Visual Studio Linux Development Tools
 
-1. Install boost
-2. Install Visual Studio 2019
-3. Install Visual Studio Linux Development Tools
-4. Open the CMakeLists.txt file in Visual Studio 2019.
+Ubuntu
+------
 
+* Tested with Ubuntu 18.04 and 20.04 .
+* Install boost:
 
-## Ubuntu 18.04
-
-1. Install boost
-    ``` 
+``` bash
     # If not already on apt
     sudo add-apt-repository ppa:boost-latest/ppa
     sudo apt-get update
-    # 
+    #
     sudo apt install libboost-all-dev
-    ```
-2. Building the project. In Topolite root folder:
-    ```
+```
+
+* Building the project. In Topolite root folder:
+
+``` bash
     mkdir build && cd build
     cmake -DCMAKE_BUILD_TYPE=Release ..
-    make -j8
-    ```
-Note: the integer following `make -j` is the number of threads supported by your CPU architecture. Replace it with your optimal value.
+    make -j 16
+```
+
+> Note: the integer following `make -j` is the number of threads supported by
+> your CPU architecture. Replace it with your optimal value.
