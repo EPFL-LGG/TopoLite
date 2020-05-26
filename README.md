@@ -48,3 +48,26 @@ Ubuntu
 
 > Note: the integer following `make -j` is the number of threads supported by
 > your CPU architecture. Replace it with your optimal value.
+
+Documenting the code
+--------------------
+
+Requirements
+^^^^^^^^^^^^
+
+Install Sphinx and Pandoc. The example below is given for macOS
+
+``` bash
+    pip install sphinx
+    brew install pandoc
+```
+
+Usage
+^^^^^
+
+``` bash
+    cd docs/
+    make html
+```
+
+then, open `build/index.html` .
