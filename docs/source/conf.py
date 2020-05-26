@@ -14,6 +14,14 @@
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+
+# -- Requirements ------------------------------------------------------------
+
+# Converting .md to .rst (see Makefile)
+# Markdown native support in sphinx is total rubbish. It is better to convert
+#
+# brew install pandoc
+
 # -- Project information -----------------------------------------------------
 
 project = 'Topolite'

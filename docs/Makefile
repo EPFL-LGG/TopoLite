@@ -20,7 +20,7 @@ help:
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 html:
-	@echo "convert markdown files"
-	\pandoc --from=markdown --to=rst --output=$(SOURCEDIR)/readme.rst $(SOURCEDIR)/README.md
-	@echo "compiling sources"
+	@echo "1. Convert markdown files\n"
+	\pandoc --from=markdown --to=rst --output=$(SOURCEDIR)/readme.rst $(SOURCEDIR)/../../README.md
+	@echo "\n2. Compiling sources\n"
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
