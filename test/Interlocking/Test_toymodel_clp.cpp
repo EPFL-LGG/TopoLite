@@ -9,7 +9,7 @@
 #include <Eigen/Sparse>
 
 #include "Interlocking/InterlockingSolver_Clp.h"
-#include "IO/JsonIO.h"
+#include "IO/JsonIOReader.h"
 #include "ClpSimplex.hpp"
 
 

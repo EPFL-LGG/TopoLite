@@ -4,7 +4,7 @@
 
 #include <catch2/catch.hpp>
 #include "Interlocking/InterlockingSolver_Ipopt.h"
-#include "IO/JsonIO.h"
+#include "IO/JsonIOReader.h"
 #include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/SparseQR>

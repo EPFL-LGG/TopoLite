@@ -31,10 +31,9 @@ public:
     shared_ptr<PolyMesh<double>> reference_surface;
     shared_ptr<PolyMesh<double>> pattern_mesh;
     shared_ptr<CrossMesh<double>> cross_mesh;
-    vector<int> boundary_crossIDs;
-    Eigen::Matrix4d textureMat;
 
     //backward data
+    vector<int> boundary_crossIDs;
     vector<int> pickPartIDs;
     double interactMatrix[16];
 

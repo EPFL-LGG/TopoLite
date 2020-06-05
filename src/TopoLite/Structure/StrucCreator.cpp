@@ -34,8 +34,8 @@ template<typename Scalar>
 bool StrucCreator<Scalar>::compute(pCrossMesh crossMesh)
 {
 
-    float   cutUpper        = getVarList()->template get<float>("cutUpper");
-    float   cutLower        = getVarList()->template get<float>("cutLower");
+    float   cutUpper        = getVarList()->getFloat("cutUpper");
+    float   cutLower        = getVarList()->getFloat("cutLower");
 
     tbb::tick_count sta = tbb::tick_count::now();
     blocks.clear();

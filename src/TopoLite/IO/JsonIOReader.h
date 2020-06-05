@@ -12,11 +12,6 @@
 #include <nlohmann/json.hpp>
 #include <filesystem>
 
-// TI Assembly creator
-
-using IgnoreList = std::unordered_map<int, bool> ;
-
-
 class JsonIOReader
 {
 public:
@@ -24,31 +19,26 @@ public:
     std::filesystem::path path;
     weak_ptr<IOData> data;
 
+
 public:
 
     JsonIOReader(const std::string input_path, shared_ptr<IOData> _data){
         path = input_path;
         data = _data;
     }
-};
-
-class JsonIOWriter{
-public:
-    std::filesystem::path path;
-    weak_ptr<IOData> data;
 
 public:
 
-    JsonIOWriter(const std::string output_path, shared_ptr<IOData> _data){
-        path = output_path;
-        data = _data;
-    }
+    bool read();
 
-    void write();
+    bool readParameter(const nlohmann::json& parameter_json);
 
-public:
+    bool readPatternMesh(const nlohmann::json& mesh_json);
 
-    nlohmann::json getParameterJson();
+    bool readReferenceMesh(const nlohmann::json& mesh_json);
+
+    bool readCrossMesh(const nlohmann::json& mesh_json);
+
 };
 
 #endif //TOPOLOCKCREATOR_GLUIXML_H

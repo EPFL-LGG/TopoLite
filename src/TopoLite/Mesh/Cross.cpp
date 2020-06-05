@@ -137,7 +137,7 @@ void Cross<Scalar>::updateTiltNormals(float tiltAngle, const std::unordered_map<
     const vector<pVertex> &vers = _Polygon<Scalar>::vers;
     Vector3 center = _Polygon<Scalar>::center();
     Vector3 normal = _Polygon<Scalar>::normal();
-    bool boundary_not_tilt = getVarList()->template get<bool>("ground_touch_bdry");
+    bool boundary_not_tilt = getVarList()->getBool("ground_touch_bdry");
 
     // 1) Clear all signs
 

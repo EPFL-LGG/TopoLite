@@ -127,6 +127,14 @@ public:
 
     void setPolyLists(vector<pPolygon> _polyList);
 
+    /*!
+     * \brief: parse from json file
+     * \param mesh_json: json object of the mesh
+     * \return: whether read the json object successfully
+     */
+
+    bool parse(const nlohmann::json &mesh_json);
+
     // Read OBJ File
     /*!
      * \brief: Read OBJ File (from file)

@@ -55,7 +55,7 @@ public:
         new nanogui::Label(window, "File", "sans-bold");
         nanogui::Button *open_button = new nanogui::Button(window, "open");
         open_button->set_callback([&](){
-            load_from_xmlfile(nanogui::file_dialog({ {"xml", "XML Portable"}, {"json", "JSON File"} }, false));
+            load_from_file(nanogui::file_dialog({ {"xml", "XML Portable"}, {"json", "JSON File"} }, false));
             return true;
         });
         nanogui::Button *save_button = new nanogui::Button(window, "save");
@@ -69,14 +69,14 @@ public:
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            main_canvas->scene->objects[0]->update_attr("show_wireframe", check);
+            main_canvas->scene->objects[0]->varList->add(check, "show_wireframe", "");
             return check;
         });
 
         checkbox = new nanogui::CheckBox(window, "faces");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            main_canvas->scene->objects[0]->update_attr("show_face", check);
+            main_canvas->scene->objects[0]->varList->add(check, "show_face", "");
             return check;
         });
 
@@ -135,11 +135,25 @@ public:
     ********************************************************************************************/
 
 
-    void load_from_xmlfile(string xmlfilename)
+    void load_from_file(std::filesystem::path path)
     {
-        if(topo_manager && topo_manager->load_from_xmlfile(xmlfilename)){
-            topo_manager->init_main_canvas();
-            topo_manager->init_pattern_canvas();
+
+        if(topo_manager)
+        {
+            bool has_load_successful = false;
+            if(path.extension() == ".json")
+            {
+                has_load_successful = topo_manager->load_from_jsonfile(path.string());
+            }
+            else if(path.extension() == ".xml")
+            {
+                has_load_successful = topo_manager->load_from_xmlfile(path.string());
+            }
+
+            if(has_load_successful){
+                topo_manager->init_main_canvas();
+                topo_manager->init_pattern_canvas();
+            }
         }
     }
 

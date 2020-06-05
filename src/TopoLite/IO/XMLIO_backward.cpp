@@ -47,6 +47,20 @@ bool XMLIO_backward::XMLReader(const string xmlFileName, IOData &data)
             crossMeshCreator->updatePatternMesh();
             data.pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
         }
+
+        //6) texturedMat and boundary_crossIDs
+        if(data.reference_surface){
+            shared_ptr<CrossMeshCreator<double>> crossMeshCreator;
+            Eigen::Matrix4d interactMat = toEigenMatrix(data.interactMatrix);
+            crossMeshCreator = std::make_shared<CrossMeshCreator<double>>(data.varList);
+            crossMeshCreator->setReferenceSurface(data.reference_surface);
+            data.varList->add(crossMeshCreator->computeTextureMat_backwards_compatible(interactMat), "texturedMat", "");
+        }
+        else{
+            data.varList->add(Eigen::Matrix4d::Identity(), "texturedMat", "");
+        }
+
+        data.varList->add(data.boundary_crossIDs, "boundary_crossIDs", "");
     }
 
     return true;
@@ -189,8 +203,8 @@ bool XMLIO_backward::XMLReader_ReferenceSurface(pugi::xml_node &xml_root, const 
         data.reference_surface = make_shared<PolyMesh<double>>(data.varList);
         if (!data.reference_surface->readOBJModel(path.c_str(), false))
             return false;
-        data.varList->set("textureModel", data.reference_surface->texturedModel);
-        
+
+        data.varList->add(data.reference_surface->texturedModel, "texturedModel", "");
     }
     return true;
 }

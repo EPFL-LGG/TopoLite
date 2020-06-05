@@ -584,6 +584,49 @@ bool PolyMesh<Scalar>::readOBJModel(
 }
 
 template<typename Scalar>
+bool PolyMesh<Scalar>::parse(const nlohmann::json &mesh_json)
+{
+    clear();
+    vector<vector<double>> V, TC;
+    vector<vector<int>> F, FTC;
+
+    if(mesh_json.contains("vertices") == false || mesh_json.contains("faces") == false)
+        return false;
+
+
+    //V
+    {
+        V.resize(mesh_json["vertices"].size());
+        for(auto &[key, value]: mesh_json["vertices"].items())
+        {
+            V[std::atoi(key.c_str())] = (vector<double>)value;
+        }
+    }
+
+    //TC
+    if(mesh_json.contains("texture")){
+        TC.resize(mesh_json["texture"].size());
+        for(auto &[key, value]: mesh_json["texture"].items())
+        {
+            TC[std::atoi(key.c_str())] = (vector<double>)value;
+        }
+    }
+
+    //F
+    for(auto value: mesh_json["faces"])
+    {
+       if(value.contains("verID")){
+           F.push_back((vector<int>)value["verID"]);
+       }
+       if(value.contains("texID")){
+           FTC.push_back((vector<int>)value["texID"]);
+       }
+    }
+
+    return readOBJModel(V, TC, F, FTC, false);
+}
+
+template<typename Scalar>
 void PolyMesh<Scalar>::writeOBJModel(const char *objFileName, bool triangulate) const
 {
 	FILE *fp;
@@ -996,10 +1039,9 @@ nlohmann::json PolyMesh<Scalar>::dump() const {
     nlohmann::json mesh_json;
     if (vertexList.empty()) return nlohmann::json();
 
-    //1) write vertices
+    //1) write vertices positions
     {
         nlohmann::json vertices_json;
-        vertices_json["n_vertices"] = (int) vertexList.size();
         for (size_t i = 0; i < vertexList.size(); i++) {
             std::string name = std::to_string(i);
             vertices_json[name] = {vertexList[i]->pos.x(),
@@ -1010,10 +1052,20 @@ nlohmann::json PolyMesh<Scalar>::dump() const {
         mesh_json["vertices"] = vertices_json;
     }
 
-    //2) write faces
+    //2) write vertices tex coordinate
+    {
+        nlohmann::json texture_json;
+        for (size_t i = 0; i < textureList.size(); i++) {
+            std::string name = std::to_string(i);
+            texture_json[name] = {textureList[i]->texCoord.x(),
+                                  textureList[i]->texCoord.y()};
+        }
+        mesh_json["texture"] = texture_json;
+    }
+
+    //3) write faces
     {
         nlohmann::json faces_json;
-        faces_json["n_faces"] = (int) polyList.size();
 
         for (size_t i = 0; i < polyList.size(); i++) {
             shared_ptr<_Polygon<Scalar>> poly = polyList[i];
@@ -1036,5 +1088,6 @@ nlohmann::json PolyMesh<Scalar>::dump() const {
     }
     return mesh_json;
 }
+
 template class PolyMesh<double>;
 template class PolyMesh<float>;

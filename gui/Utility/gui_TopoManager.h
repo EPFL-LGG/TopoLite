@@ -5,7 +5,8 @@
 #ifndef TOPOLITE_GUI_TOPOMANAGER_H
 #define TOPOLITE_GUI_TOPOMANAGER_H
 
-#include "IO/JsonIO.h"
+#include "IO/JsonIOReader.h"
+#include "IO/JsonIOWriter.h"
 #include "IO/XMLIO_backward.h"
 #include "gui_Arcball_Canvas.h"
 #include "gui_2D_Canvas.h"
@@ -23,12 +24,12 @@
 class gui_TopoManager{
 public:
     shared_ptr<IOData> iodata;
-
     shared_ptr<CrossMeshCreator<double>> crossMeshCreator;
     shared_ptr<StrucCreator<double>> strucCreator;
+
+public:
     Eigen::Matrix4d init_textureMat;
     Eigen::Matrix4d last_textureMat;
-
     shared_ptr<InputVarList> render_update_list;
 
 public:
@@ -62,6 +63,10 @@ public:
 
     void load_from_IOData()
     {
+        //0)
+        crossMeshCreator = make_shared<CrossMeshCreator<double>>(iodata->varList);
+        last_textureMat = init_textureMat = iodata->varList->getMatrix4d("texturedMat");
+
         //1) set crossMeshCreator
         if(iodata->reference_surface){
             crossMeshCreator->setReferenceSurface(iodata->reference_surface);
@@ -73,7 +78,7 @@ public:
         //2) create the cross mesh
         if(iodata->cross_mesh != nullptr){
             crossMeshCreator->setCrossMesh(iodata->cross_mesh);
-            crossMeshCreator->updateCrossMeshBoundary(iodata->boundary_crossIDs);
+            crossMeshCreator->updateCrossMeshBoundary(iodata->varList->getIntList("boundary_crossIDs"));
         }
         else if(iodata->reference_surface != nullptr && iodata->pattern_mesh != nullptr){
             crossMeshCreator->createCrossMeshFromRSnPattern(false, init_textureMat);
@@ -94,12 +99,17 @@ public:
         iodata = make_shared<IOData>();
         if(IO.XMLReader(xmlFileName, *iodata) && iodata->varList) {
             iodata->varList->add((int)1, "layerOfBoundary",  "");
-            Eigen::Matrix4d interactMat = toEigenMatrix(iodata->interactMatrix);
-            crossMeshCreator = std::make_shared<CrossMeshCreator<double>>(iodata->varList);
-            if(iodata->reference_surface){
-                crossMeshCreator->setReferenceSurface(iodata->reference_surface);
-            }
-            last_textureMat = init_textureMat = crossMeshCreator->computeTextureMat_backwards_compatible(interactMat);
+            load_from_IOData();
+            return true;
+        }
+        return false;
+    }
+
+    bool load_from_jsonfile(string xmlFileName){
+        iodata = make_shared<IOData>();
+        JsonIOReader reader(xmlFileName, iodata);
+        clear();
+        if(reader.read()){
             load_from_IOData();
             return true;
         }
@@ -119,9 +129,10 @@ public:
 
             if(crossMeshCreator->crossMesh){
                 iodata->cross_mesh = crossMeshCreator->crossMesh;
-                iodata->boundary_crossIDs = crossMeshCreator->crossMesh->getBoundaryCrossIDs();
+                iodata->varList->add(crossMeshCreator->crossMesh->getBoundaryCrossIDs(), "boundary_crossIDs", "");
             }
-            iodata->textureMat = last_textureMat;
+
+            iodata->varList->add(last_textureMat, "texturedMat", "");
         }
         JsonIOWriter writer(jsonFileName, iodata);
         writer.write();
@@ -204,7 +215,7 @@ public:
             }
             
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
-            polyMeshLists->update_attr("show_face", false);
+            polyMeshLists->varList->add(false, "show_face", "");
             polyMeshLists->line_color = nanogui::Color(242, 133, 0, 255);
             pattern_canvas->scene->objects.push_back(polyMeshLists);
             polyMeshLists->model_mat_fixed = true;
@@ -219,7 +230,7 @@ public:
                 meshLists.push_back(pattern_mesh);
             }
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
-            polyMeshLists->update_attr("show_face", false);
+            polyMeshLists->varList->add(false, "show_face", "");
             polyMeshLists->model_init_mat = init_textureMat.cast<float>();
             polyMeshLists->line_color = nanogui::Color(150, 150, 150, 255);
             pattern_canvas->scene->objects.push_back(polyMeshLists);
@@ -235,7 +246,7 @@ public:
                 meshLists.push_back(textureMesh);
             }
             polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
-            polyMeshLists->update_attr("show_wireframe", false);
+            polyMeshLists->varList->add(false, "show_wireframe", "");
             polyMeshLists->model_mat_fixed = true;
             pattern_canvas->scene->objects.push_back(polyMeshLists);
         }
@@ -323,25 +334,25 @@ public:
                     if(str == "update_base_mesh_2D"){
                         shared_ptr<gui_RenderObject<double>> object = pattern_canvas->scene->objects[1];
                         if(object && object->visible){
-                            render_update_list->set("update_base_mesh_2D", true);
+                            render_update_list->add(true, "update_base_mesh_2D", "");
                         }
                     }
                     else if(str == "update_cross_mesh"){
                         shared_ptr<gui_RenderObject<double>> object = arcball_canvas->scene->objects[0];
                         if(object && object->visible){
-                            render_update_list->set("update_cross_mesh", true);
+                            render_update_list->add(true, "update_cross_mesh", "");
                         }
                     }
                     else if(str == "update_augmented_vectors"){
                         shared_ptr<gui_RenderObject<double>> object = arcball_canvas->scene->objects[1];
                         if(object && object->visible){
-                            render_update_list->set("update_augmented_vectors", true);
+                            render_update_list->add(true, "update_augmented_vectors", "");
                         }
                     }
                     else if(str == "update_struc"){
                         shared_ptr<gui_RenderObject<double>> object = arcball_canvas->scene->objects[2];
                         if(object && object->visible){
-                            render_update_list->set("update_struc", true);
+                            render_update_list->add(true, "update_struc", "");
                         }
                     }
                 }
@@ -357,25 +368,24 @@ public:
             last_textureMat = textureMat;
         }
 
-        if(render_update_list->get<bool>("update_base_mesh_2D")){
+        if(render_update_list->getBool("update_base_mesh_2D")){
             update_base_mesh_2D();
-            render_update_list->set("update_base_mesh_2D", false);
+            render_update_list->add(false, "update_base_mesh_2D", "");
         }
 
-        if(render_update_list->get<bool>("update_cross_mesh")){
+        if(render_update_list->getBool("update_cross_mesh")){
             update_cross_mesh();
-            render_update_list->set("update_cross_mesh", false);
-
+            render_update_list->add(false, "update_cross_mesh", "");
         }
 
-        if(render_update_list->get<bool>("update_augmented_vectors")){
+        if(render_update_list->getBool("update_augmented_vectors")){
             update_augmented_vectors();
-            render_update_list->set("update_augmented_vectors", false);
+            render_update_list->add(false, "update_augmented_vectors", "");
         }
 
-        if(render_update_list->get<bool>("update_struc")){
+        if(render_update_list->getBool("update_struc")){
             update_struc();
-            render_update_list->set("update_struc", false);
+            render_update_list->add(false, "update_struc", "");
         }
         
     }

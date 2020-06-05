@@ -265,8 +265,8 @@ public:
     }
 
     void update_uniform(){
-        shader->set_uniform("show_wireframe", varList->template get<bool>("show_wireframe"));
-        shader->set_uniform("show_face", varList->template get<bool>("show_face"));
+        shader->set_uniform("show_wireframe", varList->getBool("show_wireframe"));
+        shader->set_uniform("show_face", varList->getBool("show_face"));
         shader->set_uniform("mvp", this->toNanoguiMatrix(proj_mat * view_mat * model_mat));
         shader->set_uniform("simtime", simtime);
         shader->set_uniform("line_color", line_color);

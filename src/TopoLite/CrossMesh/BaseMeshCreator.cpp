@@ -53,7 +53,7 @@ computeBaseCrossMesh(Matrix4 textureMat,
                                                    bool previewMode)
 {
 	//bool smooth boundary
-	bool use_smooth_boundary = getVarList()->template get<bool>("smooth_bdry");
+	bool use_smooth_boundary = getVarList()->getBool("smooth_bdry");
 
 	// allocate mesh memory
 	crossMesh = make_shared<CrossMesh<double>>(getVarList());
@@ -303,7 +303,7 @@ void BaseMeshCreator<Scalar>::computeBoundaryCross(Matrix4 textureMat,
 template<typename Scalar>
 void BaseMeshCreator<Scalar>::removeSmallCrosses(BaseMeshCreator::pCrossMesh crossMesh)
 {
-    Scalar minimum_ratio = getVarList()->template get<float>("minCrossArea");
+    Scalar minimum_ratio = getVarList()->getFloat("minCrossArea");
 
     //compute the maximum cross Area
     Scalar maximum_crossArea = tbb::parallel_reduce(
@@ -386,7 +386,7 @@ void BaseMeshCreator<Scalar>::removeDanglingCross(pCrossMesh crossMesh)
 template <typename Scalar>
 void BaseMeshCreator<Scalar>::recomputeBoundary(pCrossMesh crossMesh)
 {
-    int iterate_times = std::max(1, getVarList()->template get<int>("layerOfBoundary"));
+    int iterate_times = std::max(1, getVarList()->getInt("layerOfBoundary"));
 
     //clear all boundary mark
     tbb::parallel_for(tbb::blocked_range<size_t>(0, crossMesh->size()), [&](tbb::blocked_range<size_t> &r) {

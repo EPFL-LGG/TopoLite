@@ -7,7 +7,7 @@
 #include "CrossMesh/PatternCreator.h"
 #include "Utility/HelpFunc.h"
 #include "Structure/Part.h"
-#include "IO/JsonIO.h"
+#include "IO/JsonIOReader.h"
 #include "Structure/StrucCreator.h"
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_AffineScaling.h"

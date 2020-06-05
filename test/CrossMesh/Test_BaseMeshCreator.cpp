@@ -9,7 +9,7 @@
 #include "Mesh/CrossMesh.h"
 #include "Mesh/PolyMesh_AABBTree.h"
 #include <filesystem>
-#include "IO/JsonIO.h"
+#include "IO/JsonIOReader.h"
 #include "CrossMesh/PatternCreator.h"
 
 TEST_CASE("BaseMeshCreator")

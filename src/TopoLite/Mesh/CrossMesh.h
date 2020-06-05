@@ -74,6 +74,8 @@ public:
 
     void print() const;
 
+    bool parse(const nlohmann::json &mesh_json);
+
     nlohmann::json dump() const;
 
     void clear()

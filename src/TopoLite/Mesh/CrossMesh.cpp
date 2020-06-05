@@ -265,8 +265,6 @@ nlohmann::json CrossMesh<Scalar>::dump() const {
     //2) write cross
     {
         nlohmann::json crossList_json;
-        crossList_json["n_cross"] = (int) crossList.size();
-
         for (size_t i = 0; i < crossList.size(); i++)
         {
             nlohmann::json cross_json;
@@ -284,6 +282,32 @@ nlohmann::json CrossMesh<Scalar>::dump() const {
         mesh_json["crossList"] = crossList_json;
     }
     return mesh_json;
+}
+
+template<typename Scalar>
+bool CrossMesh<Scalar>::parse(const nlohmann::json &mesh_json)
+{
+    clear();
+    if(mesh_json.contains("crossList") == false)
+        return false;
+
+    size_t size = mesh_json["crossList"].size();
+    crossList.resize(size);
+    PolyMesh<Scalar>::polyList.resize(size);
+
+    for(auto& [key, value]: mesh_json["crossList"].items())
+    {
+        pCross cross = make_shared<Cross<Scalar>>(getVarList());
+        for(auto edge: value)
+        {
+            shared_ptr<OrientPoint<Scalar>> oript = make_shared<OrientPoint<Scalar>>(edge);
+            cross->push_back(Vector3(((vector<Scalar>)edge["start vertex"]).data()));
+            cross->oriPoints.push_back(oript);
+        }
+        set_cross(std::atoi(key.c_str()), cross);
+    }
+    update();
+    return true;
 }
 
 

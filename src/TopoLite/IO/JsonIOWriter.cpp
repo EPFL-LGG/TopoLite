@@ -1,24 +1,21 @@
-#include "JsonIO.h"
+//
+// Created by ziqwang on 05.06.20.
+//
+
+#include "JsonIOWriter.h"
 #include <fstream>
+
 nlohmann::json JsonIOWriter::getParameterJson()
 {
     nlohmann::json parameter_json;
     InputVarManager manager;
+
     for(shared_ptr<InputVar> var: data.lock()->varList->varLists){
         std::string name;
         nlohmann::json var_json;
         std::tie(var_json, name) = manager.getJSON(var.get());
         parameter_json[name] = var_json;
     }
-
-    vector<double> textureMatData;
-    for(int id = 0; id < 4; id ++){
-        for(int jd = 0; jd < 4; jd++){
-            textureMatData.push_back(data.lock()->textureMat(id, jd));
-        }
-    }
-    parameter_json["textureMat"] = textureMatData;
-    parameter_json["boundary CrossIDs"] = data.lock()->boundary_crossIDs;
 
     return parameter_json;
 }
@@ -48,8 +45,9 @@ void JsonIOWriter::write()
         }
     }
 
-    std::ofstream fileout(path);
+    std::ofstream fileout(path, std::ofstream::binary);
+    std::vector<std::uint8_t> binary_result = nlohmann::json::to_ubjson(result);
     if(fileout){
-        fileout << std::setw(4) << result << std::endl;
+        fileout.write((char *)binary_result.data(), binary_result.size());
     }
 }

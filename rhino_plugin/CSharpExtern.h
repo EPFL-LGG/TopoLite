@@ -9,7 +9,7 @@
 #include "Structure/StrucCreator.h"
 #include "Mesh/MeshConverter.h"
 #include "Interlocking/ContactGraph.h"
-#include "IO/JsonIO.h"
+#include "IO/JsonIOReader.h"
 struct CMesh{
     float* points;
     int* faces;

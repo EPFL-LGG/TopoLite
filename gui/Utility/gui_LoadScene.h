@@ -13,7 +13,7 @@
 #include "Mesh/CrossMesh.h"
 #include "CrossMesh/AugmentedVectorCreator.h"
 #include "CrossMesh/BaseMeshCreator.h"
-#include "IO/JsonIO.h"
+#include "IO/JsonIOReader.h"
 #include "CrossMesh/PatternCreator.h"
 #include "CrossMesh/CrossMeshCreator.h"
 using std::weak_ptr;

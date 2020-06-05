@@ -3,7 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
-#include "IO/JsonIO.h"
+#include "IO/JsonIOWriter.h"
 #include "IO/XMLIO_backward.h"
 #include <filesystem>
 using json = nlohmann::json;
