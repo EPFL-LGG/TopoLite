@@ -3,13 +3,13 @@
 //
 
 #include "XMLIO_backward.h"
-
+#include "CrossMesh/CrossMeshCreator.h"
 
 //**************************************************************************************//
 //                                  XML Reader
 //**************************************************************************************//
 
-bool XMLIO_backward::XMLReader(const string xmlFileName, XMLData &data)
+bool XMLIO_backward::XMLReader(const string xmlFileName, IOData &data)
 {
 
     pugi::xml_document xmldoc;
@@ -27,7 +27,7 @@ bool XMLIO_backward::XMLReader(const string xmlFileName, XMLData &data)
 //        data.strucCreator = make_shared<StrucCreator>(data.varList);
 
         // 1) read all gui settings
-        InitVar(data.varList.get());
+        InitVar_backward(data.varList.get());
         XMLReader_GUISettings(xml_root, data);
 
         // 2) read reference surface
@@ -38,12 +38,21 @@ bool XMLIO_backward::XMLReader(const string xmlFileName, XMLData &data)
 
         // 4) read cross mesh boundary
         XMLReader_Boundary(xml_root, data);
+
+        // 5) read pattern mesh
+        if(data.reference_surface)
+        {
+            shared_ptr<CrossMeshCreator<double>> crossMeshCreator;
+            crossMeshCreator = std::make_shared<CrossMeshCreator<double>>(data.varList);
+            crossMeshCreator->updatePatternMesh();
+            data.pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
+        }
     }
 
     return true;
 }
 
-void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &data)
+void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, IOData &data)
 {
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
     // guisettings
@@ -53,7 +62,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
         // para basic
         InputVarManager varOrganizer;
         {
-            vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Basic");
+            vector<shared_ptr<InputVar>> series = data.varList->varLists;
             for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_guisettings);
         }
 
@@ -62,7 +71,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
             pugi::xml_node node_shapeop = node_guisettings.child("ShapeOp_Settings");
             if(node_shapeop){
                 // Para_ShapeOp
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_ShapeOp");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_shapeop);
             }
         }
@@ -72,7 +81,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
             pugi::xml_node node_mitsuba = node_guisettings.child("Para_Mitsuba");
             if(node_mitsuba){
                 // Para_Mitsuba
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Mitsuba");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_mitsuba);
             }
         }
@@ -82,7 +91,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
             pugi::xml_node node_contactgraph = node_guisettings.child("Para_ContactGraph");
             if(node_contactgraph){
                 // Para_ContactGraph
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_ContactGraph");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_contactgraph);
             }
         }
@@ -92,7 +101,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
             pugi::xml_node node_crossmesh = node_guisettings.child("Para_CrossMesh");
             if(node_crossmesh){
                 // Para_CrossMesh
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_CrossMesh");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node_crossmesh);
             }
         }
@@ -101,7 +110,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(node){
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Opt");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node);
             }
         }
@@ -110,7 +119,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
         {
             pugi::xml_node node = node_guisettings.child("Para_Assembly");
             if(node){
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Assembly");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node);
             }
         }
@@ -119,7 +128,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
         {
             pugi::xml_node node = node_guisettings.child("Para_Support");
             if(node){
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Support");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node);
             }
         }
@@ -128,7 +137,7 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
         {
             pugi::xml_node node = node_guisettings.child("Para_Opt");
             if(node){
-                vector<shared_ptr<InputVar>> series = data.varList->findSeries("Para_Opt");
+                vector<shared_ptr<InputVar>> series = data.varList->varLists;
                 for(shared_ptr<InputVar> var: series) varOrganizer.read(var.get(), node);
             }
         };
@@ -171,25 +180,23 @@ void XMLIO_backward::XMLReader_GUISettings(pugi::xml_node &xml_root, XMLData &da
     }
 }
 
-bool XMLIO_backward::XMLReader_ReferenceSurface(pugi::xml_node &xml_root, const string xmlFileName_path, XMLData &data){
+bool XMLIO_backward::XMLReader_ReferenceSurface(pugi::xml_node &xml_root, const string xmlFileName_path, IOData &data){
     pugi::xml_node refenceSurfaceNode = xml_root.child("Output").child("Structure");
     if (refenceSurfaceNode)
     {
         std::filesystem::path reference_surface_path(refenceSurfaceNode.attribute("path").as_string());
         string path = (std::filesystem::path(xmlFileName_path) / reference_surface_path).string();
         data.reference_surface = make_shared<PolyMesh<double>>(data.varList);
-        bool textureModel;
-        
-        if (!data.reference_surface->readOBJModel(path.c_str(), textureModel, false))
+        if (!data.reference_surface->readOBJModel(path.c_str(), false))
             return false;
-        data.varList->set("textureModel", textureModel);
+        data.varList->set("textureModel", data.reference_surface->texturedModel);
         
     }
     return true;
 }
 
 
-bool XMLIO_backward::XMLReader_CrossMesh(pugi::xml_node &xml_root, const string xmlFileName_path, XMLData &data)
+bool XMLIO_backward::XMLReader_CrossMesh(pugi::xml_node &xml_root, const string xmlFileName_path, IOData &data)
 {
     pugi::xml_node cross_mesh_node = xml_root.child("PartGeoData");
     if(cross_mesh_node)
@@ -253,7 +260,7 @@ bool XMLIO_backward::XMLReader_CrossMesh(pugi::xml_node &xml_root, const string 
     return data.cross_mesh != nullptr;
 }
 
-void XMLIO_backward::XMLReader_Boundary(pugi::xml_node &xml_root, XMLData &data)
+void XMLIO_backward::XMLReader_Boundary(pugi::xml_node &xml_root, IOData &data)
 {
     pugi::xml_node node_guisettings = xml_root.child("GUISettings");
     if(node_guisettings)
@@ -288,7 +295,12 @@ vector<std::string> XMLIO_backward::split(const string str_text, const char sepa
     for(size_t id = 0; id < str_text.size(); id++){
         if(str_text[id] == separator || (id + 1 == str_text.size()))
         {
-            if(accumulate.find_first_not_of (' ') != accumulate.npos){
+            if(id + 1 == str_text.size()){
+                accumulate += str_text[id];
+            }
+            
+            if(accumulate.find_first_not_of (' ') != accumulate.npos)
+            {
                 split_strings.push_back(accumulate);
                 accumulate = "";
             }

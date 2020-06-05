@@ -15,7 +15,7 @@
 #define GeometricPrimitives_H
 
 #include "TopoLite/Utility/HelpDefine.h"
-
+#include <nlohmann/json.hpp>
 #include <vector>
 #include <Eigen/Dense>
 #include <cmath>
@@ -717,6 +717,19 @@ public:
 		printf("point: [%6.3f %6.3f %6.3f]   normal: [%6.3f %6.3f %6.3f] \n", point[0], point[1], point[2], normal[0], normal[1], normal[2]);
 		printf("rotation_axis: [%6.3f %6.3f %6.3f]   rotation_angle: [%6.3f] \n", rotation_axis[0], rotation_axis[1], rotation_axis[2], rotation_angle);
 	};
+
+    nlohmann::json dump(){
+        nlohmann::json oript_json;
+        oript_json["middle point"] = {point.x(), point.y(), point.z()};
+        oript_json["face normal"] = {normal.x(), normal.y(), normal.z()};
+        oript_json["rotation axis"] = {rotation_axis.x(), rotation_axis.y(), rotation_axis.z()};
+        oript_json["rotation base"] = {rotation_base.x(), rotation_base.y(), rotation_base.z()};
+        oript_json["rotation angle"] = rotation_angle;
+        oript_json["tilting sign"] = tiltSign;
+        oript_json["tilting range"] = {tilt_range.x(), tilt_range.y()};
+        oript_json["globalID"] = oriptID;
+        return oript_json;
+    }
 };
 
 template <typename Scalar>

@@ -11,13 +11,12 @@ TEST_CASE("PolyMesh_AABBTree - Test findTexPoint")
 {
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
 
     SECTION("findTexPoint after object read") {
         // This case is more difficult to understand/read as the data inputs are complicated
-        bool texturedModel;
-        polyMesh->readOBJModel("data/Mesh/primitives/Icosphere.obj", texturedModel, true);
+        polyMesh->readOBJModel("data/Mesh/primitives/Icosphere.obj", true);
         PolyMesh_AABBTree<double> aabbTree(*polyMesh);
         aabbTree.buildTexTree();
 
@@ -58,7 +57,7 @@ TEST_CASE("AABBTree_Line Quads - Test findIntersec") {
     AABBTree_Line<double> aabb_line;
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
 
     shared_ptr<_Polygon<double>> poly = make_shared<_Polygon<double>>();
@@ -106,7 +105,7 @@ TEST_CASE("AABBTree_Line Quads - Find Square has a square hole"){
     AABBTree_Line<double> aabb_line;
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
 
     shared_ptr<_Polygon<double>> base = make_shared<_Polygon<double>>();

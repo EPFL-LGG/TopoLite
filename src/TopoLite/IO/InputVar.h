@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include <pugixml.hpp>
+#include <nlohmann/json.hpp>
 #include <vector>
 #include <Eigen/Dense>
 #include <memory>
@@ -272,6 +273,42 @@ public:
 class InputVarManager
 {
 public:
+    std::tuple<nlohmann::json, std::string> getJSON(InputVar *var)
+    {
+        nlohmann::json node;
+        if(var != nullptr){
+            node["label"] = var->label;
+            node["group"] = var->series_name;
+            switch(var->var_value_type)
+            {
+                case GLUI_VAR_VALUE_INT:
+                    node["value"] = ((InputVarInt *)var)->value;
+                    node["type"] = "int";
+                    node["range"] = {((InputVarInt *)var)->bound.x(), ((InputVarInt *)var)->bound.y()};
+                    break;
+                case GLUI_VAR_VALUE_BOOL:
+                    node["value"] = ((InputVarBool *)var)->value;
+                    node["type"] = "bool";
+                    break;
+                case GLUI_VAR_VALUE_FLOAT:
+                    node["value"] = ((InputVarFloat *)var)->value;
+                    node["type"] = "float";
+                    node["range"] = {((InputVarInt *)var)->bound.x(), ((InputVarInt *)var)->bound.y()};
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if(var->var_names.empty()){
+            return {node, ""};
+        }
+        else{
+            return {node, var->var_names.front()};
+        }
+    }
+
+public:
 
     void write(InputVar *var, pugi::xml_node &node){
         pugi::xml_node node_var = node.child(var->var_names.front().c_str());
@@ -328,8 +365,8 @@ public:
     }
 };
 
-void InitVar(InputVarList *varList);
+void InitVar_backward(InputVarList *varList);
 
-void InitVarLite(InputVarList *varList);
+void InitVar(InputVarList *varList);
 
 #endif //TOPOLOCKCREATOR_GLUIVAR_H

@@ -5,7 +5,7 @@
 #ifndef TOPOLITE_GUI_TOPOMANAGER_H
 #define TOPOLITE_GUI_TOPOMANAGER_H
 
-#include "IO/XMLIO.h"
+#include "IO/JsonIO.h"
 #include "IO/XMLIO_backward.h"
 #include "gui_Arcball_Canvas.h"
 #include "gui_2D_Canvas.h"
@@ -22,7 +22,8 @@
 
 class gui_TopoManager{
 public:
-    shared_ptr<InputVarList> varList;
+    shared_ptr<IOData> iodata;
+
     shared_ptr<CrossMeshCreator<double>> crossMeshCreator;
     shared_ptr<StrucCreator<double>> strucCreator;
     Eigen::Matrix4d init_textureMat;
@@ -58,38 +59,72 @@ public:
     }
 
 public:
+
+    void load_from_IOData()
+    {
+        //1) set crossMeshCreator
+        if(iodata->reference_surface){
+            crossMeshCreator->setReferenceSurface(iodata->reference_surface);
+        }
+        if(iodata->pattern_mesh){
+            crossMeshCreator->setPatternMesh(iodata->pattern_mesh);
+        }
+
+        //2) create the cross mesh
+        if(iodata->cross_mesh != nullptr){
+            crossMeshCreator->setCrossMesh(iodata->cross_mesh);
+            crossMeshCreator->updateCrossMeshBoundary(iodata->boundary_crossIDs);
+        }
+        else if(iodata->reference_surface != nullptr && iodata->pattern_mesh != nullptr){
+            crossMeshCreator->createCrossMeshFromRSnPattern(false, init_textureMat);
+            crossMeshCreator->createAugmentedVectors();
+        }
+
+        //3) create the structure
+        if(crossMeshCreator->crossMesh){
+            strucCreator = make_shared<StrucCreator<double>>(iodata->varList);
+            strucCreator->compute(crossMeshCreator->crossMesh);
+        }
+    }
+
     bool load_from_xmlfile(string xmlFileName)
     {
         XMLIO_backward IO;
-        XMLData data;
         clear();
-        if(IO.XMLReader(xmlFileName, data) && data.varList && data.reference_surface) {
-            varList = data.varList;
-            varList->add((int)1, "layerOfBoundary",  "");
-            crossMeshCreator = std::make_shared<CrossMeshCreator<double>>(data.varList);
-            Eigen::Matrix4d interactMat = toEigenMatrix(data.interactMatrix);
-            
-            crossMeshCreator->setReferenceSurface(data.reference_surface);
-            crossMeshCreator->updatePatternMesh();
-            
+        iodata = make_shared<IOData>();
+        if(IO.XMLReader(xmlFileName, *iodata) && iodata->varList) {
+            iodata->varList->add((int)1, "layerOfBoundary",  "");
+            Eigen::Matrix4d interactMat = toEigenMatrix(iodata->interactMatrix);
+            crossMeshCreator = std::make_shared<CrossMeshCreator<double>>(iodata->varList);
+            if(iodata->reference_surface){
+                crossMeshCreator->setReferenceSurface(iodata->reference_surface);
+            }
             last_textureMat = init_textureMat = crossMeshCreator->computeTextureMat_backwards_compatible(interactMat);
-            
-            if(data.cross_mesh != nullptr){
-                crossMeshCreator->setCrossMesh(data.cross_mesh);
-                crossMeshCreator->updateCrossMeshBoundary(data.boundary_crossIDs);
-            }
-            else if(data.reference_surface != nullptr && data.cross_mesh == nullptr){
-                crossMeshCreator->createCrossMeshFromRSnPattern(false, init_textureMat);
-                crossMeshCreator->createAugmentedVectors();
-            }
-            
-            if(crossMeshCreator->crossMesh){
-                strucCreator = make_shared<StrucCreator<double>>(varList);
-                strucCreator->compute(crossMeshCreator->crossMesh);
-            }
+            load_from_IOData();
             return true;
         }
         return false;
+    }
+
+    void write_to_json(string jsonFileName)
+    {
+        if(crossMeshCreator){
+            if(crossMeshCreator->referenceSurface){
+                iodata->reference_surface = crossMeshCreator->referenceSurface;
+            }
+
+            if(crossMeshCreator->pattern2D){
+                iodata->pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
+            }
+
+            if(crossMeshCreator->crossMesh){
+                iodata->cross_mesh = crossMeshCreator->crossMesh;
+                iodata->boundary_crossIDs = crossMeshCreator->crossMesh->getBoundaryCrossIDs();
+            }
+            iodata->textureMat = last_textureMat;
+        }
+        JsonIOWriter writer(jsonFileName, iodata);
+        writer.write();
     }
 
     void init_main_canvas(){

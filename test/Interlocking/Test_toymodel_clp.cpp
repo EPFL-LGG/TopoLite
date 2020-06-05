@@ -9,7 +9,7 @@
 #include <Eigen/Sparse>
 
 #include "Interlocking/InterlockingSolver_Clp.h"
-#include "IO/XMLIO.h"
+#include "IO/JsonIO.h"
 #include "ClpSimplex.hpp"
 
 
@@ -33,7 +33,7 @@ typedef Eigen::Matrix<double, 3, 1> Vector3d;
 TEST_CASE("CLP simplex - Simple LP problem") {
     // Mock
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     shared_ptr<ContactGraph<double>> dat = make_shared<ContactGraph<double>>(varList);
     InterlockingSolver_Clp<double> solver(dat, varList);
     shared_ptr<typename InterlockingSolver<double>::InterlockingData> data;

@@ -19,13 +19,22 @@ struct InputMeshNormalizeData{
     float scale;
 };
 
-struct XMLData{
+struct IOData{
+public:
+    IOData(){
+        varList = make_shared<InputVarList>();
+    }
+
+public:
+
     shared_ptr<InputVarList> varList;
     shared_ptr<PolyMesh<double>> reference_surface;
+    shared_ptr<PolyMesh<double>> pattern_mesh;
     shared_ptr<CrossMesh<double>> cross_mesh;
     vector<int> boundary_crossIDs;
+    Eigen::Matrix4d textureMat;
 
-    //old data
+    //backward data
     vector<int> pickPartIDs;
     double interactMatrix[16];
 

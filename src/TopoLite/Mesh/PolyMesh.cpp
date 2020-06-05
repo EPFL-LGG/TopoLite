@@ -514,62 +514,70 @@ void PolyMesh<Scalar>::scaleMesh(Vector3 scale)
 //**************************************************************************************//
 
 template<typename Scalar>
+bool PolyMesh<Scalar>::readOBJModel(const vector<vector<double>> &V, const vector<vector<double>> &TC, const vector<vector<int>> &F, const vector<vector<int>> &FTC, bool normalized)
+{
+    clear();
+    
+    for(size_t id = 0; id < V.size(); id++) {
+        {
+            shared_ptr<VPoint<Scalar>> ver = make_shared<VPoint<Scalar>>();
+            ver->pos = Vector3(V[id][0], V[id][1], V[id][2]);
+            ver->verID = id;
+            vertexList.push_back(ver);
+        }
+    }
+
+    for(size_t id = 0; id < TC.size(); id++)
+    {
+            shared_ptr<VTex<Scalar>> vtex = make_shared<VTex<Scalar>>();
+            vtex->texCoord = Vector2(TC[id][0], TC[id][1]);
+            vtex->texID = id;
+            textureList.push_back(vtex);
+    }
+
+    for(size_t id = 0; id < F.size(); id++)
+    {
+        shared_ptr<_Polygon<Scalar>> poly = make_shared<_Polygon<Scalar>>();
+        for(size_t jd = 0; jd < F[id].size(); jd++)
+        {
+            poly->vers.push_back(vertexList[F[id][jd]]);
+            if(FTC[id].size() > jd)
+                poly->texs.push_back(textureList[FTC[id][jd]]); // can have a memory error without the if condition
+        }
+        polyList.push_back(poly);
+    }
+
+    if(TC.empty())
+    {
+        texturedModel = false;
+    }
+    else
+    {
+        texturedModel = true;
+    }
+    
+    if(normalized)
+    {
+        normalize();
+    }
+    
+    removeDuplicatedVertices();
+    return true;
+}
+
+
+template<typename Scalar>
 bool PolyMesh<Scalar>::readOBJModel(
         const char *fileName,
-        bool &textureModel_,
         bool normalized)
 {
 	vector<vector<double>> V, TC, N;
 	vector<vector<int>> F, FTC, FTN;
-
-	clear();
-
+    
 	if(igl::readOBJ(fileName, V, TC, N,F, FTC, FTN))
 	{
-	    clear();
-
-        for(size_t id = 0; id < V.size(); id++) {
-            {
-                shared_ptr<VPoint<Scalar>> ver = make_shared<VPoint<Scalar>>();
-                ver->pos = Vector3(V[id][0], V[id][1], V[id][2]);
-                ver->verID = id;
-                vertexList.push_back(ver);
-            }
-        }
-
-        for(size_t id = 0; id < TC.size(); id++)
-        {
-                shared_ptr<VTex<Scalar>> vtex = make_shared<VTex<Scalar>>();
-                vtex->texCoord = Vector2(TC[id][0], TC[id][1]);
-                vtex->texID = id;
-                textureList.push_back(vtex);
-        }
-
-        for(size_t id = 0; id < F.size(); id++)
-        {
-			shared_ptr<_Polygon<Scalar>> poly = make_shared<_Polygon<Scalar>>();
-            for(size_t jd = 0; jd < F[id].size(); jd++)
-			{
-				poly->vers.push_back(vertexList[F[id][jd]]);
-				if(FTC[id].size() > jd)
-				    poly->texs.push_back(textureList[FTC[id][jd]]); // can have a memory error without the if condition
-			}
-            polyList.push_back(poly);
-        }
-
-	    if(TC.empty()){
-	        texturedModel = textureModel_ = false;
-	    }
-	    else{
-            texturedModel = textureModel_ = true;
-	    }
-
-	    if(normalized)
-	        normalize();
-
-        removeDuplicatedVertices();
-		return true;
-	}
+        return readOBJModel(V, TC, F, FTC, normalized);
+    }
 	else {
 	    return false;
 	}
@@ -983,6 +991,50 @@ shared_ptr<PolyMesh<Scalar>> PolyMesh<Scalar>::getTextureMesh() const
     return polymesh;
 }
 
+template<typename Scalar>
+nlohmann::json PolyMesh<Scalar>::dump() const {
+    nlohmann::json mesh_json;
+    if (vertexList.empty()) return nlohmann::json();
 
+    //1) write vertices
+    {
+        nlohmann::json vertices_json;
+        vertices_json["n_vertices"] = (int) vertexList.size();
+        for (size_t i = 0; i < vertexList.size(); i++) {
+            std::string name = std::to_string(i);
+            vertices_json[name] = {vertexList[i]->pos.x(),
+                                   vertexList[i]->pos.y(),
+                                   vertexList[i]->pos.z()};
+        }
+
+        mesh_json["vertices"] = vertices_json;
+    }
+
+    //2) write faces
+    {
+        nlohmann::json faces_json;
+        faces_json["n_faces"] = (int) polyList.size();
+
+        for (size_t i = 0; i < polyList.size(); i++) {
+            shared_ptr<_Polygon<Scalar>> poly = polyList[i];
+            vector<int> verIDs;
+            vector<int> texIDs;
+            for (size_t j = 0; j < poly->vers.size(); j++) {
+                verIDs.push_back(poly->vers[j]->verID);
+                if (!textureList.empty()) {
+                    texIDs.push_back(poly->texs[j]->texID);
+                }
+            }
+
+            std::string name = std::to_string(i);
+            nlohmann::json face_json;
+            face_json["verID"] = verIDs;
+            face_json["texID"] = texIDs;
+            faces_json[name] = face_json;
+        }
+        mesh_json["faces"] = faces_json;
+    }
+    return mesh_json;
+}
 template class PolyMesh<double>;
 template class PolyMesh<float>;

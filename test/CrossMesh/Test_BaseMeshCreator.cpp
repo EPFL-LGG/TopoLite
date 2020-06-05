@@ -9,19 +9,19 @@
 #include "Mesh/CrossMesh.h"
 #include "Mesh/PolyMesh_AABBTree.h"
 #include <filesystem>
-#include "IO/XMLIO.h"
+#include "IO/JsonIO.h"
 #include "CrossMesh/PatternCreator.h"
 
 TEST_CASE("BaseMeshCreator")
 {
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
 
     std::shared_ptr<PolyMesh_AABBTree<double>> _polyMesh;
     std::shared_ptr<CrossMesh<double>> _pattern2D;
 
-    XMLIO IO;
+    JsonIO IO;
     std::filesystem::create_directory("Pattern");
 
     SECTION("origin.xml")
@@ -29,16 +29,15 @@ TEST_CASE("BaseMeshCreator")
         // read xml
         std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
-        XMLData data;
+        IOData data;
         IO.XMLReader(xmlFileName.c_str(), data);
 
         // read polyMesh
         std::filesystem::path surface_objfile(UNITTEST_DATAPATH);
         surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
 
-        bool texturedModel;
         _polyMesh = make_shared<PolyMesh_AABBTree<double>>(data.varList);
-        _polyMesh->readOBJModel(surface_objfile.c_str(), texturedModel, true);
+        _polyMesh->readOBJModel(surface_objfile.c_str(), true);
 
         _polyMesh->buildTexTree();
 

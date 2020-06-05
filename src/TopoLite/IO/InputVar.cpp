@@ -2,7 +2,7 @@
 // Created by ziqwang on 10.03.19.
 //
 #include "InputVar.h"
-void InitVar(InputVarList *varList)
+void InitVar_backward(InputVarList *varList)
 {
     varList->clear();
 
@@ -172,35 +172,30 @@ void InitVar(InputVarList *varList)
     varList->add(0.01f, Vector2f(0, 1), "support_smallest_area", "Smallest Area") = "Para_Support";
 }
 
-void InitVarLite(InputVarList *varList)
+void InitVar(InputVarList *varList)
 {
-    InitVar(varList);
-    varList->add(true, "showDemo", "") = "";
-    varList->add((int)1, "layerOfBoundary", "") = "";
 
-    varList->find("patternRadius")->visible = true;
-    varList->find("minCrossArea")->visible = true;
-    varList->find("minBoundaryEdge")->visible = false;
-    varList->find("textureScaleFactor")->visible = false;
-    varList->find("slopSample")->visible = false;
-    varList->find("Unit")->visible = false;
-    varList->find("mult_move_scale")->visible = false;
+    //Pattern
+    {
+        varList->add(4, Vector2f(1, 15), "patternID", "Pattern ID") = "Pattern";
+        varList->add((int)15, Vector2f(10, 30), "patternRadius", "Pattern Radius") = "Pattern";
 
-    varList->find("showStrucBBox")->visible = false;
-    varList->find("lockTiltAngle")->visible = false;
-    varList->find("showGeomVertex")->visible = false;
-    varList->find("showCrossTiltBase")->visible = false;
-    varList->find("showCrossTiltFan")->visible = false;
-    varList->find("showInnerPolys")->visible = false;
-    varList->find("mult_move")->visible = false;
+    }
 
-    varList->find("showCompression")->visible = false;
-    varList->find("showOptColorMap")->visible = false;
-    varList->find("showOptGraident")->visible = false;
+    //Cross Mesh
+    {
+        varList->add((int)1, "layerOfBoundary", "L. Boundary") = "Cross_Mesh";
+        varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Minimum Cross Area (%)") = "Cross_Mesh";
+        varList->add(true, "smooth_bdry", "Smooth Boundary") = "Cross_Mesh";
+        varList->add(1.f, "textureScaleFactor", "Texture Scale Factor") = "Cross_Mesh";
+    }
 
-    varList->set("showModel", true);
-    varList->set("showModelTex", true);
+    //Block
+    {
+        varList->add(true, "ground_touch_bdry", "Touch Ground") = "Block";
+        varList->add(20.0f, Vector2f(0, 90), "tiltAngle", "Vector Angle") = "Block";
+        varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Upper Depth") = "Block";
+        varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Lower Depth") = "Block";
+    }
 
-    varList->set("showStruc", false);
-    varList->set("showStrucWire", false);
 }

@@ -20,7 +20,7 @@ if(BUILD_TOPOTEST)
             # Interlocking/Test_toymodel_Ipopt.cpp
            #Interlocking/Test_interlockingSolver_Clp.cpp
 #            Utility/Test_SparseOperations.cpp
-            IO/Test_XMLIO_backward.cpp
+            IO/Test_JsonIO.cpp
             )
 
     add_executable(testTopo ${singleTestFile} Test_Main.cpp)

@@ -14,13 +14,9 @@ TEST_CASE("Read XML"){
     {
         std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
-        XMLData data;
+        IOData data;
         xmlio.XMLReader(xmlFileName, data);
         data.cross_mesh->writeOBJModel("CrossMesh.obj");
         data.reference_surface->writeOBJModel("Reference.obj");
-        for(int crossID: data.boundary_crossIDs){
-            std::cout << crossID << ", ";
-        }
-        std::cout << std::endl;
     }
 }

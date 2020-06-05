@@ -20,6 +20,7 @@
 #include "TopoLite/Utility/PolyPolyBoolean.h"
 #include "Polygon.h"
 #include <Eigen/Dense>
+#include <nlohmann/json.hpp>
 
 using Eigen::Matrix;
 
@@ -127,7 +128,22 @@ public:
     void setPolyLists(vector<pPolygon> _polyList);
 
     // Read OBJ File
-    bool readOBJModel(  const char *fileName, bool &textureModel_, bool normalized);
+    /*!
+     * \brief: Read OBJ File (from file)
+     * \param fileName: filename of an input file
+     * \param normalized: scale the mode into [-1, 1] x [-1, 1] x [-1, 1] box;
+     */
+    bool readOBJModel(const char *fileName, bool normalized);
+    
+    /*!
+     * \brief: Read OBJ File (from matrix)
+     * \param V: vertice's position arrary
+     * \param TC: vertex texture coordinates array
+     * \param F: face index (tri or polygon)
+     * \param FTC: texture face index (tri or polygon)
+     * \param normalized: scale the mode into [-1, 1] x [-1, 1] x [-1, 1] box;
+     */
+    bool readOBJModel(const vector<vector<double>> &V, const vector<vector<double>> &TC, const vector<vector<int>> &F, const vector<vector<int>> &FTC, bool normalized);
 
     void removeDuplicatedVertices(double eps = FLOAT_ERROR_LARGE);
 
@@ -165,6 +181,8 @@ public:
 
     //Save OBJ File
     void writeOBJModel(const char *objFileName, bool triangulate = false) const;
+
+    nlohmann::json dump() const;
 
     //convert to triangle mesh
     void convertToTriMesh(vector<pTriangle> &triList) const;

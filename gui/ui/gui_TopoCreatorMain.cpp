@@ -55,9 +55,15 @@ public:
         new nanogui::Label(window, "File", "sans-bold");
         nanogui::Button *open_button = new nanogui::Button(window, "open");
         open_button->set_callback([&](){
-            load_from_xmlfile(nanogui::file_dialog({ {"xml", ""} }, false));
+            load_from_xmlfile(nanogui::file_dialog({ {"xml", "XML Portable"}, {"json", "JSON File"} }, false));
             return true;
         });
+        nanogui::Button *save_button = new nanogui::Button(window, "save");
+        save_button->set_callback([&](){
+            topo_manager->write_to_json(nanogui::file_dialog({ {"json", "JSON File"} }, true));
+            return true;
+        });
+
 
         new nanogui::Label(window, "Rendering Settings", "sans-bold");
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");

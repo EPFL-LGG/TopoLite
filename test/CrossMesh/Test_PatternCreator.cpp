@@ -9,7 +9,7 @@ TEST_CASE("PatternCreator")
 {
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     PatternCreator<double> patternCreator(varList);
     PatternCreator<double>::pCrossMesh crossMesh;
 

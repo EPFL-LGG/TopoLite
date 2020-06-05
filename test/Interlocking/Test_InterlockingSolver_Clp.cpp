@@ -4,7 +4,7 @@
 
 #include <catch2/catch.hpp>
 #include "Interlocking/InterlockingSolver_Clp.h"
-#include "IO/XMLIO.h"
+#include "IO/JsonIO.h"
 #include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/SparseQR>
@@ -14,9 +14,7 @@ TEST_CASE("Bunny Example Clp")
     vector<shared_ptr<PolyMesh<double>>> meshList;
     vector<bool> atboundary;
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
-
-    bool textureModel;
+    InitVar(varList.get());
 
     //Read all Parts
     for(int id = 1; id <= 80; id++){
@@ -25,7 +23,7 @@ TEST_CASE("Bunny Example Clp")
         std::string part_filename = "data/Voxel/bunny/part_";
         part_filename += number;
         shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+        polyMesh->readOBJModel(part_filename.c_str(), false);
 
         meshList.push_back(polyMesh);
         atboundary.push_back(false);
@@ -88,16 +86,14 @@ TEST_CASE("Ania Example Clp"){
     vector<shared_ptr<PolyMesh<double>>> meshList;
     vector<bool> atboundary;
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
-    bool textureModel;
-
+    InitVar(varList.get());
 
     for(int id = 0; id < 5; id++){
         char number[50];
         std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
         part_filename += file_name[id];
         shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+        polyMesh->readOBJModel(part_filename.c_str(), false);
         meshList.push_back(polyMesh);
         atboundary.push_back(true);
     }
@@ -130,7 +126,7 @@ TEST_CASE("Ania Example: Special Case"){
     vector<shared_ptr<PolyMesh<double>>> meshList;
     vector<bool> atboundary;
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     bool textureModel;
 
 
@@ -139,7 +135,7 @@ TEST_CASE("Ania Example: Special Case"){
         std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
         part_filename += file_name[id];
         shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+        polyMesh->readOBJModel(part_filename.c_str(), false);
         meshList.push_back(polyMesh);
         atboundary.push_back(false);
     }
