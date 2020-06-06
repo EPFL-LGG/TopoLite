@@ -66,14 +66,14 @@ public:
         nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            main_canvas->scene->objects[0]->update_attr("show_wireframe", check);
+            main_canvas->scene->objects[0]->varList->add(check, "show_wireframe", "");
             return check;
         });
 
         checkbox = new nanogui::CheckBox(window, "faces");
         checkbox->set_checked(true);
         checkbox->set_callback([&](bool check){
-            main_canvas->scene->objects[0]->update_attr("show_face", check);
+            main_canvas->scene->objects[0]->varList->add(check, "show_face", "");
             return check;
         });
 

@@ -112,7 +112,7 @@ public:
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
             bool textureModel;
             if(std::filesystem::is_regular_file(part_filename.c_str())){
-                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
+                if(polyMesh->readOBJModel(part_filename.c_str(), false)){
                     polyMesh->mergeFaces(1e-3);
                     meshLists.push_back(polyMesh);
                     atboundary.push_back(false);
@@ -129,7 +129,7 @@ public:
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
             bool textureModel;
             if(std::filesystem::is_regular_file(part_filename.c_str())){
-                if(polyMesh->readOBJModel(part_filename.c_str(), textureModel, false)){
+                if(polyMesh->readOBJModel(part_filename.c_str(), false)){
                     polyMesh->mergeFaces(1e-3);
                     meshLists.push_back(polyMesh);
                     atboundary.push_back(false);
@@ -150,7 +150,7 @@ public:
             std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
             part_filename += file_name[id];
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+            polyMesh->readOBJModel(part_filename.c_str(), false);
             polyMesh->mergeFaces(1e-3);
             meshLists.push_back(polyMesh);
             atboundary.push_back(false);
@@ -174,7 +174,7 @@ public:
             std::string part_filename = "data/Voxel/bunny/part_";
             part_filename += number;
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+            polyMesh->readOBJModel(part_filename.c_str(), false);
 
             meshLists.push_back(polyMesh);
             atboundary.push_back(false);
@@ -194,7 +194,7 @@ public:
             std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
             part_filename += file_name[id];
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+            polyMesh->readOBJModel(part_filename.c_str(), false);
             polyMesh->mergeFaces(1e-3);
             nanogui::Color randomcolor = nanogui::Color(rand() %256 , rand() %256 , rand() %256 , 1);
             for(pPolygon poly: polyMesh->polyList){
@@ -275,7 +275,7 @@ public:
             std::string part_filename = "data/Mesh/Ania_200417_multihand/";
             part_filename += file_name[id];
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+            polyMesh->readOBJModel(part_filename.c_str(), false);
             polyMesh->mergeFaces(1e-3);
             meshLists.push_back(polyMesh);
         }
@@ -310,7 +310,7 @@ public:
             std::string part_filename = "data/Mesh/Ania_200417_frame/";
             part_filename += file_name[id];
             shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-            polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+            polyMesh->readOBJModel(part_filename.c_str(), false);
             polyMesh->mergeFaces(1e-3);
             meshLists.push_back(polyMesh);
         }
