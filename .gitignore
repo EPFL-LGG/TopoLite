@@ -30,3 +30,4 @@ ext/pybind11
 
 # Sphinx doc
 docs/build
+ext/json/
