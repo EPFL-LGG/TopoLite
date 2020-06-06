@@ -108,10 +108,10 @@ public:
         return nanogui::Vector3f(vec.x(), vec.y(), vec.z());
     }
 
-    template<typename AttrType>
-    void update_attr(string name, AttrType value){
-        varList->set(name, value);
-    }
+//    template<typename AttrType>
+//    void update_attr(string name, AttrType value){
+//        varList->set(name, value);
+//    }
 
 };
 

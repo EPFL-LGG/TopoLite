@@ -7,7 +7,7 @@
 #include "CrossMesh/PatternCreator.h"
 #include "Utility/HelpFunc.h"
 #include "Structure/Part.h"
-#include "IO/XMLIO.h"
+#include "IO/JsonIOReader.h"
 #include "Structure/StrucCreator.h"
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_AffineScaling.h"
@@ -63,7 +63,7 @@ XMLData* initStructure(){
     XMLData *data = new XMLData();
 
     data->varList = make_shared<InputVarList>();
-    InitVarLite(data->varList.get());
+    InitVar(data->varList.get());
 
     data->strucCreator = make_shared<StrucCreator>(data->varList);
 
@@ -80,7 +80,7 @@ ContactGraphData* initContactGraph(){
     ContactGraphData *graphData = new ContactGraphData();
 
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     graphData->graph = make_shared<ContactGraph>(varList);
 
     return graphData;

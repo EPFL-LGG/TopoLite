@@ -72,7 +72,7 @@ bool CrossMeshCreator<Scalar>::setReferenceSurface(pPolyMesh _ref){
 
     if(referenceSurface)
     {
-        getVarList()->set("texturedModel", true);
+        getVarList()->add(true, "texturedModel", "");
     }
     return referenceSurface != nullptr;
 }
@@ -86,25 +86,10 @@ bool CrossMeshCreator<Scalar>::setPatternMesh(pPolyMesh _pattern)
 }
 
 template <typename Scalar>
-bool CrossMeshCreator<Scalar>::setCrossMesh(pPolyMesh _cross, vector<bool> &atBoundary)
+bool CrossMeshCreator<Scalar>::setCrossMesh(pCrossMesh _crossmesh)
 {
-    if(_cross == nullptr) return false;
-
-    getVarList()->set("texturedModel", false);
-    crossMesh = make_shared<CrossMesh<Scalar>>(*_cross);
-
-    if(crossMesh->size() == atBoundary.size())
-    {
-        for(int id = 0; id < crossMesh->size(); id++)
-        {
-            pCross cross = crossMesh->cross(id);
-            cross->atBoundary = atBoundary[cross->crossID];
-        }
-    }
-    else{
-        BaseMeshCreator<Scalar> baseMeshCreator(getVarList());
-        baseMeshCreator.recomputeBoundary(crossMesh);
-    }
+    if(_crossmesh == nullptr) return false;
+    crossMesh = make_shared<CrossMesh<Scalar>>(*_crossmesh);
     return  true;
 }
 
@@ -130,8 +115,8 @@ template <typename Scalar>
 bool CrossMeshCreator<Scalar>:: updatePatternMesh()
 {
     tbb::tick_count sta = tbb::tick_count::now();
-    int patternID = getVarList()->template get<int>("patternID");
-    int patternRadius = getVarList()->template get<int>("patternRadius");
+    int patternID = getVarList()->getInt("patternID");
+    int patternRadius = getVarList()->getInt("patternRadius");
     PatternCreator<Scalar> patternCreator(getVarList());
     patternCreator.create2DPattern(PatternType(patternID), patternRadius, pattern2D);
     std::cout << "Pattern Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
@@ -142,7 +127,7 @@ template <typename Scalar>
 bool CrossMeshCreator<Scalar>::createAugmentedVectors(){
     if(crossMesh){
         tbb::tick_count sta = tbb::tick_count::now();
-        float tiltAngle = getVarList()->template get<float>("tiltAngle");
+        float tiltAngle = getVarList()->getFloat("tiltAngle");
         AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
         vectorCreator.createAugmentedVectors(tiltAngle, crossMesh);
         std::cout << "Augmented Vectors Creation:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
@@ -155,7 +140,7 @@ template <typename Scalar>
 bool CrossMeshCreator<Scalar>::updateAugmentedVectors(){
     if(crossMesh){
         tbb::tick_count sta = tbb::tick_count::now();
-        float tiltAngle = getVarList()->template get<float>("tiltAngle");
+        float tiltAngle = getVarList()->getFloat("tiltAngle");
         AugmentedVectorCreator<Scalar> vectorCreator(getVarList());
         vectorCreator.updateAugmentedVectors(tiltAngle, crossMesh);
         std::cout << "Augmented Vectors Update:\t" <<  (tbb::tick_count::now() - sta).seconds() << std::endl;
@@ -163,6 +148,26 @@ bool CrossMeshCreator<Scalar>::updateAugmentedVectors(){
     }
     return false;
 }
+
+template <typename Scalar>
+bool CrossMeshCreator<Scalar>::updateCrossMeshBoundary(const vector<int>& boundary_crossIDs){
+    if(crossMesh)
+    {
+        for(size_t id = 0; id < crossMesh->size(); id++){
+            crossMesh->cross(id)->atBoundary = false;
+        }
+        
+        for(size_t id = 0; id < boundary_crossIDs.size(); id++)
+        {
+            int crossID = boundary_crossIDs[id];
+            if(crossID >= 0 && crossID < crossMesh->size()){
+                crossMesh->cross(crossID)->atBoundary = true;
+            }
+        }
+    }
+    return true;
+}
+
 
 template <typename Scalar>
 bool CrossMeshCreator<Scalar>::computeAugmentedRange()
@@ -229,7 +234,7 @@ Matrix<Scalar, 4, 4> CrossMeshCreator<Scalar>::computeTextureMat_backwards_compa
         trans1(2, 3) = 0;
 
         //2) scale 1) into [-0.5, -0.5]x [0.5, 0.5]
-        Scalar scale_factor = getVarList()->template get<float>("textureScaleFactor");
+        Scalar scale_factor = getVarList()->getFloat("textureScaleFactor");
         Scalar footScale = scale_factor / max(texBBox.maxPt.x() - texBBox.minPt.x(), texBBox.maxPt.y() - texBBox.minPt.y());
         Matrix4 scale = Matrix4::Identity();
         scale(0, 0) = footScale; scale(1, 1) = footScale;

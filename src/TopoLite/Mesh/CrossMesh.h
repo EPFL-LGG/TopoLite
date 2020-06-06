@@ -74,6 +74,10 @@ public:
 
     void print() const;
 
+    bool parse(const nlohmann::json &mesh_json);
+
+    nlohmann::json dump() const;
+
     void clear()
     {
         PolyMesh<Scalar>::clear();
@@ -132,9 +136,17 @@ public:
 
     pPolyMesh getPolyMesh() const{
         pPolyMesh polymesh = make_shared<PolyMesh<Scalar>>(*(PolyMesh<Scalar> *) this);
-        for(int id = 0; id < PolyMesh<Scalar>::polyList.size(); id++){
-        }
         return polymesh;
+    }
+
+    vector<int> getBoundaryCrossIDs() const{
+        vector<int> boundary_crossIDs;
+        for(size_t id = 0; id < crossList.size(); id++){
+            if(crossList[id]->atBoundary){
+                boundary_crossIDs.push_back(id);
+            }
+        }
+        return boundary_crossIDs;
     }
 
 public:

@@ -16,7 +16,7 @@ void Scale_ListVector3d(vector<Vector3d>& poly, double Scale = 10000){
 TEST_CASE("Class PolyPolyBoolean")
 {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
 
     PolyPolyBoolean<double> polyBoolean(varList);
 

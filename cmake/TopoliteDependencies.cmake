@@ -86,3 +86,7 @@ if(NOT TARGET tbb)
 
 endif()
 
+#json
+if(NOT TARGET nlohmann_json::nlohmann_json)
+    topolite_download_json()
+endif()

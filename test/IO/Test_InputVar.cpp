@@ -11,8 +11,8 @@ TEST_CASE("InputVar")
     REQUIRE(varList->varLists.empty());
 
     SECTION("InputVarLite"){
-        InitVarLite(varList.get());
-        REQUIRE(varList->get<bool>("showDemo"));
+        InitVar(varList.get());
+        REQUIRE(varList->get<bool>("layerOfBoundary"));
     }
 
 }

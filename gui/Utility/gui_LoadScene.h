@@ -13,7 +13,7 @@
 #include "Mesh/CrossMesh.h"
 #include "CrossMesh/AugmentedVectorCreator.h"
 #include "CrossMesh/BaseMeshCreator.h"
-#include "IO/XMLIO.h"
+#include "IO/JsonIOReader.h"
 #include "CrossMesh/PatternCreator.h"
 #include "CrossMesh/CrossMeshCreator.h"
 using std::weak_ptr;
@@ -34,7 +34,7 @@ public:
     gui_LoadScene(weak_ptr<gui_SceneObject<double>> _scene):
             scene(_scene){
         varList = make_shared<InputVarList>();
-        InitVarLite(varList.get());
+        InitVar(varList.get());
     }
 
 public:

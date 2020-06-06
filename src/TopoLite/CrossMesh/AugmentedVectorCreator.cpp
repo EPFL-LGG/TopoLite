@@ -111,7 +111,7 @@ void AugmentedVectorCreator<Scalar>::InitMeshTiltNormalsResolveConflicts(pCrossM
         {
             if (    nextVisit.lock() == nullptr
                 ||  crossVisited.find(nextVisit.lock().get()) != crossVisited.end()
-                || (nextVisit.lock()->atBoundary && getVarList()->template get<bool>("ground_touch_bdry")))
+                || (nextVisit.lock()->atBoundary && getVarList()->getBool("ground_touch_bdry")))
                 continue;
 
             nextVisit.lock()->updateTiltNormals(tiltAngle, crossVisited);
@@ -121,7 +121,7 @@ void AugmentedVectorCreator<Scalar>::InitMeshTiltNormalsResolveConflicts(pCrossM
     }
 
     //update the reset of boundary crosses
-    if (getVarList()->template get<bool>("ground_touch_bdry")) {
+    if (getVarList()->getBool("ground_touch_bdry")) {
         for (size_t id = 0; id < crossMesh->size(); ++id) {
             wpCross part = crossMesh->cross(id);
             if (part.lock()->atBoundary){
@@ -137,7 +137,7 @@ bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {
     if (crossMesh == nullptr)
         return false;
 
-    auto big_zero_eps = getVarList()->template get<float>("big_zero_eps");
+    auto big_zero_eps = getVarList()->getFloat("big_zero_eps");
     for (int id = 0; id < crossMesh->size(); id++)
     {
         pCross cross = crossMesh->cross(id);
@@ -215,7 +215,7 @@ bool AugmentedVectorCreator<Scalar>::UpdateMeshTiltRange(pCrossMesh crossMesh) {
     }
     std::cout << "Range:\t[" << max_min << ",\t" << min_max << "]" << std::endl;
 
-    Scalar tiltangle = getVarList()->template get<float>("tiltAngle");
+    Scalar tiltangle = getVarList()->getFloat("tiltAngle");
     return tiltangle < max_min || tiltangle > min_max ? false : true;
 }
 

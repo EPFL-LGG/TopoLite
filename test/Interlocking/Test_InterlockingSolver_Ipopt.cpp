@@ -4,7 +4,7 @@
 
 #include <catch2/catch.hpp>
 #include "Interlocking/InterlockingSolver_Ipopt.h"
-#include "IO/XMLIO.h"
+#include "IO/JsonIOReader.h"
 #include <iostream>
 #include <Eigen/Dense>
 #include <Eigen/SparseQR>
@@ -16,8 +16,7 @@ using namespace Eigen;
      vector<shared_ptr<PolyMesh<double>>> meshList;
      vector<bool> atboundary;
      shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-     InitVarLite(varList.get());
-     bool textureModel;
+     InitVar(varList.get());
 
      //Read all Parts
      for(int id = 1; id <= 80; id++){
@@ -26,7 +25,7 @@ using namespace Eigen;
          std::string part_filename = "data/Voxel/bunny/part_";
          part_filename += number;
          shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-         polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+         polyMesh->readOBJModel(part_filename.c_str(), false);
 
          meshList.push_back(polyMesh);
          atboundary.push_back(false);
@@ -91,16 +90,14 @@ TEST_CASE("Ania Example Ipopt"){
     vector<shared_ptr<PolyMesh<double>>> meshList;
     vector<bool> atboundary;
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
-    bool textureModel;
-
+    InitVar(varList.get());
 
     for(int id = 0; id < 5; id++){
         char number[50];
         std::string part_filename = "data/Mesh/Ania_200127_betweenbars/";
         part_filename += file_name[id];
         shared_ptr<PolyMesh<double>> polyMesh = make_shared<PolyMesh<double>>(varList);
-        polyMesh->readOBJModel(part_filename.c_str(), textureModel, false);
+        polyMesh->readOBJModel(part_filename.c_str(), false);
         meshList.push_back(polyMesh);
         atboundary.push_back(true);
     }
@@ -202,7 +199,7 @@ TEST_CASE("IpoptProblem eval_jac_g") {
 //     vector<shared_ptr<PolyMesh<double>>> meshList;
 //     vector<bool> atboundary;
 //     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-//     InitVarLite(varList.get());
+//     InitVar(varList.get());
 //     bool textureModel;
 
 

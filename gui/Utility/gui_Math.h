@@ -4,10 +4,11 @@
 
 #ifndef TOPOLITE_GUI_MATH_H
 #define TOPOLITE_GUI_MATH_H
+
 #include <Eigen/Dense>
 #include <nanogui/vector.h>
 
-Eigen::Vector3f project(const Eigen::Vector3f &obj,
+inline Eigen::Vector3f project(const Eigen::Vector3f &obj,
                         const Eigen::Matrix4f &model,
                         const Eigen::Matrix4f &proj,
                         const nanogui::Vector2i &viewportSize) {
@@ -26,7 +27,7 @@ Eigen::Vector3f project(const Eigen::Vector3f &obj,
     return tmp.head(3);
 }
 
-Eigen::Vector3f unproject(const Eigen::Vector3f &win,
+inline Eigen::Vector3f unproject(const Eigen::Vector3f &win,
                           const Eigen::Matrix4f &model,
                           const Eigen::Matrix4f &proj,
                           const nanogui::Vector2i &viewportSize) {
@@ -44,7 +45,7 @@ Eigen::Vector3f unproject(const Eigen::Vector3f &win,
     return obj.head(3);
 }
 
-Eigen::Matrix4f lookAt(const Eigen::Vector3f &eye,
+inline Eigen::Matrix4f lookAt(const Eigen::Vector3f &eye,
                        const Eigen::Vector3f &center,
                        const Eigen::Vector3f &up) {
     Eigen::Vector3f f = (center - eye).normalized();
@@ -67,7 +68,7 @@ Eigen::Matrix4f lookAt(const Eigen::Vector3f &eye,
     return Result;
 }
 
-Eigen::Matrix4f ortho(const float left, const float right, const float bottom,
+inline Eigen::Matrix4f ortho(const float left, const float right, const float bottom,
                       const float top, const float zNear, const float zFar) {
     Eigen::Matrix4f Result = Eigen::Matrix4f::Identity();
     Result(0, 0) = 2.0f / (right - left);
@@ -79,7 +80,7 @@ Eigen::Matrix4f ortho(const float left, const float right, const float bottom,
     return Result;
 }
 
-Eigen::Matrix4f frustum(const float left, const float right, const float bottom,
+inline Eigen::Matrix4f frustum(const float left, const float right, const float bottom,
                         const float top, const float nearVal,
                         const float farVal) {
     Eigen::Matrix4f Result = Eigen::Matrix4f::Zero();
@@ -93,7 +94,7 @@ Eigen::Matrix4f frustum(const float left, const float right, const float bottom,
     return Result;
 }
 
-Eigen::Matrix4f scale(const Eigen::Matrix4f &m, const Eigen::Vector3f &v) {
+inline Eigen::Matrix4f scale(const Eigen::Matrix4f &m, const Eigen::Vector3f &v) {
     Eigen::Matrix4f Result;
     Result.col(0) = m.col(0).array() * v(0);
     Result.col(1) = m.col(1).array() * v(1);
@@ -102,7 +103,7 @@ Eigen::Matrix4f scale(const Eigen::Matrix4f &m, const Eigen::Vector3f &v) {
     return Result;
 }
 
-Eigen::Matrix4f translate(const Eigen::Matrix4f &m, const Eigen::Vector3f &v) {
+inline Eigen::Matrix4f translate(const Eigen::Matrix4f &m, const Eigen::Vector3f &v) {
     Eigen::Matrix4f Result = m;
     Result.col(3) = m.col(0).array() * v(0) + m.col(1).array() * v(1) +
                     m.col(2).array() * v(2) + m.col(3).array();

@@ -7,7 +7,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/eigen.h>
 #include <string>
-#include "IO/XMLIO.h"
+#include "IO/JsonIOReader.h"
 #include "PyContactGraph.h"
 #include "PyInterlockChecker.h"
 

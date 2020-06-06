@@ -15,7 +15,7 @@
 #define GeometricPrimitives_H
 
 #include "TopoLite/Utility/HelpDefine.h"
-
+#include <nlohmann/json.hpp>
 #include <vector>
 #include <Eigen/Dense>
 #include <cmath>
@@ -659,6 +659,10 @@ struct OrientPoint
     Vector2 sided_range;	   // for debug, show the side range
 public:
 
+    OrientPoint(const nlohmann::json &oript_json){
+        parse(oript_json);
+    }
+
 	OrientPoint(Vector3 _point, Vector3 _normal)
 	{
 		point  = _point;
@@ -717,6 +721,32 @@ public:
 		printf("point: [%6.3f %6.3f %6.3f]   normal: [%6.3f %6.3f %6.3f] \n", point[0], point[1], point[2], normal[0], normal[1], normal[2]);
 		printf("rotation_axis: [%6.3f %6.3f %6.3f]   rotation_angle: [%6.3f] \n", rotation_axis[0], rotation_axis[1], rotation_axis[2], rotation_angle);
 	};
+
+    nlohmann::json dump(){
+        nlohmann::json oript_json;
+        oript_json["middle point"] = {point.x(), point.y(), point.z()};
+        oript_json["face normal"] = {normal.x(), normal.y(), normal.z()};
+        oript_json["rotation axis"] = {rotation_axis.x(), rotation_axis.y(), rotation_axis.z()};
+        oript_json["rotation base"] = {rotation_base.x(), rotation_base.y(), rotation_base.z()};
+        oript_json["tilting range"] = {tilt_range.x(), tilt_range.y()};
+
+        oript_json["rotation angle"] = rotation_angle;
+        oript_json["tilting sign"] = tiltSign;
+        oript_json["globalID"] = oriptID;
+        return oript_json;
+    }
+
+    void parse(const nlohmann::json &oript_json){
+        point = Vector3(((vector<Scalar>)oript_json["middle point"]).data());
+        normal = Vector3(((vector<Scalar>)oript_json["face normal"]).data());
+        rotation_axis = Vector3(((vector<Scalar>)oript_json["rotation axis"]).data());
+        rotation_base = Vector3(((vector<Scalar>)oript_json["rotation base"]).data());
+        tilt_range = Vector2(((vector<Scalar>)oript_json["tilting range"]).data());
+
+        rotation_angle = (Scalar)oript_json["rotation angle"];
+        tiltSign = (int)oript_json["tilting sign"];
+        oriptID = (int)oript_json["globalID"];
+    }
 };
 
 template <typename Scalar>

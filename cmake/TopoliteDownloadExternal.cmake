@@ -133,3 +133,9 @@ function(topolite_download_nanogui)
             )
 endfunction()
 
+function(topolite_download_json)
+    topolite_download_project(json
+            GIT_REPOSITORY     https://github.com/nlohmann/json.git
+            GIT_TAG            dd7e25927fe7a49c81d07943c32444f0a9011665
+            )
+endfunction()

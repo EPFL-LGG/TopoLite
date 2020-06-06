@@ -9,7 +9,7 @@
 TEST_CASE("PolyMesh - Four Quad with index as input") {
     // Setup
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     PolyMesh<double> polyMesh(varList);
 
     vector<shared_ptr<_Polygon<double>>> polyLists;
@@ -70,7 +70,7 @@ TEST_CASE("PolyMesh - Four Quad with index as input") {
 
 TEST_CASE("PolyMesh - Cube") {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     PolyMesh<double> polyMesh(varList);
 
     SECTION("Cube") {
@@ -123,13 +123,12 @@ TEST_CASE("PolyMesh - Cube") {
     }
 
     SECTION("read polyhedron") {
-        bool texturedModel;
 
         std::filesystem::path dataFolder(UNITTEST_DATAPATH);
         std::filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
 
-        polyMesh.readOBJModel(filepath.c_str(), texturedModel, true);
-        REQUIRE(texturedModel == true);
+        polyMesh.readOBJModel(filepath.c_str(), true);
+        REQUIRE(polyMesh.texturedModel == true);
 
         polyMesh.rotateMesh(Vector3d(0, 0, 0), Vector3d(0, 0, 1), 10);
         polyMesh.translateMesh(Vector3d(1, 1, 1));

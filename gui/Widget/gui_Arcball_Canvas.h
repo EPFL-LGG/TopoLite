@@ -229,8 +229,6 @@ private:
 
     bool translate_ = false;
     Eigen::Vector2i translateStart_ = Eigen::Vector2i(0, 0);
-
-
 };
 
 

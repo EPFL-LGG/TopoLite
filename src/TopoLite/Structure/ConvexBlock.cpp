@@ -26,7 +26,6 @@ ConvexBlock<Scalar>::ConvexBlock(pCross _cross, Vector2 _cutter_heights)
 :TopoObject(_cross->getVarList()), cutter_heights(_cutter_heights), cross(_cross)
 {
 	polyMesh = nullptr;
-	atBoundary = cross.lock()->atBoundary;
 }
 
 template<typename Scalar>
@@ -127,7 +126,7 @@ void ConvexBlock<Scalar>::computeHyperPlanes()
     Vector3 center = cross.lock()->center();
     bool boundary = cross.lock()->atBoundary;
 
-    if(boundary || !getVarList()->template get <bool>("only_cut_bdry"))
+    if(boundary || !getVarList()->getBool("only_cut_bdry"))
     {
         if(cutter_heights[0] > 0.0)
         {

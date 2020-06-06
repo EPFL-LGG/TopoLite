@@ -9,7 +9,7 @@
 TEST_CASE("AugmentedVectorCreator"){
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
 
     AugmentedVectorCreator<double> augmentedVectorCreator(varList);
 

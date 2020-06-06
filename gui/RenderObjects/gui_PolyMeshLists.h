@@ -167,6 +167,7 @@ public:
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
 #endif
+        
         shader = new nanogui::Shader(render_pass, "PolyMeshShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None);
 
         update_buffer();
@@ -217,13 +218,13 @@ public:
 
                     buffer_barycentric.push_back(1);
                     buffer_barycentric.push_back(0);
-                    if(!polygon->edge_at_boundary[edgeID]) buffer_barycentric.push_back(1);
-                    else buffer_barycentric.push_back(0);
+                    if(!polygon->at_boundary(edgeID)) buffer_barycentric.push_back(1);
+                    buffer_barycentric.push_back(0);
 
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(1);
-                    if(!polygon->edge_at_boundary[edgeID]) buffer_barycentric.push_back(1);
-                    else buffer_barycentric.push_back(0);
+                    if(!polygon->at_boundary(edgeID)) buffer_barycentric.push_back(1);
+                    buffer_barycentric.push_back(0);
 
                     buffer_barycentric.push_back(0);
                     buffer_barycentric.push_back(0);
@@ -264,8 +265,8 @@ public:
     }
 
     void update_uniform(){
-        shader->set_uniform("show_wireframe", varList->template get<bool>("show_wireframe"));
-        shader->set_uniform("show_face", varList->template get<bool>("show_face"));
+        shader->set_uniform("show_wireframe", varList->getBool("show_wireframe"));
+        shader->set_uniform("show_face", varList->getBool("show_face"));
         shader->set_uniform("mvp", this->toNanoguiMatrix(proj_mat * view_mat * model_mat));
         shader->set_uniform("simtime", simtime);
         shader->set_uniform("line_color", line_color);

@@ -16,7 +16,7 @@ public:
 
     PyParamList(){
         data_ = make_shared<InputVarList>();
-        InitVarLite(data_.get());
+        InitVar(data_.get());
     }
 
     PyParamList(shared_ptr<InputVarList> varList){

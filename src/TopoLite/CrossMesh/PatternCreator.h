@@ -33,6 +33,8 @@ enum PatternType{
     CROSS_PENTAGON_MIRROR = 12
 };
 
+const int MAX_PATTERN_TYPE = 12;
+
 template<typename Scalar>
 class PatternCreator : public TopoObject
 {

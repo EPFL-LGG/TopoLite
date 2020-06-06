@@ -10,7 +10,7 @@ TEST_CASE("Cross")
 {
     shared_ptr<InputVarList> varList;
     varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
 
     // Define an Hexagon with 6 pt - Create a cross object + tilt it by 30 degrees
 

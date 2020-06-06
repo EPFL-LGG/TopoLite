@@ -61,23 +61,23 @@
 			<opt_compression_weight value="0.00999999978" />
 			<opt_tension_weight value="10000" />
 			<opt_activeset_eps value="9.99999975e-05" />
-			<opt_gravity_scale_factor value="100" />
-			<opt_knitro_opttol value="1.00000001e-10" />
+			<opt_gravity_scale_factor value="10000" />
+			<opt_knitro_opttol value="1.00000001e-07" />
 			<opt_iterations_times value="100" />
 			<opt_tiltAngle_width value="20" />
 			<opt_mod value="0" />
 			<opt_init_levelset value="0.00100000005" />
 			<opt_radius_scale_factor value="0.200000003" />
 			<opt_rs_factor_lower_bound value="0.00999999978" />
-			<opt_poly_size value="5" />
+			<opt_poly_size value="6" />
 			<opt_edge_sample value="10" />
 			<opt_tot_time value="0" />
 		</Para_Opt>
 		<pickPartIDs></pickPartIDs>
 		<Interact_Matrix>2.344562,-0.209693,0.000000,0.000000,0.209693,2.344562,0.000000,0.000000,0.000000,0.000000,0.470784,0.000000,0.000000,0.000000,0.000000,1.000000</Interact_Matrix>
 		<Camera>
-			<worldAxesMat>-0.411911,-0.389383,0.823854,0.000000,0.295346,0.798261,0.524959,0.000000,-0.862058,0.459556,-0.213802,0.000000,0.000000,0.000000,-4.000000,1.000000</worldAxesMat>
-			<worldMatrix>-0.438862,-0.414856,0.877758,0.000000,0.066234,0.948232,0.481290,0.000000,-0.968607,0.252816,-0.364790,0.000000,0.000000,0.000000,-3.800000,1.000000</worldMatrix>
+			<worldAxesMat>-0.384998,-0.583737,0.714880,0.000000,0.316865,0.643903,0.696432,0.000000,-0.866844,0.494641,-0.062929,0.000000,0.000000,0.000000,-4.000000,1.000000</worldAxesMat>
+			<worldMatrix>-0.410188,-0.621926,0.761655,0.000000,0.087060,0.799053,0.699361,0.000000,-0.979466,0.331488,-0.256807,0.000000,0.000000,0.000000,-3.800000,1.000000</worldMatrix>
 		</Camera>
 		<Para_Assembly>
 			<showAssembly value="0" />
@@ -93,13 +93,14 @@
 			<support_smallest_area value="0.00999999978" />
 		</Para_Support>
 		<Unit value="150" />
-		<slopSample value="10" />
+		<slopSample value="32" />
 		<mult_move_scale value="1" />
 		<penetration_check value="0" />
 		<tilt_face_angle_min value="0" />
 		<tilt_face_angle_max value="0" />
 		<Boundary_PartIDs>61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102</Boundary_PartIDs>
-	</GUISettings>
+	
+		</GUISettings>
 	<Output>
 		<Structure path="origin_data/origin_Surface.obj" />
 		<CrossMesh path="origin_data/origin_CrossMesh.obj" />

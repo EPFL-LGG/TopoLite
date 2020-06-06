@@ -25,7 +25,7 @@ _Polygon<double> buildContactPolygon(_Polygon<double>contactPolygon, const share
 
 TEST_CASE("Class ContactGraph") {
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
 
     pPolygon pA = make_shared<_Polygon<double>>();
     pA->push_back(Vector3d(0, 0, 0));
@@ -313,11 +313,10 @@ TEST_CASE("Class ContactGraph") {
         B = make_shared<PolyMesh<double>>(varList);
 
         string strA = "data/Mesh/contact_scaling_bug/01.obj";
-        bool texturedModel;
-        A->readOBJModel(strA.c_str(), texturedModel, false);
+        A->readOBJModel(strA.c_str(), false);
 
         string strB = "data/Mesh/contact_scaling_bug/02.obj";
-        B->readOBJModel(strB.c_str(), texturedModel, false);
+        B->readOBJModel(strB.c_str(), false);
 
         vector<pPolyMesh> meshes;
         vector<bool> atBoundary;

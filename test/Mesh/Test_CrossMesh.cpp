@@ -9,13 +9,12 @@ TEST_CASE("CrossMesh")
 {
 
     shared_ptr<InputVarList> varList = make_shared<InputVarList>();
-    InitVarLite(varList.get());
+    InitVar(varList.get());
     PolyMesh<double> polyMesh(varList);
 
     SECTION("read polyhedron")
     {
-        bool texturedModel;
-        polyMesh.readOBJModel("data/Mesh/primitives/Icosphere.obj", texturedModel, true);
+        polyMesh.readOBJModel("data/Mesh/primitives/Icosphere.obj", true);
         CrossMesh<double> crossMesh(polyMesh);
         REQUIRE(crossMesh.getVertices().size() == polyMesh.vertexList.size());
         REQUIRE(Approx(crossMesh.volume()) == polyMesh.volume());

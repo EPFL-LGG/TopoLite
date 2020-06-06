@@ -97,7 +97,7 @@ public:
 
     bool setPatternMesh(pPolyMesh surface);
 
-	bool setCrossMesh(pPolyMesh surface, vector<bool> &atBoundary);
+	bool setCrossMesh(pCrossMesh crossmesh);
 
 public:
 
@@ -122,6 +122,11 @@ public:
     * \brief: function to update the augmented vectors of each edge in cross mesh
     */
     bool updateAugmentedVectors();
+
+    /*!
+    * \brief: function to update the boundary of the crossmesh
+    */
+    bool updateCrossMeshBoundary(const vector<int>& boundary_crossIDs);
 
 
     /*!
