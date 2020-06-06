@@ -34,11 +34,13 @@ bool JsonIOReader::read()
 bool JsonIOReader::readParameter(const nlohmann::json &parameter_json)
 {
     data.lock()->varList = make_shared<InputVarList>();
+    InitVar(data.lock()->varList.get());
     InputVarManager manager;
     for(auto& [key, value] : parameter_json.items()){
         shared_ptr<InputVar> var = manager.readJSON(value, key);
         data.lock()->varList->add(var);
     }
+    std::cout << ((InputVarInt *)data.lock()->varList->find("patternID"))->bound << std::endl;
     return true;
 }
 

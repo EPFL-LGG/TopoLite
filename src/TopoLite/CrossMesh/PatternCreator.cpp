@@ -109,7 +109,7 @@ void PatternCreator<Scalar>::create2DPattern(PatternType patternID,
     //, expand the polygon by finding all its neighbouring polygon
     // and add the neighbouring polygons into the queue
     // until the depth of the BFS tree reaches the user specific number.
-
+    
 
     //BFS(Breadth-First Search) Node Data Structure
     //

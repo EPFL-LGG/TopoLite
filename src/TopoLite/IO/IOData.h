@@ -23,6 +23,7 @@ struct IOData{
 public:
     IOData(){
         varList = make_shared<InputVarList>();
+        InitVar(varList.get());
     }
 
 public:

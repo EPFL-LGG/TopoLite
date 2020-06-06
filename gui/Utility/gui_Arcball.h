@@ -4,6 +4,7 @@
 
 #ifndef TOPOLITE_GUI_ARCBALL_H
 #define TOPOLITE_GUI_ARCBALL_H
+
 #include <Eigen/Dense>
 #include <nanogui/vector.h>
 #include "gui_Math.h"

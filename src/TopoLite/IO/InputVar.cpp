@@ -177,25 +177,25 @@ void InitVar(InputVarList *varList)
 
     //Pattern
     {
-        varList->add(4, Vector2f(1, 15), "patternID", "Pattern ID") = "Pattern";
-        varList->add((int)15, Vector2f(10, 30), "patternRadius", "Pattern Radius") = "Pattern";
+        varList->add(4, Vector2f(1, 12), "patternID", "Ptn. ID") = "Pattern";
+        varList->add((int)15, Vector2f(10, 30), "patternRadius", "Ptn. Radius") = "Pattern";
 
     }
 
     //Cross Mesh
     {
-        varList->add((int)1, "layerOfBoundary", "L. Boundary") = "Cross_Mesh";
-        varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Minimum Cross Area (%)") = "Cross_Mesh";
-        varList->add(true, "smooth_bdry", "Smooth Boundary") = "Cross_Mesh";
+        varList->add((int)1, Vector2f(1, 5), "layerOfBoundary", "L. Brdy") = "Cross_Mesh";
+        varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Min. Cross") = "Cross_Mesh";
+        varList->add(true, "smooth_bdry", "Smooth Brdy") = "Cross_Mesh";
         varList->add(1.f, "textureScaleFactor", "Texture Scale Factor") = "Cross_Mesh";
+        varList->add(true, "ground_touch_bdry", "Touch Grd.") = "CrossMesh";
     }
 
     //Block
     {
-        varList->add(true, "ground_touch_bdry", "Touch Ground") = "Block";
-        varList->add(20.0f, Vector2f(0, 90), "tiltAngle", "Vector Angle") = "Block";
-        varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Upper Depth") = "Block";
-        varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Lower Depth") = "Block";
+        varList->add(20.0f, Vector2f(0, 90), "tiltAngle", "Aug. Angle") = "Block";
+        varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Cut Up.") = "Block";
+        varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Cut Lo.") = "Block";
     }
 
 }

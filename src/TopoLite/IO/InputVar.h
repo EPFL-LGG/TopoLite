@@ -30,7 +30,8 @@ enum varValueType{
 
 enum varGUIType{
     GUI_NONE,
-    GUI_SLIDER,
+    GUI_SLIDERFLOAT,
+    GUI_SLIDERINT,
     GUI_CHECKBOX,
     GUI_TEXTBOX,
 };
@@ -40,9 +41,11 @@ class InputVar
 public:
     InputVar()
     {
-        var_control_type = GUI_NONE;
+        var_gui_type = GUI_NONE;
         var_value_type = VAR_VALUE_NONE;
         visible = true;
+        update = false;
+        func = nullptr;
     }
     
     ~InputVar(){
@@ -67,8 +70,10 @@ public:
     string series_name;
     string label;
     bool visible;
-    varGUIType var_control_type;
+    bool update;
+    varGUIType var_gui_type;
     varValueType var_value_type;
+    std::function<void()> func;
 };
 
 class InputVarInt : public InputVar
@@ -77,7 +82,7 @@ public:
     InputVarInt(int val, Vector2f _bound = Vector2f(0, 0))
     {
         default_value = value = val;
-        var_control_type = GUI_SLIDER;
+        var_gui_type = GUI_SLIDERINT;
         var_value_type = VAR_VALUE_INT;
         bound = _bound;
     }
@@ -102,7 +107,7 @@ public:
     InputVarFloat(float val, Vector2f _bound = Vector2f(0, 0))
     {
         default_value = value = val;
-        var_control_type = GUI_SLIDER;
+        var_gui_type = GUI_SLIDERFLOAT;
         var_value_type = VAR_VALUE_FLOAT;
         bound = _bound;
     }
@@ -125,7 +130,7 @@ class InputVarBool: public InputVar{
 public:
     InputVarBool(bool val){
         default_value = value = val;
-        var_control_type = GUI_CHECKBOX;
+        var_gui_type = GUI_CHECKBOX;
         var_value_type = VAR_VALUE_BOOL;
     }
 
@@ -144,9 +149,10 @@ public:
 
 class InputVarIntList: public InputVar{
 public:
-    InputVarIntList(vector<int> val){
+    InputVarIntList(vector<int> val)
+    {
         value = val;
-        var_control_type = GUI_NONE;
+        var_gui_type = GUI_NONE;
         var_value_type = VAR_VALUE_INTLIST;
     }
 
@@ -158,7 +164,7 @@ class InputVarMatrix4d: public InputVar{
 public:
     InputVarMatrix4d(Eigen::Matrix4d val){
         value = val;
-        var_control_type = GUI_NONE;
+        var_gui_type = GUI_NONE;
         var_value_type = VAR_VALUE_MATRIX4D;
     }
 
@@ -174,7 +180,7 @@ public:
             }
         }
 
-        var_control_type = GUI_NONE;
+        var_gui_type = GUI_NONE;
         var_value_type = VAR_VALUE_MATRIX4D;
     }
 
@@ -426,7 +432,25 @@ public:
         {
             InputVar *findvar = find(var->var_names.front());
             if(findvar){
-                *findvar = *var;
+                switch(findvar->var_value_type)
+                {
+                    case VAR_VALUE_INT:
+                        ((InputVarInt *)findvar)->value = ((InputVarInt *)(var.get()))->value;
+                        break;
+                    case VAR_VALUE_BOOL:
+                        ((InputVarBool *)findvar)->value = ((InputVarBool *)(var.get()))->value;
+                        break;
+                    case VAR_VALUE_FLOAT:
+                        ((InputVarFloat *)findvar)->value = ((InputVarFloat *)(var.get()))->value;
+                        break;
+                    case VAR_VALUE_INTLIST:
+                        ((InputVarIntList *)findvar)->value = ((InputVarIntList *)(var.get()))->value;
+                        break;
+                    case VAR_VALUE_MATRIX4D:
+                        ((InputVarMatrix4d *)findvar)->value = ((InputVarMatrix4d *)(var.get()))->value;
+                    default:
+                        break;
+                }
             }
             else {
                 varLists.push_back(var);
