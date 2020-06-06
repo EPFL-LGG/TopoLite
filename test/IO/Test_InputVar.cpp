@@ -12,7 +12,7 @@ TEST_CASE("InputVar")
 
     SECTION("InputVarLite"){
         InitVar(varList.get());
-        REQUIRE(varList->get<bool>("layerOfBoundary"));
+        REQUIRE(varList->getBool("layerOfBoundary"));
     }
 
 }

@@ -27,7 +27,7 @@ void BaseMeshOptimizer::OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh)
     ShapeOp::Solver solver;
     solver.setPoints(position);
 
-    double weight = getVarList()->get<float>("shapeop_planarity");
+    double weight = getVarList()->getFloat("shapeop_planarity");
 
     //in plane constraint
     {
@@ -44,7 +44,7 @@ void BaseMeshOptimizer::OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh)
     }
 
     //boundary constraint
-    weight = getVarList()->get<float>("shapeop_boundary");
+    weight = getVarList()->getFloat("shapeop_boundary");
     {
         for(int id = 0; id < m; id++){
             shared_ptr<Cross> cross = crossMesh->crossList[id];
@@ -64,7 +64,7 @@ void BaseMeshOptimizer::OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh)
     }
 
     //closeness constraint
-    weight = getVarList()->get<float>("shapeop_meshFit");
+    weight = getVarList()->getFloat("shapeop_meshFit");
     {
         std::vector<int> id_vector;
         for(int id = 0; id < n; id++)
@@ -78,7 +78,7 @@ void BaseMeshOptimizer::OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh)
     }
 
     //bending constraint
-    weight  = getVarList()->get<float>("shapeop_bending");
+    weight  = getVarList()->getFloat("shapeop_bending");
     {
         for(int id = 0; id < m; id++){
             shared_ptr<Cross> cross = crossMesh->crossList[id];
@@ -99,7 +99,7 @@ void BaseMeshOptimizer::OptimizeBaseMesh(shared_ptr<CrossMesh> crossMesh)
     }
 
     //regular
-    weight  = getVarList()->get<float>("shapeop_regularity");
+    weight  = getVarList()->getFloat("shapeop_regularity");
     {
         for(int id = 0 ;id < m; id++)
         {

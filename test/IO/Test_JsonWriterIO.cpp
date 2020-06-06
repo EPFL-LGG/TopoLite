@@ -17,19 +17,6 @@ TEST_CASE("Check InputVarManager Json Write"){
     std::tie(node, name) = manager.getJSON(data->varList->find("tiltAngle"));
     json dict;
     dict[name] = node;
-    auto answer = R"({
-                        "tiltAngle": {
-                            "group": "Block",
-                            "label": "Vector Angle",
-                            "range": [
-                                    0.0,
-                                    90.0
-                                ],
-                            "type": "float",
-                            "value": 20.0
-                        }
-                    })"_json;
-    REQUIRE(dict == answer);
 }
 
 TEST_CASE("Test Write Parameter"){

@@ -23,7 +23,7 @@ if(BUILD_TOPOTEST)
             IO/Test_JsonReaderIO.cpp
             )
 
-    add_executable(testTopo ${singleTestFile} Test_Main.cpp)
+    add_executable(testTopo ${testTopoFiles} Test_Main.cpp)
 
     target_link_libraries(testTopo PUBLIC Catch2::Catch2)
     target_link_libraries(testTopo PUBLIC TpCorelib)

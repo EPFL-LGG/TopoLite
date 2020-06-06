@@ -9,7 +9,7 @@
 #include "Mesh/CrossMesh.h"
 #include "Mesh/PolyMesh_AABBTree.h"
 #include <filesystem>
-#include "IO/JsonIOReader.h"
+#include "IO/XMLIO_backward.h"
 #include "CrossMesh/PatternCreator.h"
 
 TEST_CASE("BaseMeshCreator")
@@ -21,7 +21,7 @@ TEST_CASE("BaseMeshCreator")
     std::shared_ptr<PolyMesh_AABBTree<double>> _polyMesh;
     std::shared_ptr<CrossMesh<double>> _pattern2D;
 
-    JsonIO IO;
+    XMLIO_backward IO;
     std::filesystem::create_directory("Pattern");
 
     SECTION("origin.xml")
@@ -65,7 +65,7 @@ TEST_CASE("BaseMeshCreator")
 
         SECTION("baseMeshCreator computeBaseCrossMesh")
         {
-            data.varList->set("minCrossArea", 0.2f);
+            data.varList->add(0.2f, "minCrossArea", "");
             baseMeshCreator.computeBaseCrossMesh(interactMat, baseMesh2D, crossMesh, false);
             crossMesh->writeOBJModel("Pattern/origin.obj");
             baseMesh2D->writeOBJModel("Pattern/pattern.obj");
@@ -150,7 +150,7 @@ TEST_CASE("BaseMeshCreator")
 
         REQUIRE(_pattern2D->cross(12)->atBoundary == false);
 
-        varList->set("layerOfBoundary", 2);
+        varList->add((int)2, "layerOfBoundary", "");
         BaseMeshCreator<double> baseMeshCreator(_polyMesh, _pattern2D, varList);
         baseMeshCreator.recomputeBoundary(_pattern2D);
         REQUIRE(_pattern2D->cross(12)->atBoundary == false);

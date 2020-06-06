@@ -114,6 +114,7 @@ public:
         file = std::ifstream(shader_path + "Lines.frag");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
+
 #elif defined(NANOGUI_USE_METAL)
         //read text from file
         string shader_path = TOPOCREATOR_SHADER_PATH;
@@ -145,6 +146,7 @@ public:
         buffer_linedrt.clear();
         buffer_objectindex.clear();
 
+#if defined(NANOGUI_USE_METAL)
         for(size_t mID = 0; mID < linegroups.size(); mID++){
             for(int kd = 0; kd < 3; kd++){
                 buffer_colors.push_back(object_colors[mID][kd]);
@@ -153,6 +155,7 @@ public:
                 buffer_center.push_back(ani_center[mID][kd]);
             }
         }
+#endif
 
         for(size_t mID = 0; mID < linegroups.size(); mID++)
         {
@@ -202,8 +205,21 @@ public:
                     }
                 }
 
+#if defined(NANOGUI_USE_OPENGL)
+                for(int vID = 0; vID < 6; vID ++)
+                {
+                    for(int kd = 0; kd < 3; kd ++)
+                    {
+                        buffer_colors.push_back(object_colors[mID][kd]);
+                        buffer_translation.push_back(ani_translation[mID][kd]);
+                        buffer_rotation.push_back(ani_rotation[mID][kd]);
+                        buffer_center.push_back(ani_center[mID][kd]);
+                    }
+                }
+#elif defined(NANOGUI_USE_METAL)
                 for(int id = 0; id < 6; id++)
                     buffer_objectindex.push_back(mID);
+#endif
             }
         }
         object_center /= (float)num_vertices;
@@ -217,7 +233,10 @@ public:
         shader->set_buffer("rotation", nanogui::VariableType::Float32, {buffer_rotation.size() / 3, 3}, buffer_rotation.data());
         shader->set_buffer("center", nanogui::VariableType::Float32, {buffer_center.size() / 3, 3}, buffer_center.data());
 
+#if defined(NANOGUI_USE_METAL)
         shader->set_buffer("objectindex", nanogui::VariableType::Int32, {buffer_objectindex.size(), 1}, buffer_objectindex.data());
+#endif
+
     }
 
     void update_uniform(){

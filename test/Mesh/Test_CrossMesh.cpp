@@ -18,7 +18,7 @@ TEST_CASE("CrossMesh")
         CrossMesh<double> crossMesh(polyMesh);
         REQUIRE(crossMesh.getVertices().size() == polyMesh.vertexList.size());
         REQUIRE(Approx(crossMesh.volume()) == polyMesh.volume());
-        REQUIRE(crossMesh.getVarList()->get<float>("tiltAngle") == Approx(20.0));
+        REQUIRE(crossMesh.getVarList()->getFloat("tiltAngle") == Approx(20.0));
     }
 
     SECTION("test neighbors")
