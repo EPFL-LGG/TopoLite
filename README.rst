@@ -4,10 +4,9 @@ TopoLite
 
 .. begin_brief_description
 
-TopoLite is a cross-platform tool for creating topological interlocking shell structures. It supports surface tiling, contact detection, globally interlocking verification, rigid body equilibrium, and topological interlocking block generation. See :cite:`wang2019design` for an introduction to non-standard analysis. 
+TopoLite is a cross-platform tool for creating topological interlocking shell structures. It supports surface tiling, contact detection, globally interlocking verification, rigid body equilibrium, and topological interlocking block generation. Please check our Topo2019SigA_ paper for more technical details.
 
-.. bibliography:: refs.bib
-    :all:
+.. _Topo2019SigA: https://lgg.epfl.ch/publications/2019/Topological_Interlocking/index.php
 
 .. end_brief_description
 
@@ -29,19 +28,13 @@ On Windows: currently unavailable.
 
 Documenting the code
 ------------
-
-Install Sphinx and Pandoc. The example below is given for macOS:
+On MacOS
 
 .. code-block:: bash
 
     pip install sphinx
     brew install pandoc
-
-Usage:
-
-.. code-block:: bash
-
     cd docs/
     make html
 
-then, open `build/index.html` .
+The generated documents is in ``docs/_build``
