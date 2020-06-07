@@ -8,8 +8,17 @@ TopoLite is a cross-platform tool for creating topological interlocking shell st
 
 .. _Topo2019SigA: https://lgg.epfl.ch/publications/2019/Topological_Interlocking/index.php
 
-.. end_brief_description
 
+
+
+Example screenshot
+----------------------------------------------------------------------------------------
+
+.. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/screenshot.png
+   :alt: Screenshot of TopoCreator
+   :align: center
+
+.. end_brief_description
 
 Compilation
 -----------
