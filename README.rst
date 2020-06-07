@@ -1,8 +1,11 @@
 TopoLite
 =========
 
-
 .. begin_brief_description
+
+.. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/teaser.png
+        :alt: Teaser
+        :align: center
 
 TopoLite is a cross-platform tool for creating topological interlocking shell structures. It supports surface tiling, contact detection, globally interlocking verification, rigid body equilibrium, and topological interlocking block generation. Please check our Topo2019SigA_ paper for more technical details.
 
@@ -11,7 +14,7 @@ TopoLite is a cross-platform tool for creating topological interlocking shell st
 
 
 
-Example screenshot
+GUI Interface
 ----------------------------------------------------------------------------------------
 
 .. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/screenshot.png
