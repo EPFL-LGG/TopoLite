@@ -3,7 +3,7 @@ TopoLite
 
 .. begin_brief_description
 
-.. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/teaser.png
+.. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/Teaser.png
         :alt: Teaser
         :align: center
 
