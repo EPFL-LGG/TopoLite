@@ -50,7 +50,8 @@ On Windows: currently unavailable.
 
 Documenting the code
 ------------
-On MacOS
+
+On MacOS:
 
 .. code-block:: bash
 
