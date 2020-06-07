@@ -3,11 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-########
-Topolite
-########
 
-Description
+TopoLite
 ===========
 
 Theoretical context
@@ -61,14 +58,13 @@ Contents
 ========
 
 .. toctree::
-   :glob:
    :maxdepth: 2
 
    Introduction <self>
-   usage/install
-   usage/examples
-   api/api
-   usage/license
+   usage/install.rst
+   usage/examples.rst
+   api/api.rst
+   usage/license.rst
 
 Indices and tables
 ==================

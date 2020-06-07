@@ -24,7 +24,7 @@ include(libigl)
 
 #NANOGUI
 if(BUILD_TOPOGUI)
-    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
+#    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
     find_package(NanoGUI)
     set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} ${NANOGUI_EXTRA_INCS} PARENT_SCOPE)
     set(NANOGUI_EXTRA_DEFS ${NANOGUI_EXTRA_DEFS} PARENT_SCOPE)
