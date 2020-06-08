@@ -108,6 +108,19 @@ public:
         return nanogui::Vector3f(vec.x(), vec.y(), vec.z());
     }
 
+    virtual void draw_object()
+    {
+        if(visible){
+            update_uniform();
+            if(!buffer_positions.empty())
+            {
+                shader->begin();
+                shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, buffer_positions.size() / 3, false);
+                shader->end();
+            }
+        }
+    }
+
 //    template<typename AttrType>
 //    void update_attr(string name, AttrType value){
 //        varList->set(name, value);

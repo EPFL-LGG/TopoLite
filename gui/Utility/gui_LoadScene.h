@@ -77,10 +77,23 @@ public:
             polyMeshLists->ani_rotation[id] = interlockData->rotation[id] / max_length;
             polyMeshLists->ani_center[id] = interlockData->center[id];
         }
-
-
         polyMeshLists->update_buffer();
+        polyMeshLists->varList->add(false, "show_wireframe", "");
         scene.lock()->objects.push_back(polyMeshLists);
+
+        /*
+         * Wireframe
+         */
+        vector<gui_LinesGroup<double>> linegroups;
+
+        for(shared_ptr<PolyMesh<double>> mesh: meshLists){
+            gui_LinesGroup<double> lg;
+            lg.lines = mesh->getWireFrame();
+            lg.color = nanogui::Color(0, 0, 0, 255);
+            linegroups.push_back(lg);
+        }
+        shared_ptr<gui_Lines<double>> LinesObject = make_shared<gui_Lines<double>>(linegroups, 0.002, scene.lock()->render_pass);
+        scene.lock()->objects.push_back(LinesObject);
     }
 
     void insertContactsIntoScene()

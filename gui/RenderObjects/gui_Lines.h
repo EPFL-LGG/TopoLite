@@ -38,14 +38,16 @@ public:
 
 public:
     using gui_RenderObject<Scalar>::render_pass;
-    using gui_RenderObject<Scalar>::shader;
+    vector<nanogui::ref<nanogui::Shader>> shaders;
 
 public:  //buffers
     using gui_RenderObject<Scalar>::buffer_colors;
     using gui_RenderObject<Scalar>::buffer_positions;
 
-    vector<float> buffer_linesta;
-    vector<float> buffer_linedrt;
+    vector<float> buffer_lineprev;
+    vector<float> buffer_linep1;
+    vector<float> buffer_linep2;
+    vector<float> buffer_linenext;
 
     vector<float> buffer_translation;
     vector<float> buffer_rotation;
@@ -127,12 +129,13 @@ public:
                            std::istreambuf_iterator<char>());
 #endif
 
-        shader = new nanogui::Shader(render_pass, "LinesShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None);
+        shaders.push_back(new nanogui::Shader(render_pass, "LinesShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None));
+        shaders.push_back(new nanogui::Shader(render_pass, "LinesShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None));
 
         update_buffer();
     }
 
-    void update_buffer(){
+    void update_buffer() override {
         //init buffer_positions
         int num_vertices = 0;
         object_center = Eigen::Vector3d(0, 0, 0);
@@ -142,8 +145,10 @@ public:
         buffer_translation.clear();
         buffer_rotation.clear();
         buffer_center.clear();
-        buffer_linesta.clear();
-        buffer_linedrt.clear();
+        buffer_lineprev.clear();
+        buffer_linep1.clear();
+        buffer_linep2.clear();
+        buffer_linenext.clear();
         buffer_objectindex.clear();
 
 #if defined(NANOGUI_USE_METAL)
@@ -160,48 +165,51 @@ public:
         for(size_t mID = 0; mID < linegroups.size(); mID++)
         {
             const gui_LinesGroup<Scalar> &lg = linegroups[mID];
-            for(Line<Scalar> line: lg.lines)
+            size_t lgsize = lg.lines.size();
+            for(size_t lID = 0; lID < lgsize; lID++)
             {
+                Line<Scalar> line = lg.lines[lID];
                 object_center = object_center + line.point2 + line.point1;
                 num_vertices += 2;
-                Eigen::Vector3d drt = (line.point2 - line.point1).normalized();
-                line.point1 = line.point1 - drt * line_width / 50;
-                line.point2 = line.point2 + drt * line_width / 50;
-                double length = (line.point2 - line.point1).norm();
                 {
                     buffer_positions.push_back(0);
-                    buffer_positions.push_back(line_width / 2);
+                    buffer_positions.push_back(0);
+                    buffer_positions.push_back(0);
+
+                    buffer_positions.push_back(1);
+                    buffer_positions.push_back(0);
                     buffer_positions.push_back(0);
 
                     buffer_positions.push_back(0);
-                    buffer_positions.push_back(-line_width / 2);
-                    buffer_positions.push_back(0);
-
-                    buffer_positions.push_back(length);
-                    buffer_positions.push_back(line_width / 2);
+                    buffer_positions.push_back(1);
                     buffer_positions.push_back(0);
                 }
 
-                {
-                    buffer_positions.push_back(0);
-                    buffer_positions.push_back(-line_width / 2);
-                    buffer_positions.push_back(0);
+                Line<Scalar> prevline = lg.lines[(lID - 1 + lgsize) % lgsize];
+                Line<Scalar> nextline = lg.lines[(lID + 1) % lgsize];
 
-                    buffer_positions.push_back(length);
-                    buffer_positions.push_back(-line_width / 2);
-                    buffer_positions.push_back(0);
-
-                    buffer_positions.push_back(length);
-                    buffer_positions.push_back(line_width / 2);
-                    buffer_positions.push_back(0);
-                }
-
-                for(int id = 0; id < 6; id++)
+                for(int id = 0; id < 3; id++)
                 {
                     for(int jd = 0; jd < 3; jd++)
                     {
-                        buffer_linesta.push_back((line.point1)[jd]);
-                        buffer_linedrt.push_back(drt[jd]);
+                        buffer_linep1.push_back(line.point1[jd]);
+                        buffer_linep2.push_back(line.point2[jd]);
+
+                        //prev line
+                        if((prevline.point2 - line.point1).norm() < FLOAT_ERROR_SMALL){
+                            buffer_lineprev.push_back(prevline.point1[jd]);
+                        }
+                        else{
+                            buffer_lineprev.push_back(line.point1[jd] * 2 - line.point2[jd]);
+                        }
+
+                        //next line
+                        if((nextline.point1 - line.point2).norm() < FLOAT_ERROR_SMALL){
+                            buffer_linenext.push_back(nextline.point2[jd]);
+                        }
+                        else{
+                            buffer_linenext.push_back(line.point2[jd] * 2 - line.point1[jd]);
+                        }
                     }
                 }
 
@@ -224,25 +232,47 @@ public:
         }
         object_center /= (float)num_vertices;
 
-        shader->set_buffer("position", nanogui::VariableType::Float32, {buffer_positions.size() / 3, 3},  buffer_positions.data());
-        shader->set_buffer("color", nanogui::VariableType::Float32, {buffer_colors.size() / 3, 3}, buffer_colors.data());
-        shader->set_buffer("linesta", nanogui::VariableType::Float32, {buffer_linesta.size() / 3, 3}, buffer_linesta.data());
-        shader->set_buffer("linedrt", nanogui::VariableType::Float32, {buffer_linedrt.size() / 3, 3}, buffer_linedrt.data());
+        for(int id = 0; id < 2; id++)
+        {
+            nanogui::ref<nanogui::Shader> shader = shaders[id];
+            shader->set_buffer("position", nanogui::VariableType::Float32, {buffer_positions.size() / 3, 3},  buffer_positions.data());
+            shader->set_buffer("color", nanogui::VariableType::Float32, {buffer_colors.size() / 3, 3}, buffer_colors.data());
+            shader->set_buffer("linep1", nanogui::VariableType::Float32, {buffer_linep1.size() / 3, 3}, buffer_linep1.data());
+            shader->set_buffer("linep2", nanogui::VariableType::Float32, {buffer_linep2.size() / 3, 3}, buffer_linep2.data());
+            shader->set_buffer("lineprev", nanogui::VariableType::Float32, {buffer_lineprev.size() / 3, 3}, buffer_lineprev.data());
+            shader->set_buffer("linenext", nanogui::VariableType::Float32, {buffer_linenext.size() / 3, 3}, buffer_linenext.data());
 
-        shader->set_buffer("translation", nanogui::VariableType::Float32, {buffer_translation.size() / 3, 3}, buffer_translation.data());
-        shader->set_buffer("rotation", nanogui::VariableType::Float32, {buffer_rotation.size() / 3, 3}, buffer_rotation.data());
-        shader->set_buffer("center", nanogui::VariableType::Float32, {buffer_center.size() / 3, 3}, buffer_center.data());
+            shader->set_buffer("translation", nanogui::VariableType::Float32, {buffer_translation.size() / 3, 3}, buffer_translation.data());
+            shader->set_buffer("rotation", nanogui::VariableType::Float32, {buffer_rotation.size() / 3, 3}, buffer_rotation.data());
+            shader->set_buffer("center", nanogui::VariableType::Float32, {buffer_center.size() / 3, 3}, buffer_center.data());
 
 #if defined(NANOGUI_USE_METAL)
-        shader->set_buffer("objectindex", nanogui::VariableType::Int32, {buffer_objectindex.size(), 1}, buffer_objectindex.data());
+            shader->set_buffer("objectindex", nanogui::VariableType::Int32, {buffer_objectindex.size(), 1}, buffer_objectindex.data());
 #endif
-
+            shader->set_uniform("type", id);
+            shader->set_uniform("linewidth", line_width);
+        }
     }
 
-    void update_uniform(){
-        shader->set_uniform("proj", this->toNanoguiMatrix(proj_mat));
-        shader->set_uniform("mv",this->toNanoguiMatrix(view_mat * model_mat));
-        shader->set_uniform("simtime", simtime);
+    void update_uniform() override
+    {
+        for(auto shader: shaders)
+        {
+            shader->set_uniform("mvp",this->toNanoguiMatrix(proj_mat * view_mat * model_mat));
+            shader->set_uniform("simtime", simtime);
+        }
+    }
+
+    void draw_object() override {
+        if (!buffer_positions.empty())
+        {
+            update_uniform();
+            for (auto shader: shaders) {
+                shader->begin();
+                shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, buffer_positions.size() / 3, false);
+                shader->end();
+            }
+        }
     }
 };
 

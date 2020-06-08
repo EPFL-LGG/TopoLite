@@ -1089,5 +1089,22 @@ nlohmann::json PolyMesh<Scalar>::dump() const {
     return mesh_json;
 }
 
+template<typename Scalar>
+vector<Line<Scalar>> PolyMesh<Scalar>::getWireFrame() const {
+    vector<Line<Scalar>> lines;
+    for(pPolygon poly: polyList)
+    {
+        for(size_t id = 0; id < poly->size(); id++)
+        {
+            if(poly->edge_at_boundary[id])
+            {
+                Scalar length = (poly->pos(id + 1) - poly->pos(id)).norm();
+                lines.push_back(Line<Scalar>(poly->pos(id), poly->pos(id + 1)));
+            }
+        }
+    }
+    return lines;
+}
+
 template class PolyMesh<double>;
 template class PolyMesh<float>;

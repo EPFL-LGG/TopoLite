@@ -27,53 +27,33 @@ class BezierApplication : public nanogui::Screen {
 public:
     BezierApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "TopoCreator") {
         //main canvas
+
         inc_ref();
+
+        main_canvas = new gui_Arcball_Canvas(this);
+        main_canvas->set_size(this->m_size);
+
         perform_layout();
 
-        m_render_pass = new nanogui::RenderPass({ this });
-        m_render_pass->set_clear_color(0, nanogui::Color(0.3f, 0.3f, 0.32f, 1.f));
+        init_lines();
+    }
 
-        m_shader = new nanogui::Shader(
-                m_render_pass,
+    void init_lines(){
+        main_canvas->init_render_pass();
 
-                /* An identifying name */
-                "a_simple_shader",
-                R"(using namespace metal;
-            struct VertexOut {
-                float4 position [[position]];
-            };
-
-            vertex VertexOut vertex_main(const device packed_float3 *position,
-                                         uint id [[vertex_id]]) {
-                VertexOut vert;
-                vert.position = float4(position[id], 1.f);
-                return vert;
-            })",
-
-                /* Fragment shader */
-                R"(using namespace metal;
-            fragment float4 fragment_main(const constant float &intensity) {
-                return float4(intensity);
-            })"
-            );
-
-        uint32_t indices[3*2] = {
-                0, 1, 2,
-                3, 4, 5,
-        };
-
-        float positions[3*6] = {
-                -.5f, -.5f, 0.f,
-                .5f, -.5f, 0.f,
-                .5f, .5f, 0.f,
-                -.5f, -.5f, .5f,
-                .5f, .5f, .5f,
-                -.5f, .5f, .5f,
-        };
-
-        m_shader->set_buffer("indices", nanogui::VariableType::UInt32, {3*2}, indices);
-        m_shader->set_buffer("position", nanogui::VariableType::Float32, {6, 3}, positions);
-        m_shader->set_uniform("intensity", 0.5f);
+        vector<gui_LinesGroup<double>> linegroups;
+        gui_LinesGroup<double> lg;
+        lg.color = nanogui::Color(0, 0, 0, 255);
+        for(int id = 0; id <= 4; id++){
+            lg.lines.push_back(Line<double>(Eigen::Vector3d(0.1 * id, 0, 0), Eigen::Vector3d(0.1 * (id + 1), 0, 0)));
+        }
+        for(int id = 0; id <= 4; id++){
+            lg.lines.push_back(Line<double>(Eigen::Vector3d(0.5, id * 0.1, 0), Eigen::Vector3d(0.5, (id + 1) * 0.1, 0)));
+        }
+        linegroups.push_back(lg);
+        shared_ptr<gui_Lines<double>> LinesObject = make_shared<gui_Lines<double>>(linegroups, 0.002, main_canvas->scene->render_pass);
+        main_canvas->scene->objects.push_back(LinesObject);
+        main_canvas->resize_arcball(m_size);
     }
 
     virtual void draw(NVGcontext *ctx) {
@@ -81,21 +61,13 @@ public:
         Screen::draw(ctx);
     }
 
-    virtual void draw_contents()
-    {
-        m_render_pass->resize(framebuffer_size());
-        m_render_pass->begin();
-
-        m_shader->begin();
-        m_shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, 6, true);
-        m_shader->end();
-
-        m_render_pass->end();
+    virtual void draw_contents() {
+        main_canvas->scene->update_time(1.0, 1.0);
+        main_canvas->draw_contents();
     }
 
 public:
-    nanogui::ref<nanogui::RenderPass> m_render_pass;
-    nanogui::ref<nanogui::Shader> m_shader;
+    nanogui::ref<gui_Arcball_Canvas> main_canvas;
 };
 
 int main(int /* argc */, char ** /* argv */) {

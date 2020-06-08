@@ -1,18 +1,10 @@
 using namespace metal;
 #include <metal_stdlib>
+#define eps 1E-6
 
 struct VertexOut {
     float4 position [[position]];
     float3 color;
-};
-
-struct Line{
-    float3 sta;
-    float3 dir;
-    float3 center;
-    float3 rotation;
-    float3 translation;
-    float simtime;
 };
 
 float3x3 get_rotation_matrix_of_axis(float3 u, float theta)
@@ -36,70 +28,137 @@ float3x3 get_rotation_matrix_of_axis(float3 u, float theta)
     return R;
 }
 
-Line get_line_after_animation(Line line){
-    
-    //translational vector
-    float3 trans = line.translation * line.simtime;
-    
-    //rotation matrix
-    float3 rot_vec = line.rotation;
-    float theta = line.simtime * length(rot_vec);
-    
-    float3x3 R = float3x3(1);
-    if(length(rot_vec) > 0.0001){
-        R = get_rotation_matrix_of_axis(normalize(rot_vec), theta);
-    }
-
-    line.dir = R * line.dir;
-    line.sta = R * (line.sta - line.center) + line.center + trans;
-    
-    return line;
-}
-
 vertex VertexOut lines_vert_main(
-                             const device packed_float3 *position,
-                             constant float4x4 &proj,
-                             constant float4x4 &mv,
-                             const device packed_float3 *linesta,
-                             const device packed_float3 *linedrt,
-                             const device packed_float3 *color,
-                             const device packed_float3 *translation,
-                             const device packed_float3 *rotation,
-                             const device packed_float3 *center,
-                             const device int    *objectindex,
-                             constant float &simtime,
-                             uint id [[vertex_id]])
+const device packed_float3 *position,
+constant float4x4 &mvp,
+const device packed_float3 *linep1,
+const device packed_float3 *linep2,
+const device packed_float3 *lineprev,
+const device packed_float3 *linenext,
+const device packed_float3 *color,
+const device packed_float3 *translation,
+const device packed_float3 *rotation,
+const device packed_float3 *center,
+const device int    *objectindex,
+constant float &simtime,
+constant int &type,
+constant float &linewidth,
+uint id [[vertex_id]])
 {
     VertexOut vert;
-    Line line;
-    
-    //set up line
-    line.dir = float3(linedrt[id]);
-    line.sta = float3(linesta[id]);
-    line.translation = float3(translation[objectindex[id]]);
-    line.center = float3(center[objectindex[id]]);
-    line.rotation = float3(rotation[objectindex[id]]);
-    line.simtime = simtime;
-    
-    //get animated line
-    line = get_line_after_animation(line);
-    
-    //align the normal of line plane always pointing to your eye
-    float3 pos = float3(position[id]);
-    float3 lsta = (mv * float4(linesta[id], 1)).xyz;
-    float3 x_axis = (mv * float4(linedrt[id], 0)).xyz;
-    float3 y_axis = cross(-lsta, x_axis);
-    if(length(y_axis) > 0.001){
-        y_axis = normalize(y_axis);
+
+    /*
+     * Create transformation matrix
+     */
+
+    float3 trans = float3(translation[id]) * simtime;   //translational vector
+    float3 cent = float3(center[id]);                 //center
+
+    float3 rot_vec = float3(rotation[id]);              //rotation
+    float theta = simtime * length(rot_vec);       //simulation time
+
+    float3x3 R = float3x3(1);
+    if(length(rot_vec) > eps){
+        R = get_rotation_matrix_of_axis(normalize(rot_vec), theta); //rotation matrix
+    }
+
+    /*
+     * Transform the line points
+     */
+
+    float3 prev = float3(lineprev[id]);
+    float3 p1 = float3(linep1[id]);
+    float3 p2 = float3(linep2[id]);
+    float3 next = float3(linenext[id]);
+
+    prev = R * (prev - cent) + cent + trans;
+    p1 = R * (p1 - cent) + cent + trans;
+    p2 = R * (p2 - cent) + cent + trans;
+    next = R * (next - cent) + cent + trans;
+
+    /*
+     * Project to mvp space
+     */
+
+    float4 proj_prev = mvp * float4(prev, 1);
+    float4 proj_p1 = mvp * float4(p1, 1);
+    float4 proj_p2 = mvp * float4(p2, 1);
+    float4 proj_next = mvp * float4(next, 1);
+
+    prev = float3(proj_prev.xy / proj_prev.w, 0);
+    p1 = float3(proj_p1.xy / proj_p1.w, 0);
+    p2 = float3(proj_p2.xy / proj_p2.w, 0);
+    next = float3(proj_next.xy / proj_next.w, 0);
+
+    /*
+     * Compute offset direction vector
+     */
+
+    float3 v01 = (prev - p1) / length(prev - p1);
+    float3 v12 = (p2 - p1) / length(p2 - p1);
+    float3 v23 = (next - p2) / length(next - p2);
+
+
+
+    float3 d1, d2;
+    if(length(v01 + v12) < eps){
+        d1 = cross(float3(0, 0, 1), v12);
+        d1 = d1 / length(d1) * linewidth;
     }
     else{
-        y_axis = float3(0, 1 ,0);
+         d1 = (v01 + v12) / length(v01 + v12) * linewidth / max(0.5, abs(sin(0.5 * acos(dot(v01, v12)))));
     }
-    //set position
-    vert.position = proj * float4(x_axis * pos[0] + y_axis * pos[1] + lsta, 1.0);
-    
+    if(dot(float3(0, 0, 1), cross(v12, d1)) < 0){
+            d1 = -d1;
+    }
+
+    if(length(-v12 + v23) < eps){
+        d2 = cross(float3(0, 0, 1), v12);
+        d2 = d2 / length(d2) * linewidth;
+    }
+    else{
+        d2 = (-v12 + v23) / length(-v12 + v23) * linewidth / max(0.5, abs(sin(0.5 * acos(dot(-v12, v23)))));
+    }
+
+    if(dot(float3(0, 0, 1), cross(v12, d2)) < 0){
+            d2 = -d2;
+    }
+
+    /*
+     * set up the position
+     */
+
+    //align the normal of line plane always pointing to your eye
+    float3 pos = float3(position[id]);
+
+    if(type == 0){
+        if(abs(pos[0] - 1) < eps){
+            //set position
+            vert.position = proj_p2 - float4(d2, 0) * proj_p2.w;
+        }
+        else if(abs(pos[1] - 1) < eps){
+            vert.position = proj_p1 + float4(d1, 0) * proj_p1.w;
+        }
+        else{
+            vert.position = proj_p1 - float4(d1, 0) * proj_p1.w;
+        }
+    }
+    else{
+        if(abs(pos[0] - 1) < eps){
+            //set position
+            vert.position = proj_p2 - float4(d2, 0) * proj_p2.w;
+        }
+        else if(abs(pos[1] - 1) < eps){
+            vert.position = proj_p2 + float4(d2, 0) * proj_p2.w;
+        }
+        else{
+            vert.position = proj_p1 + float4(d1, 0) * proj_p1.w;
+        }
+    }
+
     //set color
     vert.color = color[objectindex[id]];
-    
+
     return vert;
 }
+

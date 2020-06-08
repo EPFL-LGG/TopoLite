@@ -92,15 +92,7 @@ public:
 //        glDepthMask( true );
 //#endif
         for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
-            if(object->visible){
-                object->update_uniform();
-                if(!object->buffer_positions.empty())
-                {
-                    object->shader->begin();
-                    object->shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, object->buffer_positions.size() / 3, false);
-                    object->shader->end();
-                }
-            }
+            object->draw_object();
         }
         
     }
