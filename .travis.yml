@@ -35,6 +35,7 @@ matrix:
 #        - cmake
 #        - make -j 2
     - os: osx
+      osx_image: xcode11.5
       compiler: clang
       script:
         - cmake --version
