@@ -1,3 +1,5 @@
+#TopoLite Project
+
 cmake_minimum_required(VERSION 3.11)
 project(TopoLite)
 
@@ -36,7 +38,7 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     option(BUILD_TOPOGUI "Compile the gui" OFF)
 endif()
 
-    #3rd party library
+#3rd party library
 #if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
 #    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
 #	if(MSVC)
