@@ -16,7 +16,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(BUILD_TOPOGUI         ON CACHE STRING "Build gui" FORCE)
 set(BUILD_TOPOTEST        ON CACHE STRING "Build test" FORCE)
-set(BUILD_TOPOPYBIND      ON CACHE STRING "Build pybind11" FORCE)
+#set(BUILD_TOPOPYBIND      ON CACHE STRING "Build pybind11" FORCE)
 
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
@@ -93,4 +93,4 @@ endif()
 
 add_subdirectory(test)
 add_subdirectory(gui)
-add_subdirectory(python)
+#add_subdirectory(python)

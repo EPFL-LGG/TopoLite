@@ -6,22 +6,16 @@ if(BUILD_TOPOTEST)
     include(CTest)
     include(ParseAndAddCatchTests)
 
-    file(GLOB testTopoFiles
-            Interlocking/*.*
-            CrossMesh/*.*
-            Mesh/*.*
-            IO/*.*
-            Utility/*.*
-            )
+    add_subdirectory(CrossMesh)
+    add_subdirectory(Interlocking)
+    add_subdirectory(IO)
+    add_subdirectory(Mesh)
+    add_subdirectory(Structure)
+    add_subdirectory(Utility)
 
-    file(GLOB singleTestFile
-           #Interlocking/Problem_LP_simple.cpp
-           #Interlocking/Problem_LP_bigm.cpp
-            # Interlocking/Test_toymodel_Ipopt.cpp
-           #Interlocking/Test_interlockingSolver_Clp.cpp
-#            Utility/Test_SparseOperations.cpp
-            IO/Test_JsonReaderIO.cpp
-            )
+    set(testTopoFiles ${TestIO} ${TestStructure} ${TestUtility} ${TestMesh} ${TestInterlocking} ${TestCrossMesh})
+
+    file(GLOB singleTestFile IO/Test_JsonReaderIO.cpp)
 
     add_executable(testTopo ${testTopoFiles} Test_Main.cpp)
 
