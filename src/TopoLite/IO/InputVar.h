@@ -530,10 +530,10 @@ public:
                 var = make_shared<InputVarBool>((int)json_node["value"]);
             }
             else if(json_node["type"] == "intlist"){
-                var = make_shared<InputVarIntList>((vector<int>)json_node["value"]);
+                var = make_shared<InputVarIntList>(json_node["value"].get<vector<int>>());
             }
             else if(json_node["type"] == "matrix4d"){
-                var = make_shared<InputVarMatrix4d>((vector<double>)json_node["value"]);
+                var = make_shared<InputVarMatrix4d>(json_node["value"].get<vector<double>>());
             }
 
             *var << name;
