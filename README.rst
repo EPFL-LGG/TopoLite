@@ -1,6 +1,12 @@
 TopoLite
 =========
 
+|travis|
+
+.. |travis| image:: https://travis-ci.org/EPFL-LGG/TopoLite.svg?branch=master
+   :target: https://travis-ci.org/github/EPFL-LGG/TopoLite
+   :alt: Travis Build Status
+
 .. begin_brief_description
 
 .. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/Teaser.png

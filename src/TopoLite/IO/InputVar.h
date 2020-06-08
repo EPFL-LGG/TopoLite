@@ -191,7 +191,6 @@ public:
                 data.push_back(value(id, jd));
             }
         }
-
         return data;
     }
 
