@@ -38,5 +38,5 @@ matrix:
       compiler: clang
       script:
         - cmake --version
-        - cmake
+        - cmake .
         - make -j 2
