@@ -19,7 +19,7 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-html:
+html_mod:
 	@echo "1. Convert markdown files\n"
 	\pandoc --from=markdown --to=rst --output=$(SOURCEDIR)/readme.rst $(SOURCEDIR)/../../README.md
 	@echo "\n2. Compiling sources\n"
