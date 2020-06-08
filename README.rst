@@ -1,11 +1,15 @@
 TopoLite
 =========
 
-|travis|
+|travis| |docs|
 
 .. |travis| image:: https://travis-ci.org/EPFL-LGG/TopoLite.svg?branch=master
    :target: https://travis-ci.org/github/EPFL-LGG/TopoLite
    :alt: Travis Build Status
+   
+.. |docs| image:: https://readthedocs.org/projects/topolite/badge/?version=latest
+   :target: https://topolite.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
 
 .. begin_brief_description
 
@@ -13,7 +17,12 @@ TopoLite
         :alt: Teaser
         :align: center
 
+
 TopoLite is a cross-platform tool for creating topological interlocking shell structures. It supports surface tiling, contact detection, globally interlocking verification, rigid body equilibrium, and topological interlocking block generation. 
+
+Complete documentation about the software is provided here_
+
+.. _here: https://topolite.readthedocs.io/en/latest/
 
 Abstract
 --------
@@ -24,9 +33,7 @@ Please check our Topo2019SigA_ paper for more technical details.
 
 .. _Topo2019SigA: https://lgg.epfl.ch/publications/2019/Topological_Interlocking/index.php
 
-Complete documentation about the software is provided here_
 
-.. _here: https://topolite.readthedocs.io/en/latest/
 
 GUI Interface
 -------------
