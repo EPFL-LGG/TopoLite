@@ -24,8 +24,9 @@ Please check our Topo2019SigA_ paper for more technical details.
 
 .. _Topo2019SigA: https://lgg.epfl.ch/publications/2019/Topological_Interlocking/index.php
 
+Complete documentation about the software is provided here_
 
-
+.. _here: https://topolite.readthedocs.io/en/latest/
 
 GUI Interface
 -------------

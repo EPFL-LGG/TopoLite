@@ -1,5 +1,8 @@
 .. begin_brief_description
 
+TopoLite
+========
+
 .. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/Teaser.png
         :alt: Teaser
         :align: center
