@@ -2,16 +2,16 @@
 // Created by ziqwang on 19.05.20.
 //
 
-#ifndef TOPOLITE_GUI_TOPOMANAGER_H
-#define TOPOLITE_GUI_TOPOMANAGER_H
+#ifndef TOPOLITE_GUIMANAGER_TOPOCREATOR_H
+#define TOPOLITE_GUIMANAGER_TOPOCREATOR_H
 
 #include "IO/JsonIOReader.h"
 #include "IO/JsonIOWriter.h"
 #include "IO/XMLIO_backward.h"
-#include "gui_Arcball_Canvas.h"
-#include "gui_2D_Canvas.h"
-#include "gui_PolyMeshLists.h"
-#include "gui_Lines.h"
+#include "guiCanvas_3DArcball.h"
+#include "guiCanvas_2DArcball.h"
+#include "guiShader_PolyMeshes.h"
+#include "guiShader_Lines.h"
 
 #include "CrossMesh/CrossMeshCreator.h"
 #include "Structure/StrucCreator.h"
@@ -20,7 +20,7 @@
 #include <memory>
 #include <Eigen/Dense>
 
-class gui_TopoManager{
+class guiManager_TopoCreator{
 public:
 
 public:
@@ -35,11 +35,11 @@ public:
     vector<std::string> visible_var_nameList;
 
 public:
-    nanogui::ref<gui_Arcball_Canvas> arcball_canvas;
-    nanogui::ref<gui_2D_Canvas> pattern_canvas;
+    nanogui::ref<guiCanvas_3DArcball> arcball_canvas;
+    nanogui::ref<guiCanvas_2DArcball> pattern_canvas;
 
 public:
-    gui_TopoManager(nanogui::ref<gui_Arcball_Canvas> arcball, nanogui::ref<gui_2D_Canvas> pattern)
+    guiManager_TopoCreator(nanogui::ref<guiCanvas_3DArcball> arcball, nanogui::ref<guiCanvas_2DArcball> pattern)
     {
         arcball_canvas = arcball;
         pattern_canvas = pattern;
@@ -168,4 +168,4 @@ private:
 };
 
 
-#endif //TOPOLITE_GUI_TOPOMANAGER_H
+#endif //TOPOLITE_GUIMANAGER_TOPOCREATOR_H

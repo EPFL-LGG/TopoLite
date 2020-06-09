@@ -1,10 +1,9 @@
 using namespace metal;
 #include <metal_stdlib>
-
+#define eps 1E-6
 struct VertexOut {
-                float4 position [[position]];
-                float3 color;
-                float3 bary;
+    float4 position [[position]];
+    float3 color;
 };
 
 float3x3 get_rotation_matrix_of_axis(float3 u, float theta)
@@ -31,7 +30,6 @@ float3x3 get_rotation_matrix_of_axis(float3 u, float theta)
 vertex VertexOut polymeshanimation_vertex_main(
                              const device packed_float3 *position,
                              constant float4x4 &mvp,
-                             const device packed_float3 *barycentric,
                              const device packed_float3 *color,
                              const device packed_float3 *translation,
                              const device packed_float3 *rotation,
@@ -49,7 +47,8 @@ vertex VertexOut polymeshanimation_vertex_main(
     float3 rot_vec = float3(rotation[objectindex[id]]);
     float theta = simtime * length(rot_vec);
     float3x3 R = float3x3(1);
-    if(length(rot_vec) > 0.0001){
+    if(length(rot_vec) > eps)
+    {
         R = get_rotation_matrix_of_axis(normalize(rot_vec), theta);
     }
 
@@ -63,7 +62,5 @@ vertex VertexOut polymeshanimation_vertex_main(
     float3 pos = float3(position[id]);
     vert.position = mvp * float4(R * (pos - cent) + cent + trans, 1.f);
 
-    //barycentric coordinates
-    vert.bary = barycentric[id];
     return vert;
 }

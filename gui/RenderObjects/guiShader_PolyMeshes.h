@@ -5,12 +5,12 @@
 #ifndef TOPOLITE_GUI_POLYMESHLIST_H
 #define TOPOLITE_GUI_POLYMESHLIST_H
 #include "Mesh/PolyMesh.h"
-#include "gui_RenderObject.h"
+#include "guiShader_Base.h"
 #include <nanogui/vector.h>
 #include <fstream>
 #include "igl/triangle/triangulate.h"
 template<typename Scalar>
-class gui_PolyMeshLists : public gui_RenderObject<Scalar>{
+class guiShader_PolyMeshes : public guiShader_Base<Scalar>{
 public:
 
     typedef weak_ptr<PolyMesh<Scalar>> wpPolyMesh;
@@ -21,8 +21,8 @@ public:
 
 
 public:
-    using gui_RenderObject<Scalar>::object_colors;
-    using gui_RenderObject<Scalar>::object_center;
+    using guiShader_Base<Scalar>::object_colors;
+    using guiShader_Base<Scalar>::object_center;
     nanogui::Color line_color;
     vector<wpPolyMesh> meshLists;
     vector<Vector3> ani_translation;
@@ -30,33 +30,32 @@ public:
     vector<Vector3> ani_rotation;
 
 public:
-    using gui_RenderObject<Scalar>::state;
+    using guiShader_Base<Scalar>::state;
 
 public:
-    using gui_RenderObject<Scalar>::render_pass;
-    using gui_RenderObject<Scalar>::shader;
+    using guiShader_Base<Scalar>::render_pass;
+    using guiShader_Base<Scalar>::shader;
 
 public:  //buffers
-    using gui_RenderObject<Scalar>::buffer_colors;
-    using gui_RenderObject<Scalar>::buffer_positions;
-    vector<float> buffer_barycentric;
+    using guiShader_Base<Scalar>::buffer_colors;
+    using guiShader_Base<Scalar>::buffer_positions;
     vector<float> buffer_translation;
     vector<float> buffer_rotation;
     vector<float> buffer_center;
     vector<int> buffer_objectindex;
 
 public: // uniform
-    using gui_RenderObject<Scalar>::varList;
-    using gui_RenderObject<Scalar>::proj_mat;
-    using gui_RenderObject<Scalar>::model_mat;
-    using gui_RenderObject<Scalar>::model_init_mat;
-    using gui_RenderObject<Scalar>::view_mat;
-    using gui_RenderObject<Scalar>::eye;
-    using gui_RenderObject<Scalar>::simtime;
+    using guiShader_Base<Scalar>::varList;
+    using guiShader_Base<Scalar>::proj_mat;
+    using guiShader_Base<Scalar>::model_mat;
+    using guiShader_Base<Scalar>::model_init_mat;
+    using guiShader_Base<Scalar>::view_mat;
+    using guiShader_Base<Scalar>::eye;
+    using guiShader_Base<Scalar>::simtime;
 
 public:
-    gui_PolyMeshLists(const vector<pPolyMesh> &_meshLists,
-                      nanogui::ref<nanogui::RenderPass> _render_pass) : gui_RenderObject<Scalar>::gui_RenderObject(_render_pass){
+    guiShader_PolyMeshes(const vector<pPolyMesh> &_meshLists,
+                         nanogui::ref<nanogui::RenderPass> _render_pass) : guiShader_Base<Scalar>::guiShader_Base(_render_pass){
         for(pPolyMesh mesh: _meshLists)
         {
             meshLists.push_back(mesh);
@@ -72,17 +71,13 @@ public:
         ani_center.resize(meshLists.size(), Vector3(0, 0, 0));
         
         line_color = nanogui::Color(0, 0, 0, 0);
-
-        varList->add((bool)true, "show_wireframe",  "");
-        varList->add((bool)true, "show_face", "");
-                          
         state = Stop;
         initShader();
     }
 
-    gui_PolyMeshLists(const vector<pPolyMesh> &_meshLists,
-                 vector<nanogui::Color> _object_colors,
-                 nanogui::ref<nanogui::RenderPass> _render_pass) : gui_RenderObject<Scalar>::gui_RenderObject(_render_pass){
+    guiShader_PolyMeshes(const vector<pPolyMesh> &_meshLists,
+                         vector<nanogui::Color> _object_colors,
+                         nanogui::ref<nanogui::RenderPass> _render_pass) : guiShader_Base<Scalar>::guiShader_Base(_render_pass){
 
         for(pPolyMesh mesh: _meshLists)
         {
@@ -107,9 +102,6 @@ public:
         ani_rotation.resize(meshLists.size(), Vector3(0, 0, 0));
         ani_center.resize(meshLists.size(), Vector3(0, 0, 0));
 
-        varList->add((bool)true, "show_wireframe",  "");
-        varList->add((bool)true, "show_face", "");
-        varList->add((float)true, "show_face", "");
         state = Stop;
         initShader();
     }
@@ -136,8 +128,6 @@ public:
         ani_translation.clear(); ani_translation.resize(meshLists.size(), Vector3(0, 0, 0));
         ani_rotation.clear(); ani_rotation.resize(meshLists.size(), Vector3(0, 0, 0));
         ani_center.clear(); ani_center.resize(meshLists.size(), Vector3(0, 0, 0));
-        
-
         update_buffer();
     }
 
@@ -159,17 +149,16 @@ public:
                                 std::istreambuf_iterator<char>());
 #elif defined(NANOGUI_USE_METAL)
         string shader_path = TOPOCREATOR_SHADER_PATH;
-        std::ifstream file(shader_path + "PolyMeshAnimation_vert.metal");
+        std::ifstream file(shader_path + "metal/PolyMeshes_vert.metal");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 
-        file = std::ifstream(shader_path + "PolyMeshAnimation_frag.metal");
+        file = std::ifstream(shader_path + "metal/PolyMeshes_frag.metal");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
 #endif
         
         shader = new nanogui::Shader(render_pass, "PolyMeshShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None);
-
         update_buffer();
     }
 
@@ -179,7 +168,6 @@ public:
         object_center = Eigen::Vector3d(0, 0, 0);
 
         buffer_positions.clear();
-        buffer_barycentric.clear();
         buffer_colors.clear();
         buffer_translation.clear();
         buffer_rotation.clear();
@@ -203,8 +191,7 @@ public:
             for(pPolygon polygon: mesh.lock()->polyList)
             {
                 vector<pTriangle> tris;
-                polygon->triangulateNaive(tris);
-                int edgeID = 0;
+                polygon->triangulate(tris);
                 for(pTriangle tri: tris)
                 {
                     for(int vID = 0; vID < 3; vID++)
@@ -215,21 +202,6 @@ public:
                         object_center = object_center + tri->v[vID];
                         num_vertices++;
                     }
-
-                    buffer_barycentric.push_back(1);
-                    buffer_barycentric.push_back(0);
-                    if(!polygon->at_boundary(edgeID)) buffer_barycentric.push_back(1);
-                    buffer_barycentric.push_back(0);
-
-                    buffer_barycentric.push_back(0);
-                    buffer_barycentric.push_back(1);
-                    if(!polygon->at_boundary(edgeID)) buffer_barycentric.push_back(1);
-                    buffer_barycentric.push_back(0);
-
-                    buffer_barycentric.push_back(0);
-                    buffer_barycentric.push_back(0);
-                    buffer_barycentric.push_back(1);
-                    edgeID ++;
 
 #if defined(NANOGUI_USE_OPENGL)
                     for(int vID = 0; vID < 3; vID ++)
@@ -253,7 +225,6 @@ public:
         object_center /= (float)num_vertices;
 
         shader->set_buffer("position", nanogui::VariableType::Float32, {buffer_positions.size() / 3, 3},  buffer_positions.data());
-        shader->set_buffer("barycentric", nanogui::VariableType::Float32, {buffer_barycentric.size() / 3, 3}, buffer_barycentric.data());
 
         shader->set_buffer("color", nanogui::VariableType::Float32, {buffer_colors.size() / 3, 3}, buffer_colors.data());
         shader->set_buffer("translation", nanogui::VariableType::Float32, {buffer_translation.size() / 3, 3}, buffer_translation.data());
@@ -265,11 +236,8 @@ public:
     }
 
     void update_uniform(){
-        shader->set_uniform("show_wireframe", varList->getBool("show_wireframe"));
-        shader->set_uniform("show_face", varList->getBool("show_face"));
         shader->set_uniform("mvp", this->toNanoguiMatrix(proj_mat * view_mat * model_mat));
         shader->set_uniform("simtime", simtime);
-        shader->set_uniform("line_color", line_color);
     }
 };
 

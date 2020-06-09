@@ -2,26 +2,24 @@
 // Created by ziqwang on 03.04.20.
 //
 
-#ifndef TOPOLITE_GUI_ARCBALL_H
-#define TOPOLITE_GUI_ARCBALL_H
-
+#ifndef TOPOLITE_GUI_TRACKBALL2D_H
+#define TOPOLITE_GUI_TRACKBALL2D_H
 #include <Eigen/Dense>
 #include <nanogui/vector.h>
 #include "gui_Math.h"
-
 /**
  * \struct Arcball glutil.h nanogui/glutil.h
  *
  * \brief Arcball helper class to interactively rotate objects on-screen.
  */
-struct gui_Arcball {
-    gui_Arcball(float speedFactor = 2.0f)
+struct gui_TrackBall2D {
+    gui_TrackBall2D(float speedFactor = 2.0f)
             : mActive(false), mLastPos(Eigen::Vector2i::Zero()), mSize(Eigen::Vector2i::Zero()),
               mQuat(Eigen::Quaternionf::Identity()),
               mIncr(Eigen::Quaternionf::Identity()),
               mSpeedFactor(speedFactor) { }
 
-    gui_Arcball(const Eigen::Quaternionf &quat)
+    gui_TrackBall2D(const Eigen::Quaternionf &quat)
             : mActive(false), mLastPos(Eigen::Vector2i::Zero()), mSize(Eigen::Vector2i::Zero()),
               mQuat(quat),
               mIncr(Eigen::Quaternionf::Identity()),
@@ -66,7 +64,7 @@ struct gui_Arcball {
         ox *= invMinDim; oy *= invMinDim;
         tx *= invMinDim; ty *= invMinDim;
 
-        Eigen::Vector3f v0(ox, oy, 1.0f), v1(tx, ty, 1.0f);
+        Eigen::Vector3f v0(ox, oy, 0.0f), v1(tx, ty, 0.0f);
         if (v0.squaredNorm() > 1e-4f && v1.squaredNorm() > 1e-4f) {
             v0.normalize(); v1.normalize();
             Eigen::Vector3f axis = v0.cross(v1);
@@ -95,4 +93,4 @@ protected:
     Eigen::Quaternionf mQuat, mIncr;
     float mSpeedFactor;
 };
-#endif //TOPOLITE_GUI_ARCBALL_H
+#endif //TOPOLITE_GUI_TRACKBALL2D_H

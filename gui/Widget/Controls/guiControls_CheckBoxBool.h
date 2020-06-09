@@ -2,19 +2,19 @@
 // Created by ziqwang on 06.06.20.
 //
 
-#ifndef TOPOLITE_GUI_CHECKBOXBOOL_H
-#define TOPOLITE_GUI_CHECKBOXBOOL_H
+#ifndef TOPOLITE_GUICONTROLS_CHECKBOXBOOL_H
+#define TOPOLITE_GUICONTROLS_CHECKBOXBOOL_H
 
 #include <nanogui/widget.h>
 #include <nanogui/window.h>
 #include "IO/InputVar.h"
-#include "gui_ParameterObject.h"
-class gui_CheckBoxBool: public nanogui::Widget, public gui_ParameterObject{
+#include "guiControls_Base.h"
+class guiControls_CheckBoxBool: public nanogui::Widget, public guiControls_Base{
 public:
     nanogui::CheckBox *checkBox;
 public:
-    gui_CheckBoxBool(InputVarBool *_var, nanogui::Window *window)
-    :Widget(window), gui_ParameterObject(_var)
+    guiControls_CheckBoxBool(InputVarBool *_var, nanogui::Window *window)
+    : Widget(window), guiControls_Base(_var)
     {
         Widget *panel = new Widget(window);
         panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
@@ -35,4 +35,4 @@ public:
     }
 };
 
-#endif //TOPOLITE_GUI_CHECKBOXBOOL_H
+#endif //TOPOLITE_GUICONTROLS_CHECKBOXBOOL_H

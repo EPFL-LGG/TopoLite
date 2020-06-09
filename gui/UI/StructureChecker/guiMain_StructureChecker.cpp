@@ -11,7 +11,7 @@
     BSD-style license that can be found in the LICENSE.txt file.
 */
 
-#include "gui_Arcball.h"
+#include "gui_TrackBall3D.h"
 
 #include <nanogui/opengl.h>
 #include <nanogui/screen.h>
@@ -44,117 +44,72 @@
 #include <cmath>
 #include <filesystem>
 
-#include "gui_SceneObject.h"
-#include "gui_PolyMeshLists.h"
+#include "guiScene_Base.h"
+#include "guiShader_PolyMeshes.h"
 
-#include "gui_Arcball_Canvas.h"
-#include "gui_LoadScene.h"
+#include "Canvas/guiCanvas_3DArcball.h"
+#include "guiManager_StructureChecker.h"
+#include "Dialog/guiDialog_YesNoCancel.h"
 
 class TopoLiteApplication : public nanogui::Screen{
 public:
-    TopoLiteApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "TopoCreator")
+    TopoLiteApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "StructureChecker")
     {
         //main canvas
-        main_canvas = new gui_Arcball_Canvas(this);
+        main_canvas = new guiCanvas_3DArcball(this);
         main_canvas->set_size(this->m_size);
+
+        checker_manager = std::make_shared<guiManager_StructureChecker>(main_canvas);
 
         nanogui::Window *window = new nanogui::Window(this, "Menu");
         window->set_position(nanogui::Vector2i(15, 15));
         window->set_layout(new nanogui::GroupLayout());
 
-        new nanogui::Label(window, "Rendering Settings", "sans-bold");
-        nanogui::CheckBox *checkbox = new nanogui::CheckBox(window, "wireframe");
-        checkbox->set_checked(true);
-        checkbox->set_callback([&](bool check){
-            main_canvas->scene->objects[0]->varList->add(check, "show_wireframe", "");
-            return check;
+        new nanogui::Label(window, "Action", "sans-bold");
+        nanogui::Button *open_button = new nanogui::Button(window, "Open");
+        open_button->set_fixed_width(150);
+        open_button->set_callback([&](){
+            objFilesList = nanogui::file_dialog({ {"obj", "Object Files"} }, false, true);
+            if(!objFilesList.empty()){
+                new guiDialog_YesNoCancel(main_canvas->parent(), "Settings", "Set the meshes to be boundary parts.", [&](int value){
+                    if(value == 0)
+                    {
+                        checker_manager->load_meshList(objFilesList, true);
+                    }
+                    else if(value == 1){
+                        checker_manager->load_meshList(objFilesList, false);
+                    }
+                });
+            }
         });
 
-        checkbox = new nanogui::CheckBox(window, "faces");
-        checkbox->set_checked(true);
-        checkbox->set_callback([&](bool check){
-            main_canvas->scene->objects[0]->varList->add(check, "show_face", "");
-            return check;
+        nanogui::Button *interlock_button = new nanogui::Button(window, "Check");
+        interlock_button->set_fixed_width(150);
+        interlock_button->set_callback([&](){
+            if(checker_manager){
+                if(checker_manager->check_interlocking()){
+                    new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Information, "Result", "Interlocking (Rotation & Translation)");
+                }
+                else{
+                    new nanogui::MessageDialog(this, nanogui::MessageDialog::Type::Information, "Result", "Not Interlocking (Rotation & Translation)");
+                }
+            }
         });
 
-        checkbox = new nanogui::CheckBox(window, "contact");
-        checkbox->set_checked(false);
-        checkbox->set_callback([&](bool check){
-            main_canvas->scene->objects[1]->visible = check;
-            return check;
+        nanogui::Button *clear_button = new nanogui::Button(window, "Clear");
+        clear_button->set_fixed_width(150);
+        clear_button->set_callback([&](){
+            if(checker_manager){
+                checker_manager->clear_scene();
+            }
         });
 
-        new nanogui::Label(window, "Animation Control", "sans-bold");
-        Widget *tools = new Widget(window);
-        tools->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
-                                                 nanogui::Alignment::Middle, 0, 6));
+        init_render_settings(window);
 
-
-        play = new nanogui::ToolButton(tools, FA_PLAY);
-        pause = new nanogui::ToolButton(tools, FA_PAUSE);
-        stop = new nanogui::ToolButton(tools, FA_STOP);
-
-        play->set_callback([&](){
-            prev_animate_state = Run;
-            main_canvas->scene->update_state(prev_animate_state);
-            return true;
-        });
-
-        pause->set_callback([&](){
-            prev_animate_state = Pause;
-            main_canvas->scene->update_state(prev_animate_state);
-            return true;
-        });
-
-        stop->set_callback([&](){
-            prev_animate_state = Stop;
-            main_canvas->scene->update_state(prev_animate_state);
-            return true;
-        });
-
-        new nanogui::Label(window, "speed");
-        Widget *panel = new Widget(window);
-        panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
-                                                 nanogui::Alignment::Middle, 0, 20));
-
-        speed_slider = new nanogui::Slider(panel);
-        speed_slider->set_value(1 / minimum_time_one_unit);
-        speed_slider->set_fixed_width(100);
-        speed_slider->set_range({1 / maximum_time_one_unit, 1 / minimum_time_one_unit});
-        animation_speed = 1 / minimum_time_one_unit;
-
-        text_box_speed = new nanogui::TextBox(panel);
-        text_box_speed->set_fixed_size(nanogui::Vector2i(60, 25));
-        text_box_speed->set_value(main_canvas->float_to_string(1 / minimum_time_one_unit, 3));
-
-        speed_slider->set_callback([&](float value) {
-            text_box_speed->set_value(main_canvas->float_to_string(value, 3));
-            animation_speed = value;
-        });
-
-        new nanogui::Label(window, "timeline");
-        panel = new Widget(window);
-        panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
-                                                 nanogui::Alignment::Middle, 0, 20));
-
-        timeline_slider = new nanogui::Slider(panel);
-        timeline_slider->set_value(0);
-        timeline_slider->set_fixed_width(100);
-        timeline_slider->set_range({0.0f, maximum_time_one_unit});
-
-        text_box_timeline = new nanogui::TextBox(panel);
-        text_box_timeline->set_fixed_size(nanogui::Vector2i(60, 25));
-        text_box_timeline->set_value("0");
-
-        timeline_slider->set_callback([&](float value) {
-            text_box_timeline->set_value(main_canvas->float_to_string(value, 3));
-            main_canvas->scene->update_simtime(value / maximum_time_one_unit);
-        });
+        init_animation_controls(window);
 
         perform_layout();
         main_canvas->refresh_trackball_center();
-
-        init_mesh();
     }
 
     /********************************************************************************************
@@ -193,20 +148,120 @@ public:
     ********************************************************************************************/
 
 
-    void init_mesh()
+    void init_render_settings(nanogui::Window *window)
     {
-        gui_LoadScene loader(main_canvas->scene);
-        loader.load_ania_multihand();
-        main_canvas->refresh_trackball_center();
+        new nanogui::Label(window, "Settings", "sans-bold");
+        nanogui::PopupButton *popup_btn = new nanogui::PopupButton(window, "Scene");
+        popup_btn->set_fixed_width(150);
+        nanogui::Popup *popup = popup_btn->popup();
+        popup->set_layout(new nanogui::GroupLayout());
+
+        new nanogui::Label(popup, "Rendering Setting", "sans-bold");
+        nanogui::CheckBox *checkbox = new nanogui::CheckBox(popup, "Faces");
+        checkbox->set_checked(true);
+        checkbox->set_callback([&](bool check){
+            if(main_canvas && main_canvas->scene && main_canvas->scene->objects.size() > 0){
+                main_canvas->scene->objects[0]->visible = check;
+            }
+            return check;
+        });
+
+        checkbox = new nanogui::CheckBox(popup, "Wireframe");
+        checkbox->set_checked(true);
+        checkbox->set_callback([&](bool check)
+        {
+            if(main_canvas && main_canvas->scene && main_canvas->scene->objects.size() > 1){
+                main_canvas->scene->objects[1]->visible = check;
+            }
+            return check;
+        });
+
+        checkbox = new nanogui::CheckBox(popup, "Contacts");
+        checkbox->set_checked(false);
+        checkbox->set_callback([&](bool check)
+        {
+            if(main_canvas && main_canvas->scene && main_canvas->scene->objects.size() > 2){
+                main_canvas->scene->objects[2]->visible = check;
+            }
+            return check;
+        });
     }
 
-    virtual void draw(NVGcontext *ctx) {
-        /* Draw the user interface */
-        Screen::draw(ctx);
+    void init_animation_controls(nanogui::Window *window)
+    {
+        nanogui::Window *animation_window = new nanogui::Window(window->parent(), "Animation Control");
+        animation_window->set_position(nanogui::Vector2i(15, 300));
+
+        animation_window->set_layout(new nanogui::GroupLayout());
+
+        new nanogui::Label(animation_window, "Control Panel:");
+        nanogui::Widget *tools = new nanogui::Widget(animation_window);
+        tools->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
+                                                 nanogui::Alignment::Middle, 0, 20));
+
+        play = new nanogui::ToolButton(tools, FA_PLAY);
+        pause = new nanogui::ToolButton(tools, FA_PAUSE);
+        stop = new nanogui::ToolButton(tools, FA_STOP);
+
+        play->set_callback([&](){
+            prev_animate_state = Run;
+            main_canvas->scene->update_state(prev_animate_state);
+            return true;
+        });
+
+        pause->set_callback([&](){
+            prev_animate_state = Pause;
+            main_canvas->scene->update_state(prev_animate_state);
+            return true;
+        });
+
+        stop->set_callback([&](){
+            prev_animate_state = Stop;
+            main_canvas->scene->update_state(prev_animate_state);
+            return true;
+        });
+
+        new nanogui::Label(animation_window, "speed:");
+        Widget *panel = new Widget(animation_window);
+        panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
+                                                 nanogui::Alignment::Middle, 0, 20));
+
+        speed_slider = new nanogui::Slider(panel);
+        speed_slider->set_value(1 / minimum_time_one_unit);
+        speed_slider->set_fixed_width(100);
+        speed_slider->set_range({1 / maximum_time_one_unit, 1 / minimum_time_one_unit});
+        animation_speed = 1 / minimum_time_one_unit;
+
+        text_box_speed = new nanogui::TextBox(panel);
+        text_box_speed->set_fixed_size(nanogui::Vector2i(60, 25));
+        text_box_speed->set_value(main_canvas->float_to_string(1 / minimum_time_one_unit, 3));
+
+        speed_slider->set_callback([&](float value) {
+            text_box_speed->set_value(main_canvas->float_to_string(value, 3));
+            animation_speed = value;
+        });
+
+        new nanogui::Label(animation_window, "timeline:");
+        panel = new Widget(animation_window);
+        panel->set_layout(new nanogui::BoxLayout(nanogui::Orientation::Horizontal,
+                                                 nanogui::Alignment::Middle, 0, 20));
+
+        timeline_slider = new nanogui::Slider(panel);
+        timeline_slider->set_value(0);
+        timeline_slider->set_fixed_width(100);
+        timeline_slider->set_range({0.0f, maximum_time_one_unit});
+
+        text_box_timeline = new nanogui::TextBox(panel);
+        text_box_timeline->set_fixed_size(nanogui::Vector2i(60, 25));
+        text_box_timeline->set_value("0");
+
+        timeline_slider->set_callback([&](float value) {
+            text_box_timeline->set_value(main_canvas->float_to_string(value, 3));
+            main_canvas->scene->update_simtime(value / maximum_time_one_unit);
+        });
     }
 
-    virtual void draw_contents() {
-        main_canvas->scene->render_pass->resize(framebuffer_size());
+    void update_animation_controls(){
         if(!play->pushed() && !pause->pushed() && !stop->pushed()){
             if(prev_animate_state == Run){
                 main_canvas->scene->update_state(Stop);
@@ -220,28 +275,40 @@ public:
 
         main_canvas->scene->update_time((float)glfwGetTime(), animation_speed);
 
-
         if(timeline_slider->value() > maximum_time_one_unit && Run){
             main_canvas->scene->update_state(Pause);
             pause->set_pushed(true);
             play->set_pushed(false);
             prev_animate_state = Pause;
         }
-
         timeline_slider->set_value(main_canvas->scene->simtime * maximum_time_one_unit);
         text_box_timeline->set_value(main_canvas->float_to_string(main_canvas->scene->simtime * maximum_time_one_unit, 3) );
+    }
 
+    virtual void draw(NVGcontext *ctx) {
+        /* Draw the user interface */
+        Screen::draw(ctx);
+    }
+
+
+
+    virtual void draw_contents()
+    {
+        main_canvas->scene->render_pass->resize(framebuffer_size());
+        update_animation_controls();
         main_canvas->draw_contents();
     }
 private:
     nanogui::ToolButton *play, *pause, *stop;
     nanogui::TextBox *text_box_speed, *text_box_timeline;
     nanogui::Slider *timeline_slider, *speed_slider;
+    vector<std::string> objFilesList;
 
 public:
     //animation
     AnimationState prev_animate_state;
-    nanogui::ref<gui_Arcball_Canvas> main_canvas;
+    nanogui::ref<guiCanvas_3DArcball> main_canvas;
+    shared_ptr<guiManager_StructureChecker> checker_manager;
     float animation_speed = 0.1;
     float minimum_time_one_unit = 3;
     float maximum_time_one_unit = 20;

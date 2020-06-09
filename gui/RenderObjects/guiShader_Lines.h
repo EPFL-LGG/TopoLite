@@ -2,10 +2,10 @@
 // Created by ziqwang on 14.04.20.
 //
 
-#ifndef TOPOLITE_GUI_LINES_H
-#define TOPOLITE_GUI_LINES_H
+#ifndef TOPOLITE_GUISHADER_LINES_H
+#define TOPOLITE_GUISHADER_LINES_H
 
-#include "gui_RenderObject.h"
+#include "guiShader_Base.h"
 #include "Utility/GeometricPrimitives.h"
 #include "nanogui/vector.h"
 template <typename Scalar>
@@ -14,35 +14,32 @@ public:
     typedef Matrix<Scalar, 3, 1> Vector3;
     vector<Line<Scalar>> lines;
     nanogui::Color color;
-    Vector3 ani_translation;
-    Vector3 ani_center;
-    Vector3 ani_rotation;
 };
 
 template <typename Scalar>
-class gui_Lines : public gui_RenderObject<Scalar>{
+class guiShader_Lines : public guiShader_Base<Scalar>{
 public:
 
     typedef Matrix<Scalar, 3, 1> Vector3;
 
 public:
-    using gui_RenderObject<Scalar>::object_colors;
-    using gui_RenderObject<Scalar>::object_center;
+    using guiShader_Base<Scalar>::object_colors;
+    using guiShader_Base<Scalar>::object_center;
     vector<Vector3> ani_translation;
     vector<Vector3> ani_center;
     vector<Vector3> ani_rotation;
     vector<gui_LinesGroup<Scalar>> linegroups;
 
 public:
-    using gui_RenderObject<Scalar>::state;
+    using guiShader_Base<Scalar>::state;
 
 public:
-    using gui_RenderObject<Scalar>::render_pass;
+    using guiShader_Base<Scalar>::render_pass;
     vector<nanogui::ref<nanogui::Shader>> shaders;
 
 public:  //buffers
-    using gui_RenderObject<Scalar>::buffer_colors;
-    using gui_RenderObject<Scalar>::buffer_positions;
+    using guiShader_Base<Scalar>::buffer_colors;
+    using guiShader_Base<Scalar>::buffer_positions;
 
     vector<float> buffer_lineprev;
     vector<float> buffer_linep1;
@@ -57,28 +54,32 @@ public:  //buffers
     vector<int> buffer_objectindex;
 
 public: // uniform
-    using gui_RenderObject<Scalar>::simtime;
-    using gui_RenderObject<Scalar>::varList;
-    using gui_RenderObject<Scalar>::proj_mat;
-    using gui_RenderObject<Scalar>::model_mat;
-    using gui_RenderObject<Scalar>::view_mat;
-    using gui_RenderObject<Scalar>::eye;
+    using guiShader_Base<Scalar>::simtime;
+    using guiShader_Base<Scalar>::varList;
+    using guiShader_Base<Scalar>::proj_mat;
+    using guiShader_Base<Scalar>::model_mat;
+    using guiShader_Base<Scalar>::view_mat;
+    using guiShader_Base<Scalar>::eye;
     float line_width;
 
 public:
 
-    gui_Lines(  const vector<gui_LinesGroup<Scalar>> &_linegroups,
-                float _line_width,
-                nanogui::ref<nanogui::RenderPass> _render_pass)
-            : gui_RenderObject<Scalar>::gui_RenderObject(_render_pass), line_width(_line_width), linegroups(_linegroups)
+    guiShader_Lines(const vector<gui_LinesGroup<Scalar>> &_linegroups,
+                    float _line_width,
+                    nanogui::ref<nanogui::RenderPass> _render_pass)
+            : guiShader_Base<Scalar>::guiShader_Base(_render_pass), line_width(_line_width), linegroups(_linegroups)
     {
         for(gui_LinesGroup<Scalar> lg: linegroups)
         {
             object_colors.push_back(lg.color);
-            ani_translation.push_back(lg.ani_translation);
-            ani_rotation.push_back(lg.ani_rotation);
-            ani_center.push_back(lg.ani_center);
         }
+
+        ani_translation.clear();
+        ani_rotation.clear();
+        ani_center.clear();
+        ani_translation.resize(linegroups.size(), Vector3(0, 0, 0));
+        ani_rotation.resize(linegroups.size(), Vector3(0, 0, 0));
+        ani_center.resize(linegroups.size(), Vector3(0, 0, 0));
 
         state = Stop;
         initShader();
@@ -92,13 +93,10 @@ public:
         ani_rotation.clear();
 
         linegroups = _linegroups;
-        for(gui_LinesGroup<Scalar> lg: linegroups)
-        {
-            object_colors.push_back(lg.color);
-            ani_translation.push_back(lg.ani_translation);
-            ani_rotation.push_back(lg.ani_rotation);
-            ani_center.push_back(lg.ani_center);
-        }
+
+        ani_translation.clear(); ani_translation.resize(linegroups.size(), Vector3(0, 0, 0));
+        ani_rotation.clear(); ani_rotation.resize(linegroups.size(), Vector3(0, 0, 0));
+        ani_center.clear(); ani_center.resize(linegroups.size(), Vector3(0, 0, 0));
 
         update_buffer();
     }
@@ -120,11 +118,11 @@ public:
 #elif defined(NANOGUI_USE_METAL)
         //read text from file
         string shader_path = TOPOCREATOR_SHADER_PATH;
-        std::ifstream file(shader_path + "Lines_vert.metal");
+        std::ifstream file(shader_path + "metal/Lines_vert.metal");
         std::string shader_vert((std::istreambuf_iterator<char>(file)),
                                 std::istreambuf_iterator<char>());
 
-        file = std::ifstream(shader_path + "Lines_frag.metal");
+        file = std::ifstream(shader_path + "metal/Lines_frag.metal");
         string shader_frag((std::istreambuf_iterator<char>(file)),
                            std::istreambuf_iterator<char>());
 #endif
@@ -135,21 +133,24 @@ public:
         update_buffer();
     }
 
-    void update_buffer() override {
+    void update_buffer() override
+    {
         //init buffer_positions
         int num_vertices = 0;
         object_center = Eigen::Vector3d(0, 0, 0);
 
-        buffer_positions.clear();
-        buffer_colors.clear();
         buffer_translation.clear();
         buffer_rotation.clear();
         buffer_center.clear();
-        buffer_lineprev.clear();
+
+        buffer_positions.clear();
+        buffer_colors.clear();
+
         buffer_linep1.clear();
         buffer_linep2.clear();
-        buffer_linenext.clear();
+
         buffer_objectindex.clear();
+
 
 #if defined(NANOGUI_USE_METAL)
         for(size_t mID = 0; mID < linegroups.size(); mID++){
@@ -172,10 +173,6 @@ public:
                 object_center = object_center + line.point2 + line.point1;
                 num_vertices += 2;
                 {
-                    buffer_positions.push_back(0);
-                    buffer_positions.push_back(0);
-                    buffer_positions.push_back(0);
-
                     buffer_positions.push_back(1);
                     buffer_positions.push_back(0);
                     buffer_positions.push_back(0);
@@ -183,10 +180,11 @@ public:
                     buffer_positions.push_back(0);
                     buffer_positions.push_back(1);
                     buffer_positions.push_back(0);
+
+                    buffer_positions.push_back(0);
+                    buffer_positions.push_back(0);
+                    buffer_positions.push_back(1);
                 }
-
-                Line<Scalar> prevline = lg.lines[(lID - 1 + lgsize) % lgsize];
-                Line<Scalar> nextline = lg.lines[(lID + 1) % lgsize];
 
                 for(int id = 0; id < 3; id++)
                 {
@@ -194,27 +192,11 @@ public:
                     {
                         buffer_linep1.push_back(line.point1[jd]);
                         buffer_linep2.push_back(line.point2[jd]);
-
-                        //prev line
-                        if((prevline.point2 - line.point1).norm() < FLOAT_ERROR_SMALL){
-                            buffer_lineprev.push_back(prevline.point1[jd]);
-                        }
-                        else{
-                            buffer_lineprev.push_back(line.point1[jd] * 2 - line.point2[jd]);
-                        }
-
-                        //next line
-                        if((nextline.point1 - line.point2).norm() < FLOAT_ERROR_SMALL){
-                            buffer_linenext.push_back(nextline.point2[jd]);
-                        }
-                        else{
-                            buffer_linenext.push_back(line.point2[jd] * 2 - line.point1[jd]);
-                        }
                     }
                 }
 
 #if defined(NANOGUI_USE_OPENGL)
-                for(int vID = 0; vID < 6; vID ++)
+                for(int vID = 0; vID < 3; vID ++)
                 {
                     for(int kd = 0; kd < 3; kd ++)
                     {
@@ -225,7 +207,7 @@ public:
                     }
                 }
 #elif defined(NANOGUI_USE_METAL)
-                for(int id = 0; id < 6; id++)
+                for(int id = 0; id < 3; id++)
                     buffer_objectindex.push_back(mID);
 #endif
             }
@@ -239,8 +221,6 @@ public:
             shader->set_buffer("color", nanogui::VariableType::Float32, {buffer_colors.size() / 3, 3}, buffer_colors.data());
             shader->set_buffer("linep1", nanogui::VariableType::Float32, {buffer_linep1.size() / 3, 3}, buffer_linep1.data());
             shader->set_buffer("linep2", nanogui::VariableType::Float32, {buffer_linep2.size() / 3, 3}, buffer_linep2.data());
-            shader->set_buffer("lineprev", nanogui::VariableType::Float32, {buffer_lineprev.size() / 3, 3}, buffer_lineprev.data());
-            shader->set_buffer("linenext", nanogui::VariableType::Float32, {buffer_linenext.size() / 3, 3}, buffer_linenext.data());
 
             shader->set_buffer("translation", nanogui::VariableType::Float32, {buffer_translation.size() / 3, 3}, buffer_translation.data());
             shader->set_buffer("rotation", nanogui::VariableType::Float32, {buffer_rotation.size() / 3, 3}, buffer_rotation.data());
@@ -277,4 +257,4 @@ public:
 };
 
 
-#endif //TOPOLITE_GUI_LINES_H
+#endif //TOPOLITE_GUISHADER_LINES_H

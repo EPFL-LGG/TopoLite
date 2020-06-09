@@ -3,19 +3,19 @@
 // Created by ziqwang on 09.04.20.
 //
 
-#ifndef TOPOLITE_GUI_SCENEOBJECT_H
-#define TOPOLITE_GUI_SCENEOBJECT_H
+#ifndef TOPOLITE_GUISCENE_BASE_H
+#define TOPOLITE_GUISCENE_BASE_H
 
-#include "gui_RenderObject.h"
+#include "guiShader_Base.h"
 #include <memory>
 #include <Eigen/Dense>
 
 using std::shared_ptr;
 
 template<typename Scalar>
-class gui_SceneObject{
+class guiScene_Base{
 public:
-    vector<shared_ptr<gui_RenderObject<Scalar>>> objects;
+    vector<shared_ptr<guiShader_Base<Scalar>>> objects;
     nanogui::ref<nanogui::RenderPass> render_pass;
     AnimationState state;
     float simtime;
@@ -35,34 +35,34 @@ public:
     }
 
     void update_time(float curr_time, float speed = 0.1){
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->update_time(curr_time, speed);
             simtime = object->simtime;
         }
     }
 
     void update_simtime(float _simtime){
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->simtime = _simtime;
         }
         simtime = _simtime;
     }
 
     void update_state(AnimationState _state){
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->state = _state;
         }
         state = _state;
     }
 
     void update_proj(Eigen::Matrix4f proj){
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->proj_mat = proj;
         }
     }
 
     void update_model(Eigen::Matrix4f model){
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             if(object->model_mat_fixed){
                 object->model_mat = object->model_init_mat;
             }
@@ -73,13 +73,13 @@ public:
     }
 
     void update_view(Eigen::Matrix4f view){
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->view_mat = view;
         }
     }
 
     void update_eye(Eigen::Vector3f eye){
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->eye = eye;
         }
     }
@@ -91,7 +91,7 @@ public:
 //        glEnable(GL_DEPTH_TEST);
 //        glDepthMask( true );
 //#endif
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->draw_object();
         }
         
@@ -100,10 +100,10 @@ public:
     template<typename AttrType>
     void update_attr(string name, AttrType value)
     {
-        for(shared_ptr<gui_RenderObject<Scalar>> object : objects){
+        for(shared_ptr<guiShader_Base<Scalar>> object : objects){
             object->update_attr(name, value);
         }
     }
 };
 
-#endif //TOPOLITE_GUI_SCENEOBJECT_H
+#endif //TOPOLITE_GUISCENE_BASE_H

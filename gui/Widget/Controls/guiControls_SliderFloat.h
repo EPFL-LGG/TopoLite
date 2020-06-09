@@ -2,20 +2,20 @@
 // Created by ziqwang on 06.06.20.
 //
 
-#ifndef TOPOLITE_GUI_SLIDERFLOAT_H
-#define TOPOLITE_GUI_SLIDERFLOAT_H
+#ifndef TOPOLITE_GUICONTROLS_SLIDERFLOAT_H
+#define TOPOLITE_GUICONTROLS_SLIDERFLOAT_H
 
 #include <nanogui/widget.h>
 #include <nanogui/window.h>
 #include "IO/InputVar.h"
-#include "gui_ParameterObject.h"
-class gui_SliderFloat: public nanogui::Widget, public gui_ParameterObject{
+#include "guiControls_Base.h"
+class guiControls_SliderFloat: public nanogui::Widget, public guiControls_Base{
 public:
     nanogui::Slider *slider;
     nanogui::TextBox *text_box;
 public:
-    gui_SliderFloat(InputVarFloat *_var, nanogui::Window *window)
-    :Widget(window), gui_ParameterObject(_var)
+    guiControls_SliderFloat(InputVarFloat *_var, nanogui::Window *window)
+    : Widget(window), guiControls_Base(_var)
     {
 
         Widget *panel = new Widget(window);
@@ -52,4 +52,4 @@ public:
     }
 };
 
-#endif //TOPOLITE_GUI_SLIDERFLOAT_H
+#endif //TOPOLITE_GUICONTROLS_SLIDERFLOAT_H

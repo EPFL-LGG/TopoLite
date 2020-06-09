@@ -1,2 +1,2 @@
-file(GLOB FilesUtility ${CMAKE_CURRENT_SOURCE_DIR}/*.*)
-set(FilesUtility ${FilesUtility} PARENT_SCOPE)
+file(GLOB UtilityFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.*)
+set(UtilityFiles ${UtilityFiles} PARENT_SCOPE)

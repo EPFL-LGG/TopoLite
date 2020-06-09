@@ -8,14 +8,14 @@
 #include <iostream>
 #include <memory>
 
-#include "gui_Arcball_Canvas.h"
-#include "gui_2D_Canvas.h"
-#include "gui_TopoManager.h"
-#include "gui_Lines.h"
+#include "guiCanvas_3DArcball.h"
+#include "guiCanvas_2DArcball.h"
+#include "guiManager_TopoCreator.h"
+#include "guiShader_Lines.h"
 
-#include "gui_SliderFloat.h"
-#include "gui_SliderInt.h"
-#include "gui_CheckBoxBool.h"
+#include "guiControls_SliderFloat.h"
+#include "guiControls_SliderInt.h"
+#include "guiControls_CheckBoxBool.h"
 
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_Clp.h"
@@ -25,17 +25,17 @@ public:
     TopoLiteApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "TopoCreator")
     {
         //main canvas
-        main_canvas = new gui_Arcball_Canvas(this);
+        main_canvas = new guiCanvas_3DArcball(this);
         main_canvas->set_size(this->m_size);
         
         //pattern canvas
-        pattern_canvas = new gui_2D_Canvas(this);
+        pattern_canvas = new guiCanvas_2DArcball(this);
         int min_wh = std::min(m_size.x() / 2.5, m_size.y() / 2.5);
         pattern_canvas->set_position(nanogui::Vector2i(m_size.x() - min_wh, m_size.y() - min_wh));
         pattern_canvas->set_size(nanogui::Vector2i(min_wh, min_wh));
 
         //manager
-        topo_manager = make_shared<gui_TopoManager>(main_canvas, pattern_canvas);
+        topo_manager = make_shared<guiManager_TopoCreator>(main_canvas, pattern_canvas);
 
         menu_window = new nanogui::Window(this, "Menu");
         menu_window->set_position(nanogui::Vector2i(15, 15));
@@ -54,7 +54,6 @@ public:
             return true;
         });
 
-        new nanogui::Label(menu_window, "Settings", "sans-bold");
         init_scene_visible_options();
         init_parameter_options();
 
@@ -64,6 +63,7 @@ public:
 
     void init_scene_visible_options()
     {
+        new nanogui::Label(menu_window, "Settings", "sans-bold");
         nanogui::PopupButton *popup_btn = new nanogui::PopupButton(menu_window, "Scene");
         nanogui::Popup *popup = popup_btn->popup();
         popup->set_layout(new nanogui::GroupLayout());
@@ -121,13 +121,13 @@ public:
             {
                 if(var->var_gui_type == GUI_SLIDERFLOAT)
                 {
-                    parameter_objects.push_back(new gui_SliderFloat((InputVarFloat *)var, popup));
+                    parameter_objects.push_back(new guiControls_SliderFloat((InputVarFloat *)var, popup));
                 }
                 else if(var->var_gui_type == GUI_SLIDERINT){
-                    parameter_objects.push_back(new gui_SliderInt((InputVarInt *)var, popup));
+                    parameter_objects.push_back(new guiControls_SliderInt((InputVarInt *)var, popup));
                 }
                 else if(var->var_gui_type == GUI_CHECKBOX){
-                    parameter_objects.push_back(new gui_CheckBoxBool((InputVarBool *)var, popup));
+                    parameter_objects.push_back(new guiControls_CheckBoxBool((InputVarBool *)var, popup));
                 }
             }
         }
@@ -210,9 +210,9 @@ public:
 
 
 private:
-    nanogui::ref<gui_Arcball_Canvas> main_canvas;
-    nanogui::ref<gui_2D_Canvas> pattern_canvas;
-    shared_ptr<gui_TopoManager> topo_manager;
+    nanogui::ref<guiCanvas_3DArcball> main_canvas;
+    nanogui::ref<guiCanvas_2DArcball> pattern_canvas;
+    shared_ptr<guiManager_TopoCreator> topo_manager;
     nanogui::Window *menu_window;
     vector<nanogui::ref<gui_ParameterObject>> parameter_objects;
 };

@@ -12,14 +12,14 @@
 #include <iostream>
 #include <memory>
 
-#include "gui_Arcball_Canvas.h"
-#include "gui_2D_Canvas.h"
+#include "guiCanvas_3DArcball.h"
+#include "guiCanvas_2DArcball.h"
 #include "gui_TopoManager.h"
-#include "gui_Lines.h"
+#include "guiShader_Lines.h"
 
-#include "gui_SliderFloat.h"
-#include "gui_SliderInt.h"
-#include "gui_CheckBoxBool.h"
+#include "guiControls_SliderFloat.h"
+#include "guiControls_SliderInt.h"
+#include "guiControls_CheckBoxBool.h"
 
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_Clp.h"
@@ -30,7 +30,7 @@ public:
 
         inc_ref();
 
-        main_canvas = new gui_Arcball_Canvas(this);
+        main_canvas = new guiCanvas_3DArcball(this);
         main_canvas->set_size(this->m_size);
 
         perform_layout();
@@ -51,7 +51,7 @@ public:
             lg.lines.push_back(Line<double>(Eigen::Vector3d(0.5, id * 0.1, 0), Eigen::Vector3d(0.5, (id + 1) * 0.1, 0)));
         }
         linegroups.push_back(lg);
-        shared_ptr<gui_Lines<double>> LinesObject = make_shared<gui_Lines<double>>(linegroups, 0.002, main_canvas->scene->render_pass);
+        shared_ptr<guiShader_Lines<double>> LinesObject = make_shared<guiShader_Lines<double>>(linegroups, 0.002, main_canvas->scene->render_pass);
         main_canvas->scene->objects.push_back(LinesObject);
         main_canvas->resize_arcball(m_size);
     }
@@ -67,7 +67,7 @@ public:
     }
 
 public:
-    nanogui::ref<gui_Arcball_Canvas> main_canvas;
+    nanogui::ref<guiCanvas_3DArcball> main_canvas;
 };
 
 int main(int /* argc */, char ** /* argv */) {

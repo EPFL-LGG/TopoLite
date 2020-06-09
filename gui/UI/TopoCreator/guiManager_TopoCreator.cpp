@@ -2,13 +2,13 @@
 // Created by ziqwang on 06.06.20.
 //
 
-#include "gui_TopoManager.h"
+#include "guiManager_TopoCreator.h"
 
 /*
  * Input and Output
  */
 
-bool gui_TopoManager::load_from_xmlfile(string xmlFileName)
+bool guiManager_TopoCreator::load_from_xmlfile(string xmlFileName)
 {
     XMLIO_backward IO;
     clear();
@@ -21,7 +21,7 @@ bool gui_TopoManager::load_from_xmlfile(string xmlFileName)
     return false;
 }
 
-bool gui_TopoManager::load_from_jsonfile(string xmlFileName){
+bool guiManager_TopoCreator::load_from_jsonfile(string xmlFileName){
     iodata = make_shared<IOData>();
     JsonIOReader reader(xmlFileName, iodata);
     clear();
@@ -32,7 +32,7 @@ bool gui_TopoManager::load_from_jsonfile(string xmlFileName){
     return false;
 }
 
-void gui_TopoManager::write_to_json(string jsonFileName)
+void guiManager_TopoCreator::write_to_json(string jsonFileName)
 {
     if(crossMeshCreator){
         if(crossMeshCreator->referenceSurface){
@@ -58,7 +58,7 @@ void gui_TopoManager::write_to_json(string jsonFileName)
  * Initialization
  */
 
-void gui_TopoManager::init_from_IOData()
+void guiManager_TopoCreator::init_from_IOData()
 {
     //0)
     crossMeshCreator = make_shared<CrossMeshCreator<double>>(iodata->varList);
@@ -91,7 +91,7 @@ void gui_TopoManager::init_from_IOData()
     init_varlist_recompute_func();
 }
 
-void gui_TopoManager::init_main_canvas(){
+void guiManager_TopoCreator::init_main_canvas(){
     if(crossMeshCreator){
         vector<shared_ptr<PolyMesh<double>>> meshLists;
         vector<nanogui::Color> colors;
@@ -103,7 +103,7 @@ void gui_TopoManager::init_main_canvas(){
         {
             colors.push_back(nanogui::Color(200, 200 ,200, 255));
             meshLists.push_back(crossMesh->getPolyMesh());
-            shared_ptr<gui_PolyMeshLists<double>> polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, arcball_canvas->scene->render_pass);
+            shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, arcball_canvas->scene->render_pass);
             polyMeshLists->visible = false;
             arcball_canvas->scene->objects.push_back(polyMeshLists);
         }
@@ -122,7 +122,7 @@ void gui_TopoManager::init_main_canvas(){
                 }
             }
             linegroups.push_back(lg);
-            shared_ptr<gui_Lines<double>> LinesObject = make_shared<gui_Lines<double>>(linegroups, 0.01, arcball_canvas->scene->render_pass);
+            shared_ptr<guiShader_Lines<double>> LinesObject = make_shared<guiShader_Lines<double>>(linegroups, 0.01, arcball_canvas->scene->render_pass);
             LinesObject->visible = false;
             arcball_canvas->scene->objects.push_back(LinesObject);
         }
@@ -143,7 +143,7 @@ void gui_TopoManager::init_main_canvas(){
                     meshLists.push_back(block->polyMesh);
                 }
             }
-            shared_ptr<gui_PolyMeshLists<double>> polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, arcball_canvas->scene->render_pass);
+            shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, arcball_canvas->scene->render_pass);
             arcball_canvas->scene->objects.push_back(polyMeshLists);
         }
 
@@ -151,11 +151,11 @@ void gui_TopoManager::init_main_canvas(){
     }
 }
 
-void gui_TopoManager::init_pattern_canvas()
+void guiManager_TopoCreator::init_pattern_canvas()
 {
     vector<shared_ptr<PolyMesh<double>>> meshLists;
     vector<nanogui::Color> colors;
-    shared_ptr<gui_PolyMeshLists<double>> polyMeshLists;
+    shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists;
 
     pattern_canvas->init_render_pass();
 
@@ -168,7 +168,7 @@ void gui_TopoManager::init_pattern_canvas()
             meshLists.push_back(baseMesh);
         }
 
-        polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
+        polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
         polyMeshLists->varList->add(false, "show_face", "");
         polyMeshLists->line_color = nanogui::Color(242, 133, 0, 255);
         pattern_canvas->scene->objects.push_back(polyMeshLists);
@@ -183,7 +183,7 @@ void gui_TopoManager::init_pattern_canvas()
             shared_ptr<PolyMesh<double>> pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
             meshLists.push_back(pattern_mesh);
         }
-        polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
+        polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
         polyMeshLists->varList->add(false, "show_face", "");
         polyMeshLists->model_init_mat = init_textureMat.cast<float>();
         polyMeshLists->line_color = nanogui::Color(150, 150, 150, 255);
@@ -199,7 +199,7 @@ void gui_TopoManager::init_pattern_canvas()
             shared_ptr<PolyMesh<double>> textureMesh =crossMeshCreator->referenceSurface->getTextureMesh();
             meshLists.push_back(textureMesh);
         }
-        polyMeshLists = make_shared<gui_PolyMeshLists<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
+        polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
         polyMeshLists->varList->add(false, "show_wireframe", "");
         polyMeshLists->model_mat_fixed = true;
         pattern_canvas->scene->objects.push_back(polyMeshLists);
@@ -213,51 +213,51 @@ void gui_TopoManager::init_pattern_canvas()
  * Update Rendering
  */
 
-void gui_TopoManager::update_reference_surface_texture()
+void guiManager_TopoCreator::update_reference_surface_texture()
 {
     vector<shared_ptr<PolyMesh<double>>> meshLists;
     vector<nanogui::Color> colors;
-    shared_ptr<gui_PolyMeshLists<double>> polyMeshLists;
+    shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists;
 
     if(crossMeshCreator && crossMeshCreator->referenceSurface)
     {
         colors.push_back(nanogui::Color(255, 255 ,255, 255));
         shared_ptr<PolyMesh<double>> textureMesh = crossMeshCreator->referenceSurface->getTextureMesh();
         meshLists.push_back(textureMesh);
-        ((gui_PolyMeshLists<double> *)(pattern_canvas->scene->objects[2].get()))->update_mesh(meshLists, colors);
+        ((guiShader_PolyMeshes<double> *)(pattern_canvas->scene->objects[2].get()))->update_mesh(meshLists, colors);
     }
 }
 
-void gui_TopoManager::update_base_mesh_2D()
+void guiManager_TopoCreator::update_base_mesh_2D()
 {
     //baseMesh2D
     vector<shared_ptr<PolyMesh<double>>> meshLists;
     vector<nanogui::Color> colors;
-    shared_ptr<gui_PolyMeshLists<double>> polyMeshLists;
+    shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists;
 
     if(crossMeshCreator && crossMeshCreator->crossMesh && crossMeshCreator->crossMesh->baseMesh2D){
         shared_ptr<PolyMesh<double>> baseMesh = crossMeshCreator->crossMesh->baseMesh2D;
         meshLists.push_back(baseMesh);
-        ((gui_PolyMeshLists<double> *)(pattern_canvas->scene->objects[0].get()))->update_mesh(meshLists, colors);
+        ((guiShader_PolyMeshes<double> *)(pattern_canvas->scene->objects[0].get()))->update_mesh(meshLists, colors);
     }
 
 }
 
-void gui_TopoManager::update_pattern_2D()
+void guiManager_TopoCreator::update_pattern_2D()
 {
     vector<shared_ptr<PolyMesh<double>>> meshLists;
     vector<nanogui::Color> colors;
-    shared_ptr<gui_PolyMeshLists<double>> polyMeshLists;
+    shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists;
 
     if(crossMeshCreator && crossMeshCreator->pattern2D)
     {
         shared_ptr<PolyMesh<double>> pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
         meshLists.push_back(pattern_mesh);
-        ((gui_PolyMeshLists<double> *)(pattern_canvas->scene->objects[1].get()))->update_mesh(meshLists, colors);
+        ((guiShader_PolyMeshes<double> *)(pattern_canvas->scene->objects[1].get()))->update_mesh(meshLists, colors);
     }
 }
 
-void gui_TopoManager::update_cross_mesh(){
+void guiManager_TopoCreator::update_cross_mesh(){
     //CrossMesh
     vector<shared_ptr<PolyMesh<double>>> meshLists;
     vector<nanogui::Color> colors;
@@ -267,11 +267,11 @@ void gui_TopoManager::update_cross_mesh(){
         shared_ptr<CrossMesh<double>> crossMesh = crossMeshCreator->crossMesh;
         colors.push_back(nanogui::Color(200, 200 ,200, 255));
         meshLists.push_back(crossMesh->getPolyMesh());
-        ((gui_PolyMeshLists<double> *)(arcball_canvas->scene->objects[0].get()))->update_mesh(meshLists, colors);
+        ((guiShader_PolyMeshes<double> *)(arcball_canvas->scene->objects[0].get()))->update_mesh(meshLists, colors);
     }
 }
 
-void gui_TopoManager::update_augmented_vectors()
+void guiManager_TopoCreator::update_augmented_vectors()
 {
     vector<gui_LinesGroup<double>> linegroups;
     gui_LinesGroup<double> lg;
@@ -287,11 +287,11 @@ void gui_TopoManager::update_augmented_vectors()
             }
         }
         linegroups.push_back(lg);
-        ((gui_Lines<double> *) (arcball_canvas->scene->objects[1].get()))->update_line(linegroups);
+        ((guiShader_Lines<double> *) (arcball_canvas->scene->objects[1].get()))->update_line(linegroups);
     }
 }
 
-void gui_TopoManager::update_struc(){
+void guiManager_TopoCreator::update_struc(){
     vector<shared_ptr<PolyMesh<double>>> meshLists;
     vector<nanogui::Color> colors;
     meshLists.clear();
@@ -309,11 +309,11 @@ void gui_TopoManager::update_struc(){
                 meshLists.push_back(block->polyMesh);
             }
         }
-        ((gui_PolyMeshLists<double> *)(arcball_canvas->scene->objects[2].get()))->update_mesh(meshLists, colors);
+        ((guiShader_PolyMeshes<double> *)(arcball_canvas->scene->objects[2].get()))->update_mesh(meshLists, colors);
     }
 }
 
-void gui_TopoManager::set_update_list_true(vector<std::string> strs)
+void guiManager_TopoCreator::set_update_list_true(vector<std::string> strs)
 {
     if(render_update_list){
         for(auto str: strs){
@@ -322,7 +322,7 @@ void gui_TopoManager::set_update_list_true(vector<std::string> strs)
     }
 }
 
-void gui_TopoManager::update()
+void guiManager_TopoCreator::update()
 {
     Eigen::Matrix4d textureMat = pattern_canvas->get_textureMat();
     if((textureMat - last_textureMat).norm() > 1e-5) {
@@ -356,7 +356,7 @@ void gui_TopoManager::update()
  * update the geometry
  */
 
-void gui_TopoManager::recompute_cross_mesh()
+void guiManager_TopoCreator::recompute_cross_mesh()
 {
     if(crossMeshCreator)
     {
@@ -370,7 +370,7 @@ void gui_TopoManager::recompute_cross_mesh()
     }
 }
 
-void gui_TopoManager::recompute_augmented_vector_angle()
+void guiManager_TopoCreator::recompute_augmented_vector_angle()
 {
     if(crossMeshCreator){
         crossMeshCreator->updateAugmentedVectors();
@@ -382,7 +382,7 @@ void gui_TopoManager::recompute_augmented_vector_angle()
     }
 }
 
-void gui_TopoManager::recompute_reference_surface(){
+void guiManager_TopoCreator::recompute_reference_surface(){
     if(iodata && iodata->reference_surface && crossMeshCreator)
     {
         //1) reset referemce surface
@@ -407,7 +407,7 @@ void gui_TopoManager::recompute_reference_surface(){
     }
 }
 
-void gui_TopoManager::recompute_pattern_mesh(){
+void guiManager_TopoCreator::recompute_pattern_mesh(){
     if(iodata && iodata->pattern_mesh && crossMeshCreator)
     {
         //1) reset referemce surface
@@ -432,7 +432,7 @@ void gui_TopoManager::recompute_pattern_mesh(){
     }
 }
 
-void gui_TopoManager::recompute_struc()
+void guiManager_TopoCreator::recompute_struc()
 {
     if(crossMeshCreator->crossMesh)
     {

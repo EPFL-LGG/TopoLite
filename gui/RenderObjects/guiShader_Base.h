@@ -2,8 +2,8 @@
 // Created by ziqwang on 09.04.20.
 //
 
-#ifndef TOPOLITE_GUI_RENDEROBJECT_H
-#define TOPOLITE_GUI_RENDEROBJECT_H
+#ifndef TOPOLITE_GUISHADER_BASE_H
+#define TOPOLITE_GUISHADER_BASE_H
 #include <vector>
 #include "TopoLite/IO/InputVar.h"
 #include "nanogui/vector.h"
@@ -16,7 +16,7 @@ enum AnimationState{
 };
 
 template<typename Scalar>
-class gui_RenderObject{
+class guiShader_Base{
 
 public:
     vector<nanogui::Color> object_colors;
@@ -51,7 +51,7 @@ public: // uniform
 
 public:
 
-    gui_RenderObject(nanogui::ref<nanogui::RenderPass> _render_pass){
+    guiShader_Base(nanogui::ref<nanogui::RenderPass> _render_pass){
         simtime = prev_time = 0;
         state = Stop;
         model_init_mat = Eigen::Matrix4f::Identity();
@@ -128,4 +128,4 @@ public:
 
 };
 
-#endif //TOPOLITE_GUI_RENDEROBJECT_H
+#endif //TOPOLITE_GUISHADER_BASE_H

@@ -2,8 +2,8 @@
 // Created by ziqwang on 09.04.20.
 //
 
-#ifndef TOPOLITE_GUI_2D_CANVAS_H
-#define TOPOLITE_GUI_2D_CANVAS_H
+#ifndef TOPOLITE_GUICANVAS_3DARCBALL_H
+#define TOPOLITE_GUICANVAS_3DARCBALL_H
 
 #include <nanogui/opengl.h>
 #include <nanogui/screen.h>
@@ -36,14 +36,14 @@
 #include <cmath>
 #include <filesystem>
 
-#include "gui_2Dball.h"
-#include "gui_SceneObject.h"
-#include "CrossMesh/CrossMeshCreator.h"
+#include "gui_TrackBall3D.h"
+#include "guiScene_Base.h"
 
-class gui_2D_Canvas : public nanogui::Canvas {
+class guiCanvas_3DArcball : public nanogui::Canvas {
 public:
-    gui_2D_Canvas(Widget *parent) : Canvas(parent, 1)
+    guiCanvas_3DArcball(nanogui::Widget* parent): nanogui::Canvas(parent, 1)
     {
+        inc_ref();
         init_render_pass();
     }
 
@@ -55,6 +55,34 @@ public:
     virtual bool keyboard_event(int key, int scancode, int action, int modifiers) {
         if (Widget::keyboard_event(key, scancode, action, modifiers))
             return true;
+        if(key == GLFW_KEY_1){
+            camera_.arcball = gui_TrackBall3D();
+            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
+            camera_.modelZoom = 2;
+            camera_.eye = Eigen::Vector3f(0, 0, 5);
+            camera_.center = scene->focus();
+            camera_.up = Eigen::Vector3f(0, 1, 0);
+            return true;
+        }
+        if(key == GLFW_KEY_2){
+            camera_.arcball = gui_TrackBall3D();
+            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
+            camera_.modelZoom = 2;
+            camera_.eye = Eigen::Vector3f(0, -5, 0);
+            camera_.center = scene->focus();
+            camera_.up = Eigen::Vector3f(0, 0, 1);
+            return true;
+        }
+        if(key == GLFW_KEY_3){
+            camera_.arcball = gui_TrackBall3D();
+            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
+            camera_.modelZoom = 2;
+            camera_.eye = Eigen::Vector3f(5, 0, 0);
+            camera_.center = scene->focus();
+            camera_.up = Eigen::Vector3f(0, 0, 1);
+            return true;
+        }
+
         return false;
     }
     
@@ -75,8 +103,8 @@ public:
         float fW = fH * (float) m_size.x() / (float) m_size.y();
 
         proj = frustum(-fW, fW, -fH, fH, camera_.dnear, camera_.dfar);
-
         model = camera_.arcball.matrix();
+
         model = scale(model, Eigen::Vector3f::Constant(camera_.zoom * camera_.modelZoom));
         model = translate(model, camera_.modelTranslation);
     }
@@ -95,7 +123,6 @@ public:
                 Eigen::Vector3f mesh_center = scene->focus();
 
                 float zval = project(mesh_center, view * model, proj, m_size).z();
-                
                 Eigen::Vector3f pos1 = unproject(
                         Eigen::Vector3f(mouse_p.x(), m_size.y() - mouse_p.y(), zval),
                         view * model, proj, m_size);
@@ -135,55 +162,37 @@ public:
     }
 
     void refresh_trackball_center() {
-        if(scene && scene->objects.size() >= 3){
-            // Re-center the mesh
-            camera_.arcball = gui_2Dball(0.5);
-            camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
-            camera_.modelZoom = 1;
 
-            camera_.modelTranslation = -scene->focus();
-            scene->objects[0]->model_init_mat = translate(Eigen::Matrix4f::Identity(), -scene->focus());
-            scene->objects[2]->model_init_mat = translate(Eigen::Matrix4f::Identity(), -scene->focus());
-        }
-    }
+        // Re-center the mesh
+        camera_.arcball = gui_TrackBall3D();
+        camera_.arcball.setSize(Eigen::Vector2i(m_size.x(), m_size.y()));
+        camera_.modelZoom = 2;
+        
+        camera_.modelTranslation = -scene->focus();
 
-    Eigen::Matrix4d get_textureMat(){
-        if(scene && scene->objects.size() >= 3 && scene->objects[1]){
-            Eigen::Matrix4f model, view, proj;
-            computeCameraMatrices(model, view, proj);
-            Eigen::Matrix4f trans = translate(Eigen::Matrix4f::Identity(), scene->focus());
-            Eigen::Matrix4f model_init = scene->objects[1]->model_init_mat;
-            return (trans * model * model_init).cast<double>();
-        }
-        return Eigen::Matrix4d::Identity();
     }
 
     void init_render_pass()
     {
-        scene = make_shared<gui_SceneObject<double>>();
-        #if defined(NANOGUI_USE_METAL)
+        scene = make_shared<guiScene_Base<double>>();
         m_render_pass = render_pass();
-        #elif defined(NANOGUI_USE_OPENGL)
-          m_render_pass = render_pass();
-        #endif
-
         m_render_pass->set_clear_color(0, nanogui::Color(0.9f, 0.9f, 0.9f, 1.f));
         m_render_pass->set_cull_mode(nanogui::RenderPass::CullMode::Disabled);
         m_render_pass->set_depth_test(nanogui::RenderPass::DepthTest::Less, true);
-
         scene->render_pass = m_render_pass;
     }
 
     std::string float_to_string(float a_value, int n){
         std::ostringstream out;
         out.precision(n);
+        out << a_value;
         return out.str();
     }
 
-    virtual void draw_contents() {
-        if(m_render_pass){
-            scene->render_pass->resize(screen()->framebuffer_size());
-
+    virtual void draw_contents()
+    {
+        if(m_render_pass) {
+            m_render_pass->resize(screen()->framebuffer_size());
             Eigen::Matrix4f model, view, proj;
             computeCameraMatrices(model, view, proj);
 
@@ -196,19 +205,19 @@ public:
             scene->draw();
         }
     }
-    
+
 public:
     //shader and render pass
-    shared_ptr<gui_SceneObject<double>> scene;
+    shared_ptr<guiScene_Base<double>> scene;
     nanogui::ref<nanogui::RenderPass> m_render_pass;
 
 private:
     //camera
     struct CameraParameters {
-        gui_2Dball arcball;
+        gui_TrackBall3D arcball;
         float zoom = 1.0f, viewAngle = 60.0f;
         float dnear = 0.1f, dfar = 100.0f;
-        Eigen::Vector3f eye = Eigen::Vector3f(0.0f, 0.0f, 1.5f);
+        Eigen::Vector3f eye = Eigen::Vector3f(0.0f, 0.0f, 5.0f);
         // Eigen::Vector3f eye = Eigen::Vector3f(0.0f, 5.0f, 0.0f);
         Eigen::Vector3f center = Eigen::Vector3f(0.0f, 0.0f, 0.0f);
         Eigen::Vector3f up = Eigen::Vector3f(0.0f, 1.0f, 0.0f);
@@ -220,7 +229,6 @@ private:
 
     bool translate_ = false;
     Eigen::Vector2i translateStart_ = Eigen::Vector2i(0, 0);
-    
 };
 
 
