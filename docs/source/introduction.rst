@@ -55,10 +55,21 @@ GUI Interface
 We provide a GUI to users if you want to visualise assemblies. An example of usage
 is given in :ref:`gui_examples`.
 
-.. image:: https://github.com/EPFL-LGG/TopoLite/raw/master/resources/screenshot.png
-   :alt: Screenshot of TopoCreator :align: center
+.. only:: html
 
-.. end_brief_description
+   .. figure:: imgs/gui_simple.gif
+
+      3D modelisation in TopoCreator.
+
+   .. figure:: imgs/gui_patterns_diff.gif
+
+      Pattern design changing in TopoCreator
+
+   .. figure:: imgs/gui_patterns_size.gif
+
+      Pattern size changing in TopoCreator.
+
+
 
 
 License
