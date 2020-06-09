@@ -244,13 +244,14 @@ public:
     }
 
     void draw_object() override {
-        if (!buffer_positions.empty())
-        {
-            update_uniform();
-            for (auto shader: shaders) {
-                shader->begin();
-                shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, buffer_positions.size() / 3, false);
-                shader->end();
+        if(guiShader_Base<Scalar>::visible) {
+            if (!buffer_positions.empty()) {
+                update_uniform();
+                for (auto shader: shaders) {
+                    shader->begin();
+                    shader->draw_array(nanogui::Shader::PrimitiveType::Triangle, 0, buffer_positions.size() / 3, false);
+                    shader->end();
+                }
             }
         }
     }
