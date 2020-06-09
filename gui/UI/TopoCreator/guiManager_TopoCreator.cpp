@@ -3,7 +3,7 @@
 //
 
 #include "guiManager_TopoCreator.h"
-
+#include "guiShader_MeshesWireFrame.h"
 /*
  * Input and Output
  */
@@ -15,6 +15,9 @@ bool guiManager_TopoCreator::load_from_xmlfile(string xmlFileName)
     iodata = make_shared<IOData>();
     if(IO.XMLReader(xmlFileName, *iodata) && iodata->varList) {
         iodata->varList->add((int)1, "layerOfBoundary",  "");
+        iodata->varList->add((float)0.002, "wireframe_linewidth",  "");
+        iodata->varList->add((float)0.003, "augmentedvectors_linewidth",  "");
+        iodata->varList->add((float)0.005, "pattern_linewidth",  "");
         init_from_IOData();
         return true;
     }
@@ -26,6 +29,9 @@ bool guiManager_TopoCreator::load_from_jsonfile(string xmlFileName){
     JsonIOReader reader(xmlFileName, iodata);
     clear();
     if(reader.read()){
+        iodata->varList->add((float)0.002, "wireframe_linewidth",  "");
+        iodata->varList->add((float)0.003, "augmentedvectors_linewidth",  "");
+        iodata->varList->add((float)0.005, "pattern_linewidth",  "");
         init_from_IOData();
         return true;
     }
@@ -103,7 +109,8 @@ void guiManager_TopoCreator::init_main_canvas(){
         {
             colors.push_back(nanogui::Color(200, 200 ,200, 255));
             meshLists.push_back(crossMesh->getPolyMesh());
-            shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, arcball_canvas->scene->render_pass);
+            shared_ptr<guiShader_MeshesWireFrame<double>> polyMeshLists
+            = make_shared<guiShader_MeshesWireFrame<double>>(meshLists, colors, iodata->varList->getFloat("wireframe_linewidth"), arcball_canvas->scene->render_pass);
             polyMeshLists->visible = false;
             arcball_canvas->scene->objects.push_back(polyMeshLists);
         }
@@ -122,7 +129,7 @@ void guiManager_TopoCreator::init_main_canvas(){
                 }
             }
             linegroups.push_back(lg);
-            shared_ptr<guiShader_Lines<double>> LinesObject = make_shared<guiShader_Lines<double>>(linegroups, 0.01, arcball_canvas->scene->render_pass);
+            shared_ptr<guiShader_Lines<double>> LinesObject = make_shared<guiShader_Lines<double>>(linegroups, iodata->varList->getFloat("augmentedvectors_linewidth"), arcball_canvas->scene->render_pass);
             LinesObject->visible = false;
             arcball_canvas->scene->objects.push_back(LinesObject);
         }
@@ -143,8 +150,9 @@ void guiManager_TopoCreator::init_main_canvas(){
                     meshLists.push_back(block->polyMesh);
                 }
             }
-            shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, arcball_canvas->scene->render_pass);
-            arcball_canvas->scene->objects.push_back(polyMeshLists);
+            shared_ptr<guiShader_MeshesWireFrame<double>> meshWireFrame
+            = make_shared<guiShader_MeshesWireFrame<double>>(meshLists, colors, iodata->varList->getFloat("wireframe_linewidth"), arcball_canvas->scene->render_pass);
+            arcball_canvas->scene->objects.push_back(meshWireFrame);
         }
 
         arcball_canvas->refresh_trackball_center();
@@ -155,39 +163,43 @@ void guiManager_TopoCreator::init_pattern_canvas()
 {
     vector<shared_ptr<PolyMesh<double>>> meshLists;
     vector<nanogui::Color> colors;
-    shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists;
-
+    shared_ptr<guiShader_PolyMeshes<double>> polyMeshShader;
+    shared_ptr<guiShader_Lines<double>> linesShader;
     pattern_canvas->init_render_pass();
 
     //baseMesh2D
     {
-        meshLists.clear();
+        vector<gui_LinesGroup<double>> linegroups;
+
         if(crossMeshCreator->crossMesh->baseMesh2D)
         {
             shared_ptr<PolyMesh<double>> baseMesh = crossMeshCreator->crossMesh->baseMesh2D;
-            meshLists.push_back(baseMesh);
+            gui_LinesGroup<double> lg;
+            lg.color = nanogui::Color(242, 133, 0, 255);
+            lg.lines = baseMesh->getWireFrame();
+            linegroups.push_back(lg);
         }
 
-        polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
-        polyMeshLists->varList->add(false, "show_face", "");
-        polyMeshLists->line_color = nanogui::Color(242, 133, 0, 255);
-        pattern_canvas->scene->objects.push_back(polyMeshLists);
-        polyMeshLists->model_mat_fixed = true;
+        linesShader = make_shared<guiShader_Lines<double>>(linegroups, iodata->varList->getFloat("pattern_linewidth"), pattern_canvas->scene->render_pass);
+        pattern_canvas->scene->objects.push_back(linesShader);
+        linesShader->model_mat_fixed = true;
     }
 
     //Pattern2D
     {
-        meshLists.clear();
+        vector<gui_LinesGroup<double>> linegroups;
         if(crossMeshCreator->pattern2D)
         {
             shared_ptr<PolyMesh<double>> pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
-            meshLists.push_back(pattern_mesh);
+            gui_LinesGroup<double> lg;
+            lg.color = nanogui::Color(150, 150, 150, 255);
+            lg.lines = pattern_mesh->getWireFrame();
+            linegroups.push_back(lg);
         }
-        polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
-        polyMeshLists->varList->add(false, "show_face", "");
-        polyMeshLists->model_init_mat = init_textureMat.cast<float>();
-        polyMeshLists->line_color = nanogui::Color(150, 150, 150, 255);
-        pattern_canvas->scene->objects.push_back(polyMeshLists);
+
+        linesShader = make_shared<guiShader_Lines<double>>(linegroups, iodata->varList->getFloat("pattern_linewidth"), pattern_canvas->scene->render_pass);
+        pattern_canvas->scene->objects.push_back(linesShader);
+        linesShader->model_init_mat = init_textureMat.cast<float>();
     }
 
     //SurfaceTexture
@@ -199,10 +211,9 @@ void guiManager_TopoCreator::init_pattern_canvas()
             shared_ptr<PolyMesh<double>> textureMesh =crossMeshCreator->referenceSurface->getTextureMesh();
             meshLists.push_back(textureMesh);
         }
-        polyMeshLists = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
-        polyMeshLists->varList->add(false, "show_wireframe", "");
-        polyMeshLists->model_mat_fixed = true;
-        pattern_canvas->scene->objects.push_back(polyMeshLists);
+        polyMeshShader = make_shared<guiShader_PolyMeshes<double>>(meshLists, colors, pattern_canvas->scene->render_pass);
+        polyMeshShader->model_mat_fixed = true;
+        pattern_canvas->scene->objects.push_back(polyMeshShader);
     }
     pattern_canvas->scene->focus_item = 2;
     pattern_canvas->refresh_trackball_center();
@@ -230,30 +241,30 @@ void guiManager_TopoCreator::update_reference_surface_texture()
 
 void guiManager_TopoCreator::update_base_mesh_2D()
 {
-    //baseMesh2D
-    vector<shared_ptr<PolyMesh<double>>> meshLists;
-    vector<nanogui::Color> colors;
-    shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists;
+    vector<gui_LinesGroup<double>> linegroups;
 
     if(crossMeshCreator && crossMeshCreator->crossMesh && crossMeshCreator->crossMesh->baseMesh2D){
         shared_ptr<PolyMesh<double>> baseMesh = crossMeshCreator->crossMesh->baseMesh2D;
-        meshLists.push_back(baseMesh);
-        ((guiShader_PolyMeshes<double> *)(pattern_canvas->scene->objects[0].get()))->update_mesh(meshLists, colors);
+        gui_LinesGroup<double> lg;
+        lg.color = nanogui::Color(242, 133, 0, 255);
+        lg.lines = baseMesh->getWireFrame();
+        linegroups.push_back(lg);
+        ((guiShader_Lines<double> *)(pattern_canvas->scene->objects[0].get()))->update_line(linegroups);
     }
 
 }
 
 void guiManager_TopoCreator::update_pattern_2D()
 {
-    vector<shared_ptr<PolyMesh<double>>> meshLists;
-    vector<nanogui::Color> colors;
-    shared_ptr<guiShader_PolyMeshes<double>> polyMeshLists;
-
+    vector<gui_LinesGroup<double>> linegroups;
     if(crossMeshCreator && crossMeshCreator->pattern2D)
     {
         shared_ptr<PolyMesh<double>> pattern_mesh = crossMeshCreator->pattern2D->getPolyMesh();
-        meshLists.push_back(pattern_mesh);
-        ((guiShader_PolyMeshes<double> *)(pattern_canvas->scene->objects[1].get()))->update_mesh(meshLists, colors);
+        gui_LinesGroup<double> lg;
+        lg.color = nanogui::Color(150, 150, 150, 255);
+        lg.lines = pattern_mesh->getWireFrame();
+        linegroups.push_back(lg);
+        ((guiShader_Lines<double> *)(pattern_canvas->scene->objects[1].get()))->update_line(linegroups);
     }
 }
 
@@ -267,7 +278,7 @@ void guiManager_TopoCreator::update_cross_mesh(){
         shared_ptr<CrossMesh<double>> crossMesh = crossMeshCreator->crossMesh;
         colors.push_back(nanogui::Color(200, 200 ,200, 255));
         meshLists.push_back(crossMesh->getPolyMesh());
-        ((guiShader_PolyMeshes<double> *)(arcball_canvas->scene->objects[0].get()))->update_mesh(meshLists, colors);
+        ((guiShader_MeshesWireFrame<double> *)(arcball_canvas->scene->objects[0].get()))->update_mesh(meshLists, colors);
     }
 }
 
@@ -309,7 +320,7 @@ void guiManager_TopoCreator::update_struc(){
                 meshLists.push_back(block->polyMesh);
             }
         }
-        ((guiShader_PolyMeshes<double> *)(arcball_canvas->scene->objects[2].get()))->update_mesh(meshLists, colors);
+        ((guiShader_MeshesWireFrame<double> *)(arcball_canvas->scene->objects[2].get()))->update_mesh(meshLists, colors);
     }
 }
 

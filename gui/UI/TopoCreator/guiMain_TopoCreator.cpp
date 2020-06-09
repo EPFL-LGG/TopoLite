@@ -8,14 +8,14 @@
 #include <iostream>
 #include <memory>
 
-#include "guiCanvas_3DArcball.h"
-#include "guiCanvas_2DArcball.h"
+#include "Canvas/guiCanvas_3DArcball.h"
+#include "Canvas/guiCanvas_2DArcball.h"
 #include "guiManager_TopoCreator.h"
 #include "guiShader_Lines.h"
 
-#include "guiControls_SliderFloat.h"
-#include "guiControls_SliderInt.h"
-#include "guiControls_CheckBoxBool.h"
+#include "Controls/guiControls_SliderFloat.h"
+#include "Controls/guiControls_SliderInt.h"
+#include "Controls/guiControls_CheckBoxBool.h"
 
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_Clp.h"
@@ -214,7 +214,7 @@ private:
     nanogui::ref<guiCanvas_2DArcball> pattern_canvas;
     shared_ptr<guiManager_TopoCreator> topo_manager;
     nanogui::Window *menu_window;
-    vector<nanogui::ref<gui_ParameterObject>> parameter_objects;
+    vector<nanogui::ref<guiControls_Base>> parameter_objects;
 };
 
 int main(int /* argc */, char ** /* argv */) {

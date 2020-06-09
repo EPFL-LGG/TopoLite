@@ -191,7 +191,7 @@ public:
             for(pPolygon polygon: mesh.lock()->polyList)
             {
                 vector<pTriangle> tris;
-                polygon->triangulate(tris);
+                polygon->triangulateNaive(tris);
                 for(pTriangle tri: tris)
                 {
                     for(int vID = 0; vID < 3; vID++)

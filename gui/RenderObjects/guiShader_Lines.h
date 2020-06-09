@@ -8,6 +8,8 @@
 #include "guiShader_Base.h"
 #include "Utility/GeometricPrimitives.h"
 #include "nanogui/vector.h"
+#include <fstream>
+
 template <typename Scalar>
 class gui_LinesGroup{
 public:
@@ -87,12 +89,13 @@ public:
 
     void update_line(const vector<gui_LinesGroup<Scalar>> &_linegroups){
         linegroups.clear();
-        object_colors.clear();
-        ani_translation.clear();
-        ani_center.clear();
-        ani_rotation.clear();
-
         linegroups = _linegroups;
+
+        object_colors.clear();
+        for(gui_LinesGroup<Scalar> lg: linegroups)
+        {
+            object_colors.push_back(lg.color);
+        }
 
         ani_translation.clear(); ani_translation.resize(linegroups.size(), Vector3(0, 0, 0));
         ani_rotation.clear(); ani_rotation.resize(linegroups.size(), Vector3(0, 0, 0));

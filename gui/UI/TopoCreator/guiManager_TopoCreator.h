@@ -8,8 +8,8 @@
 #include "IO/JsonIOReader.h"
 #include "IO/JsonIOWriter.h"
 #include "IO/XMLIO_backward.h"
-#include "guiCanvas_3DArcball.h"
-#include "guiCanvas_2DArcball.h"
+#include "Canvas/guiCanvas_3DArcball.h"
+#include "Canvas/guiCanvas_2DArcball.h"
 #include "guiShader_PolyMeshes.h"
 #include "guiShader_Lines.h"
 

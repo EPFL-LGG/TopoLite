@@ -12,17 +12,17 @@
 #include <iostream>
 #include <memory>
 
-#include "guiCanvas_3DArcball.h"
-#include "guiCanvas_2DArcball.h"
-#include "gui_TopoManager.h"
+#include "Canvas/guiCanvas_3DArcball.h"
 #include "guiShader_Lines.h"
 
-#include "guiControls_SliderFloat.h"
-#include "guiControls_SliderInt.h"
-#include "guiControls_CheckBoxBool.h"
+#include "Controls/guiControls_SliderFloat.h"
+#include "Controls/guiControls_SliderInt.h"
+#include "Controls/guiControls_CheckBoxBool.h"
 
 #include "Interlocking/ContactGraph.h"
 #include "Interlocking/InterlockingSolver_Clp.h"
+
+#include "Utility/Bezier.h"
 class BezierApplication : public nanogui::Screen {
 public:
     BezierApplication() : nanogui::Screen(nanogui::Vector2i(1024, 768), "TopoCreator") {
@@ -41,14 +41,20 @@ public:
     void init_lines(){
         main_canvas->init_render_pass();
 
+        // Create a cubic bezier with 4 points. Visualized at https://www.desmos.com/calculator/fivneeogmh
+        Bezier::Bezier<3> cubicBezier({ {0, 0}, {0, 0.5}, {1, 0.5}, {1, 0} });
+
+        // Get coordinates on the curve from a value between 0 and 1 (values outside this range are also valid because of the way bezier curves are defined).
+
         vector<gui_LinesGroup<double>> linegroups;
         gui_LinesGroup<double> lg;
         lg.color = nanogui::Color(0, 0, 0, 255);
-        for(int id = 0; id <= 4; id++){
-            lg.lines.push_back(Line<double>(Eigen::Vector3d(0.1 * id, 0, 0), Eigen::Vector3d(0.1 * (id + 1), 0, 0)));
-        }
-        for(int id = 0; id <= 4; id++){
-            lg.lines.push_back(Line<double>(Eigen::Vector3d(0.5, id * 0.1, 0), Eigen::Vector3d(0.5, (id + 1) * 0.1, 0)));
+        int N = 20;
+        for(int id = 0; id < N; id++)
+        {
+            Bezier::Point p1 = cubicBezier.valueAt(1.0 / N * id);
+            Bezier::Point p2 = cubicBezier.valueAt(1.0 / N * (id + 1));
+            lg.lines.push_back(Line<double>(Eigen::Vector3d(p1.x, p1.y, 0), Eigen::Vector3d(p2.x, p2.y, 0)));
         }
         linegroups.push_back(lg);
         shared_ptr<guiShader_Lines<double>> LinesObject = make_shared<guiShader_Lines<double>>(linegroups, 0.002, main_canvas->scene->render_pass);
