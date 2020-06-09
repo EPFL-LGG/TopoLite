@@ -11,6 +11,7 @@
 
    Introduction <self>
    usage/compilation.rst
+   usage/gui.rst
    usage/examples.rst
    usage/license.rst
 

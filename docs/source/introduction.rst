@@ -52,8 +52,8 @@ The source code of the project is published on LGG github account here_ :
 GUI Interface
 -------------
 
-We provide a GUI to users if you want to visualise assemblies. An example of usage
-is given in :ref:`gui_examples`.
+We provide a GUI to users if you want to visualise assemblies. Description of the GUI is given in :ref:`gui_description`, examples of usage
+are given in :ref:`gui_examples`.
 
 .. only:: html
 
@@ -63,7 +63,7 @@ is given in :ref:`gui_examples`.
 
    .. figure:: imgs/gui_patterns_diff.gif
 
-      Pattern design changing in TopoCreator
+      Pattern design changing in TopoCreator.
 
    .. figure:: imgs/gui_patterns_size.gif
 
