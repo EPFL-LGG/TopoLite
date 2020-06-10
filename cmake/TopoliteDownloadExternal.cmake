@@ -64,7 +64,7 @@ endfunction()
 function(topolite_download_clp)
     topolite_download_project(clp
             GIT_REPOSITORY https://github.com/KIKI007/COIN-OR-osi-clp.git
-            GIT_TAG        9822c5ab97770ade0c5adc58faf36778cd460db6            # v1.0.0
+            GIT_TAG        4c11a2ce842cd7e667c6f69cef35a0461404c0dc            # v1.0.0
             )
 endfunction()
 
