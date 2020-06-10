@@ -23,14 +23,14 @@ class JsonIOReader
 {
 public:
 
-    path path;
+    path input_path;
     weak_ptr<IOData> data;
 
 
 public:
 
-    JsonIOReader(const std::string input_path, shared_ptr<IOData> _data){
-        path = input_path;
+    JsonIOReader(const std::string _input_path, shared_ptr<IOData> _data){
+        input_path = _input_path;
         data = _data;
     }
 

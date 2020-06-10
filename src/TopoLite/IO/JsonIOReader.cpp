@@ -5,7 +5,7 @@
 
 bool JsonIOReader::read()
 {
-    ifstream filein(path, std::ifstream::binary);
+    ifstream filein(input_path, std::ifstream::binary);
 
     if(filein.fail()) return false;
     std::vector<uint8_t> data((std::istreambuf_iterator<char>(filein)), std::istreambuf_iterator<char>());

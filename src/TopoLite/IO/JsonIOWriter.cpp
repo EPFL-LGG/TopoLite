@@ -45,7 +45,7 @@ void JsonIOWriter::write()
         }
     }
 
-    std::ofstream fileout(path, std::ofstream::binary);
+    std::ofstream fileout(output_path, std::ofstream::binary);
     std::vector<std::uint8_t> binary_result = nlohmann::json::to_ubjson(result);
     if(fileout){
         fileout.write((char *)binary_result.data(), binary_result.size());

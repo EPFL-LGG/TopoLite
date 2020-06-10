@@ -21,13 +21,13 @@ using namespace std::filesystem;
 
 class JsonIOWriter{
 public:
-    path path;
+    path output_path;
     weak_ptr<IOData> data;
 
 public:
 
-    JsonIOWriter(const std::string output_path, shared_ptr<IOData> _data){
-        path = output_path;
+    JsonIOWriter(const std::string _output_path, shared_ptr<IOData> _data){
+        output_path = _output_path;
         data = _data;
     }
 
