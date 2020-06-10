@@ -3,8 +3,8 @@ Compilation
 
 Clone the repository, run CMake to generate Makefiles or CMake/Visual Studio project files, and the rest should just work automatically.
 
-MacOS/Ubuntu
-------------
+MacOS
+-----
 
 Xcode >= 11.5 (C++ 17)
 
@@ -19,8 +19,8 @@ Xcode >= 11.5 (C++ 17)
 
     the integer following `make -j` is the number of threads supported by your CPU architecture. Replace it with the optimal value for you.
 
-Ubuntu(Linux)
--------------
+Linux (Ubuntu)
+--------------
 
 gcc >= 7.5.0 (C++ 17)
 
