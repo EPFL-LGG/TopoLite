@@ -34,8 +34,6 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     message("Compiling with ${CMAKE_CXX_COMPILER_ID} GCC")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3")
-    # NANOGUI uses Metal, not supported by GCC
-    option(BUILD_TOPOGUI "Compile the gui" OFF)
 endif()
 
 #3rd party library
@@ -84,6 +82,14 @@ target_include_directories(TpCorelib PUBLIC SYSTEM
         ${ext_include}
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/src/TopoLite)
+
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
+	if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 8)
+		message("GCC 7 does not have <filesystem>, using <experimental/filesytem> instead")
+		target_compile_definitions(TpCorelib PUBLIC -DGCC_VERSION_LESS_8)
+		target_link_libraries(TpCorelib PUBLIC stdc++fs)
+	endif()
+endif()
 
 target_link_libraries(TpCorelib PUBLIC ${ext_lib})
 
