@@ -18,7 +18,7 @@ find_path(QUICKHULL_INCLUDE_DIR QuickHull.hpp
         )
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(QUICKHULL
+find_package_handle_standard_args(QuickHull
         "\nQuickhull not found"
         QUICKHULL_INCLUDE_DIR)
 mark_as_advanced(QUICKHULL_INCLUDE_DIR)

@@ -9,7 +9,7 @@ find_path(CLIPPER_INCLUDE_DIR clipper.hpp
         ${CMAKE_SOURCE_DIR}/ext/clipper)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(CLIPPER
+find_package_handle_standard_args(Clipper
         "\nClipper not found"
         CLIPPER_INCLUDE_DIR)
 mark_as_advanced(CLIPPER_INCLUDE_DIR)
