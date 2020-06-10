@@ -600,7 +600,7 @@ bool PolyMesh<Scalar>::parse(const nlohmann::json &mesh_json)
         V.resize(mesh_json["vertices"].size());
         for(auto &[key, value]: mesh_json["vertices"].items())
         {
-            V[std::atoi(key.c_str())] = (vector<double>)value;
+            V[std::atoi(key.c_str())] = value.get<vector<double>>();
         }
     }
 
@@ -609,7 +609,7 @@ bool PolyMesh<Scalar>::parse(const nlohmann::json &mesh_json)
         TC.resize(mesh_json["texture"].size());
         for(auto &[key, value]: mesh_json["texture"].items())
         {
-            TC[std::atoi(key.c_str())] = (vector<double>)value;
+            TC[std::atoi(key.c_str())] = value.get<vector<double>>();
         }
     }
 
@@ -617,10 +617,10 @@ bool PolyMesh<Scalar>::parse(const nlohmann::json &mesh_json)
     for(auto value: mesh_json["faces"])
     {
        if(value.contains("verID")){
-           F.push_back((vector<int>)value["verID"]);
+           F.push_back(value["verID"].get<vector<int>>());
        }
        if(value.contains("texID")){
-           FTC.push_back((vector<int>)value["texID"]);
+           FTC.push_back(value["texID"].get<vector<int>>());
        }
     }
 

@@ -79,7 +79,7 @@ endif()
 # TBB library
 if(NOT TARGET tbb)
     if(WIN32)
-        topolite_download_tbb_binary()
+        topolite_download_tbb()
     else()
         topolite_download_tbb()
     endif()

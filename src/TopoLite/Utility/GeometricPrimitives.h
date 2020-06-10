@@ -738,11 +738,11 @@ public:
     }
 
     void parse(const nlohmann::json &oript_json){
-        point = Vector3(((vector<Scalar>)oript_json["middle point"]).data());
-        normal = Vector3(((vector<Scalar>)oript_json["face normal"]).data());
-        rotation_axis = Vector3(((vector<Scalar>)oript_json["rotation axis"]).data());
-        rotation_base = Vector3(((vector<Scalar>)oript_json["rotation base"]).data());
-        tilt_range = Vector2(((vector<Scalar>)oript_json["tilting range"]).data());
+        point = Vector3(oript_json["middle point"].get<vector<Scalar>>().data());
+        normal = Vector3(oript_json["face normal"].get<vector<Scalar>>().data());
+        rotation_axis = Vector3(oript_json["rotation axis"].get<vector<Scalar>>().data());
+        rotation_base = Vector3(oript_json["rotation base"].get<vector<Scalar>>().data());
+        tilt_range = Vector2(oript_json["tilting range"].get<vector<Scalar>>().data());
 
         rotation_angle = (Scalar)oript_json["rotation angle"];
         tiltSign = (int)oript_json["tilting sign"];

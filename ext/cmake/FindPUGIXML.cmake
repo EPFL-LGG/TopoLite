@@ -24,6 +24,11 @@ find_package_handle_standard_args(PUGIXML
         PUGIXML_INCLUDE_DIR)
 mark_as_advanced(PUGIXML_INCLUDE_DIR)
 
-set(BUILD_SHARED_LIBS OFF CACHE STRING "Build pugixml using static library" FORCE)
+if(MSVC)
+    set(BUILD_SHARED_LIBS ON CACHE STRING "Build pugixml using static library" FORCE)
+else()
+    set(BUILD_SHARED_LIBS OFF CACHE STRING "Build pugixml using static library" FORCE)
+endif()
+
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/pugixml)
 set(PUGIXML_LIBRARIES pugixml)

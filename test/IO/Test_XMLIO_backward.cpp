@@ -22,7 +22,7 @@ TEST_CASE("Read XML"){
         path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         IOData data;
-        xmlio.XMLReader(xmlFileName, data);
+        xmlio.XMLReader(xmlFileName.string(), data);
         data.cross_mesh->writeOBJModel("CrossMesh.obj");
         data.reference_surface->writeOBJModel("Reference.obj");
     }

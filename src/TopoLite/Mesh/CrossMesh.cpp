@@ -301,7 +301,7 @@ bool CrossMesh<Scalar>::parse(const nlohmann::json &mesh_json)
         for(auto edge: value)
         {
             shared_ptr<OrientPoint<Scalar>> oript = make_shared<OrientPoint<Scalar>>(edge);
-            cross->push_back(Vector3(((vector<Scalar>)edge["start vertex"]).data()));
+            cross->push_back(Vector3((edge["start vertex"]).get<vector<Scalar>>().data()));
             cross->oriPoints.push_back(oript);
         }
         set_cross(std::atoi(key.c_str()), cross);

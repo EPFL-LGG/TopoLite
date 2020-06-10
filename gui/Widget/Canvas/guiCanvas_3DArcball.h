@@ -37,6 +37,10 @@
 #include "gui_TrackBall3D.h"
 #include "guiScene_Base.h"
 
+#ifndef M_PI
+#define M_PI 3.1415926
+#endif
+
 #if defined(GCC_VERSION_LESS_8)
 #include <experimental/filesystem>
     using namespace std::experimental::filesystem;

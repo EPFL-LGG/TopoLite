@@ -134,7 +134,7 @@ TEST_CASE("PolyMesh - Cube") {
         path dataFolder(UNITTEST_DATAPATH);
         path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
 
-        polyMesh.readOBJModel(filepath.c_str(), true);
+        polyMesh.readOBJModel(filepath.string().c_str(), true);
         REQUIRE(polyMesh.texturedModel == true);
 
         polyMesh.rotateMesh(Vector3d(0, 0, 0), Vector3d(0, 0, 1), 10);
@@ -142,7 +142,7 @@ TEST_CASE("PolyMesh - Cube") {
         polyMesh.scaleMesh(Vector3d(2, 2, 2));
 
         path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
-        polyMesh.getTextureMesh()->writeOBJModel(outputfile.c_str(), false);
+        polyMesh.getTextureMesh()->writeOBJModel(outputfile.string().c_str(), false);
 
         SECTION("Test copy and construct function") {
             PolyMesh<double> newmesh = polyMesh;

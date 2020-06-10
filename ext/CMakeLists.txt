@@ -32,20 +32,21 @@ if(BUILD_TOPOGUI)
 endif()
 
 # TBB
-# Handled in cmake/TopoliteDependencies.cmake
-if(WIN32)
-    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tbb/cmake)
-    find_package(TBB REQUIRED tbb_preview)
+if(MSVC)
+    set(TBB_BUILD_STATIC            OFF CACHE BOOL " " FORCE)
+    set(TBB_BUILD_SHARED            ON CACHE BOOL " " FORCE)
 else()
     set(TBB_BUILD_STATIC            ON CACHE BOOL " " FORCE)
     set(TBB_BUILD_SHARED            OFF CACHE BOOL " " FORCE)
-    set(TBB_BUILD_TBBMALLOC         ON  CACHE BOOL " " FORCE) # needed for CGAL's parallel mesher
-    set(TBB_BUILD_TBBMALLOC_PROXY   OFF CACHE BOOL " " FORCE)
-    set(TBB_BUILD_TESTS             OFF CACHE BOOL " " FORCE)
-    add_subdirectory(${TOPOLITE_EXTERNAL}/tbb)
-    set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
-    set(TBB_IMPORTED_TARGETS tbb_static tbbmalloc_static)
 endif()
+
+set(TBB_BUILD_TBBMALLOC         ON  CACHE BOOL " " FORCE) # needed for CGAL's parallel mesher
+set(TBB_BUILD_TBBMALLOC_PROXY   OFF CACHE BOOL " " FORCE)
+set(TBB_BUILD_TESTS             OFF CACHE BOOL " " FORCE)
+
+add_subdirectory(${TOPOLITE_EXTERNAL}/tbb)
+set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
+set(TBB_IMPORTED_TARGETS tbb_static tbbmalloc_static)
 
 
 # CLP

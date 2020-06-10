@@ -14,8 +14,13 @@ if(NOT NANOGUI_FOUND)
     # Disable the examples and python stuff from nanogui
     set(NANOGUI_BUILD_PYTHON OFF CACHE BOOL " " FORCE)
     set(NANOGUI_BUILD_EXAMPLES OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_BUILD_SHARED_DEFAULT OFF CACHE BOOL " " FORCE)
-    set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
+    if(MSVC)
+        set(NANOGUI_BUILD_SHARED ON CACHE BOOL " " FORCE)
+        set(NANOGUI_BUILD_SHARED_DEFAULT ON CACHE BOOL " " FORCE)
+    else()
+        set(NANOGUI_BUILD_SHARED OFF CACHE BOOL " " FORCE)
+        set(NANOGUI_BUILD_SHARED_DEFAULT OFF CACHE BOOL " " FORCE)
+    endif()
     add_subdirectory("${NANOGUI_DIR}" "nanogui")
 
     # For reliability of parallel build, make the NanoGUI targets dependencies

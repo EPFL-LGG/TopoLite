@@ -32,7 +32,7 @@ TEST_CASE("Test Write Parameter"){
     InitVar(data->varList.get());
     path jsonFileName(UNITTEST_DATAPATH);
     jsonFileName = jsonFileName / "TopoInterlock/Json/origin.json";
-    std::string path = jsonFileName;
+    std::string path = jsonFileName.string();
     JsonIOWriter writer(path, data);
     writer.getParameterJson().dump(4);
 }
@@ -53,7 +53,7 @@ TEST_CASE("Test Write CrossMesh"){
     path xmlFileName(UNITTEST_DATAPATH);
     xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
     IOData data;
-    xmlio.XMLReader(xmlFileName, data);
+    xmlio.XMLReader(xmlFileName.string(), data);
     data.cross_mesh->dump().dump(4);
 }
 
@@ -64,11 +64,11 @@ TEST_CASE("Test Write whole json")
     xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
     shared_ptr<IOData> data;
     data = make_shared<IOData>();
-    xmlio.XMLReader(xmlFileName, *data);
+    xmlio.XMLReader(xmlFileName.string(), *data);
 
     path jsonFileName(UNITTEST_DATAPATH);
     jsonFileName = jsonFileName / "TopoInterlock/Json/origin.json";
-    std::string path = jsonFileName;
+    std::string path = jsonFileName.string();
     JsonIOWriter writer(path, data);
     writer.write();
 }

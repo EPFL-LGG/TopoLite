@@ -36,6 +36,12 @@ elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -std=c++17")
 endif()
 
+if(MSVC)
+    add_definitions(-D_HAS_STD_BYTE=0 -D_USE_MATH_DEFINES)
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+endif()
+
 #3rd party library
 #if(USE_UNIT_TEST OR USE_PYTHON_PLUGIN OR USE_C_EXTENSION)
 #    set(TOPO_RUNTIME_OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/Release)
@@ -70,7 +76,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${TOPO_RUNTIME_OUTPUT})
 
 add_subdirectory(src)
-add_library(TpCorelib STATIC ${TpCoreFiles})
+if(MSVC)
+    add_library(TpCorelib SHARED ${TpCoreFiles})
+else()
+    add_library(TpCorelib STATIC ${TpCoreFiles})
+endif()
 
 get_property(ext_include GLOBAL PROPERTY ext_include_property)
 get_property(ext_defs GLOBAL PROPERTY ext_defs_property)

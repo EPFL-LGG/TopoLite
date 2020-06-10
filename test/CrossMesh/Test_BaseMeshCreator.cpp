@@ -37,14 +37,14 @@ TEST_CASE("BaseMeshCreator")
         path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         IOData data;
-        IO.XMLReader(xmlFileName.c_str(), data);
+        IO.XMLReader(xmlFileName.string().c_str(), data);
 
         // read polyMesh
         path surface_objfile(UNITTEST_DATAPATH);
         surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
 
         _polyMesh = make_shared<PolyMesh_AABBTree<double>>(data.varList);
-        _polyMesh->readOBJModel(surface_objfile.c_str(), true);
+        _polyMesh->readOBJModel(surface_objfile.string().c_str(), true);
 
         _polyMesh->buildTexTree();
 
