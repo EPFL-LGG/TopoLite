@@ -39,7 +39,7 @@
 #include "CrossMesh/CrossMeshCreator.h"
 
 #if defined(GCC_VERSION_LESS_8)
-#include <experimental/filesysten>
+#include <experimental/filesystem>
     using namespace std::experimental::filesystem;
 #else
 #include <filesystem>
