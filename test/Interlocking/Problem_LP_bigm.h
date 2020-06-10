@@ -6,9 +6,7 @@
 #define TOPOLITE_IPOPT_TEST_PROBLEM_BIGM_H
 
 #define HAVE_CSTDDEF
-
 #include <IpTNLP.hpp>
-
 #undef HAVE_CSTDDEF
 
 using namespace Ipopt;

@@ -5,15 +5,9 @@
 #ifndef TOPOLITE_IPOPT_PROBLEM_H
 #define TOPOLITE_IPOPT_PROBLEM_H
 
-#if defined(__APPLE__)
-    #define HAVE_CSTDDEF
-    #include <IpTNLP.hpp>
-    #undef HAVE_CSTDDEF
-#endif
-
-#if defined(__linux__)
-    #include <IpTNLP.hpp>
-endif
+#define HAVE_CSTDDEF
+#include <IpTNLP.hpp>
+#undef HAVE_CSTDDEF
 
 using namespace Ipopt;
 
