@@ -50,7 +50,9 @@ Clone the repository, run CMake to generate Makefiles or CMake/Visual Studio pro
 
 - **MacOS**:
 Xcode >= 11.5 (C++ 17)
+
 .. code-block:: bash
+
     $ brew install ipopt
     $ mkdir build
     $ cd build
@@ -59,7 +61,9 @@ Xcode >= 11.5 (C++ 17)
 
 - **Ubuntu(Linux)**:
 gcc >= 7.5.0 (C++ 17)
+
 .. code-block:: bash
+
     $ sudo apt-get install libglu1-mesa-dev
     $ sudo apt-get install libxxf86vm-dev
     $ sudo apt-get install libxrandr-dev
@@ -74,11 +78,9 @@ gcc >= 7.5.0 (C++ 17)
     $ cmake -DCMAKE_BUILD_TYPE=Release ..
     $ make -j 16
 
-
-
 - ** note **
 
-    the integer following `make -j` is the number of threads supported by your CPU architecture. Replace it with your optimal value.
+the integer following `make -j` is the number of threads supported by your CPU architecture. Replace it with your optimal value.
 
 - **Windows**: currently unavailable.
 
