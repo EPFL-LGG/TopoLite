@@ -10,13 +10,20 @@
 
 #include <string>
 #include <nlohmann/json.hpp>
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesysten>
+    using namespace std::experimental::filesystem;
+#else
 #include <filesystem>
+using namespace std::filesystem;
+#endif
 
 class JsonIOReader
 {
 public:
 
-    std::filesystem::path path;
+    path path;
     weak_ptr<IOData> data;
 
 

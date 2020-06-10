@@ -4,7 +4,15 @@
 
 #include "CrossMesh/PatternCreator.h"
 #include <catch2/catch.hpp>
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesysten>
+    using namespace std::experimental::filesystem;
+#else
 #include <filesystem>
+using namespace std::filesystem;
+#endif
+
 TEST_CASE("PatternCreator")
 {
     shared_ptr<InputVarList> varList;

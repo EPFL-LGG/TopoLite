@@ -5,7 +5,15 @@
 #include <catch2/catch.hpp>
 #include "IO/JsonIOWriter.h"
 #include "IO/XMLIO_backward.h"
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesysten>
+    using namespace std::experimental::filesystem;
+#else
 #include <filesystem>
+using namespace std::filesystem;
+#endif
+
 using json = nlohmann::json;
 
 TEST_CASE("Check InputVarManager Json Write"){
@@ -22,7 +30,7 @@ TEST_CASE("Check InputVarManager Json Write"){
 TEST_CASE("Test Write Parameter"){
     shared_ptr<IOData> data = make_shared<IOData>();
     InitVar(data->varList.get());
-    std::filesystem::path jsonFileName(UNITTEST_DATAPATH);
+    path jsonFileName(UNITTEST_DATAPATH);
     jsonFileName = jsonFileName / "TopoInterlock/Json/origin.json";
     std::string path = jsonFileName;
     JsonIOWriter writer(path, data);
@@ -34,15 +42,15 @@ TEST_CASE("Test Write Mesh"){
     InitVar(data->varList.get());
     shared_ptr<PolyMesh<double>> mesh;
     mesh = make_shared<PolyMesh<double>>(data->varList);
-    std::filesystem::path dataFolder(UNITTEST_DATAPATH);
-    std::filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
+    path dataFolder(UNITTEST_DATAPATH);
+    path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
     mesh->readOBJModel(filepath.string().c_str(), false);
     mesh->dump().dump(4);
 }
 
 TEST_CASE("Test Write CrossMesh"){
     XMLIO_backward xmlio;
-    std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+    path xmlFileName(UNITTEST_DATAPATH);
     xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
     IOData data;
     xmlio.XMLReader(xmlFileName, data);
@@ -52,13 +60,13 @@ TEST_CASE("Test Write CrossMesh"){
 TEST_CASE("Test Write whole json")
 {
     XMLIO_backward xmlio;
-    std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+    path xmlFileName(UNITTEST_DATAPATH);
     xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
     shared_ptr<IOData> data;
     data = make_shared<IOData>();
     xmlio.XMLReader(xmlFileName, *data);
 
-    std::filesystem::path jsonFileName(UNITTEST_DATAPATH);
+    path jsonFileName(UNITTEST_DATAPATH);
     jsonFileName = jsonFileName / "TopoInterlock/Json/origin.json";
     std::string path = jsonFileName;
     JsonIOWriter writer(path, data);

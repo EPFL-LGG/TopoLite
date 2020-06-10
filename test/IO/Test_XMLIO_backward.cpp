@@ -4,7 +4,14 @@
 
 #include <catch2/catch.hpp>
 #include "IO/XMLIO_backward.h"
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesysten>
+    using namespace std::experimental::filesystem;
+#else
 #include <filesystem>
+using namespace std::filesystem;
+#endif
 
 
 TEST_CASE("Read XML"){
@@ -12,7 +19,7 @@ TEST_CASE("Read XML"){
 
     SECTION("XMLReader")
     {
-        std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         IOData data;
         xmlio.XMLReader(xmlFileName, data);

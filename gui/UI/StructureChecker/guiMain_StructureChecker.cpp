@@ -42,7 +42,6 @@
 #include <memory>
 #include <stb_image.h>
 #include <cmath>
-#include <filesystem>
 
 #include "guiScene_Base.h"
 #include "guiShader_PolyMeshes.h"

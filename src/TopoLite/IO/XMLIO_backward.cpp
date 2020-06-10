@@ -17,7 +17,7 @@ bool XMLIO_backward::XMLReader(const string xmlFileName, IOData &data)
     if(!xmldoc.load_file(xmlFileName.c_str()))
         return false;
 
-    std::filesystem::path file_path(xmlFileName);
+    path file_path(xmlFileName);
     pugi::xml_node xml_root = xmldoc.child("Documents");
 
     if (xml_root)
@@ -198,10 +198,10 @@ bool XMLIO_backward::XMLReader_ReferenceSurface(pugi::xml_node &xml_root, const 
     pugi::xml_node refenceSurfaceNode = xml_root.child("Output").child("Structure");
     if (refenceSurfaceNode)
     {
-        std::filesystem::path reference_surface_path(refenceSurfaceNode.attribute("path").as_string());
-        string path = (std::filesystem::path(xmlFileName_path) / reference_surface_path).string();
+        path reference_surface_path(refenceSurfaceNode.attribute("path").as_string());
+        string path_str = (path(xmlFileName_path) / reference_surface_path).string();
         data.reference_surface = make_shared<PolyMesh<double>>(data.varList);
-        if (!data.reference_surface->readOBJModel(path.c_str(), false))
+        if (!data.reference_surface->readOBJModel(path_str.c_str(), false))
             return false;
 
         data.varList->add(data.reference_surface->texturedModel, "texturedModel", "");
@@ -218,8 +218,8 @@ bool XMLIO_backward::XMLReader_CrossMesh(pugi::xml_node &xml_root, const string 
         //CrossData
         if(cross_mesh_node.child("CrossData"))
         {
-            std::filesystem::path cross_data_path = cross_mesh_node.child("CrossData").attribute("path").as_string();
-            cross_data_path = std::filesystem::path(xmlFileName_path) / cross_data_path;
+            path cross_data_path = cross_mesh_node.child("CrossData").attribute("path").as_string();
+            cross_data_path = path(xmlFileName_path) / cross_data_path;
             pugi::xml_document cross_doc;
             cross_doc.load_file(cross_data_path.string().c_str());
             pugi::xml_node cross_data_node = cross_doc.child("Documents").child("CrossData");

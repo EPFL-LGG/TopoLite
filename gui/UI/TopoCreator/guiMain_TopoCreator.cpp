@@ -169,7 +169,7 @@ public:
     ********************************************************************************************/
 
 
-    void load_from_file(std::filesystem::path path)
+    void load_from_file(path path)
     {
         if(topo_manager)
         {

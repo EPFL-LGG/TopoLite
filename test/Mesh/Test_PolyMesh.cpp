@@ -4,7 +4,14 @@
 
 #include <catch2/catch.hpp>
 #include "Mesh/PolyMesh.h"
-#include <filesystem>
+
+#if defined(GCC_VERSION_LESS_8)
+    #include <experimental/filesysten>
+    using namespace std::experimental::filesystem;
+#else
+    #include <filesystem>
+    using namespace std::filesystem;
+#endif
 
 TEST_CASE("PolyMesh - Four Quad with index as input") {
     // Setup
@@ -124,8 +131,8 @@ TEST_CASE("PolyMesh - Cube") {
 
     SECTION("read polyhedron") {
 
-        std::filesystem::path dataFolder(UNITTEST_DATAPATH);
-        std::filesystem::path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
+        path dataFolder(UNITTEST_DATAPATH);
+        path filepath = dataFolder / "Mesh/primitives/Icosphere.obj";
 
         polyMesh.readOBJModel(filepath.c_str(), true);
         REQUIRE(polyMesh.texturedModel == true);
@@ -134,7 +141,7 @@ TEST_CASE("PolyMesh - Cube") {
         polyMesh.translateMesh(Vector3d(1, 1, 1));
         polyMesh.scaleMesh(Vector3d(2, 2, 2));
 
-        std::filesystem::path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
+        path outputfile = dataFolder / "Mesh/primitives/Icosphere2.obj";
         polyMesh.getTextureMesh()->writeOBJModel(outputfile.c_str(), false);
 
         SECTION("Test copy and construct function") {

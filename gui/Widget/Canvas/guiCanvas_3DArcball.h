@@ -34,10 +34,16 @@
 #include <memory>
 #include <stb_image.h>
 #include <cmath>
-#include <filesystem>
-
 #include "gui_TrackBall3D.h"
 #include "guiScene_Base.h"
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesysten>
+    using namespace std::experimental::filesystem;
+#else
+#include <filesystem>
+using namespace std::filesystem;
+#endif
 
 class guiCanvas_3DArcball : public nanogui::Canvas {
 public:
