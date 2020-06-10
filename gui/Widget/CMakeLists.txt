@@ -1,2 +1,4 @@
-file(GLOB FilesWidgets ${CMAKE_CURRENT_SOURCE_DIR}/*.*)
-set(FilesWidgets ${FilesWidgets} PARENT_SCOPE)
+add_subdirectory(Canvas)
+add_subdirectory(Controls)
+add_subdirectory(Dialog)
+set(WidgetFiles ${CanvasFiles} ${ControlsFiles} ${DialogFiles} PARENT_SCOPE)

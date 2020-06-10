@@ -104,9 +104,9 @@ TEST_CASE("PolyMesh - Cube") {
         polyMesh.setPolyLists(polyLists);
         REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
         REQUIRE(polyMesh.volume() == Approx(1).margin(1e-6));
-        REQUIRE(polyMesh.vertexList.size() == 24);
 
-        polyMesh.removeDuplicatedVertices();
+        //the reason for 8 is that the setPolyLists function will merge vertices with same position into one vertex
+        //a cube only has 8 vertices
         REQUIRE(polyMesh.vertexList.size() == 8);
 
         REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));

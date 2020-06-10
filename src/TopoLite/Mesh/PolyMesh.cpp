@@ -79,6 +79,7 @@ void PolyMesh<Scalar>::fromEigenMesh(const MatrixX &V, const MatrixX &T, const M
         polyList.push_back(polygon);
     }
 
+    removeDuplicatedVertices();
     texturedModel = true;
     return;
 }
@@ -101,7 +102,7 @@ void PolyMesh<Scalar>::setPolyLists(vector<pPolygon> _polyList)
 
     texturedModel = false;
 
-    computeVertexList();
+    removeDuplicatedVertices();
 
     computeTextureList();
 
@@ -124,7 +125,7 @@ PolyMesh<Scalar>::PolyMesh(const PolyMesh &_mesh): TopoObject(_mesh)
 
     texturedModel = _mesh.texturedModel;
 
-    computeVertexList();
+    removeDuplicatedVertices();
 
     computeTextureList();
 
@@ -1087,6 +1088,25 @@ nlohmann::json PolyMesh<Scalar>::dump() const {
         mesh_json["faces"] = faces_json;
     }
     return mesh_json;
+}
+
+template<typename Scalar>
+vector<Line<Scalar>> PolyMesh<Scalar>::getWireFrame() const {
+    vector<Line<Scalar>> lines;
+
+    for(pPolygon poly: polyList)
+    {
+        for(size_t id = 0; id < poly->size(); id++)
+        {
+            if(poly->at_boundary(id))
+            {
+                Vector3 l0 = poly->pos(id);
+                Vector3 l1 = poly->pos(id + 1);
+                lines.push_back(Line<Scalar>(l0, l1));
+            }
+        }
+    }
+    return lines;
 }
 
 template class PolyMesh<double>;

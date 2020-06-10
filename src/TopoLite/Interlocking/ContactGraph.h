@@ -106,7 +106,7 @@ public:
 
 public:
 
-    bool buildFromMeshes(vector<pPolyMesh> &meshes,
+    bool buildFromMeshes(const vector<pPolyMesh> &meshes,
                          vector<bool> &atBoundary,
                          Scalar eps = 0.002,
                          bool convexhull = true);

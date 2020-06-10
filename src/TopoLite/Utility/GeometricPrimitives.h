@@ -363,6 +363,7 @@ Box<Scalar> & Box<Scalar>::operator=(const Box &box)
     this->minPt = box.minPt;
     this->maxPt = box.maxPt;
     this->cenPt = box.cenPt;
+    this->size = box.size;
 
     return *this;
 }

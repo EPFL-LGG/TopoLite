@@ -1,2 +1,2 @@
-file(GLOB FilesRenderObjects ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
-set(FilesRenderObjects ${FilesRenderObjects} PARENT_SCOPE)
+file(GLOB RenderObjectsFiles ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
+set(RenderObjectsFiles ${RenderObjectsFiles} PARENT_SCOPE)

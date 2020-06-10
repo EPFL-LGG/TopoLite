@@ -44,7 +44,7 @@ ContactGraph<Scalar>::~ContactGraph() {
  * @return
  */
 template<typename Scalar>
-bool ContactGraph<Scalar>::buildFromMeshes(vector<pPolyMesh> &input_meshes,
+bool ContactGraph<Scalar>::buildFromMeshes(const vector<pPolyMesh> &input_meshes,
                                            vector<bool> &atBoundary,
                                            Scalar eps,
                                            bool convexhull) {
