@@ -4,11 +4,13 @@
 #include <cassert>
 #include <iostream>
 #include "tbb/tbb.h"
-
-#include <IpIpoptApplication.hpp>
 #include "InterlockingSolver_Ipopt.h"
 #include <Eigen/SparseQR>
 #include "Utility/SparseOperations.h"
+
+#define HAVE_CSTDDEF
+#include <IpIpoptApplication.hpp>
+#undef HAVE_CSTDDEF
 
 using namespace Ipopt;
 
