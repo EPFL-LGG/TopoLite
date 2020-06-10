@@ -105,7 +105,6 @@ set(ext_lib ${PUGIXML_LIBRARIES}
 set(ext_defs ${NANOGUI_EXTRA_DEFS})
 
 if(IPOPT_FOUND)
-    message("IPOPT_INCLUDE_DIRS:" ${IPOPT_INCLUDE_DIRS})
     set(ext_include ${ext_include} ${IPOPT_INCLUDE_DIRS})
     set(ext_lib ${ext_lib} ${IPOPT_LIBRARIES})
 endif()

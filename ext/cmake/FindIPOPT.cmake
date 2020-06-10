@@ -79,13 +79,14 @@ ELSE( WIN32 )
     find_path(IPOPT_INCLUDE_DIR NAMES IpNLP.hpp
             PATHS  "$ENV{IPOPT_HOME}/include/coin"
             "/usr/include/coin"
-
+            "/usr/local/include/coin"
             )
 
     find_library( IPOPT_LIBRARY
             ipopt
             PATHS "$ENV{IPOPT_HOME}/lib"
-            "/usr/lib" )
+            "/usr/lib"
+            "/usr/local/lib")
 
     #wrong config under Debian workaround
     add_definitions( -DHAVE_CSTDDEF )
