@@ -1,5 +1,5 @@
 language: cpp
-dist: trusty
+dist: bionic
 sudo: false
 
 # Only build master branch, other branches will have a Pull Request build.
