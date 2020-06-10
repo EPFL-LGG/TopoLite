@@ -2,8 +2,8 @@
 // Created by Robin Jodon on 19.04.20.
 //
 
-#ifndef TOPOLITE_IPOPT_PROBLEM_H
-#define TOPOLITE_IPOPT_PROBLEM_H
+#ifndef TOPOLITE_IPOPT_TEST_SIMPLE_H
+#define TOPOLITE_IPOPT_TEST_SIMPLE_H
 
 #define HAVE_CSTDDEF
 #include <IpTNLP.hpp>
@@ -170,5 +170,5 @@ private:
     //@}
 };
 
-#endif
+#endif //TOPOLITE_IPOPT_SIMPLE_H
 
