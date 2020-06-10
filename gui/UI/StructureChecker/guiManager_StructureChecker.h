@@ -49,7 +49,7 @@ public:
         varList = make_shared<InputVarList>();
 #if defined(IPOPT_INSTALLED)
         varList->add((int)IPOPT, "interlock_solver_type", "Int. Solver");
-#elif
+#else
         varList->add((int)CLP_SIMPLEX, "interlock_solver_type", "Int. Solver");
 #endif
         varList->add((float)1e-3, "contact_eps", "Contact Eps");
@@ -75,7 +75,7 @@ public:
         else{
         #if defined(IPOPT_INSTALLED)
             return make_shared<InterlockingSolver_Ipopt<double>>(graph, varList);
-        #elif
+        #else
             return make_shared<InterlockingSolver_Clp<double>>(graph, varList, SIMPLEX);
         #endif
         }
