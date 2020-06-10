@@ -102,7 +102,7 @@ void PolyMesh<Scalar>::setPolyLists(vector<pPolygon> _polyList)
 
     texturedModel = false;
 
-    computeVertexList();
+    removeDuplicatedVertices();
 
     computeTextureList();
 
@@ -125,7 +125,7 @@ PolyMesh<Scalar>::PolyMesh(const PolyMesh &_mesh): TopoObject(_mesh)
 
     texturedModel = _mesh.texturedModel;
 
-    computeVertexList();
+    removeDuplicatedVertices();
 
     computeTextureList();
 
@@ -482,7 +482,6 @@ void PolyMesh<Scalar>::computeTextureList()
 template<typename Scalar>
 void PolyMesh<Scalar>::rotateMesh(Vector3 rotCenter, Vector3 rotAxis, Scalar rotAngle)
 {
-    removeDuplicatedVertices();
 	for (size_t i = 0; i < vertexList.size(); ++i)
 	{
 		pVertex ver = vertexList[i];
@@ -493,7 +492,6 @@ void PolyMesh<Scalar>::rotateMesh(Vector3 rotCenter, Vector3 rotAxis, Scalar rot
 template<typename Scalar>
 void PolyMesh<Scalar>::translateMesh(Vector3 move)
 {
-    removeDuplicatedVertices();
     for (size_t i = 0; i < vertexList.size(); ++i) {
         pVertex ver = vertexList[i];
         ver->pos += move;
@@ -503,7 +501,6 @@ void PolyMesh<Scalar>::translateMesh(Vector3 move)
 template<typename Scalar>
 void PolyMesh<Scalar>::scaleMesh(Vector3 scale)
 {
-    removeDuplicatedVertices();
     for (size_t i = 0; i < vertexList.size(); ++i) {
         pVertex ver = vertexList[i];
         ver->pos[0] *= scale[0];

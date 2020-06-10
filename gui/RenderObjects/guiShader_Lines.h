@@ -9,7 +9,8 @@
 #include "Utility/GeometricPrimitives.h"
 #include "nanogui/vector.h"
 #include <fstream>
-
+#include "shader/metal_shader.h"
+#include "shader/opengl_shader.h"
 template <typename Scalar>
 class gui_LinesGroup{
 public:
@@ -110,24 +111,12 @@ public:
 
 #if defined(NANOGUI_USE_OPENGL)
         //read text from file
-        string shader_path = TOPOCREATOR_SHADER_PATH;
-        std::ifstream file(shader_path + "Lines.vert");
-        std::string shader_vert((std::istreambuf_iterator<char>(file)),
-                                std::istreambuf_iterator<char>());
-        file = std::ifstream(shader_path + "Lines.frag");
-        string shader_frag((std::istreambuf_iterator<char>(file)),
-                           std::istreambuf_iterator<char>());
+        std::string shader_vert = opengl_lines_vert;
+        std::string shader_frag = opengl_lines_frag;
 
 #elif defined(NANOGUI_USE_METAL)
-        //read text from file
-        string shader_path = TOPOCREATOR_SHADER_PATH;
-        std::ifstream file(shader_path + "metal/Lines_vert.metal");
-        std::string shader_vert((std::istreambuf_iterator<char>(file)),
-                                std::istreambuf_iterator<char>());
-
-        file = std::ifstream(shader_path + "metal/Lines_frag.metal");
-        string shader_frag((std::istreambuf_iterator<char>(file)),
-                           std::istreambuf_iterator<char>());
+        std::string shader_vert = metal_lines_vert;
+        std::string shader_frag = metal_lines_frag;
 #endif
 
         shaders.push_back(new nanogui::Shader(render_pass, "LinesShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None));

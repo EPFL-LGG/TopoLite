@@ -9,6 +9,8 @@
 #include <nanogui/vector.h>
 #include <fstream>
 #include "igl/triangle/triangulate.h"
+#include "shader/metal_shader.h"
+#include "shader/opengl_shader.h"
 template<typename Scalar>
 class guiShader_PolyMeshes : public guiShader_Base<Scalar>{
 public:
@@ -139,23 +141,11 @@ public:
     {
         //read text from file
 #if defined(NANOGUI_USE_OPENGL)
-        string shader_path = TOPOCREATOR_SHADER_PATH;
-        std::ifstream file(shader_path + "PolyMeshAnimation.vert");
-        std::string shader_vert((std::istreambuf_iterator<char>(file)),
-                                std::istreambuf_iterator<char>());
-
-        file = std::ifstream(shader_path + "PolyMeshAnimation.frag");
-        std::string shader_frag((std::istreambuf_iterator<char>(file)),
-                                std::istreambuf_iterator<char>());
+        std::string shader_vert = opengl_polymeshes_vert;
+        std::string shader_frag = opengl_polymeshes_frag;
 #elif defined(NANOGUI_USE_METAL)
-        string shader_path = TOPOCREATOR_SHADER_PATH;
-        std::ifstream file(shader_path + "metal/PolyMeshes_vert.metal");
-        std::string shader_vert((std::istreambuf_iterator<char>(file)),
-                                std::istreambuf_iterator<char>());
-
-        file = std::ifstream(shader_path + "metal/PolyMeshes_frag.metal");
-        string shader_frag((std::istreambuf_iterator<char>(file)),
-                           std::istreambuf_iterator<char>());
+        std::string shader_vert = metal_polymeshes_vert;
+        std::string shader_frag = metal_polymeshes_frag;
 #endif
         
         shader = new nanogui::Shader(render_pass, "PolyMeshShader", shader_vert, shader_frag, nanogui::Shader::BlendMode::None);

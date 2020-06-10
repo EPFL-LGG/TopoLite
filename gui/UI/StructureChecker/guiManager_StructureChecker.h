@@ -141,12 +141,14 @@ public:
 
             if(interlockData != nullptr)
             {
-                double max_length = 1;
+                double max_length = 0;
                 for(int id = 0; id < polyMeshesShaders->ani_translation.size(); id++)
                 {
                     max_length = std::max(max_length, interlockData->traslation[id].norm());
                     max_length = std::max(max_length, interlockData->rotation[id].norm());
                 }
+
+                max_length *= 2;
 
                 for(int id = 0; id < polyMeshesShaders->ani_translation.size(); id++)
                 {
@@ -178,12 +180,14 @@ public:
 
             if(interlockData != nullptr)
             {
-                double max_length = 1;
+                double max_length = 0;
                 for(int id = 0; id < LinesShader->ani_translation.size(); id++)
                 {
                     max_length = std::max(max_length, interlockData->traslation[id].norm());
                     max_length = std::max(max_length, interlockData->rotation[id].norm());
                 }
+
+                max_length *= 2;
 
                 for(int id = 0; id < LinesShader->ani_translation.size(); id++)
                 {

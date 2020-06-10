@@ -14,6 +14,7 @@ if(BUILD_TOPOGUI)
     target_link_libraries(StructureChecker TpCorelib)
     target_include_directories(StructureChecker PUBLIC SYSTEM
             ${NANOGUI_INCLUDE_DIRS}
+            ${CMAKE_CURRENT_SOURCE_DIR}
             ${CMAKE_CURRENT_SOURCE_DIR}/RenderObjects
             ${CMAKE_CURRENT_SOURCE_DIR}/Utility
             ${CMAKE_CURRENT_SOURCE_DIR}/Widget)
@@ -28,6 +29,7 @@ if(BUILD_TOPOGUI)
     target_link_libraries(TopoCreator TpCorelib)
     target_include_directories(TopoCreator PUBLIC SYSTEM
             ${NANOGUI_INCLUDE_DIRS}
+            ${CMAKE_CURRENT_SOURCE_DIR}
             ${CMAKE_CURRENT_SOURCE_DIR}/RenderObjects
             ${CMAKE_CURRENT_SOURCE_DIR}/Utility
             ${CMAKE_CURRENT_SOURCE_DIR}/Widget)
@@ -41,6 +43,7 @@ if(BUILD_TOPOGUI)
     target_link_libraries(BezierTest TpCorelib)
     target_include_directories(BezierTest PUBLIC SYSTEM
             ${NANOGUI_INCLUDE_DIRS}
+            ${CMAKE_CURRENT_SOURCE_DIR}
             ${CMAKE_CURRENT_SOURCE_DIR}/RenderObjects
             ${CMAKE_CURRENT_SOURCE_DIR}/Utility
             ${CMAKE_CURRENT_SOURCE_DIR}/Widget)
@@ -48,20 +51,8 @@ if(BUILD_TOPOGUI)
 
 
     ################################
-    #           Copy files
+    #        add defination
     ################################
-    file(COPY shader DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    file(COPY ../data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    if(CMAKE_GENERATOR STREQUAL Xcode)
-        target_compile_definitions(TopoCreator PUBLIC -DTOPOCREATOR_SHADER_PATH="../shader/")
-        target_compile_definitions(StructureChecker PUBLIC -DTOPOCREATOR_SHADER_PATH="../shader/")
-        target_compile_definitions(BezierTest PUBLIC -DTOPOCREATOR_SHADER_PATH="../shader/")
-    else()
-        target_compile_definitions(TopoCreator PUBLIC -DTOPOCREATOR_SHADER_PATH="shader/")
-        target_compile_definitions(StructureChecker PUBLIC -DTOPOCREATOR_SHADER_PATH="shader/")
-        target_compile_definitions(BezierTest PUBLIC -DTOPOCREATOR_SHADER_PATH="shader/")
-    endif()
-
     get_property(IPOPT_FOUND GLOBAL PROPERTY IPOPT_FOUND)
     if(IPOPT_FOUND)
         target_compile_definitions(StructureChecker PUBLIC -DIPOPT_INSTALLED)
