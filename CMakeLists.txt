@@ -32,8 +32,8 @@ if (${CMAKE_CXX_COMPILER_ID} MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -stdlib=libc++")
 elseif(${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
     message("Compiling with ${CMAKE_CXX_COMPILER_ID} GCC")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -std=c++17")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -std=c++17")
 endif()
 
 #3rd party library

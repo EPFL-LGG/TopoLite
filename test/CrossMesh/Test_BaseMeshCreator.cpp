@@ -29,7 +29,7 @@ TEST_CASE("BaseMeshCreator")
     std::shared_ptr<CrossMesh<double>> _pattern2D;
 
     XMLIO_backward IO;
-    std::filesystem::create_directory("Pattern");
+    create_directory("Pattern");
 
     SECTION("origin.xml")
     {
