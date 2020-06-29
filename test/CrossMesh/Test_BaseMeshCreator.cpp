@@ -8,9 +8,16 @@
 #include "Mesh/PolyMesh.h"
 #include "Mesh/CrossMesh.h"
 #include "Mesh/PolyMesh_AABBTree.h"
-#include <filesystem>
 #include "IO/XMLIO_backward.h"
 #include "CrossMesh/PatternCreator.h"
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesystem>
+    using namespace std::experimental::filesystem;
+#else
+#include <filesystem>
+using namespace std::filesystem;
+#endif
 
 TEST_CASE("BaseMeshCreator")
 {
@@ -22,18 +29,18 @@ TEST_CASE("BaseMeshCreator")
     std::shared_ptr<CrossMesh<double>> _pattern2D;
 
     XMLIO_backward IO;
-    std::filesystem::create_directory("Pattern");
+    create_directory("Pattern");
 
     SECTION("origin.xml")
     {
         // read xml
-        std::filesystem::path xmlFileName(UNITTEST_DATAPATH);
+        path xmlFileName(UNITTEST_DATAPATH);
         xmlFileName = xmlFileName / "TopoInterlock/XML/origin.xml";
         IOData data;
         IO.XMLReader(xmlFileName.c_str(), data);
 
         // read polyMesh
-        std::filesystem::path surface_objfile(UNITTEST_DATAPATH);
+        path surface_objfile(UNITTEST_DATAPATH);
         surface_objfile = surface_objfile / "TopoInterlock/XML/origin_data/origin_Surface.obj";
 
         _polyMesh = make_shared<PolyMesh_AABBTree<double>>(data.varList);

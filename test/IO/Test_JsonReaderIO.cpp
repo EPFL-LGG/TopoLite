@@ -8,7 +8,7 @@
 TEST_CASE("Test Read json")
 {
     shared_ptr<IOData> data = make_shared<IOData>();
-    std::filesystem::path jsonFileName(UNITTEST_DATAPATH);
+    path jsonFileName(UNITTEST_DATAPATH);
     jsonFileName = jsonFileName / "TopoInterlock/Json/origin.json";
     std::string path = jsonFileName;
     JsonIOReader reader(path, data);

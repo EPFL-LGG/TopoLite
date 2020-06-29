@@ -9,8 +9,16 @@
 #include <unordered_map>
 #include <string>
 #include <pugixml.hpp>
-#include <filesystem>
 #include "IOData.h"
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesystem>
+    using namespace std::experimental::filesystem;
+#else
+#include <filesystem>
+using namespace std::filesystem;
+using std::string;
+#endif
 
 
 class XMLIO_backward {
@@ -18,8 +26,8 @@ public:
     bool XMLReader(const std::string xmlFileName, IOData &data);
     void XMLReader_GUISettings(pugi::xml_node &xml_root, IOData &data);
 
-    bool XMLReader_ReferenceSurface(pugi::xml_node &xml_root, const string xmlFileName_path, IOData &data);
-    bool XMLReader_CrossMesh(pugi::xml_node &xml_root, const string xmlFileName_path, IOData &data);
+    bool XMLReader_ReferenceSurface(pugi::xml_node &xml_root, const std::string xmlFileName_path, IOData &data);
+    bool XMLReader_CrossMesh(pugi::xml_node &xml_root, const std::string xmlFileName_path, IOData &data);
     void XMLReader_Boundary(pugi::xml_node &xml_root, IOData &data);
 
 private:

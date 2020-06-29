@@ -10,18 +10,24 @@
 
 #include <string>
 #include <nlohmann/json.hpp>
-#include <filesystem>
 
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesystem>
+    using namespace std::experimental::filesystem;
+#else
+#include <filesystem>
+using namespace std::filesystem;
+#endif
 
 class JsonIOWriter{
 public:
-    std::filesystem::path path;
+    path output_path;
     weak_ptr<IOData> data;
 
 public:
 
-    JsonIOWriter(const std::string output_path, shared_ptr<IOData> _data){
-        path = output_path;
+    JsonIOWriter(const std::string _output_path, shared_ptr<IOData> _data){
+        output_path = _output_path;
         data = _data;
     }
 

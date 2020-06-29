@@ -4,11 +4,13 @@
 #include <cassert>
 #include <iostream>
 #include "tbb/tbb.h"
-
-#include <IpIpoptApplication.hpp>
 #include "InterlockingSolver_Ipopt.h"
 #include <Eigen/SparseQR>
 #include "Utility/SparseOperations.h"
+
+#define HAVE_CSTDDEF
+#include <IpIpoptApplication.hpp>
+#undef HAVE_CSTDDEF
 
 using namespace Ipopt;
 
@@ -161,7 +163,7 @@ bool InterlockingSolver_Ipopt<Scalar>::solve(InterlockingSolver_Ipopt::pInterloc
         printf("\n\n*** The problem FAILED!\n");
     }
 
-    // unpackSolution(data, rotationalInterlockingCheck, solution, num_var);
+    unpackSolution(data, rotationalInterlockingCheck, interlock_pb->x_solution.data(), num_var);
     if(interlock_pb->max_abs_t < 1E-4){
         return true;
     }

@@ -4,7 +4,15 @@
 
 #include "CrossMesh/PatternCreator.h"
 #include <catch2/catch.hpp>
+
+#if defined(GCC_VERSION_LESS_8)
+#include <experimental/filesystem>
+    using namespace std::experimental::filesystem;
+#else
 #include <filesystem>
+using namespace std::filesystem;
+#endif
+
 TEST_CASE("PatternCreator")
 {
     shared_ptr<InputVarList> varList;
@@ -13,7 +21,7 @@ TEST_CASE("PatternCreator")
     PatternCreator<double> patternCreator(varList);
     PatternCreator<double>::pCrossMesh crossMesh;
 
-    std::filesystem::create_directory("Pattern");
+    create_directory("Pattern");
 
     SECTION("CROSS_SQUARE"){
         patternCreator.create2DPattern(CROSS_SQUARE, 10, crossMesh);

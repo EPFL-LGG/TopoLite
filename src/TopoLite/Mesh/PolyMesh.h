@@ -215,6 +215,8 @@ public:
 
     size_t size(){return polyList.size();}
 
+    vector<Line<Scalar>> getWireFrame() const ;
+
 private:
 
     Scalar computeVolume(vector<pTriangle> triList) const;

@@ -31,6 +31,9 @@ Quickstart
   on the assembly.
 - Once the assembly looks like what you wanted. Click on `Save`.
 
+Features
+^^^^^^^^
+
 .. only:: html
 
    .. figure:: ../imgs/gui_cut.gif

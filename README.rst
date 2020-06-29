@@ -48,18 +48,37 @@ Compilation
 -----------
 Clone the repository, run CMake to generate Makefiles or CMake/Visual Studio project files, and the rest should just work automatically.
 
-- **MacOS/Ubuntu**:
+- **MacOS**:
+Xcode >= 11.5 (C++ 17)
 
 .. code-block:: bash
 
+    $ brew install ipopt
     $ mkdir build
     $ cd build
     $ cmake -DCMAKE_BUILD_TYPE=Release ..
     $ make -j 16
 
-.. note::
+- **Ubuntu(Linux)**:
+gcc >= 7.5.0 (C++ 17)
 
-    the integer following `make -j` is the number of threads supported by your CPU architecture. Replace it with your optimal value.
+.. code-block:: bash
+
+    $ sudo apt-get install libglu1-mesa-dev
+    $ sudo apt-get install libxxf86vm-dev
+    $ sudo apt-get install libxrandr-dev
+    $ sudo apt-get install libxinerama-dev
+    $ sudo apt-get install libxcursor-dev
+    $ sudo apt-get install libxi-dev
+    $ sudo apt-get install libx11-dev
+    $ sudo apt-get install coinor-libipopt-dev
+
+    $ mkdir build
+    $ cd build
+    $ cmake -DCMAKE_BUILD_TYPE=Release ..
+    $ make -j 16
+    
+the integer following `make -j` is the number of threads supported by your CPU architecture. Replace it with your optimal value.
 
 - **Windows**: currently unavailable.
 
