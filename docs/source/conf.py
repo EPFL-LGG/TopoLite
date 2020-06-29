@@ -11,6 +11,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import subprocess
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
@@ -39,11 +40,16 @@ source_suffix = {
     '.md': 'markdown',
 }
 
-#...
+# -- Doxygen autogeneration ---------------------------------------------------
 
-extensions = ['sphinx.ext.autodoc',  # Support automatic documentation
-              'breathe'
-             ]
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+    subprocess.call('cd ..; doxygen', shell=True)
+
+extensions = ['breathe']
 # Breathe Configuration
 breathe_projects = {"Topolite": "{}/xml/".format(os.path.split(os.getcwd())[0])}
 breathe_default_project = "Topolite"
