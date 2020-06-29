@@ -15,6 +15,16 @@ import subprocess
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
 
+# -- Doxygen autogeneration ---------------------------------------------------
+
+# Add any Sphinx extension module names here, as strings. They can be
+# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+    subprocess.call('cd ..; doxygen', shell=True)
+
+
 # -- Requirements ------------------------------------------------------------
 
 # Converting .md to .rst (see Makefile)
@@ -34,26 +44,18 @@ author = 'R. Jodon & Z. Wang'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
+extensions = ['breathe']
+# Breathe Configuration
+breathe_projects = {"Topolite": "../xml"}
+breathe_default_project = "Topolite"
+breathe_default_members = ('members',)
+
 source_suffix = {
     '.rst': 'restructuredtext',
     '.txt': 'markdown',
     '.md': 'markdown',
 }
 
-# -- Doxygen autogeneration ---------------------------------------------------
-
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
-
-if read_the_docs_build:
-    subprocess.call('cd ..; doxygen', shell=True)
-
-extensions = ['breathe']
-# Breathe Configuration
-breathe_projects = {"Topolite": "{}/xml/".format(os.path.split(os.getcwd())[0])}
-breathe_default_project = "Topolite"
-breathe_default_members = ('members',)
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
