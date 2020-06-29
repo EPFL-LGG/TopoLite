@@ -44,7 +44,7 @@ Please check our Topo2019SigA_ paper for more technical details.
 
 .. _Topo2019SigA: https://lgg.epfl.ch/publications/2019/Topological_Interlocking/index.php
 
-The source code of the project is published on LGG github account here_ :
+The source code of the project is published on LGG github account here_
 
 .. _here: https://github.com/EPFL-LGG/TopoLite
 
