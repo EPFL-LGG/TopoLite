@@ -28,3 +28,7 @@ ext/eigen
 ext/pugixml
 ext/pybind11
 ext/json
+
+docs/html/
+
+docs/xml/

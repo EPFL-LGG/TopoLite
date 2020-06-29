@@ -7,13 +7,15 @@
 
 .. toctree::
    :caption: Table of Contents
-   :maxdepth: 3
+   :maxdepth: 2
 
    Introduction <self>
    usage/compilation.rst
    usage/gui.rst
    usage/examples.rst
+   api/api.rst
    usage/license.rst
+
 
 Indices and tables
 ^^^^^^^^^^^^^^^^^^

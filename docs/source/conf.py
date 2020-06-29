@@ -10,10 +10,9 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
+import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
 
 # -- Requirements ------------------------------------------------------------
 
@@ -39,6 +38,16 @@ source_suffix = {
     '.txt': 'markdown',
     '.md': 'markdown',
 }
+
+#...
+
+extensions = ['sphinx.ext.autodoc',  # Support automatic documentation
+              'breathe'
+             ]
+# Breathe Configuration
+breathe_projects = {"Topolite": "{}/xml/".format(os.path.split(os.getcwd())[0])}
+breathe_default_project = "Topolite"
+breathe_default_members = ('members',)
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
