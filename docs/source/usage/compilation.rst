@@ -1,7 +1,8 @@
 Compilation
 ===========
 
-Clone the repository, run CMake to generate Makefiles or CMake/Visual Studio project files, and the rest should just work automatically.
+- Clone the repository.
+- Run CMake to build the project based on CMakefiles or CMake/Visual Studio project files.
 
 MacOS
 -----
@@ -43,4 +44,4 @@ gcc >= 7.5.0 (C++ 17)
 Windows
 -------
 
-Not available yet.
+Compilation notes not available yet.
