@@ -1,4 +1,4 @@
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <iostream>
 #include "Utility/GeometricPrimitives.h"
 using Eigen::Vector3d;
@@ -65,8 +65,8 @@ TEST_CASE("GeometricPrimitives Plane")
 
         Vector3d intersec(0, 0, 0);
         REQUIRE(plane.computeLnLnIntersec(line, intersec) == LINE_PLANE_INTERSECT);
-        REQUIRE(intersec[0] == 0);
-        REQUIRE(intersec[1] ==  Approx(-1.0/3));
+        REQUIRE(intersec[0] == Catch::Approx(0).margin(1E-6));
+        REQUIRE(intersec[1] ==  Catch::Approx (-1.0/3));
     }
 }
 
@@ -136,28 +136,28 @@ TEST_CASE("Triangle"){
     }
 
     SECTION("computeCenter"){
-        CHECK(tri.computeCenter().x() == Approx(1.0 / 3));
-        CHECK(tri.computeCenter().y() == Approx(1.0 / 3));
-        CHECK(tri.computeCenter().z() == Approx(1.0 / 3));
+        CHECK(tri.computeCenter().x() == Catch::Approx (1.0 / 3));
+        CHECK(tri.computeCenter().y() == Catch::Approx (1.0 / 3));
+        CHECK(tri.computeCenter().z() == Catch::Approx (1.0 / 3));
     }
 
     SECTION("computeArea"){
-        CHECK(tri.computeArea() == Approx(sqrt(3) / 2));
+        CHECK(tri.computeArea() == Catch::Approx (sqrt(3) / 2));
     }
 
     SECTION("computeSignedArea"){
-        CHECK(tri.computeSignedArea() == Approx(0.5));
+        CHECK(tri.computeSignedArea() == Catch::Approx (0.5));
     }
 
     SECTION("computeNormal"){
-        CHECK((tri.computeNormal() - Vector3d(1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3))).norm() == Approx(0));
+        CHECK((tri.computeNormal() - Vector3d(1.0/sqrt(3), 1.0/sqrt(3), 1.0/sqrt(3))).norm() == Catch::Approx (0));
     }
 
     SECTION("correctNormal"){
         tri.correctNormal(Vector3d(-1, -1, -1));
-        CHECK((tri.v[0] - Vector3d(1, 0, 0)).norm() == Approx(0));
-        CHECK((tri.v[1] - Vector3d(0, 0, 1)).norm() == Approx(0));
-        CHECK((tri.v[2] - Vector3d(0, 1, 0)).norm() == Approx(0));
+        CHECK((tri.v[0] - Vector3d(1, 0, 0)).norm() == Catch::Approx (0));
+        CHECK((tri.v[1] - Vector3d(0, 0, 1)).norm() == Catch::Approx (0));
+        CHECK((tri.v[2] - Vector3d(0, 1, 0)).norm() == Catch::Approx (0));
     }
 
 }
@@ -168,7 +168,7 @@ TEST_CASE("OrientPoint")
     oriPt.print();
     oriPt.tiltSign = 1;
     oriPt.updateAngle(10.0);
-    REQUIRE(oriPt.normal[0] == Approx(std::cos(10.0 * M_PI / 180)));
+    REQUIRE(oriPt.normal[0] == Catch::Approx (std::cos(10.0 * M_PI / 180)));
     REQUIRE(oriPt.normal[1] == 0);
-    REQUIRE(oriPt.normal[2] == Approx(std::sin(-10.0 * M_PI / 180)));
+    REQUIRE(oriPt.normal[2] == Catch::Approx (std::sin(-10.0 * M_PI / 180)));
 }

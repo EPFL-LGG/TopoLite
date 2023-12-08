@@ -5,7 +5,7 @@
 #ifndef TOPOLITE_LISTVECTOR3_H
 #define TOPOLITE_LISTVECTOR3_H
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include <Eigen/Dense>
 #include <vector>
 #include <iostream>

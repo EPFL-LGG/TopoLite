@@ -14,7 +14,7 @@
 #ifndef _POLYGON_H
 #define _POLYGON_H
 
-#include "TopoLite/Utility/GeometricPrimitives.h"
+#include "Utility/GeometricPrimitives.h"
 #include <Eigen/Dense>
 #include <vector>
 #include <memory>

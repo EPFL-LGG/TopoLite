@@ -58,8 +58,8 @@ void InitVar_backward(InputVarList *varList)
     // Para Basic
     varList->add(4, Vector2f(1, 15), "patternID", "Pattern\t:") << "Pattern_ID" = "Para_Basic";
     varList->add(20.0f, Vector2f(0, 90), "tiltAngle", "Alpha\t:") << "Tile_Angle_Upper" = "Para_Basic";
-    varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Upper Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
-    varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Lower Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
+    varList->add(0.02f, Vector2f(0, 0.5), "cutUpper", "Upper Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
+    varList->add(0.02f, Vector2f(0, 0.5), "cutLower", "Lower Depth\t:") << "Cut_Plane_Height" = "Para_Basic";
     varList->add((int)15, Vector2f(10, 30), "patternRadius", "Pattern Radius\t:") << "Pattern_Radius" = "Para_Basic";
     varList->add(0.001f, Vector2f(0, 0.1), "minCrossArea", "Minimum Cross Area (%)\t:") = "Para_Basic";
     varList->add(0.03f, Vector2f(0, 0.5), "minBoundaryEdge", "Minimum Bdry Edge\t:") = "Para_Basic";
@@ -194,8 +194,8 @@ void InitVar(InputVarList *varList)
     //Block
     {
         varList->add(20.0f, Vector2f(0, 90), "tiltAngle", "Aug. Angle") = "Block";
-        varList->add(0.02f, Vector2f(0, 0.2), "cutUpper", "Cut Up.") = "Block";
-        varList->add(0.02f, Vector2f(0, 0.2), "cutLower", "Cut Lo.") = "Block";
+        varList->add(0.02f, Vector2f(0, 0.5), "cutUpper", "Cut Up.") = "Block";
+        varList->add(0.02f, Vector2f(0, 0.5), "cutLower", "Cut Lo.") = "Block";
     }
 
 }

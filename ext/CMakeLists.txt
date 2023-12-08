@@ -1,115 +1,78 @@
-cmake_minimum_required(VERSION 3.1)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+# FetchContent command is available with cmake >= 3.11
+include(FetchContent)
 
-# eigen
-set(EIGEN3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/eigen)
+# -----------------------------------------------------------------------------
+# helper funtion to download a 'fetch content declare'
+# -----------------------------------------------------------------------------
+macro(fetch what)
+    FetchContent_GetProperties("${what}")
+    if(NOT ${${what}_POPULATED})
+        message(STATUS "fetching ${what} ...")
+        FetchContent_Populate(${what})
+    endif()
+    mark_as_advanced(${${what}_SOURCE_DIR})
+endmacro()
 
-# filesystem
-set(FILESYSTEM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/filesystem)
+
+#------------------------------------------------------------------------------
+# json
+FetchContent_Declare(
+        json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.11.3
+)
+fetch(json)
+add_subdirectory(${json_SOURCE_DIR} json)
 
 # pugixml
-find_package(PUGIXML REQUIRED)
+FetchContent_Declare(
+        pugixml
+        GIT_REPOSITORY https://github.com/robin-forks/pugixml.git
+        GIT_TAG bbcc25dc72ecb8b9d53bd2342d7b37e9e8f33264
+)
+fetch(pugixml)
+add_subdirectory(${pugixml_SOURCE_DIR} pugixml)
 
-# quickhull
-find_package(QuickHull REQUIRED)
+#------------------------------------------------------------------------------
+# libigl
+#option(LIBIGL_GLFW             "Build target igl::glfw"             ON)
+#option(LIBIGL_IMGUI            "Build target igl::imgui"            ON)
+option(LIBIGL_RESTRICTED_TRIANGLE "Build target igl_restricted::triangle"           ON)
+option(LIBIGL_COPYLEFT_CORE    "Build target igl_copyleft::core"                    ON)
+FetchContent_Declare(
+        libigl
+        GIT_REPOSITORY https://github.com/libigl/libigl.git
+        GIT_TAG        v2.4.0
+)
+fetch(libigl)
+add_subdirectory(${libigl_SOURCE_DIR} libigl)
 
-# clipper
-find_package(Clipper REQUIRED)
+#----------
+# catch2
+FetchContent_Declare(
+        Catch2
+        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+        GIT_TAG        v3.0.0-preview4
+)
+FetchContent_MakeAvailable(Catch2)
 
-#LIBIGL
-set(LIBIGL_WITH_TRIANGLE ON CACHE BOOL "Use Triangle" FORCE)
-set(LIBIGL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libigl/include)
-list(APPEND CMAKE_MODULE_PATH "${LIBIGL_INCLUDE_DIR}/../cmake")
-include(libigl)
+#---------
+option (NANOGUI_BACKEND "backend" "Metal")
+# nanogui
+FetchContent_Declare(
+        nanogui
+        GIT_REPOSITORY     https://github.com/mitsuba-renderer/nanogui.git
+        GIT_TAG            741f3323c73891f62c71427c1fd766b8a32035f5
+)
+set_property(GLOBAL PROPERTY nanogui_include_dir "${nanogui_SOURCE_DIR}")
+FetchContent_MakeAvailable(nanogui)
 
-#NANOGUI
-if(BUILD_TOPOGUI)
-    set(NANOGUI_BACKEND "OpenGL" CACHE STRING "Choose the backend used for rendering" FORCE)
-    find_package(NanoGUI)
-    set(NANOGUI_INCLUDE_DIRS ${NANOGUI_INCLUDE_DIRS} ${NANOGUI_EXTRA_INCS} PARENT_SCOPE)
-    set(NANOGUI_EXTRA_DEFS ${NANOGUI_EXTRA_DEFS} PARENT_SCOPE)
-    set(NANOGUI_DIR ${NANOGUI_DIR} PARENT_SCOPE)
-endif()
+##------------------------------------------------------------------------------
+## pybind11
+#FetchContent_Declare(
+#        pybind11
+#        GIT_REPOSITORY https://github.com/pybind/pybind11.git
+#)
+#fetch(pybind11)
+#add_subdirectory(${pybind11_SOURCE_DIR} pybind11)
 
-# TBB
-# Handled in cmake/TopoliteDependencies.cmake
-if(WIN32)
-    list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_SOURCE_DIR}/tbb/cmake)
-    find_package(TBB REQUIRED tbb_preview)
-else()
-    set(TBB_BUILD_STATIC            ON CACHE BOOL " " FORCE)
-    set(TBB_BUILD_SHARED            OFF CACHE BOOL " " FORCE)
-    set(TBB_BUILD_TBBMALLOC         ON  CACHE BOOL " " FORCE) # needed for CGAL's parallel mesher
-    set(TBB_BUILD_TBBMALLOC_PROXY   OFF CACHE BOOL " " FORCE)
-    set(TBB_BUILD_TESTS             OFF CACHE BOOL " " FORCE)
-    add_subdirectory(${TOPOLITE_EXTERNAL}/tbb)
-    set(TBB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/tbb/include)
-    set(TBB_IMPORTED_TARGETS tbb_static tbbmalloc_static)
-endif()
-
-
-# CLP
-set(BUILD_SHARED_LIBS OFF CACHE STRING "Build clp using static library" FORCE)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/clp)
-set(CLP_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/clp/Clp/src/OsiClp
-        ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/CoinUtils/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/clp/ext/Osi/src/Osi)
-set(CLP_LIBRARIES CoinUtils Osi Clp OsiClpSolver)
-
-## IPOPT
-find_package(IPOPT)
-
-## Pybind11
-if(BUILD_TOPOPYBIND)
-    #Pybind11
-    if(WIN32)
-        set(PYTHON_EXECUTABLE $ENV{USERPROFILE}/anaconda3/python.exe)
-    endif()
-    set(PYBIND11_CPP_STANDARD -std=c++11)
-    set(PYBIND11_PYTHON_VERSION 3.7)
-    add_subdirectory(pybind11)
-endif()
-
-if(BUILD_TOPOTEST)
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/catch2)
-    list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/catch2/contrib)
-endif()
-
-
-#JSON
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(json)
-set(JSON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/json/include)
-#Set external inlude path/library/definitions
-
-set(ext_include ${CPPSUBPROCESS_INCLUDE_DIR}
-                ${PUGIXML_INCLUDE_DIR}
-                ${QUICKHULL_INCLUDE_DIR}
-                ${CLIPPER_INCLUDE_DIR}
-                ${LIBIGL_INCLUDE_DIR}
-                ${TBB_INCLUDE_DIR}
-                ${EIGEN3_INCLUDE_DIR}
-                ${CLP_INCLUDE_DIR}
-                ${JSON_INCLUDE_DIR})
-
-set(ext_lib ${PUGIXML_LIBRARIES}
-            ${QUICKHULL_LIBRARIES}
-            ${CLIPPER_LIBRARIES}
-            ${TBB_IMPORTED_TARGETS}
-            igl::core
-            igl::triangle
-            ${CLP_LIBRARIES}
-            nlohmann_json::nlohmann_json)
-
-set(ext_defs ${NANOGUI_EXTRA_DEFS})
-
-if(IPOPT_FOUND)
-    set(ext_include ${ext_include} ${IPOPT_INCLUDE_DIRS})
-    set(ext_lib ${ext_lib} ${IPOPT_LIBRARIES})
-endif()
-
-set_property(GLOBAL PROPERTY ext_include_property "${ext_include}")
-set_property(GLOBAL PROPERTY ext_lib_property "${ext_lib}")
-set_property(GLOBAL PROPERTY ext_defs_property "${ext_defs}")
-set_property(GLOBAL PROPERTY IPOPT_FOUND ${IPOPT_FOUND})

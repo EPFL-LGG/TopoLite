@@ -1,2 +1,3 @@
 add_subdirectory(TopoLite)
-set(TpCoreFiles ${TpCoreFiles} PARENT_SCOPE)
+add_subdirectory(quickhull)
+add_subdirectory(gui)

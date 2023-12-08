@@ -2,6 +2,8 @@
 // Created by ziqwang on 2020-02-14.
 //
 #include "ListVector3.h"
+#include <catch2/catch_all.hpp>
+
 bool compareListVector3(const std::vector<Eigen::Vector3d> &A, const std::vector<Eigen::Vector3d> &B)
 {
 
@@ -11,7 +13,7 @@ bool compareListVector3(const std::vector<Eigen::Vector3d> &A, const std::vector
     {
         int jd = 0;
         for(; jd < B.size(); jd++){
-            if(Approx(0) == (A[id] - B[jd]).norm()){
+            if(Catch::Approx(0) == (A[id] - B[jd]).norm()){
                 break;
             }
         }

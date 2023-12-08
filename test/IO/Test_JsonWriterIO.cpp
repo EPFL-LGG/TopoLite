@@ -2,7 +2,7 @@
 // Created by ziqwang on 2020-03-01.
 //
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "IO/JsonIOWriter.h"
 #include "IO/XMLIO_backward.h"
 

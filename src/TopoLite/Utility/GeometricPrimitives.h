@@ -14,7 +14,7 @@
 #ifndef GeometricPrimitives_H
 #define GeometricPrimitives_H
 
-#include "TopoLite/Utility/HelpDefine.h"
+#include "Utility/HelpDefine.h"
 #include <nlohmann/json.hpp>
 #include <vector>
 #include <Eigen/Dense>

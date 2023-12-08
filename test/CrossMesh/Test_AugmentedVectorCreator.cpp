@@ -4,7 +4,7 @@
 
 #include "CrossMesh/AugmentedVectorCreator.h"
 #include "CrossMesh/BaseMeshCreator.h"
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("AugmentedVectorCreator"){
     shared_ptr<InputVarList> varList;

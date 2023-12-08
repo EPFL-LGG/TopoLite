@@ -19,7 +19,7 @@
 #include <unordered_map>
 #include <tbb/tbb.h>
 
-#include "TopoLite/Mesh/PolyMesh_AABBTree.h"
+#include "Mesh/PolyMesh_AABBTree.h"
 #include "Mesh/CrossMesh.h"
 
 using namespace std;

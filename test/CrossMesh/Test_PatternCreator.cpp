@@ -3,7 +3,7 @@
 //
 
 #include "CrossMesh/PatternCreator.h"
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 #if defined(GCC_VERSION_LESS_8)
 #include <experimental/filesystem>

@@ -15,9 +15,9 @@
 #ifndef _MODEL_H
 #define _MODEL_H
 
-#include "TopoLite/Utility/TopoObject.h"
-#include "TopoLite/Mesh/CrossMesh.h"
-#include "TopoLite/Mesh/PolyMesh_AABBTree.h"
+#include "Utility/TopoObject.h"
+#include "Mesh/CrossMesh.h"
+#include "Mesh/PolyMesh_AABBTree.h"
 #include "BaseMeshCreator.h"
 #include "AugmentedVectorCreator.h"
 #include "PatternCreator.h"

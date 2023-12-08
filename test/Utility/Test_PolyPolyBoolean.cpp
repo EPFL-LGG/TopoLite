@@ -2,7 +2,7 @@
 // Created by ziqwang on 2019-12-11.
 //
 #include "Utility/PolyPolyBoolean.h"
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 using Eigen::Vector3d;
 using Eigen::Vector2d;
 
@@ -222,7 +222,7 @@ TEST_CASE("Class PolyPolyBoolean")
 
         double area = 0;
         REQUIRE(polyBoolean.check2DPolygonsIntersection(A, B, area) == true);
-        REQUIRE(area == Approx(1.0 / 8).margin(1e-6));
+        REQUIRE(area == Catch::Approx(1.0 / 8).margin(1e-6));
     }
 
     SECTION("check2DPolygonsIntersection", "intersected 3/8"){
@@ -243,7 +243,7 @@ TEST_CASE("Class PolyPolyBoolean")
 
         double area = 0;
         REQUIRE(polyBoolean.check2DPolygonsIntersection(A, B, area) == true);
-        REQUIRE(area == Approx(3.0 / 8).margin(1e-6));
+        REQUIRE(area == Catch::Approx(3.0 / 8).margin(1e-6));
     }
 
     SECTION("check2DPolygonsIntersection Scaling", "intersected"){
@@ -263,7 +263,7 @@ TEST_CASE("Class PolyPolyBoolean")
 
         double area = 0;
         REQUIRE(polyBoolean.check2DPolygonsIntersection(A, B, area) == true);
-        REQUIRE(area == Approx(1.0 / 2).margin(1e-6));
+        REQUIRE(area == Catch::Approx(1.0 / 2).margin(1e-6));
     }
 
 

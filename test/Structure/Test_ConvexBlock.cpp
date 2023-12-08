@@ -2,7 +2,7 @@
 // Created by ziqwang on 20.05.20.
 //
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "Mesh/Cross.h"
 #include <Structure/ConvexBlock.h>
 #include "IO/InputVar.h"

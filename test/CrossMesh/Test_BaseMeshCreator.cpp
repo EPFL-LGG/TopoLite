@@ -2,7 +2,7 @@
 // Created by ziqwang on 2020-02-22.
 //
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "CrossMesh/BaseMeshCreator.h"
 #include "CrossMesh/CrossMeshCreator.h"
 #include "Mesh/PolyMesh.h"

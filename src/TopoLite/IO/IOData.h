@@ -5,8 +5,8 @@
 #ifndef TOPOLITE_IODATA_H
 #define TOPOLITE_IODATA_H
 
-#include "TopoLite/IO/InputVar.h"
-#include "TopoLite/Mesh/CrossMesh.h"
+#include "IO/InputVar.h"
+#include "Mesh/CrossMesh.h"
 
 struct InteractData{
     double angle;

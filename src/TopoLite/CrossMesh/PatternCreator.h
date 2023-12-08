@@ -30,10 +30,11 @@ enum PatternType{
     CROSS_DODECAGON = 9,
     CROSS_PENTAGON_CROSS = 10,
     CROSS_PENTAGON_SNOW = 11,
-    CROSS_PENTAGON_MIRROR = 12
+    CROSS_PENTAGON_MIRROR = 12,
+    CROSS_RECTANGLE = 13,
 };
 
-const int MAX_PATTERN_TYPE = 12;
+const int MAX_PATTERN_TYPE = 13;
 
 template<typename Scalar>
 class PatternCreator : public TopoObject
@@ -105,7 +106,8 @@ public:
 public:
 
 	void ComputeNeighbor_Square(pPolygon poly, pPolygon &out);
-	void ComputeNeighbor_Hexagon(pPolygon poly, pPolygon &out);
+    void ComputeNeighbor_Rectangle(pPolygon poly, pPolygon &out);
+    void ComputeNeighbor_Hexagon(pPolygon poly, pPolygon &out);
 	void ComputeNeighbor_Octagon_Square(pPolygon poly, int edgeID, pPolygon &out);
 	void ComputeNeighbor_Hexagon_Rhombus(pPolygon poly, int edgeID, pPolygon &out);
 	void ComputeNeighbor_Dodecagon(pPolygon poly, int edgeID, pPolygon &out);
@@ -121,7 +123,8 @@ public:
     Matrix<Scalar, 3, 1> ComputeTileTranslation_OCTAGON_SQUARE_COLINEAR(pPolygon poly, int edgeID);
 
 	void CreatePolygon_Square(pPolygon &out, Scalar edgeLen, int polyType = POLY_SQUARE_THETA_45);
-	void CreatePolygon_Hexagon(pPolygon &out, Scalar edgeLen, int polyType = POLY_HEXAGON_TYPE_0);
+    void CreatePolygon_Rectangle(pPolygon &out, Scalar edgeLen, int polyType = POLY_SQUARE_THETA_45);
+    void CreatePolygon_Hexagon(pPolygon &out, Scalar edgeLen, int polyType = POLY_HEXAGON_TYPE_0);
 	void CreatePolygon_Octagon(pPolygon &out, Scalar edgeLen, int polyType);
 	void CreatePolygon_Dodecagon(pPolygon &out, Scalar edgeLen);
 	void CreatePolygon_Rhombus(pPolygon &out, Scalar edgeLen, int polyType = POLY_RHOMBUS_THETA_0);

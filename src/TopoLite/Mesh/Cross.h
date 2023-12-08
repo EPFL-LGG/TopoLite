@@ -14,8 +14,8 @@
 #ifndef _CROSS_H
 #define _CROSS_H
 
-#include "TopoLite/Utility/GeometricPrimitives.h"
-#include "TopoLite/Utility/TopoObject.h"
+#include "Utility/GeometricPrimitives.h"
+#include "Utility/TopoObject.h"
 #include <unordered_map>
 
 #include "Polygon.h"

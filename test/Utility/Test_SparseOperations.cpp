@@ -1,7 +1,7 @@
 //
 // Created by Robin Jodon on 05.05.20.
 //
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "Utility/SparseOperations.h"
 
 TEST_CASE("create_identity_sparseMat") {

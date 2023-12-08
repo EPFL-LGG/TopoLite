@@ -5,7 +5,7 @@
 #ifndef TOPOLITE_TOPOOBJECT_H
 #define TOPOLITE_TOPOOBJECT_H
 
-#include "TopoLite/IO/InputVar.h"
+#include "IO/InputVar.h"
 #include "TopoAssert.h"
 
 class TopoObject {

@@ -15,9 +15,9 @@
 #ifndef _POLY_MESH_H
 #define _POLY_MESH_H
 
-#include "TopoLite/Utility/GeometricPrimitives.h"
-#include "TopoLite/Utility/TopoObject.h"
-#include "TopoLite/Utility/PolyPolyBoolean.h"
+#include "Utility/GeometricPrimitives.h"
+#include "Utility/TopoObject.h"
+#include "Utility/PolyPolyBoolean.h"
 #include "Polygon.h"
 #include <Eigen/Dense>
 #include <nlohmann/json.hpp>

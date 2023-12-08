@@ -1,7 +1,7 @@
 #ifndef POLYPLOYINTERSEC_H
 #define POLYPLOYINTERSEC_H
 
-#include <clipper.hpp>
+#include "clipper.hpp"
 #include <cmath>
 #include <Eigen/Dense>
 

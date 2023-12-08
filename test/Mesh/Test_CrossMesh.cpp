@@ -2,7 +2,7 @@
 // Created by ziqwang on 2020-02-21.
 //
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "Mesh/CrossMesh.h"
 
 TEST_CASE("CrossMesh")
@@ -17,8 +17,8 @@ TEST_CASE("CrossMesh")
         polyMesh.readOBJModel("data/Mesh/primitives/Icosphere.obj", true);
         CrossMesh<double> crossMesh(polyMesh);
         REQUIRE(crossMesh.getVertices().size() == polyMesh.vertexList.size());
-        REQUIRE(Approx(crossMesh.volume()) == polyMesh.volume());
-        REQUIRE(crossMesh.getVarList()->getFloat("tiltAngle") == Approx(20.0));
+        REQUIRE(Catch::Approx(crossMesh.volume()) == polyMesh.volume());
+        REQUIRE(crossMesh.getVarList()->getFloat("tiltAngle") == Catch::Approx(20.0));
     }
 
     SECTION("test neighbors")

@@ -5,7 +5,7 @@
 #ifndef TOPOLOCKCREATOR_GLUIXML_H
 #define TOPOLOCKCREATOR_GLUIXML_H
 
-#include "TopoLite/Utility/HelpDefine.h"
+#include "Utility/HelpDefine.h"
 #include "IO/IOData.h"
 
 #include <string>

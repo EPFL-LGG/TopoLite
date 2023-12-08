@@ -1,32 +1,60 @@
-if(BUILD_TOPOTEST)
+cmake_minimum_required(VERSION 3.5)
 
-    set(CMAKE_MODULE_PATH   ${CMAKE_MODULE_PATH}
-            ${CMAKE_CURRENT_SOURCE_DIR}/../ext/catch2/contrib)
+project(TopoLiteTest)
 
-    include(CTest)
-    include(ParseAndAddCatchTests)
+set(CRL_TARGET_NAME ${PROJECT_NAME})
 
-    add_subdirectory(CrossMesh)
-    add_subdirectory(Interlocking)
-    add_subdirectory(IO)
-    add_subdirectory(Mesh)
-    add_subdirectory(Structure)
-    add_subdirectory(Utility)
+file(
+        GLOB
+        CRL_SOURCES #
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/CrossMesh/*.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Structure/*.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/IO/*.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Mesh/*.*"
+        "${CMAKE_CURRENT_SOURCE_DIR}/Utility/*.*"
+)
 
-    set(testTopoFiles ${TestIO} ${TestStructure} ${TestUtility} ${TestMesh} ${TestInterlocking} ${TestCrossMesh})
+option(CXX "enable C++ compilation" ON)
 
-    file(GLOB singleTestFile IO/Test_JsonReaderIO.cpp)
+# basic dependencies
+list(
+        APPEND
+        CRL_TARGET_DEPENDENCIES #
+        "TopoLiteLib"
+        "Catch2::Catch2WithMain"
+        "quickhull"
+)
 
-    add_executable(testTopo ${testTopoFiles} Test_Main.cpp)
+# target include dirs
+list(APPEND CRL_TARGET_INCLUDE_DIRS #
+        PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}"
+)
 
-    target_link_libraries(testTopo PUBLIC Catch2::Catch2)
-    target_link_libraries(testTopo PUBLIC TpCorelib)
-    ParseAndAddCatchTests(testTopo)
+# target link libs
+list(
+        APPEND
+        CRL_TARGET_LINK_LIBS #
+        PUBLIC
+        "TopoLiteLib"
+        PUBLIC
+        "Catch2::Catch2WithMain"
+        PUBLIC
+        "quickhull"
+)
 
-    file(COPY ../data DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    if(CMAKE_GENERATOR STREQUAL Xcode)
-        target_compile_definitions(testTopo PUBLIC -DTOPOCREATOR_DATA_PATH="../data/")
-    else()
-        target_compile_definitions(testTopo PUBLIC -DTOPOCREATOR_DATA_PATH="data/")
-    endif()
-endif()
+# compile definitions
+list(APPEND
+        CRL_COMPILE_DEFINITIONS #
+        ""
+)
+
+# create target
+create_crl_app(
+        ${CRL_TARGET_NAME}
+        "${CRL_SOURCES}" #
+        "${CRL_TARGET_DEPENDENCIES}" #
+        "${CRL_TARGET_INCLUDE_DIRS}" #
+        "${CRL_TARGET_LINK_LIBS}" #
+        "${CRL_COMPILE_DEFINITIONS}"
+)

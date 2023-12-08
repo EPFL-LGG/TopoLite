@@ -2,7 +2,7 @@
 // Created by ziqwang on 2020-02-20.
 //
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "Mesh/PolyMesh.h"
 
 #if defined(GCC_VERSION_LESS_8)
@@ -50,28 +50,28 @@ TEST_CASE("PolyMesh - Four Quad with index as input") {
 
     SECTION("Test computeVertexList") {
 
-        REQUIRE((polyMesh.vertexList[4]->pos - Vector3d(2, 0, 0)).norm() == Approx(0.0));
-        REQUIRE((polyMesh.vertexList[5]->pos - Vector3d(2, 1, 0)).norm() == Approx(0.0));
+        REQUIRE((polyMesh.vertexList[4]->pos - Vector3d(2, 0, 0)).norm() == Catch::Approx (0.0));
+        REQUIRE((polyMesh.vertexList[5]->pos - Vector3d(2, 1, 0)).norm() == Catch::Approx (0.0));
     }
 
     SECTION("Test Box PolyMesh bbox") {
         Box<double> bbox = polyMesh.bbox();
-        REQUIRE((bbox.minPt - Vector3d(0, 0, 0)).norm() == Approx(0.0));
-        REQUIRE((bbox.maxPt - Vector3d(2, 2, 0)).norm() == Approx(0.0));
-        REQUIRE((bbox.cenPt - Vector3d(1, 1, 0)).norm() == Approx(0.0));
-        REQUIRE((bbox.size - Vector3d(2, 2, 0)).norm() == Approx(0.0));
+        REQUIRE((bbox.minPt - Vector3d(0, 0, 0)).norm() == Catch::Approx (0.0));
+        REQUIRE((bbox.maxPt - Vector3d(2, 2, 0)).norm() == Catch::Approx (0.0));
+        REQUIRE((bbox.cenPt - Vector3d(1, 1, 0)).norm() == Catch::Approx (0.0));
+        REQUIRE((bbox.size - Vector3d(2, 2, 0)).norm() == Catch::Approx (0.0));
     }
 
     SECTION("Test centroid") {
-        REQUIRE((polyMesh.centroid() - Vector3d(0, 0, 0)).norm() == Approx(0.0));
+        REQUIRE((polyMesh.centroid() - Vector3d(0, 0, 0)).norm() == Catch::Approx (0.0));
     }
 
     SECTION("Test volume") {
-        REQUIRE(polyMesh.volume() == Approx(0.0));
+        REQUIRE(polyMesh.volume() == Catch::Approx (0.0));
     }
 
     SECTION("Test lowest point") {
-        REQUIRE((polyMesh.lowestPt() - Vector3d(0.5, 0, 0)).norm() == Approx(0.0));
+        REQUIRE((polyMesh.lowestPt() - Vector3d(0.5, 0, 0)).norm() == Catch::Approx (0.0));
     }
 }
 
@@ -109,16 +109,16 @@ TEST_CASE("PolyMesh - Cube") {
         }
 
         polyMesh.setPolyLists(polyLists);
-        REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
-        REQUIRE(polyMesh.volume() == Approx(1).margin(1e-6));
+        REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Catch::Approx (0.0).margin(1e-6));
+        REQUIRE(polyMesh.volume() == Catch::Approx (1).margin(1e-6));
 
         //the reason for 8 is that the setPolyLists function will merge vertices with same position into one vertex
         //a cube only has 8 vertices
         REQUIRE(polyMesh.vertexList.size() == 8);
 
-        REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Approx(0.0).margin(1e-6));
+        REQUIRE((polyMesh.centroid() - Vector3d(0.5, 0.5, 0.5)).norm() == Catch::Approx (0.0).margin(1e-6));
 
-        REQUIRE(polyMesh.volume() == Approx(1).margin(1e-6));
+        REQUIRE(polyMesh.volume() == Catch::Approx (1).margin(1e-6));
 
         // Eigen Matrix Mesh
         PolyMesh<double>::MatrixX V;
@@ -153,7 +153,7 @@ TEST_CASE("PolyMesh - Cube") {
             REQUIRE(newmesh.textureList[0] != polyMesh.textureList[0]);
 
             REQUIRE(newmesh.polyList[0] != polyMesh.polyList[0]);
-            REQUIRE((newmesh.polyList[0]->normal() - polyMesh.polyList[0]->normal()).norm() == Approx(0.0));
+            REQUIRE((newmesh.polyList[0]->normal() - polyMesh.polyList[0]->normal()).norm() == Catch::Approx (0.0));
         }
     }
 }

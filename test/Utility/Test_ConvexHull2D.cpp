@@ -2,7 +2,7 @@
 // Created by ziqwang on 2020-02-13.
 //
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "Utility/ConvexHull2D.h"
 #include <iostream>
 #include <string>

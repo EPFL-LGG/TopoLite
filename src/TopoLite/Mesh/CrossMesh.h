@@ -15,7 +15,7 @@
 #ifndef _CROSS_MESH_H
 #define _CROSS_MESH_H
 
-#include "TopoLite/Mesh/PolyMesh.h"
+#include "Mesh/PolyMesh.h"
 #include "Cross.h"
 
 template<typename Scalar>

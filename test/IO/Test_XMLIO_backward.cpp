@@ -2,7 +2,7 @@
 // Created by ziqwang on 25.05.20.
 //
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 #include "IO/XMLIO_backward.h"
 
 #if defined(GCC_VERSION_LESS_8)
@@ -12,7 +12,6 @@
 #include <filesystem>
 using namespace std::filesystem;
 #endif
-
 
 TEST_CASE("Read XML"){
     XMLIO_backward xmlio;

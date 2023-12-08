@@ -123,6 +123,10 @@ void PatternCreator<Scalar>::create2DPattern(PatternType patternID,
         }
     };
 
+    if(patternID > MAX_PATTERN_TYPE){
+        return;
+    }
+
     //the mesh class of the pattern
     pPolyMesh patternMesh = make_shared<PolyMesh<Scalar>>(getVarList());
 
@@ -212,6 +216,7 @@ void PatternCreator<Scalar>::computeNeighbors(PatternType patternID, pPolygon po
 		else if  (patternID == CROSS_PENTAGON_MIRROR )            ComputeNeighbor_Pentagon_Mirror(poly, i, neighbor);
 		else if  (patternID == CROSS_RHOMBUS )                    ComputeNeighbor_Rhombus(poly, i, neighbor);
 		else if  (patternID == CROSS_OCTAGON_SQUARE_COLINEAR )    ComputeNeighbor_Octagon_Square_Colinear(poly, i, neighbor);
+        else if  (patternID == CROSS_RECTANGLE)                   ComputeNeighbor_Rectangle(poly, neighbor);
 
 		if( neighbor != NULL )
 		{
@@ -306,6 +311,11 @@ template<typename Scalar>
 void PatternCreator<Scalar>::ComputeNeighbor_Square(pPolygon poly, pPolygon &neighbor)
 {
 	CreatePolygon_Square(neighbor, CROSS_L, POLY_SQUARE_THETA_45);
+}
+
+template<typename Scalar>
+void PatternCreator<Scalar>::ComputeNeighbor_Rectangle(PatternCreator::pPolygon poly, PatternCreator::pPolygon &neighbor) {
+    CreatePolygon_Rectangle(neighbor, CROSS_L, POLY_SQUARE_THETA_45);
 }
 
 template<typename Scalar>
@@ -640,6 +650,7 @@ void PatternCreator<Scalar>::createPolygonRoot(int patternID, Scalar edgeLen, pP
 	else if (patternID == CROSS_RHOMBUS)                     CreatePolygon_Rhombus(poly, edgeLen, POLY_RHOMBUS_THETA_120);
 	//else if (patternID == CROSS_OCTAGON_SQUARE_COLINEAR)     poly = CreatePolygon_Square(edgeLen, POLY_SQUARE_THETA_45);
 	else if (patternID == CROSS_OCTAGON_SQUARE_COLINEAR)     CreatePolygon_Octagon(poly, edgeLen, POLY_OCTAGON_COLINEAR);
+    else if (patternID == CROSS_RECTANGLE)                   CreatePolygon_Rectangle(poly, edgeLen, POLY_SQUARE_THETA_45);
 }
 
 template<typename Scalar>
@@ -668,6 +679,33 @@ void PatternCreator<Scalar>::CreatePolygon_Square(pPolygon &poly, Scalar edgeLen
 
 		poly->push_back(point);
 	}
+}
+
+template<typename Scalar>
+void PatternCreator<Scalar>::CreatePolygon_Rectangle(PatternCreator::pPolygon &poly, Scalar edgeLen, int polyType) {
+    poly.reset();
+    poly = make_shared<_Polygon<Scalar>>();
+
+    poly->setPolyType( polyType );
+
+    Scalar initTheta;
+    if     ( polyType == POLY_SQUARE_THETA_45 )      initTheta = 45;
+    else if( polyType == POLY_SQUARE_THETA_15 )      initTheta = 15;
+    else if( polyType == POLY_SQUARE_THETA_75 )      initTheta = 75;
+
+    Scalar r = 0.5f * edgeLen / cos(45* M_PI / 180.0);
+
+    //Scalar initTheta = 45;
+    Scalar stepTheta = 90;
+
+    for (int i = 0; i < 4; ++i)
+    {
+        Scalar currTheta = (initTheta + i * stepTheta) * M_PI / 180.0;
+
+        Vector3 point = Vector3(r*cos(currTheta), r*sin(currTheta) * 2, 0);
+
+        poly->push_back(point);
+    }
 }
 
 template<typename Scalar>

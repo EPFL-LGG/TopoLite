@@ -3,7 +3,7 @@
 //
 
 #include "IO/JsonIOReader.h"
-#include <catch2/catch.hpp>
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("Test Read json")
 {
@@ -16,7 +16,7 @@ TEST_CASE("Test Read json")
 
     SECTION("varList"){
         REQUIRE(data->varList->getIntList("boundary_crossIDs").size() == 42);
-        REQUIRE(data->varList->getMatrix4d("texturedMat")(0, 0) == Approx(1.76946));
+        REQUIRE(data->varList->getMatrix4d("texturedMat")(0, 0) == Catch::Approx(1.76946));
         REQUIRE(data->varList->getInt("layerOfBoundary") == 1);
     }
 
